@@ -56,18 +56,22 @@ export type Database = {
         Row: {
           allergens: string[] | null
           available_portions: number
+          barter_requests: string[] | null
           chef_id: string
           created_at: string
           description: string
           exact_address: string
+          exchange_mode: string | null
           fuzzy_lat: number
           fuzzy_lng: number
           id: string
           image_url: string | null
+          ingredients: string[] | null
           is_cooking_experience: boolean
           neighborhood: string
           pricing_minimum: number
           pricing_suggested: number | null
+          restaurant_reference_price: number | null
           scheduled_date: string
           tags: string[] | null
           title: string
@@ -76,18 +80,22 @@ export type Database = {
         Insert: {
           allergens?: string[] | null
           available_portions?: number
+          barter_requests?: string[] | null
           chef_id: string
           created_at?: string
           description: string
           exact_address: string
+          exchange_mode?: string | null
           fuzzy_lat: number
           fuzzy_lng: number
           id?: string
           image_url?: string | null
+          ingredients?: string[] | null
           is_cooking_experience?: boolean
           neighborhood: string
           pricing_minimum?: number
           pricing_suggested?: number | null
+          restaurant_reference_price?: number | null
           scheduled_date: string
           tags?: string[] | null
           title: string
@@ -96,18 +104,22 @@ export type Database = {
         Update: {
           allergens?: string[] | null
           available_portions?: number
+          barter_requests?: string[] | null
           chef_id?: string
           created_at?: string
           description?: string
           exact_address?: string
+          exchange_mode?: string | null
           fuzzy_lat?: number
           fuzzy_lng?: number
           id?: string
           image_url?: string | null
+          ingredients?: string[] | null
           is_cooking_experience?: boolean
           neighborhood?: string
           pricing_minimum?: number
           pricing_suggested?: number | null
+          restaurant_reference_price?: number | null
           scheduled_date?: string
           tags?: string[] | null
           title?: string
@@ -152,7 +164,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          allergens: string[] | null
           created_at: string
+          dislikes: string[] | null
           first_name: string
           id: string
           karma: number
@@ -161,7 +175,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          allergens?: string[] | null
           created_at?: string
+          dislikes?: string[] | null
           first_name: string
           id: string
           karma?: number
@@ -170,7 +186,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          allergens?: string[] | null
           created_at?: string
+          dislikes?: string[] | null
           first_name?: string
           id?: string
           karma?: number

@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { SafetyAlert } from '@/components/SafetyAlert';
+import { checkAllergenMatch } from '@/utils/ingredientDatabase';
 import { 
   MapPin, 
   Star, 
@@ -16,7 +18,8 @@ import {
   CheckCircle,
   Home,
   MessageCircle,
-  Calendar
+  Calendar,
+  Gift
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -25,6 +28,16 @@ const MealDetail = () => {
   const navigate = useNavigate();
   const meal = mockMeals.find(m => m.id === id);
   const [bookingStatus, setBookingStatus] = useState<'none' | 'pending' | 'confirmed'>('none');
+
+  // Mock user allergens
+  const userAllergens = ['gluten', 'nuts'];
+  // Mock meal allergens (in real app from database)
+  const mealAllergens = meal?.id === 'meal_101' ? ['dairy'] : ['gluten'];
+  const matchingAllergens = checkAllergenMatch(mealAllergens, userAllergens);
+
+  // Mock exchange mode
+  const exchangeMode = meal?.id === 'meal_103' ? 'barter' : 'money';
+  const barterRequests = ['White Wine', 'Dessert'];
 
   if (!meal) {
     return (
@@ -76,6 +89,9 @@ const MealDetail = () => {
         </div>
 
         <div className="px-4 py-6 space-y-6">
+          {/* Safety Alert */}
+          <SafetyAlert matchingAllergens={matchingAllergens} />
+
           {/* Title & Chef */}
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-3">{meal.title}</h1>

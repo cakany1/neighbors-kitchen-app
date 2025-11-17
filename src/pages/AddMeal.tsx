@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -9,23 +9,41 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Upload, ChefHat, X } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Upload, ChefHat, X, Gift, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { detectAllergens, barterOptions } from '@/utils/ingredientDatabase';
 
 const AddMeal = () => {
   const navigate = useNavigate();
   const [isCookingExperience, setIsCookingExperience] = useState(false);
+  const [exchangeMode, setExchangeMode] = useState<'money' | 'barter'>('money');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+  const [ingredients, setIngredients] = useState<string[]>([]);
+  const [ingredientInput, setIngredientInput] = useState('');
+  const [detectedAllergens, setDetectedAllergens] = useState<string[]>([]);
+  const [selectedBarterItems, setSelectedBarterItems] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     minimumPrice: '',
+    restaurantReferencePrice: '',
     portions: '',
-    allergens: '',
     scheduledDate: '',
     scheduledTime: '',
   });
+
+  // Auto-detect allergens when ingredients change
+  useEffect(() => {
+    if (ingredients.length > 0) {
+      const detected = detectAllergens(ingredients);
+      setDetectedAllergens(detected);
+    } else {
+      setDetectedAllergens([]);
+    }
+  }, [ingredients]);
 
   const handleAddTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
@@ -38,11 +56,38 @@ const AddMeal = () => {
     setTags(tags.filter(t => t !== tag));
   };
 
+  const handleAddIngredient = () => {
+    if (ingredientInput.trim() && !ingredients.includes(ingredientInput.trim())) {
+      setIngredients([...ingredients, ingredientInput.trim()]);
+      setIngredientInput('');
+    }
+  };
+
+  const handleRemoveIngredient = (ingredient: string) => {
+    setIngredients(ingredients.filter(i => i !== ingredient));
+  };
+
+  const toggleBarterItem = (item: string) => {
+    setSelectedBarterItems(prev =>
+      prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
+    );
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.title || !formData.description || !formData.scheduledDate || !formData.scheduledTime) {
       toast.error('Please fill in all required fields including date and time');
+      return;
+    }
+
+    if (ingredients.length === 0) {
+      toast.error('Please add at least one ingredient');
+      return;
+    }
+
+    if (exchangeMode === 'barter' && selectedBarterItems.length === 0) {
+      toast.error('Please select at least one barter option');
       return;
     }
 
@@ -109,16 +154,52 @@ const AddMeal = () => {
                   required
                 />
               </div>
+            </CardContent>
+          </Card>
 
-              <div>
-                <Label htmlFor="allergens">Allergens (optional)</Label>
+          {/* Smart Ingredient Input */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Ingredients *</CardTitle>
+              <CardDescription>We'll automatically detect allergens for you</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
                 <Input
-                  id="allergens"
-                  placeholder="e.g., Peanuts, Gluten, Dairy"
-                  value={formData.allergens}
-                  onChange={(e) => setFormData({ ...formData, allergens: e.target.value })}
+                  placeholder="Add an ingredient (e.g., flour, milk, eggs)"
+                  value={ingredientInput}
+                  onChange={(e) => setIngredientInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddIngredient())}
                 />
+                <Button type="button" onClick={handleAddIngredient} variant="outline">
+                  Add
+                </Button>
               </div>
+
+              {ingredients.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {ingredients.map((ingredient) => (
+                    <Badge key={ingredient} variant="secondary" className="gap-1">
+                      {ingredient}
+                      <X 
+                        className="w-3 h-3 cursor-pointer" 
+                        onClick={() => handleRemoveIngredient(ingredient)}
+                      />
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {detectedAllergens.length > 0 && (
+                <Alert className="border-alert-danger bg-alert-danger-bg">
+                  <AlertCircle className="h-4 w-4 text-alert-danger" />
+                  <AlertDescription>
+                    <strong>Auto-detected allergens:</strong> {detectedAllergens.join(', ')}
+                    <br />
+                    <span className="text-xs">⚠️ Please verify these are correct. You are responsible for accuracy.</span>
+                  </AlertDescription>
+                </Alert>
+              )}
             </CardContent>
           </Card>
 
@@ -180,56 +261,119 @@ const AddMeal = () => {
             </CardContent>
           </Card>
 
-          {/* Pricing */}
+          {/* Exchange Model Toggle */}
           <Card>
             <CardHeader>
-              <CardTitle>Pricing - Pay What You Want</CardTitle>
-              <CardDescription>Set a minimum price (can be 0 for free sharing)</CardDescription>
+              <CardTitle>Exchange Model</CardTitle>
+              <CardDescription>Choose how you want to be compensated</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="minimumPrice">Minimum Price (CHF)</Label>
-                <Input
-                  id="minimumPrice"
-                  type="number"
-                  min="0"
-                  step="0.5"
-                  placeholder="0"
-                  value={formData.minimumPrice}
-                  onChange={(e) => setFormData({ ...formData, minimumPrice: e.target.value })}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  People will pay after eating and can choose to pay more
-                </p>
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant={exchangeMode === 'money' ? 'default' : 'outline'}
+                  onClick={() => setExchangeMode('money')}
+                  className="flex-1"
+                >
+                  💰 Pay What You Want
+                </Button>
+                <Button
+                  type="button"
+                  variant={exchangeMode === 'barter' ? 'default' : 'outline'}
+                  onClick={() => setExchangeMode('barter')}
+                  className="flex-1"
+                >
+                  <Gift className="w-4 h-4 mr-2" />
+                  Bring What You Want
+                </Button>
               </div>
 
+              {exchangeMode === 'money' ? (
+                <div className="space-y-4 pt-2">
+                  <div>
+                    <Label htmlFor="restaurantReferencePrice">Restaurant Reference Price (CHF)</Label>
+                    <Input
+                      id="restaurantReferencePrice"
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      placeholder="e.g., 24"
+                      value={formData.restaurantReferencePrice}
+                      onChange={(e) => setFormData({ ...formData, restaurantReferencePrice: e.target.value })}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      What would this dish cost at a restaurant? (Optional anchor price)
+                    </p>
+                  </div>
+                  <div>
+                    <Label htmlFor="minimumPrice">Minimum Price (CHF)</Label>
+                    <Input
+                      id="minimumPrice"
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      placeholder="0"
+                      value={formData.minimumPrice}
+                      onChange={(e) => setFormData({ ...formData, minimumPrice: e.target.value })}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      People will pay after eating and can choose to pay more
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="pt-2">
+                  <Label className="mb-3 block">What would you like in exchange? *</Label>
+                  <div className="space-y-2">
+                    {barterOptions.map((option) => (
+                      <div key={option} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`barter-${option}`}
+                          checked={selectedBarterItems.includes(option)}
+                          onCheckedChange={() => toggleBarterItem(option)}
+                        />
+                        <Label
+                          htmlFor={`barter-${option}`}
+                          className="text-sm font-normal cursor-pointer flex items-center gap-2"
+                        >
+                          {option === 'Just a Smile (Free)' && '😊'}
+                          {option === 'A Bottle of Wine' && '🍷'}
+                          {option === 'Dessert' && '🍰'}
+                          {option === 'Fruit' && '🍎'}
+                          {option === 'Surprise Me' && '🎁'}
+                          {option}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Portions & Schedule */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Availability</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="portions">Available Portions</Label>
                 <Input
                   id="portions"
                   type="number"
                   min="1"
-                  placeholder="4"
+                  placeholder="1"
                   value={formData.portions}
                   onChange={(e) => setFormData({ ...formData, portions: e.target.value })}
                 />
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Scheduling */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Schedule Your Meal</CardTitle>
-              <CardDescription>When will this meal be available?</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="scheduledDate">Date *</Label>
+                <Label htmlFor="scheduledDate">Scheduled Date *</Label>
                 <Input
                   id="scheduledDate"
                   type="date"
-                  min={new Date().toISOString().split('T')[0]}
                   value={formData.scheduledDate}
                   onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
                   required
@@ -237,7 +381,7 @@ const AddMeal = () => {
               </div>
 
               <div>
-                <Label htmlFor="scheduledTime">Time *</Label>
+                <Label htmlFor="scheduledTime">Scheduled Time *</Label>
                 <Input
                   id="scheduledTime"
                   type="time"
@@ -245,15 +389,14 @@ const AddMeal = () => {
                   onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
                   required
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  When will your meal be ready?
+                </p>
               </div>
-
-              <p className="text-sm text-muted-foreground">
-                📅 Schedule your meal in advance! Planning to cook something special this Saturday? Let your neighbors know now.
-              </p>
             </CardContent>
           </Card>
 
-          <Button type="submit" size="lg" className="w-full h-14 text-lg">
+          <Button type="submit" className="w-full" size="lg">
             Create Meal Listing
           </Button>
         </form>

@@ -6,8 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Star, Award, ChefHat, Heart, Globe } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Star, Award, ChefHat, Heart, Globe, Shield } from 'lucide-react';
 import { toast } from 'sonner';
+import { allergenOptions, dislikeOptions } from '@/utils/ingredientDatabase';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -33,11 +35,33 @@ const Profile = () => {
     mealsShared: 23,
     mealsReceived: 31,
     fairPayments: 28,
+    allergens: [] as string[],
+    dislikes: [] as string[],
   });
 
   const handleLanguageChange = (newLanguage: string) => {
     setUser({ ...user, language: newLanguage });
     toast.success(`Language updated to ${languages.find(l => l.code === newLanguage)?.name}`);
+  };
+
+  const toggleAllergen = (allergen: string) => {
+    setUser(prev => ({
+      ...prev,
+      allergens: prev.allergens.includes(allergen)
+        ? prev.allergens.filter(a => a !== allergen)
+        : [...prev.allergens, allergen]
+    }));
+    toast.success('Dietary preferences updated');
+  };
+
+  const toggleDislike = (dislike: string) => {
+    setUser(prev => ({
+      ...prev,
+      dislikes: prev.dislikes.includes(dislike)
+        ? prev.dislikes.filter(d => d !== dislike)
+        : [...prev.dislikes, dislike]
+    }));
+    toast.success('Food preferences updated');
   };
 
   return (
@@ -75,6 +99,62 @@ const Profile = () => {
               <div className="text-center">
                 <p className="text-2xl font-bold text-trust-badge">{user.fairPayments}</p>
                 <p className="text-xs text-muted-foreground">Fair Payments</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Safety Shield - Dietary Preferences */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-destructive" />
+              Safety Shield (Private)
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              This information is private and only used to warn you about allergens in meals
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label className="text-base font-semibold mb-3 block">Allergens</Label>
+              <div className="space-y-3">
+                {allergenOptions.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`allergen-${option.value}`}
+                      checked={user.allergens.includes(option.value)}
+                      onCheckedChange={() => toggleAllergen(option.value)}
+                    />
+                    <Label
+                      htmlFor={`allergen-${option.value}`}
+                      className="text-sm font-normal cursor-pointer"
+                    >
+                      {option.label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="pt-4 border-t border-border">
+              <Label className="text-base font-semibold mb-3 block">Food Dislikes</Label>
+              <div className="space-y-3">
+                {dislikeOptions.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`dislike-${option.value}`}
+                      checked={user.dislikes.includes(option.value)}
+                      onCheckedChange={() => toggleDislike(option.value)}
+                    />
+                    <Label
+                      htmlFor={`dislike-${option.value}`}
+                      className="text-sm font-normal cursor-pointer"
+                    >
+                      {option.label}
+                    </Label>
+                  </div>
+                ))}
               </div>
             </div>
           </CardContent>
