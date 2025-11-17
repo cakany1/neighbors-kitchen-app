@@ -33,13 +33,41 @@ export const ingredientDB: Record<string, string[]> = {
   "egg": ["eggs"],
   "mayonnaise": ["eggs"],
   
-  // Shellfish
-  "shrimp": ["shellfish"],
-  "lobster": ["shellfish"],
-  "crab": ["shellfish"],
-  "prawns": ["shellfish"],
-  "oysters": ["shellfish"],
-  "mussels": ["shellfish"],
+  // Shellfish & Crustaceans
+  "shrimp": ["crustaceans"],
+  "lobster": ["crustaceans"],
+  "crab": ["crustaceans"],
+  "prawns": ["crustaceans"],
+  "oysters": ["molluscs"],
+  "mussels": ["molluscs"],
+  "clams": ["molluscs"],
+  "squid": ["molluscs"],
+  
+  // Fish
+  "salmon": ["fish"],
+  "tuna": ["fish"],
+  "cod": ["fish"],
+  "anchovy": ["fish"],
+  
+  // Peanuts (separate from tree nuts)
+  "peanut butter": ["peanuts"],
+  
+  // Celery
+  "celery": ["celery"],
+  
+  // Mustard
+  "mustard": ["mustard"],
+  
+  // Sesame
+  "sesame": ["sesame"],
+  "tahini": ["sesame"],
+  
+  // Sulphites
+  "wine": ["sulphites"],
+  "dried fruit": ["sulphites"],
+  
+  // Lupin
+  "lupin": ["lupin"],
   
   // Soy
   "soy": ["soy"],
@@ -49,22 +77,56 @@ export const ingredientDB: Record<string, string[]> = {
   "tempeh": ["soy"],
 };
 
+// The Official 14 EU Allergens
 export const allergenOptions = [
-  { value: "gluten", label: "Gluten" },
-  { value: "nuts", label: "Nuts" },
-  { value: "dairy", label: "Dairy" },
-  { value: "shellfish", label: "Shellfish" },
-  { value: "soy", label: "Soy" },
+  { value: "gluten", label: "Gluten (Cereals)" },
+  { value: "crustaceans", label: "Crustaceans" },
   { value: "eggs", label: "Eggs" },
+  { value: "fish", label: "Fish" },
+  { value: "peanuts", label: "Peanuts" },
+  { value: "soy", label: "Soy" },
+  { value: "dairy", label: "Dairy (Milk)" },
+  { value: "nuts", label: "Tree Nuts" },
+  { value: "celery", label: "Celery" },
+  { value: "mustard", label: "Mustard" },
+  { value: "sesame", label: "Sesame Seeds" },
+  { value: "sulphites", label: "Sulphites" },
+  { value: "lupin", label: "Lupin" },
+  { value: "molluscs", label: "Molluscs" },
 ];
 
-export const dislikeOptions = [
-  { value: "coriander", label: "Coriander" },
-  { value: "mushrooms", label: "Mushrooms" },
-  { value: "pork", label: "Pork" },
-  { value: "fish", label: "Fish" },
-  { value: "spicy", label: "Spicy Food" },
-];
+// Categorized Dislikes (Accordion UI)
+export const dislikeCategories = {
+  herbs: [
+    { value: "coriander", label: "Coriander/Cilantro" },
+    { value: "parsley", label: "Parsley" },
+    { value: "mint", label: "Mint" },
+  ],
+  vegetables: [
+    { value: "mushrooms", label: "Mushrooms" },
+    { value: "olives", label: "Olives" },
+    { value: "tomatoes", label: "Tomatoes" },
+    { value: "onions", label: "Onions" },
+  ],
+  meat: [
+    { value: "pork", label: "Pork" },
+    { value: "beef", label: "Beef" },
+    { value: "lamb", label: "Lamb" },
+  ],
+  seafood: [
+    { value: "fish", label: "Fish" },
+    { value: "shellfish", label: "Shellfish" },
+  ],
+  dairy: [
+    { value: "blue_cheese", label: "Blue Cheese" },
+    { value: "goat_cheese", label: "Goat Cheese" },
+  ],
+  taste: [
+    { value: "spicy", label: "Spicy Food" },
+    { value: "sweet", label: "Very Sweet" },
+    { value: "sour", label: "Very Sour" },
+  ],
+};
 
 export const barterOptions = [
   "A Bottle of Wine",

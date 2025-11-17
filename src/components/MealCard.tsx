@@ -1,7 +1,7 @@
 import { Meal } from '@/types/meal';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, MapPin, ChefHat, Calendar, Gift } from 'lucide-react';
+import { Star, MapPin, ChefHat, Calendar, Gift, Heart, Camera, Package, Home, Ghost, UtensilsCrossed } from 'lucide-react';
 
 interface MealCardProps {
   meal: Meal;
@@ -10,9 +10,24 @@ interface MealCardProps {
 }
 
 export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) => {
-  // Mock exchange mode for demonstration
+  // Mock data - in real app this would come from database
   const exchangeMode = meal.id === 'meal_103' ? 'barter' : 'money';
   const barterRequests = ['White Wine', 'Dessert'];
+  const isStockPhoto = false; // Mock - would come from meal.is_stock_photo
+  // Mock handover mode - vary by meal for demo
+  let handoverMode: 'pickup_box' | 'neighbor_plate' | 'anonymous_drop' | 'dine_in' = 'pickup_box';
+  if (meal.id === 'meal_102') handoverMode = 'dine_in';
+  if (meal.id === 'meal_103') handoverMode = 'anonymous_drop';
+  const estimatedValue = meal.pricing.suggested || 24;
+
+  const handoverIcons = {
+    pickup_box: Package,
+    neighbor_plate: Home,
+    anonymous_drop: Ghost,
+    dine_in: UtensilsCrossed,
+  };
+
+  const HandoverIcon = handoverIcons[handoverMode as keyof typeof handoverIcons] || Package;
   
   return (
     <Card 
@@ -31,11 +46,31 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
             <ChefHat className="w-16 h-16 text-muted-foreground" />
           </div>
         )}
-        {meal.isCookingExperience && (
-          <Badge className="absolute top-3 right-3 bg-secondary text-secondary-foreground">
-            Cooking Experience
-          </Badge>
-        )}
+        <div className="absolute top-3 right-3 flex flex-col gap-2">
+          {isStockPhoto && (
+            <Badge className="bg-secondary/90 backdrop-blur-sm text-secondary-foreground flex items-center gap-1">
+              <Camera className="w-3 h-3" />
+              Symbolic Image
+            </Badge>
+          )}
+          {meal.isCookingExperience && (
+            <Badge className="bg-secondary text-secondary-foreground">
+              Cooking Experience
+            </Badge>
+          )}
+          {handoverMode === 'dine_in' && (
+            <Badge className="bg-primary text-primary-foreground flex items-center gap-1">
+              <UtensilsCrossed className="w-3 h-3" />
+              Dine In
+            </Badge>
+          )}
+          {handoverMode === 'anonymous_drop' && (
+            <Badge className="bg-muted text-muted-foreground flex items-center gap-1">
+              <Ghost className="w-3 h-3" />
+              Ghost Mode
+            </Badge>
+          )}
+        </div>
       </div>
       
       <CardContent className="p-4">
@@ -71,25 +106,35 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           ))}
         </div>
         
-        <div className="flex items-center justify-between pt-3 border-t border-border">
-          {exchangeMode === 'money' ? (
-            <>
-              <div>
-                <span className="text-sm text-muted-foreground">From </span>
-                <span className="font-semibold text-primary">
-                  {meal.pricing.minimum === 0 ? 'Free' : `CHF ${meal.pricing.minimum}`}
-                </span>
-              </div>
-              <span className="text-xs text-muted-foreground italic">Pay what you want</span>
-            </>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Gift className="w-4 h-4 text-secondary" />
-              <span className="text-sm font-medium text-secondary">
-                Exchange: {barterRequests.join(' or ')}
-              </span>
+        <div className="pt-3 border-t border-border space-y-2">
+          {/* The "No Price Tag" Badge */}
+          <div className="flex items-center justify-center gap-2 py-2 px-3 bg-primary/10 rounded-lg">
+            <Heart className="w-4 h-4 text-primary fill-current" />
+            <span className="text-sm font-semibold text-primary">
+              Pay/Bring what you want
+            </span>
+          </div>
+
+          {/* Restaurant Value Anchor */}
+          <div className="text-center">
+            <span className="text-xs text-muted-foreground italic">
+              ~ Restaurant Value: CHF {estimatedValue}.-
+            </span>
+          </div>
+
+          {/* Barter Info (if applicable) */}
+          {exchangeMode === 'barter' && (
+            <div className="flex items-center justify-center gap-2 text-sm text-secondary">
+              <Gift className="w-4 h-4" />
+              <span>Or bring: {barterRequests.join(', ')}</span>
             </div>
           )}
+
+          {/* Handover Mode */}
+          <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
+            <HandoverIcon className="w-3.5 h-3.5" />
+            <span className="capitalize">{handoverMode.replace('_', ' ')}</span>
+          </div>
         </div>
       </CardContent>
     </Card>
