@@ -130,13 +130,6 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
             </span>
           </div>
 
-          {/* Restaurant Value Anchor */}
-          <div className="text-center">
-            <span className="text-xs text-muted-foreground italic">
-              ~ Restaurant Value: CHF {estimatedValue}.-
-            </span>
-          </div>
-
           {/* Barter Info (if applicable) */}
           {exchangeMode === 'barter' && (
             <div className="flex items-center justify-center gap-2 text-sm text-secondary">
