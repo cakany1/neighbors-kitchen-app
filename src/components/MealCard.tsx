@@ -1,14 +1,19 @@
 import { Meal } from '@/types/meal';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, MapPin, ChefHat, Calendar } from 'lucide-react';
+import { Star, MapPin, ChefHat, Calendar, Gift } from 'lucide-react';
 
 interface MealCardProps {
   meal: Meal;
   onClick: () => void;
+  userAllergens?: string[];
 }
 
-export const MealCard = ({ meal, onClick }: MealCardProps) => {
+export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) => {
+  // Mock exchange mode for demonstration
+  const exchangeMode = meal.id === 'meal_103' ? 'barter' : 'money';
+  const barterRequests = ['White Wine', 'Dessert'];
+  
   return (
     <Card 
       className="overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 border-border"
@@ -67,13 +72,24 @@ export const MealCard = ({ meal, onClick }: MealCardProps) => {
         </div>
         
         <div className="flex items-center justify-between pt-3 border-t border-border">
-          <div>
-            <span className="text-sm text-muted-foreground">From </span>
-            <span className="font-semibold text-primary">
-              {meal.pricing.minimum === 0 ? 'Free' : `CHF ${meal.pricing.minimum}`}
-            </span>
-          </div>
-          <span className="text-xs text-muted-foreground italic">Pay what you want</span>
+          {exchangeMode === 'money' ? (
+            <>
+              <div>
+                <span className="text-sm text-muted-foreground">From </span>
+                <span className="font-semibold text-primary">
+                  {meal.pricing.minimum === 0 ? 'Free' : `CHF ${meal.pricing.minimum}`}
+                </span>
+              </div>
+              <span className="text-xs text-muted-foreground italic">Pay what you want</span>
+            </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Gift className="w-4 h-4 text-secondary" />
+              <span className="text-sm font-medium text-secondary">
+                Exchange: {barterRequests.join(' or ')}
+              </span>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

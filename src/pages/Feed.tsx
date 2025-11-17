@@ -13,6 +13,9 @@ const Feed = () => {
     return !localStorage.getItem('disclaimerSeen');
   });
 
+  // Mock user allergens - in real app, this would come from user profile
+  const userAllergens = ['gluten', 'nuts'];
+
   const handleDismissDisclaimer = () => {
     localStorage.setItem('disclaimerSeen', 'true');
     setShowDisclaimer(false);
@@ -44,6 +47,7 @@ const Feed = () => {
               key={meal.id} 
               meal={meal}
               onClick={() => navigate(`/meal/${meal.id}`)}
+              userAllergens={userAllergens}
             />
           ))}
         </div>
