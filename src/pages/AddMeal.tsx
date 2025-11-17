@@ -19,6 +19,8 @@ const AddMeal = () => {
   const navigate = useNavigate();
   const [isCookingExperience, setIsCookingExperience] = useState(false);
   const [exchangeMode, setExchangeMode] = useState<'money' | 'barter'>('money');
+  const [handoverMode, setHandoverMode] = useState<'pickup_box' | 'neighbor_plate' | 'ghost_mode' | 'dine_in'>('pickup_box');
+  const [identityReveal, setIdentityReveal] = useState<'full_name' | 'first_name' | 'last_name' | 'address_only'>('full_name');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [ingredients, setIngredients] = useState<string[]>([]);
@@ -33,6 +35,9 @@ const AddMeal = () => {
     portions: '',
     scheduledDate: '',
     scheduledTime: '',
+    collectionWindowStart: '',
+    collectionWindowEnd: '',
+    pickupInstructions: '',
   });
 
   // Auto-detect allergens when ingredients change
@@ -78,6 +83,11 @@ const AddMeal = () => {
     
     if (!formData.title || !formData.description || !formData.scheduledDate || !formData.scheduledTime) {
       toast.error('Please fill in all required fields including date and time');
+      return;
+    }
+
+    if (handoverMode !== 'ghost_mode' && !formData.collectionWindowStart) {
+      toast.error('Please set a collection window');
       return;
     }
 
@@ -346,6 +356,164 @@ const AddMeal = () => {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Handover Mode */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Handover & Privacy</CardTitle>
+              <CardDescription>How will guests receive their meal?</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  variant={handoverMode === 'pickup_box' ? 'default' : 'outline'}
+                  onClick={() => setHandoverMode('pickup_box')}
+                  className="h-auto py-3 flex-col"
+                >
+                  <span className="text-2xl mb-1">📦</span>
+                  <span className="text-xs">Pickup (Box)</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={handoverMode === 'neighbor_plate' ? 'default' : 'outline'}
+                  onClick={() => setHandoverMode('neighbor_plate')}
+                  className="h-auto py-3 flex-col"
+                >
+                  <span className="text-2xl mb-1">🍽️</span>
+                  <span className="text-xs">Neighbor (Plate)</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={handoverMode === 'ghost_mode' ? 'default' : 'outline'}
+                  onClick={() => setHandoverMode('ghost_mode')}
+                  className="h-auto py-3 flex-col"
+                >
+                  <span className="text-2xl mb-1">👻</span>
+                  <span className="text-xs">Ghost Mode</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={handoverMode === 'dine_in' ? 'default' : 'outline'}
+                  onClick={() => setHandoverMode('dine_in')}
+                  className="h-auto py-3 flex-col"
+                >
+                  <span className="text-2xl mb-1">🍴</span>
+                  <span className="text-xs">Dine In</span>
+                </Button>
+              </div>
+
+              {/* Identity Reveal Options */}
+              <div className="pt-2">
+                <Label className="text-sm font-medium mb-2 block">What to reveal when booking is confirmed?</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="full_name"
+                      name="identity"
+                      value="full_name"
+                      checked={identityReveal === 'full_name'}
+                      onChange={() => setIdentityReveal('full_name')}
+                      className="w-4 h-4"
+                    />
+                    <Label htmlFor="full_name" className="text-sm font-normal cursor-pointer">
+                      Full Name + Address
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="first_name"
+                      name="identity"
+                      value="first_name"
+                      checked={identityReveal === 'first_name'}
+                      onChange={() => setIdentityReveal('first_name')}
+                      className="w-4 h-4"
+                    />
+                    <Label htmlFor="first_name" className="text-sm font-normal cursor-pointer">
+                      First Name Only + Address
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="last_name"
+                      name="identity"
+                      value="last_name"
+                      checked={identityReveal === 'last_name'}
+                      onChange={() => setIdentityReveal('last_name')}
+                      className="w-4 h-4"
+                    />
+                    <Label htmlFor="last_name" className="text-sm font-normal cursor-pointer">
+                      Last Name Only + Address
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="address_only"
+                      name="identity"
+                      value="address_only"
+                      checked={identityReveal === 'address_only'}
+                      onChange={() => setIdentityReveal('address_only')}
+                      className="w-4 h-4"
+                    />
+                    <Label htmlFor="address_only" className="text-sm font-normal cursor-pointer">
+                      Address Only (Ghost Mode - No Name)
+                    </Label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Collection Window */}
+              {handoverMode !== 'ghost_mode' && (
+                <div className="pt-2">
+                  <Label className="text-sm font-medium mb-2 block">
+                    Collection Window *
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Set a time range to avoid disruptions while cooking or eating
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="collectionWindowStart" className="text-xs">From</Label>
+                      <Input
+                        id="collectionWindowStart"
+                        type="time"
+                        value={formData.collectionWindowStart}
+                        onChange={(e) => setFormData({ ...formData, collectionWindowStart: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="collectionWindowEnd" className="text-xs">To</Label>
+                      <Input
+                        id="collectionWindowEnd"
+                        type="time"
+                        value={formData.collectionWindowEnd}
+                        onChange={(e) => setFormData({ ...formData, collectionWindowEnd: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Pickup Instructions */}
+              {identityReveal === 'address_only' && (
+                <div>
+                  <Label htmlFor="pickupInstructions">Pickup Instructions</Label>
+                  <Textarea
+                    id="pickupInstructions"
+                    placeholder="e.g., Look for blue box at entrance, Ring bell #3"
+                    value={formData.pickupInstructions}
+                    onChange={(e) => setFormData({ ...formData, pickupInstructions: e.target.value })}
+                    rows={2}
+                  />
                 </div>
               )}
             </CardContent>
