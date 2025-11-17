@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Star, Award, ChefHat, Heart, Globe, Shield } from 'lucide-react';
 import { toast } from 'sonner';
-import { allergenOptions, dislikeOptions } from '@/utils/ingredientDatabase';
+import { allergenOptions, dislikeCategories } from '@/utils/ingredientDatabase';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -138,24 +139,35 @@ const Profile = () => {
             </div>
             
             <div className="pt-4 border-t border-border">
-              <Label className="text-base font-semibold mb-3 block">Food Dislikes</Label>
-              <div className="space-y-3">
-                {dislikeOptions.map((option) => (
-                  <div key={option.value} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`dislike-${option.value}`}
-                      checked={user.dislikes.includes(option.value)}
-                      onCheckedChange={() => toggleDislike(option.value)}
-                    />
-                    <Label
-                      htmlFor={`dislike-${option.value}`}
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      {option.label}
-                    </Label>
-                  </div>
+              <Label className="text-base font-semibold mb-3 block">Dislikes (Accordion)</Label>
+              <Accordion type="multiple" className="w-full">
+                {Object.entries(dislikeCategories).map(([category, items]) => (
+                  <AccordionItem key={category} value={category}>
+                    <AccordionTrigger className="text-sm capitalize">
+                      {category} ({items.filter(item => user.dislikes.includes(item.value)).length}/{items.length})
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2 pt-2">
+                        {items.map((dislike) => (
+                          <div key={dislike.value} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`dislike-${dislike.value}`}
+                              checked={user.dislikes.includes(dislike.value)}
+                              onCheckedChange={() => toggleDislike(dislike.value)}
+                            />
+                            <Label
+                              htmlFor={`dislike-${dislike.value}`}
+                              className="text-sm font-normal cursor-pointer"
+                            >
+                              {dislike.label}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
                 ))}
-              </div>
+              </Accordion>
             </div>
           </CardContent>
         </Card>

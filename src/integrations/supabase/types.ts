@@ -55,19 +55,26 @@ export type Database = {
       meals: {
         Row: {
           allergens: string[] | null
+          arrival_time: string | null
           available_portions: number
           barter_requests: string[] | null
           chef_id: string
+          collection_window_end: string | null
+          collection_window_start: string | null
           created_at: string
           description: string
+          estimated_restaurant_value: number | null
           exact_address: string
           exchange_mode: string | null
           fuzzy_lat: number
           fuzzy_lng: number
+          handover_mode: string | null
           id: string
           image_url: string | null
           ingredients: string[] | null
           is_cooking_experience: boolean
+          is_stock_photo: boolean | null
+          max_seats: number | null
           neighborhood: string
           pricing_minimum: number
           pricing_suggested: number | null
@@ -79,19 +86,26 @@ export type Database = {
         }
         Insert: {
           allergens?: string[] | null
+          arrival_time?: string | null
           available_portions?: number
           barter_requests?: string[] | null
           chef_id: string
+          collection_window_end?: string | null
+          collection_window_start?: string | null
           created_at?: string
           description: string
+          estimated_restaurant_value?: number | null
           exact_address: string
           exchange_mode?: string | null
           fuzzy_lat: number
           fuzzy_lng: number
+          handover_mode?: string | null
           id?: string
           image_url?: string | null
           ingredients?: string[] | null
           is_cooking_experience?: boolean
+          is_stock_photo?: boolean | null
+          max_seats?: number | null
           neighborhood: string
           pricing_minimum?: number
           pricing_suggested?: number | null
@@ -103,19 +117,26 @@ export type Database = {
         }
         Update: {
           allergens?: string[] | null
+          arrival_time?: string | null
           available_portions?: number
           barter_requests?: string[] | null
           chef_id?: string
+          collection_window_end?: string | null
+          collection_window_start?: string | null
           created_at?: string
           description?: string
+          estimated_restaurant_value?: number | null
           exact_address?: string
           exchange_mode?: string | null
           fuzzy_lat?: number
           fuzzy_lng?: number
+          handover_mode?: string | null
           id?: string
           image_url?: string | null
           ingredients?: string[] | null
           is_cooking_experience?: boolean
+          is_stock_photo?: boolean | null
+          max_seats?: number | null
           neighborhood?: string
           pricing_minimum?: number
           pricing_suggested?: number | null
@@ -167,33 +188,39 @@ export type Database = {
           allergens: string[] | null
           created_at: string
           dislikes: string[] | null
+          display_real_name: boolean | null
           first_name: string
           id: string
           karma: number
           language: string
           last_name: string
+          role: string | null
           updated_at: string
         }
         Insert: {
           allergens?: string[] | null
           created_at?: string
           dislikes?: string[] | null
+          display_real_name?: boolean | null
           first_name: string
           id: string
           karma?: number
           language?: string
           last_name: string
+          role?: string | null
           updated_at?: string
         }
         Update: {
           allergens?: string[] | null
           created_at?: string
           dislikes?: string[] | null
+          display_real_name?: boolean | null
           first_name?: string
           id?: string
           karma?: number
           language?: string
           last_name?: string
+          role?: string | null
           updated_at?: string
         }
         Relationships: []
