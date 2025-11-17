@@ -26,6 +26,7 @@ export const mockMeals: Meal[] = [
     isCookingExperience: true,
     availablePortions: 4,
     allergens: ['Peanuts'],
+    scheduledDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
   },
   {
     id: '2',
@@ -52,6 +53,7 @@ export const mockMeals: Meal[] = [
     isCookingExperience: false,
     availablePortions: 6,
     allergens: ['Gluten', 'Dairy', 'Eggs'],
+    scheduledDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(), // tomorrow
   },
   {
     id: '3',
@@ -78,6 +80,7 @@ export const mockMeals: Meal[] = [
     isCookingExperience: true,
     availablePortions: 5,
     allergens: ['Gluten'],
+    scheduledDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now (Saturday)
   },
   {
     id: '4',
@@ -104,5 +107,6 @@ export const mockMeals: Meal[] = [
     isCookingExperience: false,
     availablePortions: 3,
     allergens: [],
+    scheduledDate: new Date().toISOString(), // Available today
   },
 ];

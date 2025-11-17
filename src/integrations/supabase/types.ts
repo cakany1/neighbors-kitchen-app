@@ -14,7 +14,172 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          created_at: string
+          guest_id: string
+          id: string
+          meal_id: string
+          payment_amount: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          guest_id: string
+          id?: string
+          meal_id: string
+          payment_amount?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          guest_id?: string
+          id?: string
+          meal_id?: string
+          payment_amount?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_meal_id_fkey"
+            columns: ["meal_id"]
+            isOneToOne: false
+            referencedRelation: "meals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meals: {
+        Row: {
+          allergens: string[] | null
+          available_portions: number
+          chef_id: string
+          created_at: string
+          description: string
+          exact_address: string
+          fuzzy_lat: number
+          fuzzy_lng: number
+          id: string
+          image_url: string | null
+          is_cooking_experience: boolean
+          neighborhood: string
+          pricing_minimum: number
+          pricing_suggested: number | null
+          scheduled_date: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          allergens?: string[] | null
+          available_portions?: number
+          chef_id: string
+          created_at?: string
+          description: string
+          exact_address: string
+          fuzzy_lat: number
+          fuzzy_lng: number
+          id?: string
+          image_url?: string | null
+          is_cooking_experience?: boolean
+          neighborhood: string
+          pricing_minimum?: number
+          pricing_suggested?: number | null
+          scheduled_date: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          allergens?: string[] | null
+          available_portions?: number
+          chef_id?: string
+          created_at?: string
+          description?: string
+          exact_address?: string
+          fuzzy_lat?: number
+          fuzzy_lng?: number
+          id?: string
+          image_url?: string | null
+          is_cooking_experience?: boolean
+          neighborhood?: string
+          pricing_minimum?: number
+          pricing_suggested?: number | null
+          scheduled_date?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          booking_id: string
+          created_at: string
+          id: string
+          message_text: string
+          original_language: string
+          sender_id: string
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          id?: string
+          message_text: string
+          original_language: string
+          sender_id: string
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          id?: string
+          message_text?: string
+          original_language?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          first_name: string
+          id: string
+          karma: number
+          language: string
+          last_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          first_name: string
+          id: string
+          karma?: number
+          language?: string
+          last_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string
+          id?: string
+          karma?: number
+          language?: string
+          last_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

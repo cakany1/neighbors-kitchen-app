@@ -14,7 +14,9 @@ import {
   Clock, 
   AlertTriangle,
   CheckCircle,
-  Home
+  Home,
+  MessageCircle,
+  Calendar
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -122,6 +124,38 @@ const MealDetail = () => {
             </CardContent>
           </Card>
 
+          {/* Scheduled Date */}
+          {meal.scheduledDate && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-primary" />
+                  Available On
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex flex-col items-center justify-center">
+                    <span className="text-xs font-medium text-primary">
+                      {new Date(meal.scheduledDate).toLocaleDateString([], { month: 'short' }).toUpperCase()}
+                    </span>
+                    <span className="text-lg font-bold text-primary">
+                      {new Date(meal.scheduledDate).getDate()}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">
+                      {new Date(meal.scheduledDate).toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(meal.scheduledDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Location */}
           <Card>
             <CardHeader>
@@ -226,12 +260,22 @@ const MealDetail = () => {
                     Booking confirmed! See you soon 🎉
                   </AlertDescription>
                 </Alert>
-                <Button 
-                  onClick={() => navigate(`/payment/${meal.id}`)}
-                  className="w-full h-12 text-lg"
-                >
-                  Complete Payment Later
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => navigate(`/chat/booking-${meal.id}`)}
+                    variant="outline"
+                    className="flex-1 h-12 text-lg gap-2"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    Chat with {meal.chef.firstName}
+                  </Button>
+                  <Button 
+                    onClick={() => navigate(`/payment/${meal.id}`)}
+                    className="flex-1 h-12 text-lg"
+                  >
+                    Payment
+                  </Button>
+                </div>
               </div>
             )}
           </div>

@@ -1,7 +1,7 @@
 import { Meal } from '@/types/meal';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, MapPin, ChefHat } from 'lucide-react';
+import { Star, MapPin, ChefHat, Calendar } from 'lucide-react';
 
 interface MealCardProps {
   meal: Meal;
@@ -50,6 +50,13 @@ export const MealCard = ({ meal, onClick }: MealCardProps) => {
             <span>{meal.distance}</span>
           </div>
         </div>
+        
+        {meal.scheduledDate && (
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3 bg-muted px-2 py-1 rounded-md w-fit">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>Available: {new Date(meal.scheduledDate).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+          </div>
+        )}
         
         <div className="flex flex-wrap gap-2 mb-3">
           {meal.tags.map((tag) => (

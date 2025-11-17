@@ -25,6 +25,7 @@ export interface Meal {
   isCookingExperience: boolean;
   availablePortions: number;
   allergens?: string[];
+  scheduledDate?: string;
 }
 
 export interface Booking {
