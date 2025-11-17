@@ -23,6 +23,8 @@ const AddMeal = () => {
     minimumPrice: '',
     portions: '',
     allergens: '',
+    scheduledDate: '',
+    scheduledTime: '',
   });
 
   const handleAddTag = () => {
@@ -39,8 +41,8 @@ const AddMeal = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.description) {
-      toast.error('Please fill in all required fields');
+    if (!formData.title || !formData.description || !formData.scheduledDate || !formData.scheduledTime) {
+      toast.error('Please fill in all required fields including date and time');
       return;
     }
 
@@ -212,6 +214,42 @@ const AddMeal = () => {
                   onChange={(e) => setFormData({ ...formData, portions: e.target.value })}
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Scheduling */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Schedule Your Meal</CardTitle>
+              <CardDescription>When will this meal be available?</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="scheduledDate">Date *</Label>
+                <Input
+                  id="scheduledDate"
+                  type="date"
+                  min={new Date().toISOString().split('T')[0]}
+                  value={formData.scheduledDate}
+                  onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="scheduledTime">Time *</Label>
+                <Input
+                  id="scheduledTime"
+                  type="time"
+                  value={formData.scheduledTime}
+                  onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
+                  required
+                />
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                📅 Schedule your meal in advance! Planning to cook something special this Saturday? Let your neighbors know now.
+              </p>
             </CardContent>
           </Card>
 

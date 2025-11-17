@@ -1,19 +1,43 @@
+import { useState } from 'react';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, Award, ChefHat, Heart } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Star, Award, ChefHat, Heart, Globe } from 'lucide-react';
+import { toast } from 'sonner';
+
+const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'de', name: 'Deutsch (German)' },
+  { code: 'fr', name: 'Français (French)' },
+  { code: 'it', name: 'Italiano (Italian)' },
+  { code: 'es', name: 'Español (Spanish)' },
+  { code: 'pt', name: 'Português (Portuguese)' },
+  { code: 'ar', name: 'العربية (Arabic)' },
+  { code: 'tr', name: 'Türkçe (Turkish)' },
+  { code: 'vi', name: 'Tiếng Việt (Vietnamese)' },
+  { code: 'th', name: 'ไทย (Thai)' },
+  { code: 'zh', name: '中文 (Chinese)' },
+];
 
 const Profile = () => {
   // Mock user data
-  const user = {
+  const [user, setUser] = useState({
     firstName: 'Alex',
     lastName: 'Chen',
+    language: 'en',
     karma: 178,
     mealsShared: 23,
     mealsReceived: 31,
     fairPayments: 28,
+  });
+
+  const handleLanguageChange = (newLanguage: string) => {
+    setUser({ ...user, language: newLanguage });
+    toast.success(`Language updated to ${languages.find(l => l.code === newLanguage)?.name}`);
   };
 
   return (
@@ -52,6 +76,36 @@ const Profile = () => {
                 <p className="text-2xl font-bold text-trust-badge">{user.fairPayments}</p>
                 <p className="text-xs text-muted-foreground">Fair Payments</p>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Language Selection */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="w-5 h-5 text-primary" />
+              Language Preference
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Label htmlFor="language">I speak</Label>
+              <Select value={user.language} onValueChange={handleLanguageChange}>
+                <SelectTrigger id="language">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {languages.map((lang) => (
+                    <SelectItem key={lang.code} value={lang.code}>
+                      {lang.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-2">
+                💬 Messages with chefs who speak different languages will be automatically translated for you
+              </p>
             </div>
           </CardContent>
         </Card>
