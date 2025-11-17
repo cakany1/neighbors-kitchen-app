@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { SafetyAlert } from '@/components/SafetyAlert';
+import { TranslateButton } from '@/components/TranslateButton';
 import { checkAllergenMatch } from '@/utils/ingredientDatabase';
 import { 
   MapPin, 
@@ -28,19 +29,25 @@ const MealDetail = () => {
   const navigate = useNavigate();
   const meal = mockMeals.find(m => m.id === id);
   const [bookingStatus, setBookingStatus] = useState<'none' | 'pending' | 'confirmed'>('none');
+  const [translatedTitle, setTranslatedTitle] = useState(meal?.title || '');
+  const [translatedDescription, setTranslatedDescription] = useState(meal?.description || '');
   
   // Mock chef preferences (in real app from database)
-  let identityReveal: 'full_name' | 'first_name' | 'last_name' | 'address_only';
+  let identityReveal: 'real_name' | 'nickname' = 'nickname';
+  let handoverMode: 'pickup_box' | 'neighbor_plate' | 'ghost_mode' | 'dine_in' = 'pickup_box';
+  const chefNickname = "FoodieChef";
+  const chefRealName = "Maria Schmidt";
   
   // Assign different reveal modes for different meals
   if (meal?.id === 'meal_101') {
-    identityReveal = 'address_only';
+    identityReveal = 'nickname';
+    handoverMode = 'ghost_mode';
   } else if (meal?.id === 'meal_102') {
-    identityReveal = 'first_name';
-  } else if (meal?.id === 'meal_103') {
-    identityReveal = 'last_name';
+    identityReveal = 'real_name';
+    handoverMode = 'dine_in';
   } else {
-    identityReveal = 'full_name';
+    identityReveal = 'nickname';
+    handoverMode = 'pickup_box';
   }
   
   const collectionWindow = { start: '17:00', end: '19:00' };
@@ -210,25 +217,13 @@ const MealDetail = () => {
                     <Home className="h-4 w-4 text-secondary" />
                     <AlertDescription>
                       <div className="space-y-2">
-                        {identityReveal === 'full_name' && (
-                          <p className="text-foreground">
-                            <strong className="text-secondary">Contact:</strong> {meal.chef.firstName} {meal.chef.lastName}
-                          </p>
-                        )}
-                        {identityReveal === 'first_name' && (
-                          <p className="text-foreground">
-                            <strong className="text-secondary">Contact:</strong> {meal.chef.firstName}
-                          </p>
-                        )}
-                        {identityReveal === 'last_name' && (
-                          <p className="text-foreground">
-                            <strong className="text-secondary">Contact:</strong> {meal.chef.lastName}
-                          </p>
-                        )}
+                        <p className="text-foreground">
+                          <strong className="text-secondary">Contact:</strong> {identityReveal === 'real_name' ? chefRealName : chefNickname}
+                        </p>
                         <p className="text-foreground">
                           <strong className="text-secondary">Address:</strong> {meal.location.exactAddress}
                         </p>
-                        {identityReveal === 'address_only' && pickupInstructions && (
+                        {handoverMode === 'ghost_mode' && pickupInstructions && (
                           <p className="text-foreground">
                             <strong className="text-secondary">Instructions:</strong> {pickupInstructions}
                           </p>

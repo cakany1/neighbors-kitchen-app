@@ -2,6 +2,8 @@ import { Meal } from '@/types/meal';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, MapPin, ChefHat, Calendar, Gift, Heart, Camera, Package, Home, Ghost, UtensilsCrossed } from 'lucide-react';
+import { TranslateButton } from '@/components/TranslateButton';
+import { useState } from 'react';
 
 interface MealCardProps {
   meal: Meal;
@@ -10,6 +12,8 @@ interface MealCardProps {
 }
 
 export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) => {
+  const [translatedTitle, setTranslatedTitle] = useState(meal.title);
+  
   // Mock data - in real app this would come from database
   const exchangeMode = meal.id === 'meal_103' ? 'barter' : 'money';
   const barterRequests = ['White Wine', 'Dessert'];
@@ -19,6 +23,9 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   if (meal.id === 'meal_102') handoverMode = 'dine_in';
   if (meal.id === 'meal_103') handoverMode = 'anonymous_drop';
   const estimatedValue = meal.pricing.suggested || 24;
+  
+  // Mock chef nickname
+  const chefNickname = "FoodieChef";
 
   const handoverIcons = {
     pickup_box: Package,
@@ -74,16 +81,24 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
       </div>
       
       <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="font-semibold text-lg text-card-foreground">{meal.title}</h3>
-          <div className="flex items-center gap-1 text-trust-gold">
+        <div className="flex items-start justify-between mb-2 gap-2">
+          <div className="flex-1">
+            <div className="flex items-center gap-1">
+              <h3 className="font-semibold text-lg text-card-foreground">{translatedTitle}</h3>
+              <TranslateButton 
+                originalText={meal.title} 
+                onTranslate={setTranslatedTitle} 
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-trust-gold shrink-0">
             <Star className="w-4 h-4 fill-current" />
             <span className="text-sm font-medium">{meal.chef.karma}</span>
           </div>
         </div>
         
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-          <span className="font-medium">{meal.chef.firstName} {meal.chef.lastName.charAt(0)}.</span>
+          <span className="font-medium">{chefNickname}</span>
           <span>•</span>
           <div className="flex items-center gap-1">
             <MapPin className="w-3.5 h-3.5" />

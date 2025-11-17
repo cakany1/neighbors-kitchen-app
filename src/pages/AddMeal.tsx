@@ -20,21 +20,25 @@ const AddMeal = () => {
   const [isCookingExperience, setIsCookingExperience] = useState(false);
   const [exchangeMode, setExchangeMode] = useState<'money' | 'barter'>('money');
   const [handoverMode, setHandoverMode] = useState<'pickup_box' | 'neighbor_plate' | 'ghost_mode' | 'dine_in'>('pickup_box');
-  const [identityReveal, setIdentityReveal] = useState<'full_name' | 'first_name' | 'last_name' | 'address_only'>('full_name');
+  const [identityReveal, setIdentityReveal] = useState<'real_name' | 'nickname'>('nickname');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [ingredientInput, setIngredientInput] = useState('');
   const [detectedAllergens, setDetectedAllergens] = useState<string[]>([]);
   const [selectedBarterItems, setSelectedBarterItems] = useState<string[]>([]);
+  const [priceDetectiveLoading, setPriceDetectiveLoading] = useState(false);
+  const [priceDetectiveResult, setPriceDetectiveResult] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     minimumPrice: '',
     restaurantReferencePrice: '',
     portions: '',
+    maxSeats: '',
     scheduledDate: '',
     scheduledTime: '',
+    arrivalTime: '',
     collectionWindowStart: '',
     collectionWindowEnd: '',
     pickupInstructions: '',
@@ -78,6 +82,32 @@ const AddMeal = () => {
     );
   };
 
+  // Price Detective - Auto-detect restaurant prices
+  const runPriceDetective = () => {
+    if (!formData.title.trim()) {
+      toast.error('Please enter a meal title first');
+      return;
+    }
+    
+    setPriceDetectiveLoading(true);
+    
+    // Mock API call - simulate price discovery
+    setTimeout(() => {
+      // Mock price based on meal title length (simulation)
+      const mockPrice = Math.round((formData.title.length * 2 + Math.random() * 10) * 100) / 100;
+      setPriceDetectiveResult(mockPrice);
+      setPriceDetectiveLoading(false);
+      toast.success('Price found!');
+    }, 1500);
+  };
+
+  const usePriceDetectiveResult = () => {
+    if (priceDetectiveResult) {
+      setFormData({ ...formData, restaurantReferencePrice: priceDetectiveResult.toString() });
+      toast.success('Price anchor set!');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -86,8 +116,13 @@ const AddMeal = () => {
       return;
     }
 
-    if (handoverMode !== 'ghost_mode' && !formData.collectionWindowStart) {
+    if (!formData.collectionWindowStart && (handoverMode === 'pickup_box' || handoverMode === 'neighbor_plate' || handoverMode === 'ghost_mode')) {
       toast.error('Please set a collection window');
+      return;
+    }
+
+    if (handoverMode === 'dine_in' && (!formData.arrivalTime || !formData.maxSeats)) {
+      toast.error('Please set arrival time and max guest capacity for Kitchen Experience');
       return;
     }
 
@@ -271,7 +306,7 @@ const AddMeal = () => {
             </CardContent>
           </Card>
 
-          {/* Exchange Model Toggle */}
+              {/* Exchange Model Toggle */}
           <Card>
             <CardHeader>
               <CardTitle>Exchange Model</CardTitle>
@@ -300,6 +335,45 @@ const AddMeal = () => {
 
               {exchangeMode === 'money' ? (
                 <div className="space-y-4 pt-2">
+                  {/* Price Detective */}
+                  <div className="border border-border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">Price Detective 🔍</Label>
+                      <Button 
+                        type="button" 
+                        size="sm" 
+                        variant="outline"
+                        onClick={runPriceDetective}
+                        disabled={priceDetectiveLoading || !formData.title}
+                      >
+                        {priceDetectiveLoading ? 'Scanning...' : 'Find Price'}
+                      </Button>
+                    </div>
+                    {priceDetectiveLoading && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                        Scanning neighborhood restaurant prices...
+                      </div>
+                    )}
+                    {priceDetectiveResult && !priceDetectiveLoading && (
+                      <Alert className="bg-primary/10 border-primary">
+                        <AlertDescription className="space-y-2">
+                          <p className="text-sm font-medium">
+                            Found! Average price for "{formData.title}" in Basel St. Johann: <strong>CHF {priceDetectiveResult.toFixed(2)}</strong>
+                          </p>
+                          <Button 
+                            type="button" 
+                            size="sm" 
+                            onClick={usePriceDetectiveResult}
+                            className="w-full"
+                          >
+                            Use this as Value Anchor
+                          </Button>
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+
                   <div>
                     <Label htmlFor="restaurantReferencePrice">Restaurant Reference Price (CHF)</Label>
                     <Input
@@ -414,64 +488,36 @@ const AddMeal = () => {
                   <div className="flex items-center space-x-2">
                     <input
                       type="radio"
-                      id="full_name"
+                      id="real_name"
                       name="identity"
-                      value="full_name"
-                      checked={identityReveal === 'full_name'}
-                      onChange={() => setIdentityReveal('full_name')}
+                      value="real_name"
+                      checked={identityReveal === 'real_name'}
+                      onChange={() => setIdentityReveal('real_name')}
                       className="w-4 h-4"
                     />
-                    <Label htmlFor="full_name" className="text-sm font-normal cursor-pointer">
-                      Full Name + Address
+                    <Label htmlFor="real_name" className="text-sm font-normal cursor-pointer">
+                      Real Name + Address
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <input
                       type="radio"
-                      id="first_name"
+                      id="nickname"
                       name="identity"
-                      value="first_name"
-                      checked={identityReveal === 'first_name'}
-                      onChange={() => setIdentityReveal('first_name')}
+                      value="nickname"
+                      checked={identityReveal === 'nickname'}
+                      onChange={() => setIdentityReveal('nickname')}
                       className="w-4 h-4"
                     />
-                    <Label htmlFor="first_name" className="text-sm font-normal cursor-pointer">
-                      First Name Only + Address
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      id="last_name"
-                      name="identity"
-                      value="last_name"
-                      checked={identityReveal === 'last_name'}
-                      onChange={() => setIdentityReveal('last_name')}
-                      className="w-4 h-4"
-                    />
-                    <Label htmlFor="last_name" className="text-sm font-normal cursor-pointer">
-                      Last Name Only + Address
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      id="address_only"
-                      name="identity"
-                      value="address_only"
-                      checked={identityReveal === 'address_only'}
-                      onChange={() => setIdentityReveal('address_only')}
-                      className="w-4 h-4"
-                    />
-                    <Label htmlFor="address_only" className="text-sm font-normal cursor-pointer">
-                      Address Only (Ghost Mode - No Name)
+                    <Label htmlFor="nickname" className="text-sm font-normal cursor-pointer">
+                      Nickname + Address {handoverMode === 'ghost_mode' && '+ Instructions'}
                     </Label>
                   </div>
                 </div>
               </div>
 
               {/* Collection Window */}
-              {handoverMode !== 'ghost_mode' && (
+              {handoverMode !== 'dine_in' && (
                 <div className="pt-2">
                   <Label className="text-sm font-medium mb-2 block">
                     Collection Window *
@@ -504,7 +550,7 @@ const AddMeal = () => {
               )}
 
               {/* Pickup Instructions */}
-              {identityReveal === 'address_only' && (
+              {handoverMode === 'ghost_mode' && (
                 <div>
                   <Label htmlFor="pickupInstructions">Pickup Instructions</Label>
                   <Textarea
