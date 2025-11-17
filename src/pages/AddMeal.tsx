@@ -28,7 +28,8 @@ const AddMeal = () => {
   const [detectedAllergens, setDetectedAllergens] = useState<string[]>([]);
   const [selectedBarterItems, setSelectedBarterItems] = useState<string[]>([]);
   const [priceDetectiveLoading, setPriceDetectiveLoading] = useState(false);
-  const [priceDetectiveResult, setPriceDetectiveResult] = useState<number | null>(null);
+  const [priceDetectiveResult, setPriceDetectiveResult] = useState<{ min: number; max: number } | null>(null);
+  const [useStockPhoto, setUseStockPhoto] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -91,20 +92,23 @@ const AddMeal = () => {
     
     setPriceDetectiveLoading(true);
     
-    // Mock API call - simulate price discovery
+    // Mock API call - simulate price range discovery
     setTimeout(() => {
-      // Mock price based on meal title length (simulation)
-      const mockPrice = Math.round((formData.title.length * 2 + Math.random() * 10) * 100) / 100;
-      setPriceDetectiveResult(mockPrice);
+      // Mock price range based on meal title length (simulation)
+      const basePrice = formData.title.length * 2 + Math.random() * 5;
+      const minPrice = Math.round(basePrice * 100) / 100;
+      const maxPrice = Math.round((basePrice + 3 + Math.random() * 3) * 100) / 100;
+      setPriceDetectiveResult({ min: minPrice, max: maxPrice });
       setPriceDetectiveLoading(false);
-      toast.success('Price found!');
+      toast.success('Price range found!');
     }, 1500);
   };
 
   const usePriceDetectiveResult = () => {
     if (priceDetectiveResult) {
-      setFormData({ ...formData, restaurantReferencePrice: priceDetectiveResult.toString() });
-      toast.success('Price anchor set!');
+      const avgPrice = (priceDetectiveResult.min + priceDetectiveResult.max) / 2;
+      setFormData({ ...formData, restaurantReferencePrice: avgPrice.toFixed(2) });
+      toast.success('Average price applied!');
     }
   };
 
@@ -123,11 +127,6 @@ const AddMeal = () => {
 
     if (handoverMode === 'dine_in' && (!formData.arrivalTime || !formData.maxSeats)) {
       toast.error('Please set arrival time and max guest capacity for Kitchen Experience');
-      return;
-    }
-
-    if (ingredients.length === 0) {
-      toast.error('Please add at least one ingredient');
       return;
     }
 
@@ -157,17 +156,47 @@ const AddMeal = () => {
           <Card>
             <CardContent className="pt-6">
               <Label htmlFor="photo" className="block mb-2 font-medium">Dish Photo</Label>
-              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
-                <Upload className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground mb-1">Click to upload photo</p>
-                <p className="text-xs text-muted-foreground">PNG, JPG up to 10MB</p>
-                <input 
-                  type="file" 
-                  id="photo" 
-                  accept="image/*" 
-                  className="hidden"
-                />
-              </div>
+              {!useStockPhoto ? (
+                <>
+                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                    <Upload className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground mb-1">Click to upload photo</p>
+                    <p className="text-xs text-muted-foreground">PNG, JPG up to 10MB</p>
+                    <input 
+                      type="file" 
+                      id="photo" 
+                      accept="image/*" 
+                      className="hidden"
+                    />
+                  </div>
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setUseStockPhoto(true)}
+                    className="w-full mt-2"
+                  >
+                    Haven't cooked yet? Use a symbolic image
+                  </Button>
+                </>
+              ) : (
+                <div className="space-y-3">
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      📷 A symbolic/stock image will be displayed with a "Symbolbild" badge
+                    </AlertDescription>
+                  </Alert>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setUseStockPhoto(false)}
+                    className="w-full"
+                  >
+                    Upload my own photo instead
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -205,8 +234,8 @@ const AddMeal = () => {
           {/* Smart Ingredient Input */}
           <Card>
             <CardHeader>
-              <CardTitle>Ingredients *</CardTitle>
-              <CardDescription>We'll automatically detect allergens for you</CardDescription>
+              <CardTitle>Ingredients</CardTitle>
+              <CardDescription>Optional - We can auto-fill from recipes online or detect allergens</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
@@ -359,7 +388,7 @@ const AddMeal = () => {
                       <Alert className="bg-primary/10 border-primary">
                         <AlertDescription className="space-y-2">
                           <p className="text-sm font-medium">
-                            Found! Average price for "{formData.title}" in Basel St. Johann: <strong>CHF {priceDetectiveResult.toFixed(2)}</strong>
+                            Found! "{formData.title}" in Basel St. Johann costs between: <strong>CHF {priceDetectiveResult.min.toFixed(2)}</strong> and <strong>CHF {priceDetectiveResult.max.toFixed(2)}</strong>
                           </p>
                           <Button 
                             type="button" 
@@ -367,7 +396,7 @@ const AddMeal = () => {
                             onClick={usePriceDetectiveResult}
                             className="w-full"
                           >
-                            Use this as Value Anchor
+                            Use Average as Value Anchor
                           </Button>
                         </AlertDescription>
                       </Alert>
@@ -409,6 +438,25 @@ const AddMeal = () => {
                 <div className="pt-2">
                   <Label className="mb-3 block">What would you like in exchange? *</Label>
                   <div className="space-y-2">
+                    <div className="flex items-center space-x-2 pb-2 border-b border-border">
+                      <Checkbox
+                        id="barter-any"
+                        checked={selectedBarterItems.length === barterOptions.length}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedBarterItems([...barterOptions]);
+                          } else {
+                            setSelectedBarterItems([]);
+                          }
+                        }}
+                      />
+                      <Label
+                        htmlFor="barter-any"
+                        className="text-sm font-medium cursor-pointer"
+                      >
+                        ✨ Any of these (Guest's choice)
+                      </Label>
+                    </div>
                     {barterOptions.map((option) => (
                       <div key={option} className="flex items-center space-x-2">
                         <Checkbox
@@ -450,7 +498,7 @@ const AddMeal = () => {
                   className="h-auto py-3 flex-col"
                 >
                   <span className="text-2xl mb-1">📦</span>
-                  <span className="text-xs">Pickup (Box)</span>
+                  <span className="text-xs">Pickup (Bring Tupperware)</span>
                 </Button>
                 <Button
                   type="button"
@@ -520,10 +568,10 @@ const AddMeal = () => {
               {handoverMode !== 'dine_in' && (
                 <div className="pt-2">
                   <Label className="text-sm font-medium mb-2 block">
-                    Collection Window *
+                    Collection Window * (24h format)
                   </Label>
                   <p className="text-xs text-muted-foreground mb-3">
-                    Set a time range to avoid disruptions while cooking or eating
+                    Set a time range to avoid disruptions (e.g., 17:00 - 19:00)
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -595,7 +643,7 @@ const AddMeal = () => {
               </div>
 
               <div>
-                <Label htmlFor="scheduledTime">Scheduled Time *</Label>
+                <Label htmlFor="scheduledTime">Meal Ready Time * (24h format)</Label>
                 <Input
                   id="scheduledTime"
                   type="time"
@@ -604,9 +652,44 @@ const AddMeal = () => {
                   required
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  When will your meal be ready?
+                  When will your meal be ready? (e.g., 20:30)
                 </p>
               </div>
+              
+              {/* Dine In specific fields */}
+              {handoverMode === 'dine_in' && (
+                <>
+                  <div>
+                    <Label htmlFor="arrivalTime">Guest Arrival Time * (24h format)</Label>
+                    <Input
+                      id="arrivalTime"
+                      type="time"
+                      value={formData.arrivalTime}
+                      onChange={(e) => setFormData({ ...formData, arrivalTime: e.target.value })}
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      What time should guests arrive? (e.g., 19:00)
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="maxSeats">Max Guest Capacity *</Label>
+                    <Input
+                      id="maxSeats"
+                      type="number"
+                      min="1"
+                      placeholder="2"
+                      value={formData.maxSeats}
+                      onChange={(e) => setFormData({ ...formData, maxSeats: e.target.value })}
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      How many people can join at your table?
+                    </p>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
