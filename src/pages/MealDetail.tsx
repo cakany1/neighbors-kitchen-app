@@ -28,6 +28,23 @@ const MealDetail = () => {
   const navigate = useNavigate();
   const meal = mockMeals.find(m => m.id === id);
   const [bookingStatus, setBookingStatus] = useState<'none' | 'pending' | 'confirmed'>('none');
+  
+  // Mock chef preferences (in real app from database)
+  let identityReveal: 'full_name' | 'first_name' | 'last_name' | 'address_only';
+  
+  // Assign different reveal modes for different meals
+  if (meal?.id === 'meal_101') {
+    identityReveal = 'address_only';
+  } else if (meal?.id === 'meal_102') {
+    identityReveal = 'first_name';
+  } else if (meal?.id === 'meal_103') {
+    identityReveal = 'last_name';
+  } else {
+    identityReveal = 'full_name';
+  }
+  
+  const collectionWindow = { start: '17:00', end: '19:00' };
+  const pickupInstructions = 'Look for blue box at entrance';
 
   // Mock user allergens
   const userAllergens = ['gluten', 'nuts'];
@@ -188,18 +205,46 @@ const MealDetail = () => {
                 </div>
                 <p className="font-medium text-foreground">{meal.location.neighborhood}</p>
                 
-                {bookingStatus === 'confirmed' ? (
+{bookingStatus === 'confirmed' ? (
                   <Alert className="border-secondary bg-secondary-light">
                     <Home className="h-4 w-4 text-secondary" />
                     <AlertDescription>
-                      <strong className="text-secondary">Exact Address:</strong>
-                      <p className="text-foreground mt-1">{meal.location.exactAddress}</p>
+                      <div className="space-y-2">
+                        {identityReveal === 'full_name' && (
+                          <p className="text-foreground">
+                            <strong className="text-secondary">Contact:</strong> {meal.chef.firstName} {meal.chef.lastName}
+                          </p>
+                        )}
+                        {identityReveal === 'first_name' && (
+                          <p className="text-foreground">
+                            <strong className="text-secondary">Contact:</strong> {meal.chef.firstName}
+                          </p>
+                        )}
+                        {identityReveal === 'last_name' && (
+                          <p className="text-foreground">
+                            <strong className="text-secondary">Contact:</strong> {meal.chef.lastName}
+                          </p>
+                        )}
+                        <p className="text-foreground">
+                          <strong className="text-secondary">Address:</strong> {meal.location.exactAddress}
+                        </p>
+                        {identityReveal === 'address_only' && pickupInstructions && (
+                          <p className="text-foreground">
+                            <strong className="text-secondary">Instructions:</strong> {pickupInstructions}
+                          </p>
+                        )}
+                        {collectionWindow && (
+                          <p className="text-foreground">
+                            <strong className="text-secondary">Collection Window:</strong> {collectionWindow.start} - {collectionWindow.end}
+                          </p>
+                        )}
+                      </div>
                     </AlertDescription>
                   </Alert>
                 ) : (
                   <Alert>
                     <AlertDescription className="text-sm text-muted-foreground">
-                      📍 Exact address revealed after booking confirmation (privacy protection)
+                      📍 Details revealed after chef confirms your booking (privacy protection)
                     </AlertDescription>
                   </Alert>
                 )}
