@@ -237,6 +237,18 @@ const Chat = () => {
 
         {/* Messages */}
         <div className="px-4 py-6 space-y-4">
+          {/* Translation Notice */}
+          {booking && currentUser?.profile && 
+           booking.meal.chef.language !== booking.guest.language && (
+            <div className="bg-muted/50 border border-border rounded-lg p-3 mb-4 flex items-start gap-2">
+              <Globe className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+              <div className="text-xs text-muted-foreground">
+                <strong className="text-foreground">Auto-Translation Active:</strong> You and your chat partner speak different languages. 
+                Messages will be automatically translated to help you communicate.
+              </div>
+            </div>
+          )}
+          
           {messages.map((msg) => {
             const isCurrentUser = msg.sender_id === currentUser.id;
             const needsTranslation = msg.original_language !== currentUser.profile.language;
