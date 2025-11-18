@@ -167,6 +167,49 @@ const MealDetail = () => {
     bookingMutation.mutate();
   };
 
+  // Cancel booking mutation
+  const cancelBookingMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser?.id || !existingBooking?.id) throw new Error('Missing data');
+
+      const { data, error } = await supabase.rpc('cancel_booking', {
+        p_booking_id: existingBooking.id,
+        p_guest_id: currentUser.id,
+      });
+
+      if (error) throw error;
+
+      const result = data as { success: boolean; message?: string };
+
+      if (!result.success) {
+        throw new Error(result.message || 'Cancellation failed');
+      }
+
+      return result;
+    },
+    onSuccess: () => {
+      setBookingStatus('none');
+      toast.success('Booking cancelled successfully');
+      // Refresh queries
+      queryClient.invalidateQueries({ queryKey: ['meal', id] });
+      queryClient.invalidateQueries({ queryKey: ['booking', id, currentUser?.id] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to cancel booking');
+    },
+  });
+
+  const handleCancelBooking = () => {
+    if (window.confirm('Are you sure you want to cancel this booking?')) {
+      cancelBookingMutation.mutate();
+    }
+  };
+
+  // Calculate if booking is within 15-minute grace period
+  const isWithinCancellationPeriod = existingBooking
+    ? (Date.now() - new Date(existingBooking.created_at).getTime()) < 15 * 60 * 1000
+    : false;
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -401,17 +444,35 @@ const MealDetail = () => {
           )}
           
           {bookingStatus === 'pending' && (
-            <Button disabled className="flex-1">
-              <Clock className="w-4 h-4 mr-2" />
-              Pending...
-            </Button>
+            <>
+              {isWithinCancellationPeriod ? (
+                <Button 
+                  variant="destructive"
+                  onClick={handleCancelBooking}
+                  disabled={cancelBookingMutation.isPending}
+                  className="flex-1"
+                >
+                  {cancelBookingMutation.isPending ? 'Cancelling...' : 'Cancel Booking'}
+                </Button>
+              ) : (
+                <Button disabled className="flex-1">
+                  <Clock className="w-4 h-4 mr-2" />
+                  Pending...
+                </Button>
+              )}
+            </>
           )}
           
           {bookingStatus === 'confirmed' && (
-            <Button className="flex-1 bg-secondary">
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Confirmed
-            </Button>
+            <div className="flex-1 space-y-2">
+              <Button disabled className="w-full bg-secondary">
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Booking Confirmed
+              </Button>
+              <p className="text-xs text-center text-muted-foreground">
+                Contact chef to cancel
+              </p>
+            </div>
           )}
         </div>
       </div>
