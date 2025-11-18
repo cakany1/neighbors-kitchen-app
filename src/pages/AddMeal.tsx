@@ -30,6 +30,7 @@ const AddMeal = () => {
   const [priceDetectiveLoading, setPriceDetectiveLoading] = useState(false);
   const [priceDetectiveResult, setPriceDetectiveResult] = useState<{ min: number; max: number } | null>(null);
   const [useStockPhoto, setUseStockPhoto] = useState(false);
+  const [ingredientAutoFillLoading, setIngredientAutoFillLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -109,6 +110,60 @@ const AddMeal = () => {
       const avgPrice = (priceDetectiveResult.min + priceDetectiveResult.max) / 2;
       setFormData({ ...formData, restaurantReferencePrice: avgPrice.toFixed(2) });
       toast.success('Average price applied!');
+    }
+  };
+
+  // Auto-fill ingredients from recipe database
+  const autoFillIngredients = async () => {
+    if (!formData.title.trim()) {
+      toast.error('Please enter a meal title first');
+      return;
+    }
+    
+    setIngredientAutoFillLoading(true);
+    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-recipe-ingredients`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ mealTitle: formData.title }),
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          toast.error('Rate limit exceeded. Please try again in a moment.');
+          return;
+        }
+        if (response.status === 402) {
+          toast.error('Service unavailable. Please try again later.');
+          return;
+        }
+        throw new Error('Failed to fetch ingredients');
+      }
+
+      const data = await response.json();
+      
+      if (data.ingredients && data.ingredients.length > 0) {
+        // Add only new ingredients that aren't already in the list
+        const newIngredients = data.ingredients.filter(
+          (ing: string) => !ingredients.includes(ing)
+        );
+        setIngredients([...ingredients, ...newIngredients]);
+        toast.success(`Found ${newIngredients.length} ingredients from recipes online!`);
+      } else {
+        toast.info('No ingredients found. Try adding them manually.');
+      }
+    } catch (error) {
+      console.error('Error fetching ingredients:', error);
+      toast.error('Failed to auto-fill ingredients. Please add them manually.');
+    } finally {
+      setIngredientAutoFillLoading(false);
     }
   };
 
@@ -238,6 +293,27 @@ const AddMeal = () => {
               <CardDescription>Optional - We can auto-fill from recipes online or detect allergens</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex gap-2 mb-2">
+                <Button 
+                  type="button" 
+                  onClick={autoFillIngredients}
+                  disabled={ingredientAutoFillLoading || !formData.title.trim()}
+                  variant="secondary"
+                  className="flex-1"
+                >
+                  {ingredientAutoFillLoading ? (
+                    <>
+                      <span className="animate-spin mr-2">🔄</span>
+                      Searching recipes...
+                    </>
+                  ) : (
+                    <>
+                      🤖 Auto-fill from Recipes
+                    </>
+                  )}
+                </Button>
+              </div>
+              
               <div className="flex gap-2">
                 <Input
                   placeholder="Add an ingredient (e.g., flour, milk, eggs)"
