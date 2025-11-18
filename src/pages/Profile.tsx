@@ -273,7 +273,7 @@ const Profile = () => {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>Always bring your own container for meals</span>
+                <span>Bring your own container or plate for takeaway (except when dining in)</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
