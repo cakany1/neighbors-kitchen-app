@@ -53,31 +53,27 @@ const MealDetail = () => {
     },
   });
 
-  // Fetch meal data
+  // Fetch meal data with chef in a single query
   const { data: meal, isLoading } = useQuery({
     queryKey: ['meal', id],
     queryFn: async () => {
-      const { data: mealData, error: mealError } = await supabase
+      const { data, error } = await supabase
         .from('meals')
-        .select('*')
+        .select(`
+          *,
+          chef:profiles!chef_id (
+            first_name,
+            last_name,
+            nickname,
+            karma,
+            display_real_name
+          )
+        `)
         .eq('id', id)
         .single();
       
-      if (mealError) throw mealError;
-      
-      // Fetch chef profile separately
-      const { data: chefData, error: chefError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', mealData.chef_id)
-        .single();
-      
-      if (chefError) throw chefError;
-      
-      return {
-        ...mealData,
-        chef_profile: chefData,
-      };
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -141,7 +137,7 @@ const MealDetail = () => {
     },
     onSuccess: () => {
       setBookingStatus('pending');
-      toast.success('Booking request sent to ' + meal?.chef_profile?.first_name);
+      toast.success('Booking request sent to ' + meal?.chef?.first_name);
       queryClient.invalidateQueries({ queryKey: ['booking', id, currentUser?.id] });
     },
     onError: (error: any) => {
@@ -217,9 +213,9 @@ const MealDetail = () => {
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <ChefHat className="w-4 h-4" />
-                <span>by {meal.chef_profile?.first_name} {meal.chef_profile?.last_name?.charAt(0)}.</span>
+                <span>by {meal.chef?.first_name} {meal.chef?.last_name?.charAt(0)}.</span>
                 <Star className="w-4 h-4 fill-trust-gold text-trust-gold" />
-                <span className="text-trust-gold font-semibold">{meal.chef_profile?.karma || 0}</span>
+                <span className="text-trust-gold font-semibold">{meal.chef?.karma || 0}</span>
               </div>
             </div>
           </div>
@@ -313,7 +309,7 @@ const MealDetail = () => {
                     <AlertDescription>
                       <div className="space-y-2">
                         <p className="text-foreground">
-                          <strong className="text-secondary">Contact:</strong> {meal.chef_profile?.first_name} {meal.chef_profile?.last_name}
+                          <strong className="text-secondary">Contact:</strong> {meal.chef?.first_name} {meal.chef?.last_name}
                         </p>
                         <p className="text-foreground">
                           <strong className="text-secondary">Address:</strong> {meal.exact_address}
@@ -411,7 +407,7 @@ const MealDetail = () => {
       <ChatModal 
         open={chatOpen} 
         onOpenChange={setChatOpen} 
-        chefName={meal.chef_profile?.first_name || 'Chef'}
+        chefName={meal.chef?.first_name || 'Chef'}
         mealTitle={meal.title}
       />
     </div>
