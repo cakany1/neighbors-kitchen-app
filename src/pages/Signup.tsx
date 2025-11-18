@@ -211,7 +211,10 @@ const Signup = () => {
                 />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">{t('signup.addressHint')}</p>
+            
+            <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+              <p className="text-xs text-foreground">{t('signup.addressHint')}</p>
+            </div>
 
             <div>
               <Label htmlFor="email">Email</Label>

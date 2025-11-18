@@ -11,14 +11,14 @@
     "mealsShared": "Mahlzeiten geteilt",
     "mealsReceived": "Mahlzeiten erhalten",
     "fairPayments": "Faire Zahlungen",
-    "languagePreference": "Spracheinstellung",
+    "languagePreference": "Sprachen die Sie sprechen",
     "dietaryRestrictions": "Ernährungseinschränkungen",
     "allergens": "Allergene",
     "foodPreferences": "Essensvorlieben",
     "dislikes": "Abneigungen",
     "communityGuidelines": "Gemeinschaftsrichtlinien",
     "badges": "Abzeichen",
-    "languageUpdated": "Sprache aktualisiert auf"
+    "languageUpdated": "Sprachen aktualisiert"
   },
   "signup": {
     "gender": "Ich bin",
@@ -29,10 +29,10 @@
     "isCouple": "Wir sind ein Paar (Portionen immer mindestens x2)",
     "phoneNumber": "Telefonnummer (zur Verifizierung)",
     "phoneHint": "Wir senden Ihnen einen Bestätigungscode",
-    "address": "Straße und Hausnummer",
+    "address": "Straße und Hausnummer (Optional)",
     "city": "Stadt",
     "postalCode": "Postleitzahl",
-    "addressHint": "Privat - nur nach bestätigten Buchungen sichtbar"
+    "addressHint": "🔒 Ihre Adresse ist privat und verschlüsselt. Sie wird NUR nach Ihrer Buchungsbestätigung an Gäste weitergegeben."
   },
   "guidelines": {
     "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (außer beim Vor-Ort-Essen)",
@@ -40,7 +40,8 @@
     "payFairly": "Fair bezahlen basierend auf Qualität und Aufwand",
     "respectPrivacy": "Privatsphäre respektieren - genaue Orte erst nach Bestätigung teilen",
     "communicate": "Ernährungseinschränkungen klar kommunizieren",
-    "leaveFeedback": "Ehrliches Feedback geben um Vertrauen aufzubauen"
+    "leaveFeedback": "Ehrliches Feedback geben um Vertrauen aufzubauen",
+    "disclaimer": "⚠️ Wichtig: Dies ist eine private Plattform zum Teilen von Essen. Neighbors Kitchen übernimmt keine Verantwortung für Qualität, Sicherheit oder Hygiene geteilter Mahlzeiten. Alle Essensaustausche erfolgen auf eigenes Risiko. Bitte überprüfen Sie Allergeninformationen, beachten Sie Lebensmittelsicherheit und vertrauen Sie Ihrem Urteilsvermögen."
   },
   "navigation": {
     "feed": "Feed",
