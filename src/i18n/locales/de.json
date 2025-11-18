@@ -22,11 +22,17 @@
   },
   "signup": {
     "gender": "Ich bin",
-    "genderMale": "Mann",
-    "genderFemale": "Frau",
+    "genderMale": "Männlich",
+    "genderFemale": "Weiblich",
     "genderPlaceholder": "Auswählen...",
     "genderHint": "Für Sicherheit und Matching-Präferenzen",
-    "isCouple": "Wir sind ein Paar (Portionen immer mindestens x2)"
+    "isCouple": "Wir sind ein Paar (Portionen immer mindestens x2)",
+    "phoneNumber": "Telefonnummer (zur Verifizierung)",
+    "phoneHint": "Wir senden Ihnen einen Bestätigungscode",
+    "address": "Straße und Hausnummer",
+    "city": "Stadt",
+    "postalCode": "Postleitzahl",
+    "addressHint": "Privat - nur nach bestätigten Buchungen sichtbar"
   },
   "guidelines": {
     "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (außer beim Vor-Ort-Essen)",
@@ -59,7 +65,38 @@
     "symbolicImage": "📷 Symbolbild"
   },
   "buttons": {
-    "book": "Reservieren",
-    "translate": "Übersetzen"
+    "book": "Buchen",
+    "translate": "Übersetzen",
+    "block": "Benutzer blockieren",
+    "report": "Melden",
+    "unblock": "Blockierung aufheben"
+  },
+  "verification": {
+    "phoneVerified": "Telefon verifiziert",
+    "idVerified": "ID verifiziert"
+  },
+  "guestComposition": {
+    "title": "Wer wird zu Besuch kommen?",
+    "description": "Bitte wählen Sie die Zusammensetzung Ihrer Gruppe. Dies hilft, eine komfortable und sichere Umgebung zu gewährleisten.",
+    "mixedCouple": "Gemischtes Paar",
+    "mixedGroup": "Gemischte Gruppe",
+    "womenOnly": "Nur Frauen",
+    "menOnly": "Nur Männer",
+    "diverseGroup": "Diverse Gruppe",
+    "preferNotSay": "Keine Angabe",
+    "safetyNote": "Wir verwenden diese Informationen ausschließlich zu organisatorischen Zwecken, um ein respektvolles, komfortables und sicheres Erlebnis für alle Gäste zu gewährleisten."
+  },
+  "reporting": {
+    "title": "Melden",
+    "reasonLabel": "Grund für die Meldung",
+    "safetyConcern": "Sicherheitsbedenken",
+    "harassment": "Belästigung",
+    "fakeProfile": "Gefälschtes Profil",
+    "inappropriateContent": "Unangemessener Inhalt",
+    "spam": "Spam",
+    "other": "Sonstiges",
+    "descriptionLabel": "Zusätzliche Details (optional)",
+    "submitReport": "Meldung absenden",
+    "reportSubmitted": "Meldung erfolgreich eingereicht"
   }
 }
