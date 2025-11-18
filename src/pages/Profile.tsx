@@ -47,6 +47,10 @@ const Profile = () => {
     allergens: [] as string[],
     dislikes: [] as string[],
     languages: ['de'] as string[],
+    phone_number: '',
+    private_address: '',
+    private_city: '',
+    private_postal_code: '',
   });
 
   // Fetch current user and profile
@@ -80,6 +84,10 @@ const Profile = () => {
         allergens: currentUser.profile.allergens || [],
         dislikes: currentUser.profile.dislikes || [],
         languages: currentUser.profile.languages || ['de'],
+        phone_number: currentUser.profile.phone_number || '',
+        private_address: currentUser.profile.private_address || '',
+        private_city: currentUser.profile.private_city || '',
+        private_postal_code: currentUser.profile.private_postal_code || '',
       });
     }
   }, [currentUser]);
@@ -99,6 +107,10 @@ const Profile = () => {
           allergens: formData.allergens,
           dislikes: formData.dislikes,
           languages: formData.languages,
+          phone_number: formData.phone_number || null,
+          private_address: formData.private_address || null,
+          private_city: formData.private_city || null,
+          private_postal_code: formData.private_postal_code || null,
         })
         .eq('id', currentUser.id);
 
@@ -236,6 +248,63 @@ const Profile = () => {
                 })}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Verification & Location */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5" />
+              Verifizierung & Standort
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="phone">Mobile Number (for coordination)</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="+41 79 123 45 67"
+                value={formData.phone_number}
+                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="address">Street & Number</Label>
+              <Input
+                id="address"
+                type="text"
+                placeholder="Steinenvorstadt 25"
+                value={formData.private_address}
+                onChange={(e) => setFormData({ ...formData, private_address: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="zip">Zip Code</Label>
+                <Input
+                  id="zip"
+                  type="text"
+                  placeholder="4051"
+                  value={formData.private_postal_code}
+                  onChange={(e) => setFormData({ ...formData, private_postal_code: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  type="text"
+                  placeholder="Basel"
+                  value={formData.private_city}
+                  onChange={(e) => setFormData({ ...formData, private_city: e.target.value })}
+                />
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              💡 This address defines your center for the Meal Radar.
+            </p>
           </CardContent>
         </Card>
 
