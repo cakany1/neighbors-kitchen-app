@@ -31,34 +31,25 @@ const Feed = () => {
     },
   });
 
-  // Fetch meals from database
+  // Fetch meals from database with chef data in a single query
   const { data: meals, isLoading } = useQuery({
     queryKey: ['meals'],
     queryFn: async () => {
-      const { data: mealsData, error: mealsError } = await supabase
+      const { data, error } = await supabase
         .from('meals')
-        .select('*')
+        .select(`
+          *,
+          chef:profiles!chef_id (
+            first_name,
+            last_name,
+            nickname,
+            karma
+          )
+        `)
         .order('created_at', { ascending: false });
       
-      if (mealsError) throw mealsError;
-      
-      // Fetch chef profiles for all meals
-      const mealsWithChefs = await Promise.all(
-        mealsData.map(async (meal) => {
-          const { data: chefData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', meal.chef_id)
-            .single();
-          
-          return {
-            ...meal,
-            chef_profile: chefData,
-          };
-        })
-      );
-      
-      return mealsWithChefs;
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -107,9 +98,9 @@ const Feed = () => {
                   title: meal.title,
                   description: meal.description,
                   chef: {
-                    firstName: meal.chef_profile?.first_name || 'Chef',
-                    lastName: meal.chef_profile?.last_name || '',
-                    karma: meal.chef_profile?.karma || 0,
+                    firstName: meal.chef?.first_name || 'Chef',
+                    lastName: meal.chef?.last_name || '',
+                    karma: meal.chef?.karma || 0,
                   },
                   location: {
                     neighborhood: meal.neighborhood,
@@ -117,7 +108,7 @@ const Feed = () => {
                     fuzzyLng: parseFloat(String(meal.fuzzy_lng)),
                     exactAddress: meal.exact_address,
                   },
-                  distance: '~5 min walk', // Calculate based on user location in future
+                  distance: '~5 min walk',
                   tags: meal.tags || [],
                   imageUrl: meal.image_url || undefined,
                   pricing: {
