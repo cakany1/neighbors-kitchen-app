@@ -97,6 +97,33 @@ const Profile = () => {
     mutationFn: async () => {
       if (!currentUser?.id) throw new Error('Not authenticated');
       
+      let latitude = null;
+      let longitude = null;
+
+      // Geocode address if provided
+      if (formData.private_address && formData.private_city) {
+        try {
+          const { data: geoData, error: geoError } = await supabase.functions.invoke('geocode-address', {
+            body: {
+              street: formData.private_address,
+              city: formData.private_city,
+              postalCode: formData.private_postal_code,
+            },
+          });
+
+          if (!geoError && geoData?.latitude && geoData?.longitude) {
+            latitude = geoData.latitude;
+            longitude = geoData.longitude;
+            console.log('Address geocoded:', { latitude, longitude });
+          } else {
+            console.warn('Geocoding failed, proceeding without coordinates');
+          }
+        } catch (geoError) {
+          console.error('Geocoding error:', geoError);
+          // Continue without geocoding - don't block profile update
+        }
+      }
+      
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -111,6 +138,8 @@ const Profile = () => {
           private_address: formData.private_address || null,
           private_city: formData.private_city || null,
           private_postal_code: formData.private_postal_code || null,
+          latitude,
+          longitude,
         })
         .eq('id', currentUser.id);
 
