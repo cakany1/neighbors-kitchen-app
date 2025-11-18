@@ -35,7 +35,7 @@ const Profile = () => {
     firstName: 'Alex',
     lastName: 'Chen',
     nickname: 'FoodieChef',
-    language: localStorage.getItem('language') || 'en',
+    languages: ['en', 'de'], // Multiple languages now supported
     karma: 178,
     mealsShared: 23,
     mealsReceived: 31,
@@ -44,11 +44,22 @@ const Profile = () => {
     dislikes: [] as string[],
   });
 
-  const handleLanguageChange = (newLanguage: string) => {
-    setUser({ ...user, language: newLanguage });
-    localStorage.setItem('language', newLanguage);
-    i18n.changeLanguage(newLanguage);
-    toast.success(`${t('profile.languageUpdated')} ${languages.find(l => l.code === newLanguage)?.name}`);
+  const toggleLanguage = (languageCode: string) => {
+    setUser(prev => ({
+      ...prev,
+      languages: prev.languages.includes(languageCode)
+        ? prev.languages.filter(l => l !== languageCode)
+        : [...prev.languages, languageCode]
+    }));
+    
+    // Set UI language to first selected language
+    const primaryLanguage = user.languages.includes(languageCode) 
+      ? user.languages.find(l => l !== languageCode) || 'en'
+      : languageCode;
+    
+    localStorage.setItem('language', primaryLanguage);
+    i18n.changeLanguage(primaryLanguage);
+    toast.success(t('profile.languageUpdated'));
   };
 
   const toggleAllergen = (allergen: string) => {
@@ -184,26 +195,31 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-primary" />
-              Language Preference
+              {t('profile.languagePreference')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <Label htmlFor="language">I speak</Label>
-              <Select value={user.language} onValueChange={handleLanguageChange}>
-                <SelectTrigger id="language">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {languages.map((lang) => (
-                    <SelectItem key={lang.code} value={lang.code}>
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">{t('profile.languagePreference')}</Label>
+              <div className="grid grid-cols-2 gap-3">
+                {languages.map((lang) => (
+                  <div key={lang.code} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`language-${lang.code}`}
+                      checked={user.languages.includes(lang.code)}
+                      onCheckedChange={() => toggleLanguage(lang.code)}
+                    />
+                    <Label
+                      htmlFor={`language-${lang.code}`}
+                      className="text-sm font-normal cursor-pointer"
+                    >
                       {lang.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </Label>
+                  </div>
+                ))}
+              </div>
               <p className="text-xs text-muted-foreground mt-2">
-                💬 Messages with chefs who speak different languages will be automatically translated for you
+                💬 {t('profile.languagePreference')} - Messages with chefs who speak different languages will be automatically translated for you
               </p>
             </div>
           </CardContent>
@@ -301,6 +317,13 @@ const Profile = () => {
                 <span>{t('guidelines.leaveFeedback')}</span>
               </li>
             </ul>
+            
+            {/* Disclaimer */}
+            <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-sm text-foreground leading-relaxed">
+                {t('guidelines.disclaimer')}
+              </p>
+            </div>
           </CardContent>
         </Card>
 

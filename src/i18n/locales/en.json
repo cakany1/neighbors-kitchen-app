@@ -11,14 +11,14 @@
     "mealsShared": "Meals Shared",
     "mealsReceived": "Meals Received",
     "fairPayments": "Fair Payments",
-    "languagePreference": "Language Preference",
+    "languagePreference": "Languages You Speak",
     "dietaryRestrictions": "Dietary Restrictions",
     "allergens": "Allergens",
     "foodPreferences": "Food Preferences",
     "dislikes": "Dislikes",
     "communityGuidelines": "Community Guidelines",
     "badges": "Badges",
-    "languageUpdated": "Language updated to"
+    "languageUpdated": "Languages updated"
   },
   "signup": {
     "gender": "I am",
@@ -29,10 +29,10 @@
     "isCouple": "We are a couple (portions always minimum x2)",
     "phoneNumber": "Phone Number (for verification)",
     "phoneHint": "We'll send you a verification code",
-    "address": "Street Address",
+    "address": "Street Address (Optional)",
     "city": "City",
     "postalCode": "Postal Code",
-    "addressHint": "Private - only shown after confirmed bookings"
+    "addressHint": "🔒 Your address is private and encrypted. It will ONLY be revealed to guests after you confirm their booking."
   },
   "guidelines": {
     "bringContainer": "Bring your own container or plate for takeaway (except when dining in)",
@@ -40,7 +40,8 @@
     "payFairly": "Pay fairly based on the quality and effort",
     "respectPrivacy": "Respect privacy - only share exact locations after confirmation",
     "communicate": "Communicate dietary restrictions clearly",
-    "leaveFeedback": "Leave honest feedback to build community trust"
+    "leaveFeedback": "Leave honest feedback to build community trust",
+    "disclaimer": "⚠️ Important: This is a private food-sharing community platform. Neighbors Kitchen is not responsible for the quality, safety, or hygiene of shared meals. All food exchanges are at your own risk. Please verify allergen information, practice good food safety, and trust your judgment."
   },
   "navigation": {
     "feed": "Feed",
