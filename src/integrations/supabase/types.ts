@@ -372,6 +372,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      book_meal: {
+        Args: { p_guest_id: string; p_meal_id: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
