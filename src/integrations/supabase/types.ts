@@ -382,6 +382,10 @@ export type Database = {
         Args: { p_guest_id: string; p_meal_id: string }
         Returns: Json
       }
+      cancel_booking: {
+        Args: { p_booking_id: string; p_guest_id: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
