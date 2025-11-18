@@ -10,6 +10,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { SafetyAlert } from '@/components/SafetyAlert';
 import { TranslateButton } from '@/components/TranslateButton';
 import { checkAllergenMatch } from '@/utils/ingredientDatabase';
+import FuzzyLocationMap from '@/components/maps/FuzzyLocationMap';
+import ChatModal from '@/components/ChatModal';
 import { 
   MapPin, 
   Star, 
@@ -23,14 +25,17 @@ import {
   Gift
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const MealDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const meal = mockMeals.find(m => m.id === id);
   const [bookingStatus, setBookingStatus] = useState<'none' | 'pending' | 'confirmed'>('none');
   const [translatedTitle, setTranslatedTitle] = useState(meal?.title || '');
   const [translatedDescription, setTranslatedDescription] = useState(meal?.description || '');
+  const [chatOpen, setChatOpen] = useState(false);
   
   // Mock chef preferences (in real app from database)
   let identityReveal: 'real_name' | 'nickname' = 'nickname';
@@ -212,7 +217,7 @@ const MealDetail = () => {
                 </div>
                 <p className="font-medium text-foreground">{meal.location.neighborhood}</p>
                 
-{bookingStatus === 'confirmed' ? (
+                {bookingStatus === 'confirmed' ? (
                   <Alert className="border-secondary bg-secondary-light">
                     <Home className="h-4 w-4 text-secondary" />
                     <AlertDescription>
@@ -237,11 +242,19 @@ const MealDetail = () => {
                     </AlertDescription>
                   </Alert>
                 ) : (
-                  <Alert>
-                    <AlertDescription className="text-sm text-muted-foreground">
-                      📍 Details revealed after chef confirms your booking (privacy protection)
-                    </AlertDescription>
-                  </Alert>
+                  <>
+                    <Alert>
+                      <AlertDescription className="text-sm text-muted-foreground">
+                        📍 Details revealed after chef confirms your booking (privacy protection)
+                      </AlertDescription>
+                    </Alert>
+                    <FuzzyLocationMap 
+                      lat={meal.location.fuzzyLat} 
+                      lng={meal.location.fuzzyLng} 
+                      radius={200}
+                      neighborhood={meal.location.neighborhood}
+                    />
+                  </>
                 )}
               </div>
             </CardContent>
@@ -337,6 +350,13 @@ const MealDetail = () => {
           </div>
         </div>
       </main>
+
+      <ChatModal 
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+        chefName={meal.chef.firstName}
+        mealTitle={meal.title}
+      />
 
       <BottomNav />
     </div>
