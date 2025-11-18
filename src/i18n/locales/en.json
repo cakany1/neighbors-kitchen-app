@@ -26,7 +26,7 @@
     "genderFemale": "Female",
     "genderPlaceholder": "Select...",
     "genderHint": "For safety and matching preferences",
-    "isCouple": "We are a couple (portions always x2)"
+    "isCouple": "We are a couple (portions always minimum x2)"
   },
   "guidelines": {
     "bringContainer": "Bring your own container or plate for takeaway (except when dining in)",
