@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Meal } from '@/types/meal';
@@ -13,7 +12,6 @@ interface InteractiveMapProps {
 const InteractiveMap = ({ meals, userLat = 47.5596, userLng = 7.5886 }: InteractiveMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
@@ -55,7 +53,7 @@ const InteractiveMap = ({ meals, userLat = 47.5596, userLng = 7.5886 }: Interact
       circle.bindPopup(popupContent);
     });
 
-    // Cleanup
+    // Cleanup on unmount
     return () => {
       map.remove();
       mapInstanceRef.current = null;
