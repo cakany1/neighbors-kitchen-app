@@ -20,6 +20,14 @@
     "badges": "Badges",
     "languageUpdated": "Language updated to"
   },
+  "signup": {
+    "gender": "I am",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderPlaceholder": "Select...",
+    "genderHint": "For safety and matching preferences",
+    "isCouple": "We are a couple (portions always x2)"
+  },
   "guidelines": {
     "bringContainer": "Bring your own container or plate for takeaway (except when dining in)",
     "bePunctual": "Be punctual and respect the chef's time",

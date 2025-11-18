@@ -56,6 +56,17 @@ const AddMeal = () => {
     }
   }, [ingredients]);
 
+  // Auto-run Price Detective when title changes
+  useEffect(() => {
+    if (formData.title.trim() && exchangeMode === 'money') {
+      const timer = setTimeout(() => {
+        runPriceDetective();
+      }, 1000); // Debounce for 1 second
+      
+      return () => clearTimeout(timer);
+    }
+  }, [formData.title, exchangeMode]);
+
   const handleAddTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
       setTags([...tags, tagInput.trim()]);
@@ -440,44 +451,35 @@ const AddMeal = () => {
 
               {exchangeMode === 'money' ? (
                 <div className="space-y-4 pt-2">
-                  {/* Price Detective */}
-                  <div className="border border-border rounded-lg p-4 space-y-3">
-                    <div className="flex items-center justify-between">
+                  {/* Price Detective - Auto-runs */}
+                  {(priceDetectiveLoading || priceDetectiveResult) && (
+                    <div className="border border-border rounded-lg p-4 space-y-3">
                       <Label className="text-sm font-medium">Price Detective 🔍</Label>
-                      <Button 
-                        type="button" 
-                        size="sm" 
-                        variant="outline"
-                        onClick={runPriceDetective}
-                        disabled={priceDetectiveLoading || !formData.title}
-                      >
-                        {priceDetectiveLoading ? 'Scanning...' : 'Find Price'}
-                      </Button>
+                      {priceDetectiveLoading && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                          Scanning neighborhood restaurant prices...
+                        </div>
+                      )}
+                      {priceDetectiveResult && !priceDetectiveLoading && (
+                        <Alert className="bg-primary/10 border-primary">
+                          <AlertDescription className="space-y-2">
+                            <p className="text-sm font-medium">
+                              Found! "{formData.title}" in Basel St. Johann costs between: <strong>CHF {priceDetectiveResult.min.toFixed(2)}</strong> and <strong>CHF {priceDetectiveResult.max.toFixed(2)}</strong>
+                            </p>
+                            <Button 
+                              type="button" 
+                              size="sm" 
+                              onClick={usePriceDetectiveResult}
+                              className="w-full"
+                            >
+                              Use Average as Value Anchor
+                            </Button>
+                          </AlertDescription>
+                        </Alert>
+                      )}
                     </div>
-                    {priceDetectiveLoading && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
-                        Scanning neighborhood restaurant prices...
-                      </div>
-                    )}
-                    {priceDetectiveResult && !priceDetectiveLoading && (
-                      <Alert className="bg-primary/10 border-primary">
-                        <AlertDescription className="space-y-2">
-                          <p className="text-sm font-medium">
-                            Found! "{formData.title}" in Basel St. Johann costs between: <strong>CHF {priceDetectiveResult.min.toFixed(2)}</strong> and <strong>CHF {priceDetectiveResult.max.toFixed(2)}</strong>
-                          </p>
-                          <Button 
-                            type="button" 
-                            size="sm" 
-                            onClick={usePriceDetectiveResult}
-                            className="w-full"
-                          >
-                            Use Average as Value Anchor
-                          </Button>
-                        </AlertDescription>
-                      </Alert>
-                    )}
-                  </div>
+                  )}
 
                   <div>
                     <Label htmlFor="restaurantReferencePrice">Restaurant Reference Price (CHF)</Label>
