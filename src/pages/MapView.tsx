@@ -27,7 +27,6 @@ const MapView = () => {
           </Alert>
         </div>
 
-        {/* Interactive Map */}
         <div className="mb-6 h-[400px]">
           <InteractiveMap meals={mockMeals} />
         </div>
