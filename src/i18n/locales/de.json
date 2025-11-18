@@ -1,0 +1,43 @@
+{
+  "common": {
+    "payWhatYouWant": "Zahle/Bring was du willst",
+    "orBring": "Oder bringe",
+    "portions": "Portionen",
+    "community": "Gemeinschaft",
+    "guidelines": "Richtlinien"
+  },
+  "profile": {
+    "karma": "Karma",
+    "mealsShared": "Mahlzeiten geteilt",
+    "mealsReceived": "Mahlzeiten erhalten",
+    "fairPayments": "Faire Zahlungen",
+    "languagePreference": "Spracheinstellung",
+    "dietaryRestrictions": "Ernährungseinschränkungen",
+    "allergens": "Allergene",
+    "foodPreferences": "Essensvorlieben",
+    "dislikes": "Abneigungen",
+    "communityGuidelines": "Gemeinschaftsrichtlinien",
+    "badges": "Abzeichen",
+    "languageUpdated": "Sprache aktualisiert auf"
+  },
+  "guidelines": {
+    "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (außer beim Vor-Ort-Essen)",
+    "bePunctual": "Pünktlich sein und die Zeit des Kochs respektieren",
+    "payFairly": "Fair bezahlen basierend auf Qualität und Aufwand",
+    "respectPrivacy": "Privatsphäre respektieren - genaue Orte erst nach Bestätigung teilen",
+    "communicate": "Ernährungseinschränkungen klar kommunizieren",
+    "leaveFeedback": "Ehrliches Feedback geben um Vertrauen aufzubauen"
+  },
+  "navigation": {
+    "feed": "Feed",
+    "map": "Karte",
+    "addMeal": "Hinzufügen",
+    "profile": "Profil"
+  },
+  "handover": {
+    "pickupTupperware": "Abholung (Tupperware)",
+    "neighborPlate": "Nachbarteller",
+    "anonymousDrop": "Anonyme Übergabe",
+    "dineIn": "Vor Ort essen"
+  }
+}
