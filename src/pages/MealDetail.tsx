@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockMeals } from '@/data/mockMeals';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -26,47 +25,93 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const MealDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const meal = mockMeals.find(m => m.id === id);
+  const queryClient = useQueryClient();
   const [bookingStatus, setBookingStatus] = useState<'none' | 'pending' | 'confirmed'>('none');
-  const [translatedTitle, setTranslatedTitle] = useState(meal?.title || '');
-  const [translatedDescription, setTranslatedDescription] = useState(meal?.description || '');
   const [chatOpen, setChatOpen] = useState(false);
   
-  // Mock chef preferences (in real app from database)
-  let identityReveal: 'real_name' | 'nickname' = 'nickname';
-  let handoverMode: 'pickup_box' | 'neighbor_plate' | 'ghost_mode' | 'dine_in' = 'pickup_box';
-  const chefNickname = "FoodieChef";
-  const chefRealName = "Maria Schmidt";
-  
-  // Assign different reveal modes for different meals
-  if (meal?.id === 'meal_101') {
-    identityReveal = 'nickname';
-    handoverMode = 'ghost_mode';
-  } else if (meal?.id === 'meal_102') {
-    identityReveal = 'real_name';
-    handoverMode = 'dine_in';
-  } else {
-    identityReveal = 'nickname';
-    handoverMode = 'pickup_box';
+  // Fetch current user
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      return { ...user, profile };
+    },
+  });
+
+  // Fetch meal data
+  const { data: meal, isLoading } = useQuery({
+    queryKey: ['meal', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('meals')
+        .select(`
+          *,
+          chef_profile:profiles(*)
+        `)
+        .eq('id', id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch existing booking if any
+  const { data: existingBooking } = useQuery({
+    queryKey: ['booking', id, currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      
+      const { data } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('meal_id', id)
+        .eq('guest_id', currentUser.id)
+        .maybeSingle();
+      
+      return data;
+    },
+    enabled: !!currentUser?.id,
+  });
+
+  // Update booking status when existingBooking changes
+  useEffect(() => {
+    if (existingBooking) {
+      if (existingBooking.status === 'confirmed') {
+        setBookingStatus('confirmed');
+      } else if (existingBooking.status === 'pending') {
+        setBookingStatus('pending');
+      }
+    }
+  }, [existingBooking]);
+
+  const matchingAllergens = checkAllergenMatch(
+    meal?.allergens || [],
+    currentUser?.profile?.allergens || []
+  );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
   }
-  
-  const collectionWindow = { start: '17:00', end: '19:00' };
-  const pickupInstructions = 'Look for blue box at entrance';
-
-  // Mock user allergens
-  const userAllergens = ['gluten', 'nuts'];
-  // Mock meal allergens (in real app from database)
-  const mealAllergens = meal?.id === 'meal_101' ? ['dairy'] : ['gluten'];
-  const matchingAllergens = checkAllergenMatch(mealAllergens, userAllergens);
-
-  // Mock exchange mode
-  const exchangeMode = meal?.id === 'meal_103' ? 'barter' : 'money';
-  const barterRequests = ['White Wine', 'Dessert'];
 
   if (!meal) {
     return (
@@ -81,15 +126,47 @@ const MealDetail = () => {
     );
   }
 
+  const bookingMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser?.id || !meal) throw new Error('Missing user or meal');
+      
+      // Check if meal is still available
+      if (meal.available_portions <= 0) {
+        throw new Error('This meal is sold out');
+      }
+
+      // Create booking
+      const { data: booking, error: bookingError } = await supabase
+        .from('bookings')
+        .insert({
+          meal_id: meal.id,
+          guest_id: currentUser.id,
+          status: 'pending',
+        })
+        .select()
+        .single();
+
+      if (bookingError) throw bookingError;
+
+      return booking;
+    },
+    onSuccess: () => {
+      setBookingStatus('pending');
+      toast.success('Booking request sent to ' + meal?.chef_profile.first_name);
+      queryClient.invalidateQueries({ queryKey: ['booking', id, currentUser?.id] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to create booking');
+    },
+  });
+
   const handleRequestBooking = () => {
-    setBookingStatus('pending');
-    toast.success('Booking request sent to ' + meal.chef.firstName);
-    
-    // Simulate chef accepting after 2 seconds
-    setTimeout(() => {
-      setBookingStatus('confirmed');
-      toast.success('Booking confirmed! Address revealed.');
-    }, 2000);
+    if (!currentUser) {
+      toast.error('Please log in to book this meal');
+      navigate('/login');
+      return;
+    }
+    bookingMutation.mutate();
   };
 
   return (
@@ -170,7 +247,7 @@ const MealDetail = () => {
           </Card>
 
           {/* Scheduled Date */}
-          {meal.scheduledDate && (
+          {meal.scheduled_date && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -182,18 +259,15 @@ const MealDetail = () => {
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex flex-col items-center justify-center">
                     <span className="text-xs font-medium text-primary">
-                      {new Date(meal.scheduledDate).toLocaleDateString([], { month: 'short' }).toUpperCase()}
+                      {new Date(meal.scheduled_date).toLocaleDateString([], { month: 'short' }).toUpperCase()}
                     </span>
                     <span className="text-lg font-bold text-primary">
-                      {new Date(meal.scheduledDate).getDate()}
+                      {new Date(meal.scheduled_date).getDate()}
                     </span>
                   </div>
                   <div>
                     <p className="font-semibold text-foreground">
-                      {new Date(meal.scheduledDate).toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(meal.scheduledDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(meal.scheduled_date).toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
                   </div>
                 </div>
@@ -211,11 +285,7 @@ const MealDetail = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span>{meal.distance} from you</span>
-                </div>
-                <p className="font-medium text-foreground">{meal.location.neighborhood}</p>
+                <p className="font-medium text-foreground">{meal.neighborhood}</p>
                 
                 {bookingStatus === 'confirmed' ? (
                   <Alert className="border-secondary bg-secondary-light">
