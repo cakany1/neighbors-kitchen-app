@@ -35,9 +35,23 @@
     "profile": "Profile"
   },
   "handover": {
-    "pickupTupperware": "Pickup (Tupperware)",
-    "neighborPlate": "Neighbor Plate",
-    "anonymousDrop": "Anonymous Drop",
+    "pickupTupperware": "Pickup (Box)",
+    "neighborPlate": "Neighbor (Plate)",
+    "anonymousDrop": "Ghost Mode",
     "dineIn": "Dine In"
+  },
+  "form": {
+    "title": "Title",
+    "collectionWindow": "Collection Window",
+    "estimatedValue": "Estimated Restaurant Value",
+    "searchImage": "Search for Image"
+  },
+  "badges": {
+    "payWhatYouWant": "❤️ Pay what you want",
+    "symbolicImage": "📷 Symbolic Image"
+  },
+  "buttons": {
+    "book": "Book",
+    "translate": "Translate"
   }
 }
