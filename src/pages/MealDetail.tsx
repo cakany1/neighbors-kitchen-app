@@ -115,6 +115,19 @@ const MealDetail = () => {
     mutationFn: async () => {
       if (!currentUser?.id || !meal) throw new Error('Missing user or meal');
 
+      // BOOKING GATE: Check profile completion
+      const profile = currentUser.profile;
+      const isProfileComplete = 
+        profile?.phone_number && 
+        profile?.private_address && 
+        profile?.private_city;
+
+      if (!isProfileComplete) {
+        toast.error('Please complete your profile (Address & Phone) to book meals.');
+        navigate('/profile');
+        throw new Error('Profile incomplete');
+      }
+
       // Call secure booking function (prevents overbooking with row-level lock)
       const { data, error } = await supabase.rpc('book_meal', {
         p_meal_id: meal.id,
