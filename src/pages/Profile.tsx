@@ -1,17 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Star, Award, ChefHat, Heart, Globe, Shield } from 'lucide-react';
+import { Star, Award, ChefHat, Heart, Globe, Shield, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { allergenOptions, dislikeCategories } from '@/utils/ingredientDatabase';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -29,23 +35,86 @@ const languages = [
 
 const Profile = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
-  // Mock user data
-  const [user, setUser] = useState({
-    firstName: 'Alex',
-    lastName: 'Chen',
-    nickname: 'FoodieChef',
-    languages: ['en', 'de'], // Multiple languages now supported
-    karma: 178,
-    mealsShared: 23,
-    mealsReceived: 31,
-    fairPayments: 28,
+  // Form state for editing
+  const [formData, setFormData] = useState({
+    nickname: '',
+    age: null as number | null,
+    vacation_mode: false,
+    notification_radius: 1000,
     allergens: [] as string[],
     dislikes: [] as string[],
+    languages: ['de'] as string[],
+  });
+
+  // Fetch current user and profile
+  const { data: currentUser, isLoading: userLoading } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/login');
+        return null;
+      }
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      return { ...user, profile };
+    },
+  });
+
+  // Initialize form data when profile loads
+  useEffect(() => {
+    if (currentUser?.profile) {
+      setFormData({
+        nickname: currentUser.profile.nickname || '',
+        age: currentUser.profile.age || null,
+        vacation_mode: currentUser.profile.vacation_mode || false,
+        notification_radius: currentUser.profile.notification_radius || 1000,
+        allergens: currentUser.profile.allergens || [],
+        dislikes: currentUser.profile.dislikes || [],
+        languages: currentUser.profile.languages || ['de'],
+      });
+    }
+  }, [currentUser]);
+
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser?.id) throw new Error('Not authenticated');
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          nickname: formData.nickname || null,
+          age: formData.age || null,
+          vacation_mode: formData.vacation_mode,
+          notification_radius: formData.notification_radius,
+          allergens: formData.allergens,
+          dislikes: formData.dislikes,
+          languages: formData.languages,
+        })
+        .eq('id', currentUser.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Profile updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update profile');
+    },
   });
 
   const toggleLanguage = (languageCode: string) => {
-    setUser(prev => ({
+    setFormData(prev => ({
       ...prev,
       languages: prev.languages.includes(languageCode)
         ? prev.languages.filter(l => l !== languageCode)
@@ -53,34 +122,45 @@ const Profile = () => {
     }));
     
     // Set UI language to first selected language
-    const primaryLanguage = user.languages.includes(languageCode) 
-      ? user.languages.find(l => l !== languageCode) || 'en'
+    const primaryLanguage = formData.languages.includes(languageCode) 
+      ? formData.languages.find(l => l !== languageCode) || 'de'
       : languageCode;
     
     localStorage.setItem('language', primaryLanguage);
     i18n.changeLanguage(primaryLanguage);
-    toast.success(t('profile.languageUpdated'));
   };
 
   const toggleAllergen = (allergen: string) => {
-    setUser(prev => ({
+    setFormData(prev => ({
       ...prev,
       allergens: prev.allergens.includes(allergen)
         ? prev.allergens.filter(a => a !== allergen)
         : [...prev.allergens, allergen]
     }));
-    toast.success('Dietary preferences updated');
   };
 
   const toggleDislike = (dislike: string) => {
-    setUser(prev => ({
+    setFormData(prev => ({
       ...prev,
       dislikes: prev.dislikes.includes(dislike)
         ? prev.dislikes.filter(d => d !== dislike)
         : [...prev.dislikes, dislike]
     }));
-    toast.success('Food preferences updated');
   };
+
+  if (userLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return null;
+  }
+
+  const profile = currentUser.profile;
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -96,29 +176,108 @@ const Profile = () => {
               </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-foreground">
-                  {user.firstName} {user.lastName}
+                  {profile?.first_name} {profile?.last_name}
                 </h2>
-                <p className="text-sm text-muted-foreground">@{user.nickname}</p>
+                <p className="text-sm text-muted-foreground">
+                  @{formData.nickname || profile?.first_name || 'User'}
+                </p>
                 <div className="flex items-center gap-2 mt-1">
                   <Star className="w-5 h-5 text-trust-gold fill-current" />
-                  <span className="text-lg font-semibold text-trust-gold">{user.karma} {t('profile.karma')}</span>
+                  <span className="text-lg font-semibold text-trust-gold">
+                    {profile?.karma || 0} {t('profile.karma')}
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
               <div className="text-center">
-                <p className="text-2xl font-bold text-primary">{user.mealsShared}</p>
+                <p className="text-2xl font-bold text-primary">0</p>
                 <p className="text-xs text-muted-foreground">{t('profile.mealsShared')}</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-secondary">{user.mealsReceived}</p>
+                <p className="text-2xl font-bold text-secondary">0</p>
                 <p className="text-xs text-muted-foreground">{t('profile.mealsReceived')}</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-trust-badge">{user.fairPayments}</p>
+                <p className="text-2xl font-bold text-trust-badge">0</p>
                 <p className="text-xs text-muted-foreground">{t('profile.fairPayments')}</p>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Personal Details */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Personal Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="nickname">Nickname</Label>
+              <Input
+                id="nickname"
+                type="text"
+                placeholder="How neighbors should call you"
+                value={formData.nickname}
+                onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="age">Age (Optional)</Label>
+              <Input
+                id="age"
+                type="number"
+                placeholder="Your age"
+                value={formData.age || ''}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  age: e.target.value ? parseInt(e.target.value) : null 
+                })}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Preferences */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Preferences</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="vacation-mode" className="text-base">Vacation Mode</Label>
+                <p className="text-sm text-muted-foreground">
+                  Pause all notifications and hide my meals
+                </p>
+              </div>
+              <Switch
+                id="vacation-mode"
+                checked={formData.vacation_mode}
+                onCheckedChange={(checked) => setFormData({ ...formData, vacation_mode: checked })}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="notification-radius">Notification Radius</Label>
+                <span className="text-sm font-medium text-primary">
+                  {formData.notification_radius}m
+                </span>
+              </div>
+              <Slider
+                id="notification-radius"
+                min={100}
+                max={5000}
+                step={100}
+                value={[formData.notification_radius]}
+                onValueChange={([value]) => setFormData({ ...formData, notification_radius: value })}
+                className="w-full"
+              />
+              <p className="text-xs text-muted-foreground">
+                You'll be notified about meals within this radius from your location
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -142,7 +301,7 @@ const Profile = () => {
                   <div key={option.value} className="flex items-center space-x-2">
                     <Checkbox
                       id={`allergen-${option.value}`}
-                      checked={user.allergens.includes(option.value)}
+                      checked={formData.allergens.includes(option.value)}
                       onCheckedChange={() => toggleAllergen(option.value)}
                     />
                     <Label
@@ -162,7 +321,7 @@ const Profile = () => {
                 {Object.entries(dislikeCategories).map(([category, items]) => (
                   <AccordionItem key={category} value={category}>
                     <AccordionTrigger className="text-sm capitalize">
-                      {category} ({items.filter(item => user.dislikes.includes(item.value)).length}/{items.length})
+                      {category} ({items.filter(item => formData.dislikes.includes(item.value)).length}/{items.length})
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="space-y-2 pt-2">
@@ -170,7 +329,7 @@ const Profile = () => {
                           <div key={dislike.value} className="flex items-center space-x-2">
                             <Checkbox
                               id={`dislike-${dislike.value}`}
-                              checked={user.dislikes.includes(dislike.value)}
+                              checked={formData.dislikes.includes(dislike.value)}
                               onCheckedChange={() => toggleDislike(dislike.value)}
                             />
                             <Label
@@ -206,7 +365,7 @@ const Profile = () => {
                   <div key={lang.code} className="flex items-center space-x-2">
                     <Checkbox
                       id={`language-${lang.code}`}
-                      checked={user.languages.includes(lang.code)}
+                      checked={formData.languages.includes(lang.code)}
                       onCheckedChange={() => toggleLanguage(lang.code)}
                     />
                     <Label
@@ -327,12 +486,18 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        <div className="mt-6 space-y-3">
-          <Button variant="outline" className="w-full">
-            Edit Profile
-          </Button>
-          <Button variant="ghost" className="w-full text-muted-foreground">
-            Settings
+        {/* Save Button */}
+        <div className="mt-6">
+          <Button 
+            onClick={() => updateProfileMutation.mutate()}
+            disabled={updateProfileMutation.isPending}
+            className="w-full"
+            size="lg"
+          >
+            {updateProfileMutation.isPending && (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            )}
+            {updateProfileMutation.isPending ? 'Saving...' : 'Save Profile'}
           </Button>
         </div>
       </main>
