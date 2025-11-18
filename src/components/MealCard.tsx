@@ -34,6 +34,13 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
     dine_in: UtensilsCrossed,
   };
 
+  const handoverLabels = {
+    pickup_box: 'Pickup (Tupperware)',
+    neighbor_plate: 'Neighbor Plate',
+    anonymous_drop: 'Anonymous Drop',
+    dine_in: 'Dine In',
+  };
+
   const HandoverIcon = handoverIcons[handoverMode as keyof typeof handoverIcons] || Package;
   
   return (
@@ -141,7 +148,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           {/* Handover Mode */}
           <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
             <HandoverIcon className="w-3.5 h-3.5" />
-            <span className="capitalize">{handoverMode.replace('_', ' ')}</span>
+            <span>{handoverLabels[handoverMode as keyof typeof handoverLabels] || handoverMode}</span>
           </div>
         </div>
       </CardContent>
