@@ -15,7 +15,7 @@ export interface Meal {
     // Exact location revealed only after booking confirmed
     exactAddress?: string;
   };
-  distance: string;
+  distance?: number; // Distance in meters (optional, calculated on client)
   tags: string[];
   imageUrl: string;
   pricing: {

@@ -16,7 +16,6 @@ export const mockMeals: Meal[] = [
       fuzzyLng: 7.5845,
       exactAddress: 'Lothringerstrasse 42, 4056 Basel', // Revealed only after confirmation
     },
-    distance: '5 min walk',
     tags: ['Vietnamese', 'Vegetarian', 'Gluten-Free'],
     imageUrl: '/placeholder-meal-1.jpg',
     pricing: {
@@ -43,7 +42,6 @@ export const mockMeals: Meal[] = [
       fuzzyLng: 7.6024,
       exactAddress: 'Güterstrasse 15, 4053 Basel',
     },
-    distance: '8 min walk',
     tags: ['Italian', 'Comfort Food'],
     imageUrl: '/placeholder-meal-2.jpg',
     pricing: {
@@ -70,7 +68,6 @@ export const mockMeals: Meal[] = [
       fuzzyLng: 7.5956,
       exactAddress: 'Klybeckstrasse 88, 4057 Basel',
     },
-    distance: '12 min walk',
     tags: ['Moroccan', 'Halal', 'Spicy'],
     imageUrl: '/placeholder-meal-3.jpg',
     pricing: {
@@ -97,7 +94,6 @@ export const mockMeals: Meal[] = [
       fuzzyLng: 7.5789,
       exactAddress: 'Erlenmattstrasse 22, 4058 Basel',
     },
-    distance: '6 min walk',
     tags: ['Thai', 'Vegan', 'Spicy'],
     imageUrl: '/placeholder-meal-4.jpg',
     pricing: {
