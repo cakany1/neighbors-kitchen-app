@@ -92,11 +92,6 @@ const MapView = () => {
                       )}
                     </div>
                   </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="font-semibold text-primary">
-                      {meal.pricing.minimum === 0 ? 'Free' : `CHF ${meal.pricing.minimum}+`}
-                    </p>
-                  </div>
                 </div>
               </CardContent>
             </Card>
