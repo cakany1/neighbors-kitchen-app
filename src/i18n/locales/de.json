@@ -35,9 +35,23 @@
     "profile": "Profil"
   },
   "handover": {
-    "pickupTupperware": "Abholung (Tupperware)",
-    "neighborPlate": "Nachbarteller",
-    "anonymousDrop": "Anonyme Übergabe",
-    "dineIn": "Vor Ort essen"
+    "pickupTupperware": "Abholung (Tupperware mitbringen)",
+    "neighborPlate": "Nachbar (eigener Teller)",
+    "anonymousDrop": "Kontaktlos (Eingangsbereich)",
+    "dineIn": "Zu Gast (Am Tisch essen)"
+  },
+  "form": {
+    "title": "Gericht Name",
+    "collectionWindow": "Abholzeitraum",
+    "estimatedValue": "Restaurant-Vergleichspreis",
+    "searchImage": "Symbolbild suchen"
+  },
+  "badges": {
+    "payWhatYouWant": "❤️ Zahl/Bring was du willst",
+    "symbolicImage": "📷 Symbolbild"
+  },
+  "buttons": {
+    "book": "Reservieren",
+    "translate": "Übersetzen"
   }
 }
