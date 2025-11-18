@@ -190,7 +190,9 @@ export type Database = {
           dislikes: string[] | null
           display_real_name: boolean | null
           first_name: string
+          gender: string | null
           id: string
+          is_couple: boolean | null
           karma: number
           language: string
           last_name: string
@@ -203,7 +205,9 @@ export type Database = {
           dislikes?: string[] | null
           display_real_name?: boolean | null
           first_name: string
+          gender?: string | null
           id: string
+          is_couple?: boolean | null
           karma?: number
           language?: string
           last_name: string
@@ -216,7 +220,9 @@ export type Database = {
           dislikes?: string[] | null
           display_real_name?: boolean | null
           first_name?: string
+          gender?: string | null
           id?: string
+          is_couple?: boolean | null
           karma?: number
           language?: string
           last_name?: string
