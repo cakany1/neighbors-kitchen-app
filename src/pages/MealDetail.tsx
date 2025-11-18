@@ -57,17 +57,27 @@ const MealDetail = () => {
   const { data: meal, isLoading } = useQuery({
     queryKey: ['meal', id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: mealData, error: mealError } = await supabase
         .from('meals')
-        .select(`
-          *,
-          chef_profile:profiles(*)
-        `)
+        .select('*')
         .eq('id', id)
         .single();
       
-      if (error) throw error;
-      return data;
+      if (mealError) throw mealError;
+      
+      // Fetch chef profile separately
+      const { data: chefData, error: chefError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', mealData.chef_id)
+        .single();
+      
+      if (chefError) throw chefError;
+      
+      return {
+        ...mealData,
+        chef_profile: chefData,
+      };
     },
   });
 
@@ -105,27 +115,6 @@ const MealDetail = () => {
     currentUser?.profile?.allergens || []
   );
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!meal) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground">Meal not found</p>
-          <Button onClick={() => navigate('/')} className="mt-4">
-            Back to Feed
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   const bookingMutation = useMutation({
     mutationFn: async () => {
       if (!currentUser?.id || !meal) throw new Error('Missing user or meal');
@@ -152,7 +141,7 @@ const MealDetail = () => {
     },
     onSuccess: () => {
       setBookingStatus('pending');
-      toast.success('Booking request sent to ' + meal?.chef_profile.first_name);
+      toast.success('Booking request sent to ' + meal?.chef_profile?.first_name);
       queryClient.invalidateQueries({ queryKey: ['booking', id, currentUser?.id] });
     },
     onError: (error: any) => {
@@ -169,6 +158,27 @@ const MealDetail = () => {
     bookingMutation.mutate();
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!meal) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Meal not found</p>
+          <Button onClick={() => navigate('/')} className="mt-4">
+            Back to Feed
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <Header />
@@ -176,9 +186,9 @@ const MealDetail = () => {
       <main className="max-w-lg mx-auto">
         {/* Hero Image */}
         <div className="relative h-64 bg-muted">
-          {meal.imageUrl ? (
+          {meal.image_url ? (
             <img 
-              src={meal.imageUrl} 
+              src={meal.image_url} 
               alt={meal.title}
               className="w-full h-full object-cover"
             />
@@ -187,41 +197,51 @@ const MealDetail = () => {
               <ChefHat className="w-20 h-20 text-muted-foreground" />
             </div>
           )}
-          {meal.isCookingExperience && (
-            <Badge className="absolute top-4 right-4 bg-secondary text-secondary-foreground text-sm px-3 py-1">
-              Cooking Experience 🍳
+          {meal.is_stock_photo && (
+            <Badge className="absolute top-3 right-3 bg-background/80 backdrop-blur">
+              📷 Symbolic Image
             </Badge>
           )}
         </div>
 
-        <div className="px-4 py-6 space-y-6">
-          {/* Safety Alert */}
-          <SafetyAlert matchingAllergens={matchingAllergens} />
-
+        <div className="p-4 space-y-4">
           {/* Title & Chef */}
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-3">{meal.title}</h1>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <ChefHat className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">
-                    {meal.chef.firstName} {meal.chef.lastName.charAt(0)}.
-                  </p>
-                  <div className="flex items-center gap-1 text-trust-gold">
-                    <Star className="w-3.5 h-3.5 fill-current" />
-                    <span className="text-sm">{meal.chef.karma} Karma</span>
-                  </div>
-                </div>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-2xl font-bold text-foreground">{meal.title}</h1>
+                <TranslateButton 
+                  originalText={meal.title}
+                  onTranslate={(translated) => {}}
+                />
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <ChefHat className="w-4 h-4" />
+                <span>by {meal.chef_profile?.first_name} {meal.chef_profile?.last_name?.charAt(0)}.</span>
+                <Star className="w-4 h-4 fill-trust-gold text-trust-gold" />
+                <span className="text-trust-gold font-semibold">{meal.chef_profile?.karma || 0}</span>
               </div>
             </div>
           </div>
 
+          {/* Safety Alert */}
+          {matchingAllergens.length > 0 && (
+            <SafetyAlert matchingAllergens={matchingAllergens} />
+          )}
+
+          {/* Cooking Experience Badge */}
+          {meal.is_cooking_experience && (
+            <Alert className="border-primary bg-primary/5">
+              <Home className="h-4 w-4 text-primary" />
+              <AlertDescription>
+                🍽️ <strong>Cooking Experience</strong> - Watch and socialize in the kitchen!
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* Tags */}
           <div className="flex flex-wrap gap-2">
-            {meal.tags.map((tag) => (
+            {meal.tags?.map((tag: string) => (
               <Badge key={tag} variant="secondary">
                 {tag}
               </Badge>
@@ -293,38 +313,22 @@ const MealDetail = () => {
                     <AlertDescription>
                       <div className="space-y-2">
                         <p className="text-foreground">
-                          <strong className="text-secondary">Contact:</strong> {identityReveal === 'real_name' ? chefRealName : chefNickname}
+                          <strong className="text-secondary">Contact:</strong> {meal.chef_profile?.first_name} {meal.chef_profile?.last_name}
                         </p>
                         <p className="text-foreground">
-                          <strong className="text-secondary">Address:</strong> {meal.location.exactAddress}
+                          <strong className="text-secondary">Address:</strong> {meal.exact_address}
                         </p>
-                        {handoverMode === 'ghost_mode' && pickupInstructions && (
-                          <p className="text-foreground">
-                            <strong className="text-secondary">Instructions:</strong> {pickupInstructions}
-                          </p>
-                        )}
-                        {collectionWindow && (
-                          <p className="text-foreground">
-                            <strong className="text-secondary">Collection Window:</strong> {collectionWindow.start} - {collectionWindow.end}
-                          </p>
-                        )}
                       </div>
                     </AlertDescription>
                   </Alert>
                 ) : (
-                  <>
-                    <Alert>
-                      <AlertDescription className="text-sm text-muted-foreground">
-                        📍 Details revealed after chef confirms your booking (privacy protection)
-                      </AlertDescription>
-                    </Alert>
-                    <FuzzyLocationMap 
-                      lat={meal.location.fuzzyLat} 
-                      lng={meal.location.fuzzyLng} 
-                      radius={200}
-                      neighborhood={meal.location.neighborhood}
+                  <div className="mt-4">
+                    <FuzzyLocationMap
+                      lat={parseFloat(String(meal.fuzzy_lat))}
+                      lng={parseFloat(String(meal.fuzzy_lng))}
+                      neighborhood={meal.neighborhood}
                     />
-                  </>
+                  </div>
                 )}
               </div>
             </CardContent>
@@ -333,102 +337,83 @@ const MealDetail = () => {
           {/* Pricing */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Pricing</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Gift className="w-5 h-5 text-primary" />
+                Exchange
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold text-primary">
-                    {meal.pricing.minimum === 0 ? 'Free' : `CHF ${meal.pricing.minimum}`}
-                  </span>
-                  <span className="text-sm text-muted-foreground">minimum</span>
-                </div>
-                <p className="text-sm text-muted-foreground italic">
-                  💚 Pay what you want • Payment after you enjoy the meal
-                </p>
-                {meal.pricing.suggested && (
+                <Badge variant="outline" className="text-base py-1">
+                  ❤️ Pay what you want
+                </Badge>
+                {meal.pricing_suggested && (
                   <p className="text-sm text-muted-foreground">
-                    Suggested: CHF {meal.pricing.suggested}
+                    ~ Restaurant Value: CHF {meal.pricing_suggested}.-
+                  </p>
+                )}
+                {meal.pricing_minimum > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Minimum: CHF {meal.pricing_minimum}.-
                   </p>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Cooking Experience Info */}
-          {meal.isCookingExperience && (
-            <Alert className="border-secondary bg-secondary-light">
-              <ChefHat className="h-4 w-4 text-secondary" />
-              <AlertDescription>
-                <strong className="text-secondary">Cooking Experience Available!</strong>
-                <p className="text-foreground mt-1">
-                  {meal.chef.firstName} invites you to watch the cooking process and enjoy an apéro together.
-                </p>
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {/* Booking Action */}
-          <div className="sticky bottom-20 bg-background pt-4 pb-2 border-t border-border">
-            {bookingStatus === 'none' && (
-              <Button 
-                onClick={handleRequestBooking}
-                className="w-full h-12 text-lg"
-                size="lg"
-              >
-                Request Booking
-              </Button>
-            )}
-            
-            {bookingStatus === 'pending' && (
-              <Button 
-                disabled
-                className="w-full h-12 text-lg"
-                variant="secondary"
-              >
-                <Clock className="w-5 h-5 mr-2" />
-                Waiting for {meal.chef.firstName}'s confirmation...
-              </Button>
-            )}
-            
-            {bookingStatus === 'confirmed' && (
-              <div className="space-y-3">
-                <Alert className="border-secondary bg-secondary-light">
-                  <CheckCircle className="h-4 w-4 text-secondary" />
-                  <AlertDescription className="text-secondary font-medium">
-                    Booking confirmed! See you soon 🎉
-                  </AlertDescription>
-                </Alert>
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={() => navigate(`/chat/booking-${meal.id}`)}
-                    variant="outline"
-                    className="flex-1 h-12 text-lg gap-2"
-                  >
-                    <MessageCircle className="w-5 h-5" />
-                    Chat with {meal.chef.firstName}
-                  </Button>
-                  <Button 
-                    onClick={() => navigate(`/payment/${meal.id}`)}
-                    className="flex-1 h-12 text-lg"
-                  >
-                    Payment
-                  </Button>
-                </div>
-              </div>
-            )}
+          {/* Available Portions */}
+          <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+            <span className="text-sm text-muted-foreground">Available Portions</span>
+            <span className="text-lg font-semibold text-foreground">{meal.available_portions}</span>
           </div>
         </div>
       </main>
 
-      <ChatModal 
-        open={chatOpen}
-        onOpenChange={setChatOpen}
-        chefName={meal.chef.firstName}
-        mealTitle={meal.title}
-      />
+      {/* Action Button */}
+      <div className="fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t border-border">
+        <div className="max-w-lg mx-auto flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setChatOpen(true)}
+            className="flex-1"
+          >
+            <MessageCircle className="w-4 h-4 mr-2" />
+            Ask Chef
+          </Button>
+          
+          {bookingStatus === 'none' && (
+            <Button
+              onClick={handleRequestBooking}
+              disabled={meal.available_portions === 0 || bookingMutation.isPending}
+              className="flex-1"
+            >
+              {meal.available_portions === 0 ? 'Sold Out' : 'Request Booking'}
+            </Button>
+          )}
+          
+          {bookingStatus === 'pending' && (
+            <Button disabled className="flex-1">
+              <Clock className="w-4 h-4 mr-2" />
+              Pending...
+            </Button>
+          )}
+          
+          {bookingStatus === 'confirmed' && (
+            <Button className="flex-1 bg-secondary">
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Confirmed
+            </Button>
+          )}
+        </div>
+      </div>
 
       <BottomNav />
+      <ChatModal 
+        open={chatOpen} 
+        onOpenChange={setChatOpen} 
+        chefName={meal.chef_profile?.first_name || 'Chef'}
+        mealTitle={meal.title}
+      />
     </div>
   );
 };
