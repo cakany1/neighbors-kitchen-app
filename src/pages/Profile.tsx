@@ -92,35 +92,57 @@ const Profile = () => {
     }
   }, [currentUser]);
 
+  // Geocoding helper function
+  const getCoordinates = async (address: string): Promise<{ lat: number; lon: number } | null> => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`,
+        { headers: { "User-Agent": "NeighborsKitchen/1.0" } }
+      );
+      const data = await response.json();
+      if (data && data.length > 0) {
+        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+      }
+    } catch (error) {
+      console.error("Geocoding failed:", error);
+    }
+    return null;
+  };
+
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async () => {
       if (!currentUser?.id) throw new Error('Not authenticated');
       
-      let latitude = null;
-      let longitude = null;
+      let latitude = currentUser.profile?.latitude || null;
+      let longitude = currentUser.profile?.longitude || null;
 
-      // Geocode address if provided
-      if (formData.private_address && formData.private_city) {
-        try {
-          const { data: geoData, error: geoError } = await supabase.functions.invoke('geocode-address', {
-            body: {
-              street: formData.private_address,
-              city: formData.private_city,
-              postalCode: formData.private_postal_code,
-            },
+      // Check if address fields have changed
+      const addressChanged = 
+        formData.private_address !== currentUser.profile?.private_address ||
+        formData.private_city !== currentUser.profile?.private_city ||
+        formData.private_postal_code !== currentUser.profile?.private_postal_code;
+
+      // Geocode address if it has changed and is complete
+      if (addressChanged && formData.private_address && formData.private_city) {
+        const fullAddress = `${formData.private_address}, ${formData.private_postal_code || ''} ${formData.private_city}, Switzerland`.trim();
+        console.log('Geocoding address:', fullAddress);
+        
+        const coords = await getCoordinates(fullAddress);
+        
+        if (coords) {
+          latitude = coords.lat;
+          longitude = coords.lon;
+          console.log('Address geocoded successfully:', { latitude, longitude });
+        } else {
+          // Address not found - warn user but still allow save
+          toast.error('Address could not be located on the map. Please check spelling.', {
+            duration: 5000,
           });
-
-          if (!geoError && geoData?.latitude && geoData?.longitude) {
-            latitude = geoData.latitude;
-            longitude = geoData.longitude;
-            console.log('Address geocoded:', { latitude, longitude });
-          } else {
-            console.warn('Geocoding failed, proceeding without coordinates');
-          }
-        } catch (geoError) {
-          console.error('Geocoding error:', geoError);
-          // Continue without geocoding - don't block profile update
+          console.warn('Geocoding returned no results for:', fullAddress);
+          // Keep existing coordinates if any, or set to null
+          latitude = null;
+          longitude = null;
         }
       }
       
