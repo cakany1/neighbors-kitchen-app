@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,12 +28,14 @@ const languages = [
 ];
 
 const Profile = () => {
+  const { t, i18n } = useTranslation();
+  
   // Mock user data
   const [user, setUser] = useState({
     firstName: 'Alex',
     lastName: 'Chen',
     nickname: 'FoodieChef',
-    language: 'en',
+    language: localStorage.getItem('language') || 'en',
     karma: 178,
     mealsShared: 23,
     mealsReceived: 31,
@@ -43,7 +46,9 @@ const Profile = () => {
 
   const handleLanguageChange = (newLanguage: string) => {
     setUser({ ...user, language: newLanguage });
-    toast.success(`Language updated to ${languages.find(l => l.code === newLanguage)?.name}`);
+    localStorage.setItem('language', newLanguage);
+    i18n.changeLanguage(newLanguage);
+    toast.success(`${t('profile.languageUpdated')} ${languages.find(l => l.code === newLanguage)?.name}`);
   };
 
   const toggleAllergen = (allergen: string) => {
@@ -85,7 +90,7 @@ const Profile = () => {
                 <p className="text-sm text-muted-foreground">@{user.nickname}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <Star className="w-5 h-5 text-trust-gold fill-current" />
-                  <span className="text-lg font-semibold text-trust-gold">{user.karma} Karma</span>
+                  <span className="text-lg font-semibold text-trust-gold">{user.karma} {t('profile.karma')}</span>
                 </div>
               </div>
             </div>
@@ -93,15 +98,15 @@ const Profile = () => {
             <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
               <div className="text-center">
                 <p className="text-2xl font-bold text-primary">{user.mealsShared}</p>
-                <p className="text-xs text-muted-foreground">Meals Shared</p>
+                <p className="text-xs text-muted-foreground">{t('profile.mealsShared')}</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-secondary">{user.mealsReceived}</p>
-                <p className="text-xs text-muted-foreground">Meals Received</p>
+                <p className="text-xs text-muted-foreground">{t('profile.mealsReceived')}</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-trust-badge">{user.fairPayments}</p>
-                <p className="text-xs text-muted-foreground">Fair Payments</p>
+                <p className="text-xs text-muted-foreground">{t('profile.fairPayments')}</p>
               </div>
             </div>
           </CardContent>
@@ -267,29 +272,33 @@ const Profile = () => {
         {/* Community Guidelines */}
         <Card>
           <CardHeader>
-            <CardTitle>Community Guidelines</CardTitle>
+            <CardTitle>{t('profile.communityGuidelines')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>Bring your own container or plate for takeaway (except when dining in)</span>
+                <span>{t('guidelines.bringContainer')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>Be punctual and respect the chef's time</span>
+                <span>{t('guidelines.bePunctual')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>Pay fairly based on the quality and effort</span>
+                <span>{t('guidelines.payFairly')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>Respect privacy - don't share exact addresses publicly</span>
+                <span>{t('guidelines.respectPrivacy')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>Communicate dietary restrictions clearly</span>
+                <span>{t('guidelines.communicate')}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary">✓</span>
+                <span>{t('guidelines.leaveFeedback')}</span>
               </li>
             </ul>
           </CardContent>

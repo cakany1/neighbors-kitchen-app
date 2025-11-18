@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Star, MapPin, ChefHat, Calendar, Gift, Heart, Camera, Package, Home, Ghost, UtensilsCrossed } from 'lucide-react';
 import { TranslateButton } from '@/components/TranslateButton';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface MealCardProps {
   meal: Meal;
@@ -12,6 +13,7 @@ interface MealCardProps {
 }
 
 export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) => {
+  const { t } = useTranslation();
   const [translatedTitle, setTranslatedTitle] = useState(meal.title);
   
   // Mock data - in real app this would come from database
@@ -35,10 +37,10 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   };
 
   const handoverLabels = {
-    pickup_box: 'Pickup (Tupperware)',
-    neighbor_plate: 'Neighbor Plate',
-    anonymous_drop: 'Anonymous Drop',
-    dine_in: 'Dine In',
+    pickup_box: t('handover.pickupTupperware'),
+    neighbor_plate: t('handover.neighborPlate'),
+    anonymous_drop: t('handover.anonymousDrop'),
+    dine_in: t('handover.dineIn'),
   };
 
   const HandoverIcon = handoverIcons[handoverMode as keyof typeof handoverIcons] || Package;
@@ -133,7 +135,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           <div className="flex items-center justify-center gap-2 py-2 px-3 bg-primary/10 rounded-lg">
             <Heart className="w-4 h-4 text-primary fill-current" />
             <span className="text-sm font-semibold text-primary">
-              Pay/Bring what you want
+              {t('common.payWhatYouWant')}
             </span>
           </div>
 
@@ -141,7 +143,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           {exchangeMode === 'barter' && (
             <div className="flex items-center justify-center gap-2 text-sm text-secondary">
               <Gift className="w-4 h-4" />
-              <span>Or bring: {barterRequests.join(', ')}</span>
+              <span>{t('common.orBring')}: {barterRequests.join(', ')}</span>
             </div>
           )}
 

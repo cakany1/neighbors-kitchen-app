@@ -1,0 +1,43 @@
+{
+  "common": {
+    "payWhatYouWant": "Pay/Bring what you want",
+    "orBring": "Or bring",
+    "portions": "portions",
+    "community": "Community",
+    "guidelines": "Guidelines"
+  },
+  "profile": {
+    "karma": "Karma",
+    "mealsShared": "Meals Shared",
+    "mealsReceived": "Meals Received",
+    "fairPayments": "Fair Payments",
+    "languagePreference": "Language Preference",
+    "dietaryRestrictions": "Dietary Restrictions",
+    "allergens": "Allergens",
+    "foodPreferences": "Food Preferences",
+    "dislikes": "Dislikes",
+    "communityGuidelines": "Community Guidelines",
+    "badges": "Badges",
+    "languageUpdated": "Language updated to"
+  },
+  "guidelines": {
+    "bringContainer": "Bring your own container or plate for takeaway (except when dining in)",
+    "bePunctual": "Be punctual and respect the chef's time",
+    "payFairly": "Pay fairly based on the quality and effort",
+    "respectPrivacy": "Respect privacy - only share exact locations after confirmation",
+    "communicate": "Communicate dietary restrictions clearly",
+    "leaveFeedback": "Leave honest feedback to build community trust"
+  },
+  "navigation": {
+    "feed": "Feed",
+    "map": "Map",
+    "addMeal": "Add",
+    "profile": "Profile"
+  },
+  "handover": {
+    "pickupTupperware": "Pickup (Tupperware)",
+    "neighborPlate": "Neighbor Plate",
+    "anonymousDrop": "Anonymous Drop",
+    "dineIn": "Dine In"
+  }
+}
