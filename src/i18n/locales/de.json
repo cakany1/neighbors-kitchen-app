@@ -20,6 +20,14 @@
     "badges": "Abzeichen",
     "languageUpdated": "Sprache aktualisiert auf"
   },
+  "signup": {
+    "gender": "Ich bin",
+    "genderMale": "Mann",
+    "genderFemale": "Frau",
+    "genderPlaceholder": "Auswählen...",
+    "genderHint": "Für Sicherheit und Matching-Präferenzen",
+    "isCouple": "Wir sind ein Paar (Portionen immer x2)"
+  },
   "guidelines": {
     "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (außer beim Vor-Ort-Essen)",
     "bePunctual": "Pünktlich sein und die Zeit des Kochs respektieren",

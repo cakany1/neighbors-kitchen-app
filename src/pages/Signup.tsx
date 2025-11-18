@@ -32,6 +32,8 @@ const Signup = () => {
     firstName: '',
     lastName: '',
     language: 'en',
+    gender: '',
+    isCouple: false,
   });
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -47,6 +49,8 @@ const Signup = () => {
             first_name: formData.firstName,
             last_name: formData.lastName,
             language: formData.language,
+            gender: formData.gender,
+            is_couple: formData.isCouple,
           },
         },
       });
@@ -113,6 +117,33 @@ const Signup = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="gender">I am</Label>
+              <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })} required>
+                <SelectTrigger id="gender">
+                  <SelectValue placeholder="Select..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">For safety and matching preferences</p>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isCouple"
+                checked={formData.isCouple}
+                onChange={(e) => setFormData({ ...formData, isCouple: e.target.checked })}
+                className="w-4 h-4 rounded border-input"
+              />
+              <Label htmlFor="isCouple" className="font-normal cursor-pointer">
+                We are a couple (portions always x2)
+              </Label>
             </div>
 
             <div>
