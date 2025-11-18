@@ -5,6 +5,7 @@ import { Star, MapPin, ChefHat, Calendar, Gift, Heart, Camera, Package, Home, Gh
 import { TranslateButton } from '@/components/TranslateButton';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatDistance } from '@/utils/distance';
 
 interface MealCardProps {
   meal: Meal;
@@ -111,8 +112,14 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           <span>•</span>
           <div className="flex items-center gap-1">
             <MapPin className="w-3.5 h-3.5" />
-            <span>{meal.distance}</span>
+            <span>{meal.location.neighborhood}</span>
           </div>
+          {meal.distance !== undefined && (
+            <>
+              <span>•</span>
+              <span className="font-medium text-primary">📍 {formatDistance(meal.distance)}</span>
+            </>
+          )}
         </div>
         
         {meal.scheduledDate && (

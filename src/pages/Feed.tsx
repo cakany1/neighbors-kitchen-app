@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { MealCard } from '@/components/MealCard';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { getDistance } from '@/utils/distance';
 
 const Feed = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const Feed = () => {
     },
   });
 
-  // Fetch meals from database with chef data in a single query
+  // Fetch meals from database with chef data AND coordinates in a single query
   const { data: meals, isLoading } = useQuery({
     queryKey: ['meals'],
     queryFn: async () => {
@@ -43,7 +44,9 @@ const Feed = () => {
             first_name,
             last_name,
             nickname,
-            karma
+            karma,
+            latitude,
+            longitude
           )
         `)
         .order('created_at', { ascending: false });
@@ -54,6 +57,47 @@ const Feed = () => {
   });
 
   const userAllergens = currentUser?.profile?.allergens || [];
+  const userLat = currentUser?.profile?.latitude;
+  const userLon = currentUser?.profile?.longitude;
+  const userRadius = currentUser?.profile?.notification_radius || 5000; // Default 5km
+
+  // Calculate distances, filter by radius, and sort
+  const filteredAndSortedMeals = useMemo(() => {
+    if (!meals) return [];
+
+    // If user has no location, show all meals
+    if (!userLat || !userLon) {
+      return meals;
+    }
+
+    // Calculate distance for each meal
+    const mealsWithDistance = meals
+      .map((meal) => {
+        const chefLat = meal.chef?.latitude;
+        const chefLon = meal.chef?.longitude;
+
+        // If chef has no coordinates, skip this meal
+        if (!chefLat || !chefLon) {
+          return null;
+        }
+
+        const distance = getDistance(userLat, userLon, chefLat, chefLon);
+
+        return {
+          ...meal,
+          calculatedDistance: distance,
+        };
+      })
+      .filter((meal): meal is NonNullable<typeof meal> => meal !== null);
+
+    // Filter by notification radius
+    const withinRadius = mealsWithDistance.filter(
+      (meal) => meal.calculatedDistance <= userRadius
+    );
+
+    // Sort by distance (nearest first)
+    return withinRadius.sort((a, b) => a.calculatedDistance - b.calculatedDistance);
+  }, [meals, userLat, userLon, userRadius]);
 
   const handleDismissDisclaimer = () => {
     localStorage.setItem('disclaimerSeen', 'true');
@@ -77,8 +121,20 @@ const Feed = () => {
 
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-foreground mb-2">Available Meals</h2>
-          <p className="text-muted-foreground">Fresh home-cooked meals from your neighbors</p>
+          <p className="text-muted-foreground">
+            Fresh home-cooked meals from your neighbors
+            {userLat && userLon && ` (within ${userRadius / 1000}km)`}
+          </p>
         </div>
+
+        {!userLat || !userLon ? (
+          <Alert className="mb-6 border-warning bg-warning/10">
+            <AlertCircle className="h-4 w-4 text-warning" />
+            <AlertDescription className="text-sm">
+              <strong>Set your location</strong> in Profile Settings to see meals filtered by distance.
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
         {isLoading ? (
           <div className="text-center py-8">
@@ -88,9 +144,16 @@ const Feed = () => {
           <div className="text-center py-8">
             <p className="text-muted-foreground">No meals available yet. Be the first to share!</p>
           </div>
+        ) : filteredAndSortedMeals.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">
+              No meals available within your {userRadius / 1000}km radius. 
+              Try increasing your notification radius in Profile Settings.
+            </p>
+          </div>
         ) : (
           <div className="grid gap-4">
-            {meals.map((meal) => (
+            {filteredAndSortedMeals.map((meal) => (
               <MealCard 
                 key={meal.id} 
                 meal={{
@@ -108,7 +171,7 @@ const Feed = () => {
                     fuzzyLng: parseFloat(String(meal.fuzzy_lng)),
                     exactAddress: meal.exact_address,
                   },
-                  distance: '~5 min walk',
+                  distance: 'calculatedDistance' in meal ? (meal as any).calculatedDistance as number : undefined,
                   tags: meal.tags || [],
                   imageUrl: meal.image_url || undefined,
                   pricing: {
