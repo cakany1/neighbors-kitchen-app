@@ -114,30 +114,30 @@ const MealDetail = () => {
   const bookingMutation = useMutation({
     mutationFn: async () => {
       if (!currentUser?.id || !meal) throw new Error('Missing user or meal');
-      
-      // Check if meal is still available
-      if (meal.available_portions <= 0) {
-        throw new Error('This meal is sold out');
+
+      // Call secure booking function (prevents overbooking with row-level lock)
+      const { data, error } = await supabase.rpc('book_meal', {
+        p_meal_id: meal.id,
+        p_guest_id: currentUser.id,
+      });
+
+      if (error) throw error;
+
+      // Type the response
+      const result = data as { success: boolean; message?: string; booking_id?: string };
+
+      // Check function response
+      if (!result.success) {
+        throw new Error(result.message || 'Booking failed');
       }
 
-      // Create booking
-      const { data: booking, error: bookingError } = await supabase
-        .from('bookings')
-        .insert({
-          meal_id: meal.id,
-          guest_id: currentUser.id,
-          status: 'pending',
-        })
-        .select()
-        .single();
-
-      if (bookingError) throw bookingError;
-
-      return booking;
+      return result;
     },
     onSuccess: () => {
       setBookingStatus('pending');
       toast.success('Booking request sent to ' + meal?.chef?.first_name);
+      // Refresh meal data to show updated portion count
+      queryClient.invalidateQueries({ queryKey: ['meal', id] });
       queryClient.invalidateQueries({ queryKey: ['booking', id, currentUser?.id] });
     },
     onError: (error: any) => {
