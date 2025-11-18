@@ -82,6 +82,7 @@ export type Database = {
           arrival_time: string | null
           available_portions: number
           barter_requests: string[] | null
+          booked_seats: number | null
           chef_id: string
           collection_window_end: string | null
           collection_window_start: string | null
@@ -106,6 +107,7 @@ export type Database = {
           scheduled_date: string
           tags: string[] | null
           title: string
+          unit_type: string | null
           updated_at: string
         }
         Insert: {
@@ -113,6 +115,7 @@ export type Database = {
           arrival_time?: string | null
           available_portions?: number
           barter_requests?: string[] | null
+          booked_seats?: number | null
           chef_id: string
           collection_window_end?: string | null
           collection_window_start?: string | null
@@ -137,6 +140,7 @@ export type Database = {
           scheduled_date: string
           tags?: string[] | null
           title: string
+          unit_type?: string | null
           updated_at?: string
         }
         Update: {
@@ -144,6 +148,7 @@ export type Database = {
           arrival_time?: string | null
           available_portions?: number
           barter_requests?: string[] | null
+          booked_seats?: number | null
           chef_id?: string
           collection_window_end?: string | null
           collection_window_start?: string | null
@@ -168,6 +173,7 @@ export type Database = {
           scheduled_date?: string
           tags?: string[] | null
           title?: string
+          unit_type?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -209,6 +215,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
           allergens: string[] | null
           created_at: string
           dislikes: string[] | null
@@ -219,8 +226,10 @@ export type Database = {
           id_verified: boolean | null
           is_couple: boolean | null
           karma: number
-          language: string
+          languages: string[] | null
           last_name: string
+          nickname: string | null
+          notification_radius: number | null
           phone_number: string | null
           phone_verified: boolean | null
           private_address: string | null
@@ -228,8 +237,10 @@ export type Database = {
           private_postal_code: string | null
           role: string | null
           updated_at: string
+          vacation_mode: boolean | null
         }
         Insert: {
+          age?: number | null
           allergens?: string[] | null
           created_at?: string
           dislikes?: string[] | null
@@ -240,8 +251,10 @@ export type Database = {
           id_verified?: boolean | null
           is_couple?: boolean | null
           karma?: number
-          language?: string
+          languages?: string[] | null
           last_name: string
+          nickname?: string | null
+          notification_radius?: number | null
           phone_number?: string | null
           phone_verified?: boolean | null
           private_address?: string | null
@@ -249,8 +262,10 @@ export type Database = {
           private_postal_code?: string | null
           role?: string | null
           updated_at?: string
+          vacation_mode?: boolean | null
         }
         Update: {
+          age?: number | null
           allergens?: string[] | null
           created_at?: string
           dislikes?: string[] | null
@@ -261,8 +276,10 @@ export type Database = {
           id_verified?: boolean | null
           is_couple?: boolean | null
           karma?: number
-          language?: string
+          languages?: string[] | null
           last_name?: string
+          nickname?: string | null
+          notification_radius?: number | null
           phone_number?: string | null
           phone_verified?: boolean | null
           private_address?: string | null
@@ -270,6 +287,7 @@ export type Database = {
           private_postal_code?: string | null
           role?: string | null
           updated_at?: string
+          vacation_mode?: boolean | null
         }
         Relationships: []
       }
