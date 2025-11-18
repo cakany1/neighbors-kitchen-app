@@ -1,6 +1,6 @@
 {
   "common": {
-    "payWhatYouWant": "Zahle/Bring was du willst",
+    "payWhatYouWant": "Zahl/Bring was du willst",
     "orBring": "Oder bringe",
     "portions": "Portionen",
     "community": "Gemeinschaft",
@@ -66,7 +66,7 @@
     "symbolicImage": "📷 Symbolbild"
   },
   "buttons": {
-    "book": "Buchen",
+    "book": "Reservieren",
     "translate": "Übersetzen",
     "block": "Benutzer blockieren",
     "report": "Melden",
