@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ChefHat } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -25,6 +27,7 @@ const languages = [
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -34,6 +37,10 @@ const Signup = () => {
     language: 'en',
     gender: '',
     isCouple: false,
+    phoneNumber: '',
+    address: '',
+    city: '',
+    postalCode: '',
   });
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -41,10 +48,11 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
@@ -56,6 +64,23 @@ const Signup = () => {
       });
 
       if (error) throw error;
+
+      // Update profile with additional fields after signup
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            phone_number: formData.phoneNumber || null,
+            private_address: formData.address || null,
+            private_city: formData.city || null,
+            private_postal_code: formData.postalCode || null,
+          })
+          .eq('id', data.user.id);
+
+        if (profileError) {
+          console.error('Profile update error:', profileError);
+        }
+      }
 
       toast.success('Account created! Welcome to Neighbors Kitchen 🎉');
       navigate('/');
@@ -120,31 +145,73 @@ const Signup = () => {
             </div>
 
             <div>
-              <Label htmlFor="gender">I am</Label>
+              <Label htmlFor="gender">{t('signup.gender')}</Label>
               <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })} required>
                 <SelectTrigger id="gender">
-                  <SelectValue placeholder="Select..." />
+                  <SelectValue placeholder={t('signup.genderPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="male">{t('signup.genderMale')}</SelectItem>
+                  <SelectItem value="female">{t('signup.genderFemale')}</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground mt-1">For safety and matching preferences</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('signup.genderHint')}</p>
             </div>
 
             <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
+              <Checkbox
                 id="isCouple"
                 checked={formData.isCouple}
-                onChange={(e) => setFormData({ ...formData, isCouple: e.target.checked })}
-                className="w-4 h-4 rounded border-input"
+                onCheckedChange={(checked) => setFormData({ ...formData, isCouple: checked as boolean })}
               />
-              <Label htmlFor="isCouple" className="font-normal cursor-pointer">
-                We are a couple (portions always x2)
+              <Label htmlFor="isCouple" className="text-sm font-normal cursor-pointer">
+                {t('signup.isCouple')}
               </Label>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber">{t('signup.phoneNumber')}</Label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                value={formData.phoneNumber}
+                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                placeholder="+41 79 123 45 67"
+              />
+              <p className="text-xs text-muted-foreground">{t('signup.phoneHint')}</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">{t('signup.address')}</Label>
+              <Input
+                id="address"
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                placeholder="Hauptstrasse 123"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="postalCode">{t('signup.postalCode')}</Label>
+                <Input
+                  id="postalCode"
+                  value={formData.postalCode}
+                  onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                  placeholder="4051"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="city">{t('signup.city')}</Label>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  placeholder="Basel"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">{t('signup.addressHint')}</p>
 
             <div>
               <Label htmlFor="email">Email</Label>

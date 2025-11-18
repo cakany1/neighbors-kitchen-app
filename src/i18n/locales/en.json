@@ -26,7 +26,13 @@
     "genderFemale": "Female",
     "genderPlaceholder": "Select...",
     "genderHint": "For safety and matching preferences",
-    "isCouple": "We are a couple (portions always minimum x2)"
+    "isCouple": "We are a couple (portions always minimum x2)",
+    "phoneNumber": "Phone Number (for verification)",
+    "phoneHint": "We'll send you a verification code",
+    "address": "Street Address",
+    "city": "City",
+    "postalCode": "Postal Code",
+    "addressHint": "Private - only shown after confirmed bookings"
   },
   "guidelines": {
     "bringContainer": "Bring your own container or plate for takeaway (except when dining in)",
@@ -60,6 +66,37 @@
   },
   "buttons": {
     "book": "Book",
-    "translate": "Translate"
+    "translate": "Translate",
+    "block": "Block User",
+    "report": "Report",
+    "unblock": "Unblock"
+  },
+  "verification": {
+    "phoneVerified": "Phone Verified",
+    "idVerified": "ID Verified"
+  },
+  "guestComposition": {
+    "title": "Who will be visiting?",
+    "description": "Please select the composition of your group. This helps ensure a comfortable and safe environment.",
+    "mixedCouple": "Mixed couple",
+    "mixedGroup": "Mixed group",
+    "womenOnly": "Women only",
+    "menOnly": "Men only",
+    "diverseGroup": "Diverse group",
+    "preferNotSay": "Prefer not to say",
+    "safetyNote": "We use this information solely for organizational purposes to ensure a respectful, comfortable, and safe experience for all guests."
+  },
+  "reporting": {
+    "title": "Report",
+    "reasonLabel": "Reason for reporting",
+    "safetyConcern": "Safety concern",
+    "harassment": "Harassment",
+    "fakeProfile": "Fake profile",
+    "inappropriateContent": "Inappropriate content",
+    "spam": "Spam",
+    "other": "Other",
+    "descriptionLabel": "Additional details (optional)",
+    "submitReport": "Submit Report",
+    "reportSubmitted": "Report submitted successfully"
   }
 }

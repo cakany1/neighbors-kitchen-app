@@ -14,9 +14,31 @@ export type Database = {
   }
   public: {
     Tables: {
+      blocked_users: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           created_at: string
+          guest_composition: string | null
           guest_id: string
           id: string
           meal_id: string
@@ -26,6 +48,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          guest_composition?: string | null
           guest_id: string
           id?: string
           meal_id: string
@@ -35,6 +58,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          guest_composition?: string | null
           guest_id?: string
           id?: string
           meal_id?: string
@@ -192,10 +216,16 @@ export type Database = {
           first_name: string
           gender: string | null
           id: string
+          id_verified: boolean | null
           is_couple: boolean | null
           karma: number
           language: string
           last_name: string
+          phone_number: string | null
+          phone_verified: boolean | null
+          private_address: string | null
+          private_city: string | null
+          private_postal_code: string | null
           role: string | null
           updated_at: string
         }
@@ -207,10 +237,16 @@ export type Database = {
           first_name: string
           gender?: string | null
           id: string
+          id_verified?: boolean | null
           is_couple?: boolean | null
           karma?: number
           language?: string
           last_name: string
+          phone_number?: string | null
+          phone_verified?: boolean | null
+          private_address?: string | null
+          private_city?: string | null
+          private_postal_code?: string | null
           role?: string | null
           updated_at?: string
         }
@@ -222,12 +258,86 @@ export type Database = {
           first_name?: string
           gender?: string | null
           id?: string
+          id_verified?: boolean | null
           is_couple?: boolean | null
           karma?: number
           language?: string
           last_name?: string
+          phone_number?: string | null
+          phone_verified?: boolean | null
+          private_address?: string | null
+          private_city?: string | null
+          private_postal_code?: string | null
           role?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          reason: string
+          reported_meal_id: string | null
+          reported_user_id: string | null
+          reporter_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reason: string
+          reported_meal_id?: string | null
+          reported_user_id?: string | null
+          reporter_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reason?: string
+          reported_meal_id?: string | null
+          reported_user_id?: string | null
+          reporter_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_reported_meal_id_fkey"
+            columns: ["reported_meal_id"]
+            isOneToOne: false
+            referencedRelation: "meals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -236,10 +346,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -366,6 +482,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
