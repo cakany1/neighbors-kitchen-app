@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -6,13 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
-import { allergenOptions } from '@/utils/ingredientDatabase';
+import { allergenOptions, detectAllergens } from '@/utils/ingredientDatabase';
+import { toast } from 'sonner';
 
 interface TagSelectorProps {
   selectedAllergens: string[];
   onAllergensChange: (allergens: string[]) => void;
   selectedTags: string[];
   onTagsChange: (tags: string[]) => void;
+  ingredientText?: string; // Optional ingredient text to scan for allergens
 }
 
 // Common predefined tags
@@ -36,8 +38,36 @@ export function TagSelector({
   onAllergensChange,
   selectedTags,
   onTagsChange,
+  ingredientText = '',
 }: TagSelectorProps) {
   const [customTagInput, setCustomTagInput] = useState('');
+
+  // Auto-detect allergens from ingredient text
+  useEffect(() => {
+    if (ingredientText.trim()) {
+      // Split text by common separators
+      const ingredients = ingredientText.split(/[,\n;]+/).map(i => i.trim()).filter(Boolean);
+      const detectedAllergens = detectAllergens(ingredients);
+      
+      // Only add newly detected allergens
+      const newAllergens = detectedAllergens.filter(a => !selectedAllergens.includes(a));
+      
+      if (newAllergens.length > 0) {
+        const updatedAllergens = [...selectedAllergens, ...newAllergens];
+        onAllergensChange(updatedAllergens);
+        
+        // Show feedback toast
+        const allergenLabels = newAllergens.map(a => {
+          const option = allergenOptions.find(opt => opt.value === a);
+          return option?.label || a;
+        }).join(', ');
+        
+        toast.success(`Allergene erkannt: ${allergenLabels}`, {
+          duration: 4000,
+        });
+      }
+    }
+  }, [ingredientText]);
 
   const handleAllergenToggle = (allergenValue: string) => {
     if (selectedAllergens.includes(allergenValue)) {

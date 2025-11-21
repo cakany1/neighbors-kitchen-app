@@ -291,8 +291,8 @@ const MealDetail = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground">Meal not found</p>
-          <Button onClick={() => navigate('/')} className="mt-4">
-            Back to Feed
+          <Button onClick={() => navigate('/app')} className="mt-4">
+            Zurück zum Feed
           </Button>
         </div>
       </div>

@@ -1,19 +1,29 @@
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
+import { Button } from '@/components/ui/button';
 import { mockMeals } from '@/data/mockMeals';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import InteractiveMap from '@/components/maps/InteractiveMap';
 
 const MapView = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background pb-20">
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/app')} 
+          className="mb-4"
+        >
+          ← Zurück zum Feed
+        </Button>
         <div className="mb-4">
           <h2 className="text-2xl font-bold text-foreground mb-2">
             Mahlzeiten in der Nähe

@@ -21,8 +21,8 @@ const Payment = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground">Meal not found</p>
-          <Button onClick={() => navigate('/')} className="mt-4">
-            Back to Feed
+          <Button onClick={() => navigate('/app')} className="mt-4">
+            Zurück zum Feed
           </Button>
         </div>
       </div>
@@ -30,9 +30,15 @@ const Payment = () => {
   }
 
   const handlePayment = () => {
+    // Validate minimum total amount
+    if (totalAmount < minTotal) {
+      toast.error(`Minimumbetrag ist CHF ${minTotal.toFixed(2)} (inkl. Gebühr).`);
+      return;
+    }
+    
     toast.success(`Payment of CHF ${paymentAmount} processed! Thank you for supporting ${meal.chef.firstName}.`);
     setTimeout(() => {
-      navigate('/');
+      navigate('/app');
     }, 1500);
   };
 

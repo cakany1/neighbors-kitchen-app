@@ -36,6 +36,7 @@ const AddMeal = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    ingredients: '', // Add ingredients field for auto-detection
     minimumPrice: '',
     restaurantReferencePrice: '',
     portions: '',
@@ -228,6 +229,20 @@ const AddMeal = () => {
                   required
                 />
               </div>
+
+              <div>
+                <Label htmlFor="ingredients">Zutaten (optional, für Allergen-Erkennung)</Label>
+                <Textarea
+                  id="ingredients"
+                  placeholder="z.B. Mehl, Milch, Eier, Butter, Nüsse..."
+                  value={formData.ingredients}
+                  onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Tippe Zutaten ein und wir erkennen automatisch Allergene
+                </p>
+              </div>
             </CardContent>
           </Card>
 
@@ -237,6 +252,7 @@ const AddMeal = () => {
             onAllergensChange={setSelectedAllergens}
             selectedTags={tags}
             onTagsChange={setTags}
+            ingredientText={formData.ingredients}
           />
 
           {/* Cooking Experience */}
@@ -403,14 +419,14 @@ const AddMeal = () => {
                     <Input
                       id="minimumPrice"
                       type="number"
-                      min="0"
+                      min="7"
                       step="0.5"
-                      placeholder="0"
+                      placeholder="7"
                       value={formData.minimumPrice}
                       onChange={(e) => setFormData({ ...formData, minimumPrice: e.target.value })}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Gäste zahlen nach dem Essen und können mehr geben
+                      Minimumbetrag ist CHF 7.00 (inkl. Gebühr)
                     </p>
                   </div>
                 </div>

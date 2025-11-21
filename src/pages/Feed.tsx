@@ -45,15 +45,14 @@ const Feed = () => {
 
   // Check if user just logged in (show onboarding tour)
   useEffect(() => {
-    const hasSeenOnboarding = localStorage.getItem('onboardingCompleted');
-    if (currentUser && !hasSeenOnboarding && !isGuestMode) {
+    const hasSeenTour = localStorage.getItem('tour_completed');
+    if (currentUser && !hasSeenTour && !isGuestMode) {
       // Small delay to ensure UI is rendered
       setTimeout(() => setShowOnboarding(true), 500);
     }
   }, [currentUser, isGuestMode]);
 
   const handleOnboardingComplete = () => {
-    localStorage.setItem('onboardingCompleted', 'true');
     setShowOnboarding(false);
   };
 
