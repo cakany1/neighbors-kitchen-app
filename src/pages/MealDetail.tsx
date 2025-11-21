@@ -165,12 +165,6 @@ const MealDetail = () => {
       return;
     }
     
-    // Check verification status
-    if (currentUser?.profile?.verification_status === 'pending') {
-      toast.error('Dein Profil wird noch überprüft. Bitte warte auf die Freigabe.');
-      return;
-    }
-    
     bookingMutation.mutate();
   };
 
@@ -443,18 +437,10 @@ const MealDetail = () => {
           {bookingStatus === 'none' && (
             <Button
               onClick={handleRequestBooking}
-              disabled={
-                meal.available_portions === 0 || 
-                bookingMutation.isPending ||
-                currentUser?.profile?.verification_status === 'pending'
-              }
+              disabled={meal.available_portions === 0 || bookingMutation.isPending}
               className="flex-1"
             >
-              {currentUser?.profile?.verification_status === 'pending' 
-                ? 'Warte auf Verifizierung' 
-                : meal.available_portions === 0 
-                  ? 'Sold Out' 
-                  : 'Request Booking'}
+              {meal.available_portions === 0 ? 'Sold Out' : 'Request Booking'}
             </Button>
           )}
           

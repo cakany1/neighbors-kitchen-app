@@ -133,7 +133,7 @@ export const barterOptions = [
   "Dessert",
   "Fruit",
   "Surprise Me",
-  "Just a Smile (Free)",
+  "Nur ein Lächeln (Gratis)",
 ];
 
 /**

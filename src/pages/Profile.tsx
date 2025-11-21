@@ -277,13 +277,12 @@ const Profile = () => {
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
-        {/* Verification Pending Banner */}
-        {profile?.verification_status === 'pending' && (
-          <Alert className="mb-6 border-warning bg-warning/10">
-            <Shield className="h-4 w-4 text-warning" />
+        {/* Verification Incentive Banner */}
+        {!profile?.id_verified && !profile?.phone_verified && (
+          <Alert className="mb-6 border-primary bg-primary/10">
+            <Shield className="h-4 w-4 text-primary" />
             <AlertDescription className="text-sm">
-              <strong>Dein Profil wird gerade von unserem Team überprüft.</strong> Danke für deine Geduld! 
-              Du kannst Mahlzeiten ansehen, aber noch nicht buchen oder teilen.
+              <strong>Get Verified to increase your booking chances!</strong> Verified users get a blue tick badge and more trust from the community.
             </AlertDescription>
           </Alert>
         )}
@@ -297,8 +296,11 @@ const Profile = () => {
                 👤
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-foreground">
+                <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   {profile?.first_name} {profile?.last_name}
+                  {(profile?.id_verified || profile?.phone_verified) && (
+                    <span className="text-blue-500" title="Verified User">✓</span>
+                  )}
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   @{formData.nickname || profile?.first_name || 'User'}

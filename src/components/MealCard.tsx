@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, MapPin, ChefHat, Calendar, Gift, Heart, Camera, Package, Home, Ghost, UtensilsCrossed } from 'lucide-react';
 import { TranslateButton } from '@/components/TranslateButton';
+import { VerificationBadge } from '@/components/VerificationBadge';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDistance } from '@/utils/distance';
@@ -108,7 +109,10 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
         </div>
         
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-          <span className="font-medium">{chefNickname}</span>
+          <span className="font-medium flex items-center gap-1">
+            {chefNickname}
+            {meal.chef.isVerified && <VerificationBadge isVerified={true} size="sm" />}
+          </span>
           <span>•</span>
           <div className="flex items-center gap-1">
             <MapPin className="w-3.5 h-3.5" />
