@@ -36,13 +36,14 @@ const MealDetail = () => {
   const [bookingStatus, setBookingStatus] = useState<'none' | 'pending' | 'confirmed'>('none');
   const [chatOpen, setChatOpen] = useState(false);
   
-  // Fetch current user
+  // Fetch current user - SECURITY: Own profile can access all fields
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
       
+      // User can access their own full profile
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
@@ -53,20 +54,52 @@ const MealDetail = () => {
     },
   });
 
-  // Fetch meal data with chef in a single query
+  // Fetch meal data with chef - SECURITY: Never fetch exact_address here
   const { data: meal, isLoading } = useQuery({
     queryKey: ['meal', id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('meals')
         .select(`
-          *,
+          id,
+          title,
+          description,
+          image_url,
+          chef_id,
+          fuzzy_lat,
+          fuzzy_lng,
+          neighborhood,
+          tags,
+          allergens,
+          available_portions,
+          pricing_minimum,
+          pricing_suggested,
+          is_cooking_experience,
+          scheduled_date,
+          created_at,
+          updated_at,
+          handover_mode,
+          collection_window_start,
+          collection_window_end,
+          arrival_time,
+          max_seats,
+          booked_seats,
+          unit_type,
+          exchange_mode,
+          barter_requests,
+          restaurant_reference_price,
+          estimated_restaurant_value,
+          ingredients,
+          is_stock_photo,
+          women_only,
           chef:profiles!chef_id (
             first_name,
             last_name,
             nickname,
             karma,
-            display_real_name
+            display_real_name,
+            id_verified,
+            phone_verified
           )
         `)
         .eq('id', id)
@@ -75,6 +108,22 @@ const MealDetail = () => {
       if (error) throw error;
       return data;
     },
+  });
+
+  // SECURITY: Only fetch exact address AFTER booking is confirmed
+  const { data: confirmedAddress } = useQuery({
+    queryKey: ['mealAddress', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('meals')
+        .select('exact_address')
+        .eq('id', id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: bookingStatus === 'confirmed',
   });
 
   // Fetch existing booking if any
@@ -368,8 +417,8 @@ const MealDetail = () => {
                         <p className="text-foreground">
                           <strong className="text-secondary">Contact:</strong> {meal.chef?.first_name} {meal.chef?.last_name}
                         </p>
-                        <p className="text-foreground">
-                          <strong className="text-secondary">Address:</strong> {meal.exact_address}
+                         <p className="text-foreground">
+                          <strong className="text-secondary">Address:</strong> {confirmedAddress?.exact_address}
                         </p>
                       </div>
                     </AlertDescription>

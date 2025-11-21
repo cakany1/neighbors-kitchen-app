@@ -87,11 +87,41 @@ const Feed = () => {
       
       const allBlockedUsers = [...blockedUserIds, ...usersWhoBlockedMe];
       
-      // Build the query
+      // Build the query - SECURITY: Only select public fields, exclude exact_address
       let query = supabase
         .from('meals')
         .select(`
-          *,
+          id,
+          title,
+          description,
+          image_url,
+          chef_id,
+          fuzzy_lat,
+          fuzzy_lng,
+          neighborhood,
+          tags,
+          allergens,
+          available_portions,
+          pricing_minimum,
+          pricing_suggested,
+          is_cooking_experience,
+          scheduled_date,
+          created_at,
+          updated_at,
+          handover_mode,
+          collection_window_start,
+          collection_window_end,
+          arrival_time,
+          max_seats,
+          booked_seats,
+          unit_type,
+          exchange_mode,
+          barter_requests,
+          restaurant_reference_price,
+          estimated_restaurant_value,
+          ingredients,
+          is_stock_photo,
+          women_only,
           chef:profiles!chef_id (
             first_name,
             last_name,
@@ -227,12 +257,11 @@ const Feed = () => {
                     karma: meal.chef?.karma || 0,
                     isVerified: meal.chef?.id_verified || meal.chef?.phone_verified || false,
                   },
-                  location: {
-                    neighborhood: meal.neighborhood,
-                    fuzzyLat: parseFloat(String(meal.fuzzy_lat)),
-                    fuzzyLng: parseFloat(String(meal.fuzzy_lng)),
-                    exactAddress: meal.exact_address,
-                  },
+                    location: {
+                      neighborhood: meal.neighborhood,
+                      fuzzyLat: parseFloat(String(meal.fuzzy_lat)),
+                      fuzzyLng: parseFloat(String(meal.fuzzy_lng)),
+                    },
                   distance: 'calculatedDistance' in meal ? (meal as any).calculatedDistance as number : undefined,
                   tags: meal.tags || [],
                   imageUrl: meal.image_url || undefined,
