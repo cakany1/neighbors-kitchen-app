@@ -7,7 +7,8 @@ const mockMeals = [
     id: 1,
     image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&q=80',
     title: 'Hausgemachte Kürbis-Lasagne 🎃',
-    restaurantValue: 'CHF 25.-',
+    badgeText: '💸 Bezahle nach dem Essen, was du willst',
+    subtext: '~ Restaurant-Wert: CHF 25.-',
     chef: 'Nonna Rosa',
     location: 'Gundeli',
     delay: '0s'
@@ -16,7 +17,8 @@ const mockMeals = [
     id: 2,
     image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&q=80',
     title: 'Frisches Thai Green Curry 🌶️',
-    restaurantValue: 'CHF 22.-',
+    badgeText: '🎁 Überrasch mich! (Wein / Dessert)',
+    subtext: '~ Restaurant-Wert: CHF 18.-',
     chef: 'Mai L.',
     location: 'St. Johann',
     delay: '0.2s'
@@ -25,7 +27,8 @@ const mockMeals = [
     id: 3,
     image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=80',
     title: 'Sonntagszopf (frisch gebacken)',
-    restaurantValue: 'CHF 12.-',
+    badgeText: '😊 Nichts, nur ein Lächeln (Gratis)',
+    subtext: 'Nachbarschafts-Geschenk',
     chef: 'Lukas',
     location: 'Kleinbasel',
     delay: '0.4s'
@@ -60,11 +63,10 @@ export const HeroFeedTeaser = () => {
                   {meal.title}
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  ~ Restaurant-Wert: {meal.restaurantValue}
+                  {meal.subtext}
                 </p>
-                <Badge variant="secondary" className="bg-primary/20 text-primary flex items-center gap-1 w-fit">
-                  <Heart className="w-3 h-3" />
-                  <span>Zahl was du willst</span>
+                <Badge variant="secondary" className="bg-primary/20 text-primary w-fit text-xs">
+                  {meal.badgeText}
                 </Badge>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
