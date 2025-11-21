@@ -43,17 +43,27 @@ const Feed = () => {
     },
   });
 
-  // Check if user just logged in (show onboarding tour)
+  // Check if user just registered or logged in (show onboarding tour)
   useEffect(() => {
     const hasSeenTour = localStorage.getItem('tour_completed');
-    if (currentUser && !hasSeenTour && !isGuestMode) {
-      // Small delay to ensure UI is rendered
-      setTimeout(() => setShowOnboarding(true), 500);
+    const justRegistered = localStorage.getItem('just_registered');
+    
+    if (currentUser && !isGuestMode) {
+      // Force show tour if user just registered
+      if (justRegistered === 'true') {
+        localStorage.removeItem('just_registered');
+        localStorage.removeItem('tour_completed'); // Reset tour flag
+        setTimeout(() => setShowOnboarding(true), 500);
+      } else if (!hasSeenTour) {
+        // Show tour for first-time users
+        setTimeout(() => setShowOnboarding(true), 500);
+      }
     }
   }, [currentUser, isGuestMode]);
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
+    localStorage.setItem('tour_completed', 'true');
   };
 
   // Fetch meals from database with chef data AND coordinates in a single query

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ChefHat } from 'lucide-react';
+import { ChefHat, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { Progress } from '@/components/ui/progress';
@@ -32,12 +32,15 @@ const Signup = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [accountType, setAccountType] = useState<'single' | 'couple'>('single');
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['de']);
+  const [partnerPhotoFile, setPartnerPhotoFile] = useState<File | null>(null);
+  const [partnerPhotoPreview, setPartnerPhotoPreview] = useState<string>('');
+  const [uploadingPartnerPhoto, setUploadingPartnerPhoto] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     firstName: '',
     lastName: '',
-    language: 'de',
     gender: '',
     isCouple: false,
     partnerName: '',
@@ -72,6 +75,59 @@ const Signup = () => {
     return { level: 40, label: 'Schwach', color: 'bg-orange-500' };
   }, [formData.password]);
 
+  const handlePartnerPhotoUpload = async (file: File) => {
+    setUploadingPartnerPhoto(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `partner_photos/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('gallery')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, partnerPhotoUrl: publicUrl });
+      setPartnerPhotoPreview(URL.createObjectURL(file));
+      toast.success('Partner Foto hochgeladen');
+    } catch (error: any) {
+      toast.error('Foto-Upload fehlgeschlagen: ' + error.message);
+    } finally {
+      setUploadingPartnerPhoto(false);
+    }
+  };
+
+  const handlePartnerPhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Datei zu groß! Max 5MB.');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Nur Bilder erlaubt!');
+      return;
+    }
+
+    setPartnerPhotoFile(file);
+    handlePartnerPhotoUpload(file);
+  };
+
+  const toggleLanguage = (langCode: string) => {
+    setSelectedLanguages(prev => 
+      prev.includes(langCode) 
+        ? prev.filter(l => l !== langCode)
+        : [...prev, langCode]
+    );
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -86,7 +142,7 @@ const Signup = () => {
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
-            language: formData.language,
+            languages: selectedLanguages,
             gender: formData.gender,
             is_couple: formData.isCouple,
           },
@@ -135,11 +191,12 @@ const Signup = () => {
               id: loginData.user.id,
               first_name: formData.firstName,
               last_name: formData.lastName,
-              languages: [formData.language],
+              languages: selectedLanguages,
               gender: formData.gender || null,
               is_couple: formData.isCouple,
               partner_name: formData.isCouple ? formData.partnerName : null,
               partner_gender: formData.isCouple ? formData.partnerGender : null,
+              partner_photo_url: formData.isCouple ? formData.partnerPhotoUrl : null,
               phone_number: formData.phoneNumber || null,
               private_address: formData.address || null,
               private_city: formData.city || null,
@@ -201,11 +258,12 @@ const Signup = () => {
             id: data.user.id,
             first_name: formData.firstName,
             last_name: formData.lastName,
-            languages: [formData.language],
+            languages: selectedLanguages,
             gender: formData.gender || null,
             is_couple: formData.isCouple,
             partner_name: formData.isCouple ? formData.partnerName : null,
             partner_gender: formData.isCouple ? formData.partnerGender : null,
+            partner_photo_url: formData.isCouple ? formData.partnerPhotoUrl : null,
             phone_number: formData.phoneNumber || null,
             private_address: formData.address || null,
             private_city: formData.city || null,
@@ -237,6 +295,9 @@ const Signup = () => {
         }
       }
 
+      // Set flag to trigger onboarding tour
+      localStorage.setItem('just_registered', 'true');
+      
       toast.success(t('auth.account_created'));
       navigate('/feed');
     } catch (error: any) {
@@ -288,20 +349,23 @@ const Signup = () => {
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="language">{t('auth.i_speak')}</Label>
-              <Select value={formData.language} onValueChange={(value) => setFormData({ ...formData, language: value })}>
-                <SelectTrigger id="language">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {languages.map((lang) => (
-                    <SelectItem key={lang.code} value={lang.code}>
+            <div className="space-y-2">
+              <Label>{t('auth.i_speak')}</Label>
+              <p className="text-xs text-muted-foreground">Wähle alle Sprachen, die du sprichst</p>
+              <div className="grid grid-cols-2 gap-2">
+                {languages.slice(0, 6).map((lang) => (
+                  <div key={lang.code} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`lang-${lang.code}`}
+                      checked={selectedLanguages.includes(lang.code)}
+                      onCheckedChange={() => toggleLanguage(lang.code)}
+                    />
+                    <Label htmlFor={`lang-${lang.code}`} className="cursor-pointer text-sm">
                       {lang.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div>
@@ -376,14 +440,45 @@ const Signup = () => {
                   </Select>
                 </div>
 
-                <div>
-                  <Label htmlFor="partnerPhotoUrl">Partner Foto URL</Label>
-                  <Input
-                    id="partnerPhotoUrl"
-                    value={formData.partnerPhotoUrl}
-                    onChange={(e) => setFormData({ ...formData, partnerPhotoUrl: e.target.value })}
-                    placeholder="https://..."
+                <div className="space-y-2">
+                  <Label htmlFor="partnerPhoto">Partner Foto</Label>
+                  <input
+                    id="partnerPhoto"
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePartnerPhotoSelect}
+                    className="hidden"
                   />
+                  {partnerPhotoPreview ? (
+                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-border">
+                      <img src={partnerPhotoPreview} alt="Partner" className="w-full h-full object-cover" />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6"
+                        onClick={() => {
+                          setPartnerPhotoPreview('');
+                          setPartnerPhotoFile(null);
+                          setFormData({ ...formData, partnerPhotoUrl: '' });
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById('partnerPhoto')?.click()}
+                      disabled={uploadingPartnerPhoto}
+                      className="w-full"
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      {uploadingPartnerPhoto ? 'Lädt hoch...' : 'Foto hochladen'}
+                    </Button>
+                  )}
+                  <p className="text-xs text-muted-foreground">Max 5MB, JPG/PNG</p>
                 </div>
               </div>
             )}
