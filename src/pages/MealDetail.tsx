@@ -213,6 +213,14 @@ const MealDetail = () => {
       navigate('/login');
       return;
     }
+
+    // DEMO LOCK: Prevent booking demo meals
+    if (meal?.tags?.includes('Demo / Beispiel')) {
+      toast.info('👋 Dies ist nur ein Demo-Eintrag. Du kannst ihn nicht wirklich buchen, aber probier es gerne aus!', {
+        duration: 5000,
+      });
+      return;
+    }
     
     bookingMutation.mutate();
   };
