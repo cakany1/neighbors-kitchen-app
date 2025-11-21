@@ -52,6 +52,10 @@
     "message_sent": "Nachricht gesendet"
   },
   "feed": {
+    "available_meals": "Verfügbare Gerichte",
+    "fresh_meals_subtitle": "Frisch gekocht aus deiner Nachbarschaft",
+    "portfolio_available": "Koch-Portfolio ansehen",
+    "available_date": "Verfügbar",
     "loading_meals": "Lade Gerichte...",
     "no_meals_yet": "Noch keine Gerichte verfügbar. Sei der Erste, der teilt!",
     "no_meals_radius": "Keine Gerichte in deinem {radius}km Radius verfügbar. Versuche, deinen Benachrichtigungs-Radius in den Profil-Einstellungen zu erhöhen.",

@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const languages = [
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'de', name: 'Deutsch' },
+  { code: 'en', name: 'English' },
 ];
 
 export const LanguageSwitcher = () => {
@@ -28,8 +28,8 @@ export const LanguageSwitcher = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="gap-2">
           <Globe className="w-4 h-4" />
-          <span className="hidden sm:inline">{currentLang.flag} {currentLang.code.toUpperCase()}</span>
-          <span className="sm:hidden">{currentLang.flag}</span>
+          <span className="hidden sm:inline">{currentLang.name}</span>
+          <span className="sm:hidden">{currentLang.code.toUpperCase()}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -39,7 +39,6 @@ export const LanguageSwitcher = () => {
             onClick={() => changeLanguage(lang.code)}
             className="cursor-pointer"
           >
-            <span className="mr-2">{lang.flag}</span>
             {lang.name}
           </DropdownMenuItem>
         ))}
