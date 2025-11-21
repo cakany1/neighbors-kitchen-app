@@ -38,13 +38,14 @@ const Chat = () => {
   const [showReportDialog, setShowReportDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Get current user
+  // Get current user - SECURITY: User can access their own full profile
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
       
+      // User can access their own full profile data
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
@@ -64,8 +65,9 @@ const Chat = () => {
         .select(`
           *,
           meal:meals(
-            *,
-            chef_profile:profiles(*)
+            id,
+            title,
+            chef_id
           )
         `)
         .eq('id', bookingId)
@@ -73,16 +75,16 @@ const Chat = () => {
       
       if (error) throw error;
       
-      // Also get chef and guest profiles separately
+      // SECURITY: Only fetch public profile fields for chat participants
       const { data: guestProfile } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, first_name, last_name, nickname, languages, id_verified, phone_verified')
         .eq('id', data.guest_id)
         .single();
       
       const { data: chefProfile } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, first_name, last_name, nickname, languages, id_verified, phone_verified')
         .eq('id', data.meal.chef_id)
         .single();
       
