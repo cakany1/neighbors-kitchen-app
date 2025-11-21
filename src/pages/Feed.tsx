@@ -98,7 +98,9 @@ const Feed = () => {
             nickname,
             karma,
             latitude,
-            longitude
+            longitude,
+            id_verified,
+            phone_verified
           )
         `)
         .order('created_at', { ascending: false });
@@ -168,17 +170,6 @@ const Feed = () => {
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
-        {/* Verification Pending Banner */}
-        {currentUser?.profile?.verification_status === 'pending' && (
-          <Alert className="mb-6 border-warning bg-warning/10">
-            <Shield className="h-4 w-4 text-warning" />
-            <AlertDescription className="text-sm">
-              <strong>Dein Profil wird gerade von unserem Team überprüft.</strong> Danke für deine Geduld! 
-              Du kannst Mahlzeiten ansehen, aber noch nicht buchen oder teilen.
-            </AlertDescription>
-          </Alert>
-        )}
-
         {showDisclaimer && (
           <Alert className="mb-6 border-primary bg-primary-light" onClick={handleDismissDisclaimer}>
             <AlertCircle className="h-4 w-4 text-primary" />
@@ -234,6 +225,7 @@ const Feed = () => {
                     firstName: meal.chef?.first_name || 'Chef',
                     lastName: meal.chef?.last_name || '',
                     karma: meal.chef?.karma || 0,
+                    isVerified: meal.chef?.id_verified || meal.chef?.phone_verified || false,
                   },
                   location: {
                     neighborhood: meal.neighborhood,

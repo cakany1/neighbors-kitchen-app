@@ -6,6 +6,7 @@ export interface Meal {
     firstName: string;
     lastName: string;
     karma: number;
+    isVerified?: boolean;
   };
   location: {
     neighborhood: string;

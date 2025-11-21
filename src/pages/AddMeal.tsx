@@ -22,6 +22,7 @@ const AddMeal = () => {
   const navigate = useNavigate();
   const [isCookingExperience, setIsCookingExperience] = useState(false);
   const [womenOnly, setWomenOnly] = useState(false);
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [exchangeMode, setExchangeMode] = useState<'money' | 'barter'>('money');
   const [handoverMode, setHandoverMode] = useState<'pickup_box' | 'neighbor_plate' | 'ghost_mode' | 'dine_in'>('pickup_box');
   const [identityReveal, setIdentityReveal] = useState<'real_name' | 'nickname'>('nickname');
@@ -113,12 +114,6 @@ const AddMeal = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check verification status
-    if (currentUser?.verification_status === 'pending') {
-      toast.error('Dein Profil wird noch überprüft. Bitte warte auf die Freigabe.');
-      return;
-    }
-    
     if (!formData.title || !formData.description || !formData.scheduledDate || !formData.scheduledTime) {
       toast.error('Please fill in all required fields including date and time');
       return;
@@ -150,16 +145,6 @@ const AddMeal = () => {
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
-        {/* Verification Pending Banner */}
-        {currentUser?.verification_status === 'pending' && (
-          <Alert className="mb-6 border-warning bg-warning/10">
-            <Shield className="h-4 w-4 text-warning" />
-            <AlertDescription className="text-sm">
-              <strong>Dein Profil wird gerade überprüft.</strong> Du kannst noch keine Mahlzeiten teilen, bis dein Profil freigegeben wurde.
-            </AlertDescription>
-          </Alert>
-        )}
-        
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground mb-2">Share a Meal</h1>
           <p className="text-muted-foreground">Create a listing for your home-cooked dish</p>
@@ -303,11 +288,35 @@ const AddMeal = () => {
             </Card>
           )}
 
+          {/* Verified Only Mode (Trust Filter) */}
+          <Card className="border-primary/50 bg-primary/5">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <Shield className="w-6 h-6 text-primary mt-1" />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <Label htmlFor="verified-only" className="text-base font-semibold">
+                      ✓ Nur verifizierte Nutzer zulassen?
+                    </Label>
+                    <Switch
+                      id="verified-only"
+                      checked={verifiedOnly}
+                      onCheckedChange={setVerifiedOnly}
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Only guests with a blue verification badge (phone or ID verified) can book this meal. Increases trust and security.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
               {/* Exchange Model Toggle */}
           <Card>
             <CardHeader>
-              <CardTitle>Exchange Model</CardTitle>
-              <CardDescription>Choose how you want to be compensated</CardDescription>
+              <CardTitle>Whatever you want</CardTitle>
+              <CardDescription>Was würde dich freuen? (Suggestions for guests)</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-3">
@@ -326,7 +335,7 @@ const AddMeal = () => {
                   className="flex-1"
                 >
                   <Gift className="w-4 h-4 mr-2" />
-                  Bring What You Want
+                  Geld oder Kleines
                 </Button>
               </div>
 
@@ -395,7 +404,10 @@ const AddMeal = () => {
                 </div>
               ) : (
                 <div className="pt-2">
-                  <Label className="mb-3 block">What would you like in exchange? *</Label>
+                  <Label className="mb-3 block">Was würde dich freuen? (Suggestions for guests)</Label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Select what you'd like guests to bring. They can choose any of these options.
+                  </p>
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2 pb-2 border-b border-border">
                       <Checkbox
@@ -413,7 +425,7 @@ const AddMeal = () => {
                         htmlFor="barter-any"
                         className="text-sm font-medium cursor-pointer"
                       >
-                        ✨ Any of these (Guest's choice)
+                        ✨ Egal, überrasch mich!
                       </Label>
                     </div>
                     {barterOptions.map((option) => (
@@ -427,7 +439,7 @@ const AddMeal = () => {
                           htmlFor={`barter-${option}`}
                           className="text-sm font-normal cursor-pointer flex items-center gap-2"
                         >
-                          {option === 'Just a Smile (Free)' && '😊'}
+                          {option === 'Nur ein Lächeln (Gratis)' && '😊'}
                           {option === 'A Bottle of Wine' && '🍷'}
                           {option === 'Dessert' && '🍰'}
                           {option === 'Fruit' && '🍎'}
@@ -676,11 +688,8 @@ const AddMeal = () => {
             type="submit" 
             className="w-full" 
             size="lg"
-            disabled={currentUser?.verification_status === 'pending'}
           >
-            {currentUser?.verification_status === 'pending' 
-              ? 'Warte auf Verifizierung...' 
-              : 'Create Meal Listing'}
+            Create Meal Listing
           </Button>
         </form>
       </main>
