@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 export const CookieBanner = () => {
@@ -23,9 +22,9 @@ export const CookieBanner = () => {
       <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
         <p className="text-sm text-foreground">
           Wir nutzen essenzielle Cookies für die Funktion der App.{' '}
-          <Link to="/agb" className="underline text-primary">
+          <a href="/agb" className="underline text-primary">
             Infos
-          </Link>
+          </a>
         </p>
         <Button onClick={handleAccept} size="sm">
           Ok
