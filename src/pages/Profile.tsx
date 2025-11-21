@@ -453,7 +453,7 @@ const Profile = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="phone">Mobile Number (for coordination)</Label>
+              <Label htmlFor="phone">{t('profile.settings_mobile')}</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -463,7 +463,7 @@ const Profile = () => {
               />
             </div>
             <div>
-              <Label htmlFor="address">Street & Number</Label>
+              <Label htmlFor="address">{t('profile.settings_address')}</Label>
               <Input
                 id="address"
                 type="text"
@@ -474,7 +474,7 @@ const Profile = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="zip">Zip Code</Label>
+                <Label htmlFor="zip">{t('profile.settings_zip')}</Label>
                 <Input
                   id="zip"
                   type="text"
@@ -484,7 +484,7 @@ const Profile = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="city">City</Label>
+                <Label htmlFor="city">{t('profile.settings_city')}</Label>
                 <Input
                   id="city"
                   type="text"
@@ -495,7 +495,7 @@ const Profile = () => {
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              💡 This address defines your center for the Meal Radar.
+              {t('profile.settings_address_hint')}
             </p>
           </CardContent>
         </Card>
@@ -503,14 +503,14 @@ const Profile = () => {
         {/* Preferences */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Preferences</CardTitle>
+            <CardTitle>{t('profile.settings_preferences')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="vacation-mode" className="text-base">Vacation Mode</Label>
+                <Label htmlFor="vacation-mode" className="text-base">{t('profile.settings_vacation_mode')}</Label>
                 <p className="text-sm text-muted-foreground">
-                  Pause all notifications and hide my meals
+                  {t('profile.settings_vacation_desc')}
                 </p>
               </div>
               <Switch
@@ -522,7 +522,7 @@ const Profile = () => {
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="notification-radius">Notification Radius</Label>
+                <Label htmlFor="notification-radius">{t('profile.settings_notification_radius')}</Label>
                 <span className="text-sm font-medium text-primary">
                   {(formData.notification_radius / 1000).toFixed(1)} km
                 </span>
@@ -561,15 +561,15 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-destructive" />
-              Safety Shield (Private)
+              {t('profile.settings_safety_title')}
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              This information is private and only used to warn you about allergens in meals
+              {t('profile.settings_safety_desc')}
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label className="text-base font-semibold mb-3 block">Allergens</Label>
+              <Label className="text-base font-semibold mb-3 block">{t('profile.settings_allergens')}</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {allergenOptions.map((option) => (
                   <div key={option.value} className="flex items-center space-x-2">
@@ -590,7 +590,7 @@ const Profile = () => {
             </div>
             
             <div className="pt-4 border-t border-border">
-              <Label className="text-base font-semibold mb-3 block">Dislikes (Accordion)</Label>
+              <Label className="text-base font-semibold mb-3 block">{t('profile.settings_dislikes')}</Label>
               <Accordion type="multiple" className="w-full">
                 {Object.entries(dislikeCategories).map(([category, items]) => (
                   <AccordionItem key={category} value={category}>
@@ -653,10 +653,10 @@ const Profile = () => {
               </div>
               
               <div className="pt-3 border-t border-border">
-                <Label className="text-sm font-medium mb-2 block">Missing your language?</Label>
+                <Label className="text-sm font-medium mb-2 block">{t('profile.settings_language_missing')}</Label>
                 <div className="flex gap-2">
                   <Input
-                    placeholder="➕ Request language (e.g., Korean, Hindi)"
+                    placeholder={t('profile.settings_language_request_placeholder')}
                     value={customLanguageInput}
                     onChange={(e) => setCustomLanguageInput(e.target.value)}
                     onKeyPress={(e) => {
@@ -672,16 +672,16 @@ const Profile = () => {
                     variant="outline"
                     disabled={!customLanguageInput.trim()}
                   >
-                    Request
+                    {t('profile.settings_language_request')}
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  🌍 We'll add popular requested languages!
+                  {t('profile.settings_language_popular')}
                 </p>
               </div>
               
               <p className="text-xs text-muted-foreground mt-2">
-                💬 {t('profile.languagePreference')} - Messages with chefs who speak different languages will be automatically translated for you
+                {t('profile.settings_language_translation')}
               </p>
             </div>
           </CardContent>
@@ -692,20 +692,20 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Award className="w-5 h-5 text-trust-gold" />
-              Achievements
+              {t('profile.achievements_title')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-secondary-light p-4 rounded-lg text-center">
                 <ChefHat className="w-8 h-8 mx-auto mb-2 text-secondary" />
-                <p className="font-semibold text-sm text-foreground">Chef Master</p>
-                <p className="text-xs text-muted-foreground">20+ meals shared</p>
+                <p className="font-semibold text-sm text-foreground">{t('profile.achievements_chef_master')}</p>
+                <p className="text-xs text-muted-foreground">{t('profile.achievements_chef_master_desc')}</p>
               </div>
               <div className="bg-primary-light p-4 rounded-lg text-center">
                 <Heart className="w-8 h-8 mx-auto mb-2 text-primary" />
-                <p className="font-semibold text-sm text-foreground">Fair Payer</p>
-                <p className="text-xs text-muted-foreground">Always pays fairly</p>
+                <p className="font-semibold text-sm text-foreground">{t('profile.achievements_fair_payer')}</p>
+                <p className="text-xs text-muted-foreground">{t('profile.achievements_fair_payer_desc')}</p>
               </div>
             </div>
           </CardContent>
@@ -714,7 +714,7 @@ const Profile = () => {
         {/* Trust System Info */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>About Karma Points</CardTitle>
+            <CardTitle>{t('profile.karma_title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-start gap-3">
@@ -722,8 +722,8 @@ const Profile = () => {
                 <ChefHat className="w-4 h-4 text-secondary" />
               </div>
               <div>
-                <p className="font-medium text-sm text-foreground">Share Meals</p>
-                <p className="text-xs text-muted-foreground">Earn karma by sharing your cooking</p>
+                <p className="font-medium text-sm text-foreground">{t('profile.karma_share')}</p>
+                <p className="text-xs text-muted-foreground">{t('profile.karma_share_desc')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -731,8 +731,8 @@ const Profile = () => {
                 <Heart className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-sm text-foreground">Pay Fairly</p>
-                <p className="text-xs text-muted-foreground">Build trust by fair payments</p>
+                <p className="font-medium text-sm text-foreground">{t('profile.karma_pay')}</p>
+                <p className="text-xs text-muted-foreground">{t('profile.karma_pay_desc')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -740,8 +740,8 @@ const Profile = () => {
                 <Star className="w-4 h-4 text-trust-gold" />
               </div>
               <div>
-                <p className="font-medium text-sm text-foreground">Be Respectful</p>
-                <p className="text-xs text-muted-foreground">Respect hosts and bring your own container</p>
+                <p className="font-medium text-sm text-foreground">{t('profile.karma_respect')}</p>
+                <p className="text-xs text-muted-foreground">{t('profile.karma_respect_desc')}</p>
               </div>
             </div>
           </CardContent>
@@ -752,12 +752,12 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ChefHat className="w-5 h-5 text-primary" />
-              My Food Gallery
+              {t('profile.gallery_title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Show off your cooking skills! Upload photos of your meals to build trust with neighbors.
+              {t('profile.gallery_desc')}
             </p>
             <GalleryUpload userId={currentUser.id} />
             <GalleryGrid userId={currentUser.id} isOwnProfile={true} />
