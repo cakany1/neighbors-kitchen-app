@@ -125,3 +125,10 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide Lovable Badge on mobile screens */
+@media (max-width: 768px) {
+  div[data-lovable-badge] {
+    display: none !important;
+  }
+}

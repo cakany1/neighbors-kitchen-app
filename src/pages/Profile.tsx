@@ -92,6 +92,24 @@ const Profile = () => {
     },
   });
 
+  // Check if user is admin
+  const { data: isAdmin } = useQuery({
+    queryKey: ['isAdmin', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return false;
+      
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', currentUser.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
+      return !!roles;
+    },
+    enabled: !!currentUser?.id,
+  });
+
   // Initialize form data when profile loads
   useEffect(() => {
     if (currentUser?.profile) {
@@ -278,6 +296,29 @@ const Profile = () => {
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
+        {/* Admin Dashboard Access */}
+        {isAdmin && (
+          <Card 
+            className="mb-6 border-blue-600 bg-blue-950/20 hover:bg-blue-950/30 cursor-pointer transition-colors"
+            onClick={() => navigate('/admin')}
+          >
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-blue-600/20 flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-blue-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-blue-100">Admin Dashboard</h3>
+                  <p className="text-sm text-blue-300/80">
+                    Verifizierungen, Statistik & Meldungen
+                  </p>
+                </div>
+                <div className="text-blue-400">→</div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         {/* Verification Incentive Banner */}
         {!profile?.id_verified && !profile?.phone_verified && (
           <Alert className="mb-6 border-primary bg-primary/10">
