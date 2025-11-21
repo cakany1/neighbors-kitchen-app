@@ -20,6 +20,7 @@ import AGB from "./pages/AGB";
 import FAQ from "./pages/FAQ";
 import { Footer } from "./components/Footer";
 import { InstallPrompt } from "./components/InstallPrompt";
+import { CookieBanner } from "./components/layout/CookieBanner";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <InstallPrompt />
+      <CookieBanner />
       <BrowserRouter>
         <div className="flex flex-col min-h-screen pb-24">
           <Routes>
