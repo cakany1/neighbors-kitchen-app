@@ -36,6 +36,13 @@ const languages = [
   { code: 'zh', name: '中文 (Chinese)' },
 ];
 
+const genderOptions = [
+  { value: 'female', label: '👩 Female (Weiblich)' },
+  { value: 'male', label: '👨 Male (Männlich)' },
+  { value: 'diverse', label: '🌈 Diverse' },
+  { value: 'prefer_not_to_say', label: '🔒 Prefer not to say' },
+];
+
 const Profile = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -45,6 +52,7 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     nickname: '',
     age: null as number | null,
+    gender: null as string | null,
     vacation_mode: false,
     notification_radius: 1000,
     allergens: [] as string[],
@@ -55,6 +63,8 @@ const Profile = () => {
     private_city: '',
     private_postal_code: '',
   });
+
+  const [customLanguageInput, setCustomLanguageInput] = useState('');
 
   // Fetch current user and profile
   const { data: currentUser, isLoading: userLoading } = useQuery({
@@ -82,6 +92,7 @@ const Profile = () => {
       setFormData({
         nickname: currentUser.profile.nickname || '',
         age: currentUser.profile.age || null,
+        gender: currentUser.profile.gender || null,
         vacation_mode: currentUser.profile.vacation_mode || false,
         notification_radius: currentUser.profile.notification_radius || 1000,
         allergens: currentUser.profile.allergens || [],
@@ -154,6 +165,7 @@ const Profile = () => {
         .update({
           nickname: formData.nickname || null,
           age: formData.age || null,
+          gender: formData.gender || null,
           vacation_mode: formData.vacation_mode,
           notification_radius: formData.notification_radius,
           allergens: formData.allergens,
@@ -212,6 +224,27 @@ const Profile = () => {
         ? prev.dislikes.filter(d => d !== dislike)
         : [...prev.dislikes, dislike]
     }));
+  };
+
+  const handleCustomLanguageRequest = async () => {
+    if (!customLanguageInput.trim() || !currentUser?.id) return;
+    
+    try {
+      const { error } = await supabase
+        .from('language_requests')
+        .insert({
+          language_name: customLanguageInput.trim(),
+          requested_by_user_id: currentUser.id
+        });
+      
+      if (error) throw error;
+      
+      toast.success(`Language request "${customLanguageInput}" submitted! We'll add it if there's demand.`);
+      setCustomLanguageInput('');
+    } catch (error) {
+      console.error('Error submitting language request:', error);
+      toast.error('Failed to submit language request');
+    }
   };
 
   if (userLoading) {
@@ -301,6 +334,28 @@ const Profile = () => {
                   age: e.target.value ? parseInt(e.target.value) : null 
                 })}
               />
+            </div>
+            
+            <div>
+              <Label htmlFor="gender">Gender (for safety features)</Label>
+              <Select
+                value={formData.gender || undefined}
+                onValueChange={(value) => setFormData({ ...formData, gender: value })}
+              >
+                <SelectTrigger id="gender">
+                  <SelectValue placeholder="Select gender..." />
+                </SelectTrigger>
+                <SelectContent className="bg-background border-border z-50">
+                  {genderOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                💡 Enables "Ladies Only" mode for women chefs
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -432,7 +487,7 @@ const Profile = () => {
           <CardContent className="space-y-4">
             <div>
               <Label className="text-base font-semibold mb-3 block">Allergens</Label>
-              <div className="space-y-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {allergenOptions.map((option) => (
                   <div key={option.value} className="flex items-center space-x-2">
                     <Checkbox
@@ -513,6 +568,35 @@ const Profile = () => {
                   </div>
                 ))}
               </div>
+              
+              <div className="pt-3 border-t border-border">
+                <Label className="text-sm font-medium mb-2 block">Missing your language?</Label>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="➕ Request language (e.g., Korean, Hindi)"
+                    value={customLanguageInput}
+                    onChange={(e) => setCustomLanguageInput(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleCustomLanguageRequest();
+                      }
+                    }}
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={handleCustomLanguageRequest} 
+                    variant="outline"
+                    disabled={!customLanguageInput.trim()}
+                  >
+                    Request
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  🌍 We'll add popular requested languages!
+                </p>
+              </div>
+              
               <p className="text-xs text-muted-foreground mt-2">
                 💬 {t('profile.languagePreference')} - Messages with chefs who speak different languages will be automatically translated for you
               </p>

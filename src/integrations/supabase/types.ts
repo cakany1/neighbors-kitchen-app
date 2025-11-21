@@ -76,6 +76,27 @@ export type Database = {
           },
         ]
       }
+      language_requests: {
+        Row: {
+          created_at: string | null
+          id: string
+          language_name: string
+          requested_by_user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          language_name: string
+          requested_by_user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          language_name?: string
+          requested_by_user_id?: string | null
+        }
+        Relationships: []
+      }
       meals: {
         Row: {
           allergens: string[] | null
@@ -109,6 +130,7 @@ export type Database = {
           title: string
           unit_type: string | null
           updated_at: string
+          women_only: boolean | null
         }
         Insert: {
           allergens?: string[] | null
@@ -142,6 +164,7 @@ export type Database = {
           title: string
           unit_type?: string | null
           updated_at?: string
+          women_only?: boolean | null
         }
         Update: {
           allergens?: string[] | null
@@ -175,6 +198,7 @@ export type Database = {
           title?: string
           unit_type?: string | null
           updated_at?: string
+          women_only?: boolean | null
         }
         Relationships: [
           {

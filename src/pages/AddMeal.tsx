@@ -11,14 +11,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload, ChefHat, Gift, AlertCircle } from 'lucide-react';
+import { Upload, ChefHat, Gift, AlertCircle, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { barterOptions } from '@/utils/ingredientDatabase';
 import { TagSelector } from '@/components/meals/TagSelector';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 const AddMeal = () => {
   const navigate = useNavigate();
   const [isCookingExperience, setIsCookingExperience] = useState(false);
+  const [womenOnly, setWomenOnly] = useState(false);
   const [exchangeMode, setExchangeMode] = useState<'money' | 'barter'>('money');
   const [handoverMode, setHandoverMode] = useState<'pickup_box' | 'neighbor_plate' | 'ghost_mode' | 'dine_in'>('pickup_box');
   const [identityReveal, setIdentityReveal] = useState<'real_name' | 'nickname'>('nickname');
@@ -42,6 +45,23 @@ const AddMeal = () => {
     collectionWindowStart: '',
     collectionWindowEnd: '',
     pickupInstructions: '',
+  });
+
+  // Fetch current user's gender for Ladies Only feature
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('gender')
+        .eq('id', user.id)
+        .single();
+      
+      return { id: user.id, gender: profile?.gender };
+    },
   });
 
   // Auto-run Price Detective when title changes
@@ -240,6 +260,32 @@ const AddMeal = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Ladies Only Mode (Safety Feature for Women Chefs) */}
+          {currentUser?.gender === 'female' && (
+            <Card className="border-destructive/50 bg-destructive/5">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <Shield className="w-6 h-6 text-destructive mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <Label htmlFor="women-only" className="text-base font-semibold">
+                        👩 Ladies Only (Nur für Frauen)
+                      </Label>
+                      <Switch
+                        id="women-only"
+                        checked={womenOnly}
+                        onCheckedChange={setWomenOnly}
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Only female guests can book this meal. This setting helps create a safe, comfortable environment for women-only gatherings.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
               {/* Exchange Model Toggle */}
           <Card>
