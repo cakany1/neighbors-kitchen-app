@@ -172,7 +172,7 @@ const MealDetail = () => {
         profile?.private_city;
 
       if (!isProfileComplete) {
-        toast.error('Please complete your profile (Address & Phone) to book meals.');
+        toast.error(t('toast.profile_incomplete'));
         navigate('/profile');
         throw new Error('Profile incomplete');
       }
@@ -197,13 +197,13 @@ const MealDetail = () => {
     },
     onSuccess: () => {
       setBookingStatus('pending');
-      toast.success('Booking request sent to ' + meal?.chef?.first_name);
+      toast.success(t('toast.booking_sent', { name: meal?.chef?.first_name || '' }));
       // Refresh meal data to show updated portion count
       queryClient.invalidateQueries({ queryKey: ['meal', id] });
       queryClient.invalidateQueries({ queryKey: ['booking', id, currentUser?.id] });
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to create booking');
+      toast.error(error.message || t('toast.booking_failed'));
     },
   });
 
@@ -239,13 +239,13 @@ const MealDetail = () => {
     },
     onSuccess: () => {
       setBookingStatus('none');
-      toast.success('Booking cancelled successfully');
+      toast.success(t('toast.booking_cancelled'));
       // Refresh queries
       queryClient.invalidateQueries({ queryKey: ['meal', id] });
       queryClient.invalidateQueries({ queryKey: ['booking', id, currentUser?.id] });
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to cancel booking');
+      toast.error(error.message || t('toast.cancel_failed'));
     },
   });
 

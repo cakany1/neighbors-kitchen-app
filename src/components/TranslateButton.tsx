@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Languages } from 'lucide-react';
 import { toast } from 'sonner';
@@ -9,6 +10,7 @@ interface TranslateButtonProps {
 }
 
 export const TranslateButton = ({ originalText, onTranslate }: TranslateButtonProps) => {
+  const { t } = useTranslation();
   const [isTranslated, setIsTranslated] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
 
@@ -28,7 +30,7 @@ export const TranslateButton = ({ originalText, onTranslate }: TranslateButtonPr
       onTranslate(mockTranslation);
       setIsTranslated(true);
       setIsTranslating(false);
-      toast.success('Translated successfully');
+      toast.success(t('toast.translated_successfully'));
     }, 500);
   };
 

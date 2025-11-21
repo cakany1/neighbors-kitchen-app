@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -14,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const Admin = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -113,11 +115,11 @@ const Admin = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('User verification approved');
+      toast.success(t('admin.approval_success'));
       queryClient.invalidateQueries({ queryKey: ['pendingVerifications'] });
     },
     onError: () => {
-      toast.error('Failed to approve verification');
+      toast.error(t('admin.approval_failed'));
     },
   });
 
@@ -132,11 +134,11 @@ const Admin = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('User verification rejected');
+      toast.success(t('admin.rejection_success'));
       queryClient.invalidateQueries({ queryKey: ['pendingVerifications'] });
     },
     onError: () => {
-      toast.error('Failed to reject verification');
+      toast.error(t('admin.rejection_failed'));
     },
   });
 
@@ -151,11 +153,11 @@ const Admin = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Feedback status updated');
+      toast.success(t('admin.feedback_updated'));
       queryClient.invalidateQueries({ queryKey: ['feedbackList'] });
     },
     onError: () => {
-      toast.error('Failed to update feedback');
+      toast.error(t('admin.feedback_update_failed'));
     },
   });
 
@@ -290,7 +292,7 @@ const Admin = () => {
                               className="flex-1"
                             >
                               <CheckCircle className="w-4 h-4 mr-2" />
-                              Approve
+                              {t('admin.approve')}
                             </Button>
                             <Button
                               variant="destructive"
@@ -299,7 +301,7 @@ const Admin = () => {
                               className="flex-1"
                             >
                               <XCircle className="w-4 h-4 mr-2" />
-                              Reject
+                              {t('admin.reject')}
                             </Button>
                           </div>
                         </CardContent>
@@ -316,7 +318,7 @@ const Admin = () => {
             <div className="grid gap-4 md:grid-cols-3">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('admin.total_users')}</CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>

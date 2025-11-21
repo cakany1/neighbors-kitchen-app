@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
 const AddMeal = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isCookingExperience, setIsCookingExperience] = useState(false);
   const [womenOnly, setWomenOnly] = useState(false);
@@ -84,7 +86,7 @@ const AddMeal = () => {
   // Price Detective - Auto-detect restaurant prices
   const runPriceDetective = () => {
     if (!formData.title.trim()) {
-      toast.error('Please enter a meal title first');
+      toast.error(t('toast.meal_title_required'));
       return;
     }
     
@@ -98,7 +100,7 @@ const AddMeal = () => {
       const maxPrice = Math.round((basePrice + 3 + Math.random() * 3) * 100) / 100;
       setPriceDetectiveResult({ min: minPrice, max: maxPrice });
       setPriceDetectiveLoading(false);
-      toast.success('Price range found!');
+      toast.success(t('toast.price_range_found'));
     }, 1500);
   };
 
@@ -106,7 +108,7 @@ const AddMeal = () => {
     if (priceDetectiveResult) {
       const avgPrice = (priceDetectiveResult.min + priceDetectiveResult.max) / 2;
       setFormData({ ...formData, restaurantReferencePrice: avgPrice.toFixed(2) });
-      toast.success('Average price applied!');
+      toast.success(t('toast.price_applied'));
     }
   };
 
@@ -114,26 +116,26 @@ const AddMeal = () => {
     e.preventDefault();
     
     if (!formData.title || !formData.description || !formData.scheduledDate || !formData.scheduledTime) {
-      toast.error('Please fill in all required fields including date and time');
+      toast.error(t('toast.fill_required_fields'));
       return;
     }
 
     if (!formData.collectionWindowStart && (handoverMode === 'pickup_box' || handoverMode === 'neighbor_plate' || handoverMode === 'ghost_mode')) {
-      toast.error('Please set a collection window');
+      toast.error(t('toast.set_collection_window'));
       return;
     }
 
     if (handoverMode === 'dine_in' && (!formData.arrivalTime || !formData.maxSeats)) {
-      toast.error('Please set arrival time and max guest capacity for Kitchen Experience');
+      toast.error(t('toast.set_arrival_time'));
       return;
     }
 
     if (selectedExchangeOptions.length === 0) {
-      toast.error('Bitte wähle mindestens eine Gegenleistungs-Option');
+      toast.error(t('toast.select_exchange_option'));
       return;
     }
 
-    toast.success('Meal listing created! Your neighbors will see it soon.');
+    toast.success(t('toast.meal_created'));
     setTimeout(() => {
       navigate('/');
     }, 1500);

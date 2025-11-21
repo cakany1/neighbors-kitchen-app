@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ interface FeedbackDialogProps {
 }
 
 export const FeedbackDialog = ({ userId }: FeedbackDialogProps) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     subject: '',
@@ -43,12 +45,12 @@ export const FeedbackDialog = ({ userId }: FeedbackDialogProps) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Feedback submitted! Thank you for helping us improve.');
+      toast.success(t('toast.feedback_submitted'));
       setFormData({ subject: '', message: '' });
       setOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to submit feedback');
+      toast.error(error.message || t('toast.feedback_failed'));
     },
   });
 

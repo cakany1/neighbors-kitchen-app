@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +31,7 @@ export function BlockUserDialog({
   currentUserId,
   onBlockComplete,
 }: BlockUserDialogProps) {
+  const { t } = useTranslation();
   const [isBlocking, setIsBlocking] = useState(false);
 
   const handleBlock = async () => {
@@ -51,14 +53,14 @@ export function BlockUserDialog({
           throw error;
         }
       } else {
-        toast.success(`${blockedUserName} has been blocked. You won't see their meals or messages.`);
+        toast.success(t('toast.user_blocked', { name: blockedUserName }));
       }
 
       onOpenChange(false);
       onBlockComplete?.();
     } catch (error) {
       console.error('Error blocking user:', error);
-      toast.error('Failed to block user. Please try again.');
+      toast.error(t('toast.block_failed'));
     } finally {
       setIsBlocking(false);
     }

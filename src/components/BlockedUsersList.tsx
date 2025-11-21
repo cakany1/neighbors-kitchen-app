@@ -84,14 +84,14 @@ export function BlockedUsersList({ currentUserId }: BlockedUsersListProps) {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('User unblocked successfully');
+      toast.success(t('toast.user_unblocked'));
       queryClient.invalidateQueries({ queryKey: ['blockedUsers', currentUserId] });
       queryClient.invalidateQueries({ queryKey: ['meals'] }); // Refresh feed
       setUnblockUserId(null);
     },
     onError: (error) => {
       console.error('Error unblocking user:', error);
-      toast.error('Failed to unblock user');
+      toast.error(t('toast.unblock_failed'));
     },
   });
 

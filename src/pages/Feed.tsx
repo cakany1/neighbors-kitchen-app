@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MealCard } from '@/components/MealCard';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -13,6 +14,7 @@ import { getDistance } from '@/utils/distance';
 import { OnboardingTour } from '@/components/OnboardingTour';
 
 const Feed = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isGuestMode = searchParams.get('guest') === 'true';
@@ -222,24 +224,23 @@ const Feed = () => {
           <Alert className="mb-6 border-warning bg-warning/10">
             <AlertCircle className="h-4 w-4 text-warning" />
             <AlertDescription className="text-sm">
-              <strong>Set your location</strong> in Profile Settings to see meals filtered by distance.
+              <strong>{t('feed.set_location')}</strong> {t('feed.set_location_desc')}
             </AlertDescription>
           </Alert>
         ) : null}
 
         {isLoading ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">Loading meals...</p>
+            <p className="text-muted-foreground">{t('feed.loading_meals')}</p>
           </div>
         ) : !meals || meals.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">No meals available yet. Be the first to share!</p>
+            <p className="text-muted-foreground">{t('feed.no_meals_yet')}</p>
           </div>
         ) : filteredAndSortedMeals.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground">
-              No meals available within your {userRadius / 1000}km radius. 
-              Try increasing your notification radius in Profile Settings.
+              {t('feed.no_meals_radius', { radius: userRadius / 1000 })}
             </p>
           </div>
         ) : (
