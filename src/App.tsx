@@ -15,6 +15,9 @@ import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
+import Impressum from "./pages/Impressum";
+import AGB from "./pages/AGB";
+import { Footer } from "./components/Footer";
 
 const queryClient = new QueryClient();
 
@@ -24,21 +27,26 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/feed" element={<Feed />} />
-          <Route path="/map" element={<MapView />} />
-          <Route path="/add-meal" element={<AddMeal />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/meal/:id" element={<MealDetail />} />
-          <Route path="/payment/:id" element={<Payment />} />
-          <Route path="/chat/:bookingId" element={<Chat />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <div className="flex flex-col min-h-screen">
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/map" element={<MapView />} />
+            <Route path="/add-meal" element={<AddMeal />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/meal/:id" element={<MealDetail />} />
+            <Route path="/payment/:id" element={<Payment />} />
+            <Route path="/chat/:bookingId" element={<Chat />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/impressum" element={<Impressum />} />
+            <Route path="/agb" element={<AGB />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Footer />
+        </div>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
