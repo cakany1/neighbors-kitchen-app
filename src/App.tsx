@@ -17,6 +17,7 @@ import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 import Impressum from "./pages/Impressum";
 import AGB from "./pages/AGB";
+import FAQ from "./pages/FAQ";
 import { Footer } from "./components/Footer";
 import { InstallPrompt } from "./components/InstallPrompt";
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/signup" element={<Signup />} />
             <Route path="/impressum" element={<Impressum />} />
             <Route path="/agb" element={<AGB />} />
+            <Route path="/faq" element={<FAQ />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -29,6 +29,8 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 const MealDetail = () => {
   const { id } = useParams();
@@ -317,11 +319,23 @@ const MealDetail = () => {
               <ChefHat className="w-20 h-20 text-muted-foreground" />
             </div>
           )}
-          {meal.is_stock_photo && (
-            <Badge className="absolute top-3 right-3 bg-background/80 backdrop-blur">
-              📷 Symbolic Image
-            </Badge>
-          )}
+          <div className="absolute top-3 right-3 flex flex-col gap-2">
+            {meal.is_stock_photo && (
+              <Badge className="bg-background/80 backdrop-blur">
+                📷 Symbolic Image
+              </Badge>
+            )}
+            {meal.available_portions > 0 && (
+              <Badge className="bg-primary/90 backdrop-blur text-primary-foreground font-bold text-sm">
+                Noch {meal.available_portions} {meal.unit_type === 'slices' ? 'Stücke' : meal.unit_type === 'items' ? 'Stück' : meal.unit_type === 'whole' ? 'Ganzes' : 'Portionen'}
+              </Badge>
+            )}
+            {meal.available_portions === 0 && (
+              <Badge className="bg-destructive/90 backdrop-blur text-destructive-foreground font-bold text-sm">
+                Ausverkauft
+              </Badge>
+            )}
+          </div>
         </div>
 
         <div className="p-4 space-y-4">
@@ -399,16 +413,26 @@ const MealDetail = () => {
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex flex-col items-center justify-center">
                     <span className="text-xs font-medium text-primary">
-                      {new Date(meal.scheduled_date).toLocaleDateString([], { month: 'short' }).toUpperCase()}
+                      {format(new Date(meal.scheduled_date), 'MMM', { locale: de }).toUpperCase()}
                     </span>
                     <span className="text-lg font-bold text-primary">
-                      {new Date(meal.scheduled_date).getDate()}
+                      {format(new Date(meal.scheduled_date), 'd', { locale: de })}
                     </span>
                   </div>
                   <div>
                     <p className="font-semibold text-foreground">
-                      {new Date(meal.scheduled_date).toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                      {format(new Date(meal.scheduled_date), 'EEEE, d. MMMM yyyy', { locale: de })}
                     </p>
+                    {(meal.collection_window_start || meal.arrival_time) && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        <Clock className="w-3.5 h-3.5 inline mr-1" />
+                        {meal.collection_window_start && meal.collection_window_end 
+                          ? `${meal.collection_window_start.slice(0, 5)} - ${meal.collection_window_end.slice(0, 5)} Uhr`
+                          : meal.arrival_time 
+                          ? `${meal.arrival_time.slice(0, 5)} Uhr`
+                          : ''}
+                      </p>
+                    )}
                   </div>
                 </div>
               </CardContent>
