@@ -14,7 +14,9 @@ const Payment = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const meal = mockMeals.find(m => m.id === id);
-  const [paymentAmount, setPaymentAmount] = useState(meal?.pricing.suggested || meal?.pricing.minimum || 10);
+  const [paymentAmount, setPaymentAmount] = useState(
+    Math.max(meal?.pricing.suggested || 7, meal?.pricing.minimum || 7, 7)
+  );
 
   if (!meal) {
     return (
@@ -46,6 +48,7 @@ const Payment = () => {
   const serviceFee = 2.00;
   const totalAmount = paymentAmount + serviceFee;
   const minTotal = 7.00;
+  const minPayment = 7;
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -121,8 +124,8 @@ const Payment = () => {
               <div className="space-y-4">
                 <Slider
                   value={[paymentAmount]}
-                  onValueChange={(value) => setPaymentAmount(value[0])}
-                  min={meal.pricing.minimum}
+                  onValueChange={(value) => setPaymentAmount(Math.max(value[0], minPayment))}
+                  min={minPayment}
                   max={maxPayment}
                   step={1}
                   className="w-full"
@@ -130,10 +133,10 @@ const Payment = () => {
                 
                 <div className="grid grid-cols-4 gap-2">
                   {[
-                    meal.pricing.minimum,
-                    meal.pricing.suggested || 10,
-                    (meal.pricing.suggested || 10) + 5,
-                    (meal.pricing.suggested || 10) + 10,
+                    Math.max(minPayment, meal.pricing.minimum),
+                    Math.max(minPayment, meal.pricing.suggested || 10),
+                    Math.max(minPayment, (meal.pricing.suggested || 10) + 5),
+                    Math.max(minPayment, (meal.pricing.suggested || 10) + 10),
                   ].map((amount) => (
                     <Button
                       key={amount}

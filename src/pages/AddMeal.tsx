@@ -420,10 +420,17 @@ const AddMeal = () => {
                       id="minimumPrice"
                       type="number"
                       min="7"
-                      step="0.5"
-                      placeholder="7"
-                      value={formData.minimumPrice}
+                      step="0.50"
+                      placeholder="7.00"
+                      value={formData.minimumPrice || '7.00'}
                       onChange={(e) => setFormData({ ...formData, minimumPrice: e.target.value })}
+                      onBlur={(e) => {
+                        const value = parseFloat(e.target.value);
+                        if (isNaN(value) || value < 7) {
+                          setFormData({ ...formData, minimumPrice: '7.00' });
+                          toast.info('Mindestpreis auf CHF 7.00 gesetzt');
+                        }
+                      }}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       Minimumbetrag ist CHF 7.00 (inkl. Gebühr)
