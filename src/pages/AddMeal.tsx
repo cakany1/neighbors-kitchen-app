@@ -13,7 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Upload, ChefHat, Gift, AlertCircle, Shield } from 'lucide-react';
 import { toast } from 'sonner';
-import { barterOptions } from '@/utils/ingredientDatabase';
+import { exchangeOptions } from '@/utils/ingredientDatabase';
 import { TagSelector } from '@/components/meals/TagSelector';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -23,12 +23,11 @@ const AddMeal = () => {
   const [isCookingExperience, setIsCookingExperience] = useState(false);
   const [womenOnly, setWomenOnly] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [exchangeMode, setExchangeMode] = useState<'money' | 'barter'>('money');
   const [handoverMode, setHandoverMode] = useState<'pickup_box' | 'neighbor_plate' | 'ghost_mode' | 'dine_in'>('pickup_box');
   const [identityReveal, setIdentityReveal] = useState<'real_name' | 'nickname'>('nickname');
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
-  const [selectedBarterItems, setSelectedBarterItems] = useState<string[]>([]);
+  const [selectedExchangeOptions, setSelectedExchangeOptions] = useState<string[]>([]);
   const [priceDetectiveLoading, setPriceDetectiveLoading] = useState(false);
   const [priceDetectiveResult, setPriceDetectiveResult] = useState<{ min: number; max: number } | null>(null);
   const [useStockPhoto, setUseStockPhoto] = useState(false);
@@ -67,18 +66,18 @@ const AddMeal = () => {
 
   // Auto-run Price Detective when title changes
   useEffect(() => {
-    if (formData.title.trim() && exchangeMode === 'money') {
+    if (formData.title.trim() && selectedExchangeOptions.includes('money')) {
       const timer = setTimeout(() => {
         runPriceDetective();
       }, 1000); // Debounce for 1 second
       
       return () => clearTimeout(timer);
     }
-  }, [formData.title, exchangeMode]);
+  }, [formData.title, selectedExchangeOptions]);
 
-  const toggleBarterItem = (item: string) => {
-    setSelectedBarterItems(prev =>
-      prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
+  const toggleExchangeOption = (option: string) => {
+    setSelectedExchangeOptions(prev =>
+      prev.includes(option) ? prev.filter(i => i !== option) : [...prev, option]
     );
   };
 
@@ -129,8 +128,8 @@ const AddMeal = () => {
       return;
     }
 
-    if (exchangeMode === 'barter' && selectedBarterItems.length === 0) {
-      toast.error('Please select at least one barter option');
+    if (selectedExchangeOptions.length === 0) {
+      toast.error('Bitte wähle mindestens eine Gegenleistungs-Option');
       return;
     }
 
@@ -146,21 +145,21 @@ const AddMeal = () => {
       
       <main className="max-w-lg mx-auto px-4 py-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Share a Meal</h1>
-          <p className="text-muted-foreground">Create a listing for your home-cooked dish</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Essen teilen</h1>
+          <p className="text-muted-foreground">Erstelle ein Angebot für dein selbstgekochtes Gericht</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Photo Upload */}
           <Card>
             <CardContent className="pt-6">
-              <Label htmlFor="photo" className="block mb-2 font-medium">Dish Photo</Label>
+              <Label htmlFor="photo" className="block mb-2 font-medium">Foto vom Gericht</Label>
               {!useStockPhoto ? (
                 <>
                   <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
                     <Upload className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-1">Click to upload photo</p>
-                    <p className="text-xs text-muted-foreground">PNG, JPG up to 10MB</p>
+                    <p className="text-sm text-muted-foreground mb-1">Klicke zum Hochladen</p>
+                    <p className="text-xs text-muted-foreground">PNG, JPG bis 10MB</p>
                     <input 
                       type="file" 
                       id="photo" 
@@ -175,7 +174,7 @@ const AddMeal = () => {
                     onClick={() => setUseStockPhoto(true)}
                     className="w-full mt-2"
                   >
-                    Haven't cooked yet? Use a symbolic image
+                    Noch nicht gekocht? Symbolbild verwenden
                   </Button>
                 </>
               ) : (
@@ -183,7 +182,7 @@ const AddMeal = () => {
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                      📷 A symbolic/stock image will be displayed with a "Symbolbild" badge
+                      📷 Ein Symbolbild wird mit dem Badge "Symbolbild" angezeigt
                     </AlertDescription>
                   </Alert>
                   <Button 
@@ -192,7 +191,7 @@ const AddMeal = () => {
                     onClick={() => setUseStockPhoto(false)}
                     className="w-full"
                   >
-                    Upload my own photo instead
+                    Eigenes Foto hochladen
                   </Button>
                 </div>
               )}
@@ -202,14 +201,14 @@ const AddMeal = () => {
           {/* Basic Info */}
           <Card>
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>Grundinformationen</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="title">Dish Name *</Label>
+                <Label htmlFor="title">Name des Gerichts *</Label>
                 <Input
                   id="title"
-                  placeholder="e.g., Vietnamese Summer Rolls"
+                  placeholder="z.B. Vietnamesische Sommerrollen"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   required
@@ -217,10 +216,10 @@ const AddMeal = () => {
               </div>
 
               <div>
-                <Label htmlFor="description">Description *</Label>
+                <Label htmlFor="description">Beschreibung *</Label>
                 <Textarea
                   id="description"
-                  placeholder="Describe your dish, ingredients, and any special details..."
+                  placeholder="Beschreibe dein Gericht, Zutaten und besondere Details..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={4}
@@ -246,7 +245,7 @@ const AddMeal = () => {
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <Label htmlFor="cooking-experience" className="text-base font-semibold">
-                      Cooking Experience
+                      Koch-Erlebnis
                     </Label>
                     <Switch
                       id="cooking-experience"
@@ -255,7 +254,7 @@ const AddMeal = () => {
                     />
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Invite people into your kitchen to watch the cooking process and enjoy an apéro together
+                    Lade Leute in deine Küche ein, um beim Kochen zuzuschauen und gemeinsam einen Apéro zu genießen
                   </p>
                 </div>
               </div>
@@ -280,7 +279,7 @@ const AddMeal = () => {
                       />
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Only female guests can book this meal. This setting helps create a safe, comfortable environment for women-only gatherings.
+                      Nur weibliche Gäste können dieses Essen buchen. Diese Einstellung hilft, eine sichere und angenehme Umgebung zu schaffen.
                     </p>
                   </div>
                 </div>
@@ -305,89 +304,100 @@ const AddMeal = () => {
                     />
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Only guests with a blue verification badge (phone or ID verified) can book this meal. Increases trust and security.
+                    Nur verifizierte Gäste (Telefon oder ID) können dieses Essen buchen. Erhöht Vertrauen und Sicherheit.
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-              {/* Exchange Model Toggle */}
+          {/* Exchange Options - Unified List */}
           <Card>
             <CardHeader>
-              <CardTitle>Whatever you want</CardTitle>
-              <CardDescription>Was würde dich freuen? (Suggestions for guests)</CardDescription>
+              <CardTitle>Dein Wunsch an den Gast</CardTitle>
+              <CardDescription>Was akzeptierst du als Gegenleistung?</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex gap-3">
-                <Button
-                  type="button"
-                  variant={exchangeMode === 'money' ? 'default' : 'outline'}
-                  onClick={() => setExchangeMode('money')}
-                  className="flex-1"
-                >
-                  💰 Pay What You Want
-                </Button>
-                <Button
-                  type="button"
-                  variant={exchangeMode === 'barter' ? 'default' : 'outline'}
-                  onClick={() => setExchangeMode('barter')}
-                  className="flex-1"
-                >
-                  <Gift className="w-4 h-4 mr-2" />
-                  Geld oder Kleines
-                </Button>
-              </div>
-
-              {exchangeMode === 'money' ? (
-                <div className="space-y-4 pt-2">
-                  {/* Price Detective - Auto-runs */}
-                  {(priceDetectiveLoading || priceDetectiveResult) && (
-                    <div className="border border-border rounded-lg p-4 space-y-3">
-                      <Label className="text-sm font-medium">Price Detective 🔍</Label>
-                      {priceDetectiveLoading && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
-                          Scanning neighborhood restaurant prices...
-                        </div>
-                      )}
-                      {priceDetectiveResult && !priceDetectiveLoading && (
-                        <Alert className="bg-primary/10 border-primary">
-                          <AlertDescription className="space-y-2">
-                            <p className="text-sm font-medium">
-                              Found! "{formData.title}" in Basel St. Johann costs between: <strong>CHF {priceDetectiveResult.min.toFixed(2)}</strong> and <strong>CHF {priceDetectiveResult.max.toFixed(2)}</strong>
-                            </p>
-                            <Button 
-                              type="button" 
-                              size="sm" 
-                              onClick={usePriceDetectiveResult}
-                              className="w-full"
-                            >
-                              Use Average as Value Anchor
-                            </Button>
-                          </AlertDescription>
-                        </Alert>
-                      )}
+              <Label className="mb-3 block">Wähle alle Optionen, die du akzeptierst:</Label>
+              <p className="text-xs text-muted-foreground mb-3">
+                Gäste können eine dieser Optionen wählen. Mehrfachauswahl möglich.
+              </p>
+              
+              {/* Price Detective - Auto-runs when money is selected */}
+              {selectedExchangeOptions.includes('money') && (priceDetectiveLoading || priceDetectiveResult) && (
+                <div className="border border-border rounded-lg p-4 space-y-3 mb-4">
+                  <Label className="text-sm font-medium">Price Detective 🔍</Label>
+                  {priceDetectiveLoading && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                      Scanne Restaurant-Preise in der Nachbarschaft...
                     </div>
                   )}
+                  {priceDetectiveResult && !priceDetectiveLoading && (
+                    <Alert className="bg-primary/10 border-primary">
+                      <AlertDescription className="space-y-2">
+                        <p className="text-sm font-medium">
+                          Gefunden! "{formData.title}" in Basel St. Johann kostet zwischen: <strong>CHF {priceDetectiveResult.min.toFixed(2)}</strong> und <strong>CHF {priceDetectiveResult.max.toFixed(2)}</strong>
+                        </p>
+                        <Button 
+                          type="button" 
+                          size="sm" 
+                          onClick={usePriceDetectiveResult}
+                          className="w-full"
+                        >
+                          Durchschnitt als Richtwert verwenden
+                        </Button>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              )}
+              
+              <div className="space-y-3">
+                {exchangeOptions.map((option) => (
+                  <div key={option.value} className="flex items-start space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors">
+                    <Checkbox
+                      id={`exchange-${option.value}`}
+                      checked={selectedExchangeOptions.includes(option.value)}
+                      onCheckedChange={() => toggleExchangeOption(option.value)}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <Label
+                        htmlFor={`exchange-${option.value}`}
+                        className="text-sm font-normal cursor-pointer flex items-center gap-2"
+                      >
+                        {option.icon && <span className="text-lg">{option.icon}</span>}
+                        <span>{option.label}</span>
+                      </Label>
+                      {option.note && (
+                        <p className="text-xs text-muted-foreground mt-1 ml-6">{option.note}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
 
+              {/* Money-specific fields */}
+              {selectedExchangeOptions.includes('money') && (
+                <div className="space-y-4 pt-2 border-t border-border mt-4">
                   <div>
-                    <Label htmlFor="restaurantReferencePrice">Restaurant Reference Price (CHF)</Label>
+                    <Label htmlFor="restaurantReferencePrice">Restaurant-Referenzpreis (CHF)</Label>
                     <Input
                       id="restaurantReferencePrice"
                       type="number"
                       min="0"
                       step="0.5"
-                      placeholder="e.g., 24"
+                      placeholder="z.B. 24"
                       value={formData.restaurantReferencePrice}
                       onChange={(e) => setFormData({ ...formData, restaurantReferencePrice: e.target.value })}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      What would this dish cost at a restaurant? (Optional anchor price)
+                      Was würde dieses Gericht im Restaurant kosten? (Optionaler Richtwert)
                     </p>
                   </div>
                   <div>
-                    <Label htmlFor="minimumPrice">Minimum Price (CHF)</Label>
+                    <Label htmlFor="minimumPrice">Mindestpreis (CHF)</Label>
                     <Input
                       id="minimumPrice"
                       type="number"
@@ -398,56 +408,8 @@ const AddMeal = () => {
                       onChange={(e) => setFormData({ ...formData, minimumPrice: e.target.value })}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      People will pay after eating and can choose to pay more
+                      Gäste zahlen nach dem Essen und können mehr geben
                     </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="pt-2">
-                  <Label className="mb-3 block">Was würde dich freuen? (Suggestions for guests)</Label>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Select what you'd like guests to bring. They can choose any of these options.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2 pb-2 border-b border-border">
-                      <Checkbox
-                        id="barter-any"
-                        checked={selectedBarterItems.length === barterOptions.length}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setSelectedBarterItems([...barterOptions]);
-                          } else {
-                            setSelectedBarterItems([]);
-                          }
-                        }}
-                      />
-                      <Label
-                        htmlFor="barter-any"
-                        className="text-sm font-medium cursor-pointer"
-                      >
-                        ✨ Egal, überrasch mich!
-                      </Label>
-                    </div>
-                    {barterOptions.map((option) => (
-                      <div key={option} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`barter-${option}`}
-                          checked={selectedBarterItems.includes(option)}
-                          onCheckedChange={() => toggleBarterItem(option)}
-                        />
-                        <Label
-                          htmlFor={`barter-${option}`}
-                          className="text-sm font-normal cursor-pointer flex items-center gap-2"
-                        >
-                          {option === 'Nur ein Lächeln (Gratis)' && '😊'}
-                          {option === 'A Bottle of Wine' && '🍷'}
-                          {option === 'Dessert' && '🍰'}
-                          {option === 'Fruit' && '🍎'}
-                          {option === 'Surprise Me' && '🎁'}
-                          {option}
-                        </Label>
-                      </div>
-                    ))}
                   </div>
                 </div>
               )}
@@ -457,8 +419,8 @@ const AddMeal = () => {
           {/* Handover Mode */}
           <Card>
             <CardHeader>
-              <CardTitle>Handover & Privacy</CardTitle>
-              <CardDescription>How will guests receive their meal?</CardDescription>
+              <CardTitle>Übergabe & Ort</CardTitle>
+              <CardDescription>Wie soll das Essen übergeben werden?</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
@@ -469,7 +431,7 @@ const AddMeal = () => {
                   className="h-auto py-3 flex-col"
                 >
                   <span className="text-2xl mb-1">📦</span>
-                  <span className="text-xs">Pickup (Bring Tupperware)</span>
+                  <span className="text-xs">Abholung (Tupperware mitbringen)</span>
                 </Button>
                 <Button
                   type="button"
@@ -478,7 +440,7 @@ const AddMeal = () => {
                   className="h-auto py-3 flex-col"
                 >
                   <span className="text-2xl mb-1">🍽️</span>
-                  <span className="text-xs">Neighbor (Plate)</span>
+                  <span className="text-xs">Nachbar (eigener Teller)</span>
                 </Button>
                 <Button
                   type="button"
@@ -487,7 +449,7 @@ const AddMeal = () => {
                   className="h-auto py-3 flex-col"
                 >
                   <span className="text-2xl mb-1">👻</span>
-                  <span className="text-xs">Ghost Mode</span>
+                  <span className="text-xs">Kontaktlos (Eingang/Briefkasten)</span>
                 </Button>
                 <Button
                   type="button"
@@ -496,13 +458,13 @@ const AddMeal = () => {
                   className="h-auto py-3 flex-col"
                 >
                   <span className="text-2xl mb-1">🍴</span>
-                  <span className="text-xs">Dine In</span>
+                  <span className="text-xs">Zu Gast (Am Tisch essen)</span>
                 </Button>
               </div>
 
               {/* Identity Reveal Options */}
               <div className="pt-2">
-                <Label className="text-sm font-medium mb-2 block">What to reveal when booking is confirmed?</Label>
+                <Label className="text-sm font-medium mb-2 block">Was soll bei Buchungsbestätigung preisgegeben werden?</Label>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <input
@@ -515,7 +477,7 @@ const AddMeal = () => {
                       className="w-4 h-4"
                     />
                     <Label htmlFor="real_name" className="text-sm font-normal cursor-pointer">
-                      Real Name + Address
+                      Echter Name + Adresse
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -529,7 +491,7 @@ const AddMeal = () => {
                       className="w-4 h-4"
                     />
                     <Label htmlFor="nickname" className="text-sm font-normal cursor-pointer">
-                      Nickname + Address {handoverMode === 'ghost_mode' && '+ Instructions'}
+                      Nickname + Adresse {handoverMode === 'ghost_mode' && '+ Anweisungen'}
                     </Label>
                   </div>
                 </div>
@@ -539,14 +501,14 @@ const AddMeal = () => {
               {handoverMode !== 'dine_in' && (
                 <div className="pt-2">
                   <Label className="text-sm font-medium mb-2 block">
-                    Collection Window * (24h format)
+                    Abholzeitraum * (24h Format)
                   </Label>
                   <p className="text-xs text-muted-foreground mb-3">
-                    Set a time range to avoid disruptions (e.g., 17:00 - 19:00)
+                    Setze ein Zeitfenster, um Störungen zu vermeiden (z.B. 17:00 - 19:00)
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label htmlFor="collectionWindowStart" className="text-xs">From</Label>
+                      <Label htmlFor="collectionWindowStart" className="text-xs">Von</Label>
                       <Input
                         id="collectionWindowStart"
                         type="time"
@@ -556,7 +518,7 @@ const AddMeal = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="collectionWindowEnd" className="text-xs">To</Label>
+                      <Label htmlFor="collectionWindowEnd" className="text-xs">Bis</Label>
                       <Input
                         id="collectionWindowEnd"
                         type="time"
@@ -571,10 +533,10 @@ const AddMeal = () => {
               {/* Pickup Instructions */}
               {handoverMode === 'ghost_mode' && (
                 <div>
-                  <Label htmlFor="pickupInstructions">Pickup Instructions</Label>
+                  <Label htmlFor="pickupInstructions">Abholanweisungen</Label>
                   <Textarea
                     id="pickupInstructions"
-                    placeholder="e.g., Look for blue box at entrance, Ring bell #3"
+                    placeholder="z.B. Blaue Box am Eingang, Klingel Nr. 3"
                     value={formData.pickupInstructions}
                     onChange={(e) => setFormData({ ...formData, pickupInstructions: e.target.value })}
                     rows={2}
@@ -587,30 +549,30 @@ const AddMeal = () => {
           {/* Portions & Schedule */}
           <Card>
             <CardHeader>
-              <CardTitle>Availability</CardTitle>
+              <CardTitle>Verfügbarkeit</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="unitType">Unit Type</Label>
+                <Label htmlFor="unitType">Einheits-Typ</Label>
                 <select
                   id="unitType"
                   value={formData.unitType || 'portions'}
                   onChange={(e) => setFormData({ ...formData, unitType: e.target.value as 'portions' | 'slices' | 'items' | 'whole' })}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
-                  <option value="portions">Portions (Portionen)</option>
-                  <option value="slices">Slices (Stücke)</option>
-                  <option value="items">Items (Einzelne Gerichte)</option>
-                  <option value="whole">Whole (Ganzes)</option>
+                  <option value="portions">Portionen</option>
+                  <option value="slices">Stücke</option>
+                  <option value="items">Einzelne Gerichte</option>
+                  <option value="whole">Ganzes</option>
                 </select>
                 <p className="text-xs text-muted-foreground mt-1">
-                  How should this meal be measured?
+                  Wie soll dieses Essen gemessen werden?
                 </p>
               </div>
               
               <div>
                 <Label htmlFor="portions">
-                  Available {formData.unitType === 'slices' ? 'Slices' : formData.unitType === 'items' ? 'Items' : formData.unitType === 'whole' ? 'Units' : 'Portions'}
+                  Verfügbare {formData.unitType === 'slices' ? 'Stücke' : formData.unitType === 'items' ? 'Gerichte' : formData.unitType === 'whole' ? 'Einheiten' : 'Portionen'}
                 </Label>
                 <Input
                   id="portions"
@@ -623,7 +585,7 @@ const AddMeal = () => {
               </div>
 
               <div>
-                <Label htmlFor="scheduledDate">Scheduled Date *</Label>
+                <Label htmlFor="scheduledDate">Geplantes Datum *</Label>
                 <Input
                   id="scheduledDate"
                   type="date"
@@ -634,7 +596,7 @@ const AddMeal = () => {
               </div>
 
               <div>
-                <Label htmlFor="scheduledTime">Meal Ready Time * (24h format)</Label>
+                <Label htmlFor="scheduledTime">Essen fertig um * (24h Format)</Label>
                 <Input
                   id="scheduledTime"
                   type="time"
@@ -643,7 +605,7 @@ const AddMeal = () => {
                   required
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  When will your meal be ready? (e.g., 20:30)
+                  Wann wird dein Essen fertig sein? (z.B. 20:30)
                 </p>
               </div>
               
@@ -651,7 +613,7 @@ const AddMeal = () => {
               {handoverMode === 'dine_in' && (
                 <>
                   <div>
-                    <Label htmlFor="arrivalTime">Guest Arrival Time * (24h format)</Label>
+                    <Label htmlFor="arrivalTime">Gäste-Ankunftszeit * (24h Format)</Label>
                     <Input
                       id="arrivalTime"
                       type="time"
@@ -660,12 +622,12 @@ const AddMeal = () => {
                       required
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      What time should guests arrive? (e.g., 19:00)
+                      Wann sollen die Gäste ankommen? (z.B. 19:00)
                     </p>
                   </div>
                   
                   <div>
-                    <Label htmlFor="maxSeats">Max Guest Capacity *</Label>
+                    <Label htmlFor="maxSeats">Maximale Gästeanzahl *</Label>
                     <Input
                       id="maxSeats"
                       type="number"
@@ -676,7 +638,7 @@ const AddMeal = () => {
                       required
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      How many people can join at your table?
+                      Wie viele Personen können an deinem Tisch teilnehmen?
                     </p>
                   </div>
                 </>
@@ -689,7 +651,7 @@ const AddMeal = () => {
             className="w-full" 
             size="lg"
           >
-            Create Meal Listing
+            Mahlzeit erstellen
           </Button>
         </form>
       </main>

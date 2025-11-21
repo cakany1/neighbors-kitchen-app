@@ -128,12 +128,13 @@ export const dislikeCategories = {
   ],
 };
 
-export const barterOptions = [
-  "A Bottle of Wine",
-  "Dessert",
-  "Fruit",
-  "Surprise Me",
-  "Nur ein Lächeln (Gratis)",
+export const exchangeOptions = [
+  { value: "money", label: "Geld (via Twint/Bar)", note: "min. CHF 7.-" },
+  { value: "wine", label: "Eine Flasche Wein", icon: "🍷" },
+  { value: "dessert", label: "Dessert / Süsses", icon: "🍰" },
+  { value: "produce", label: "Früchte / Gemüse", icon: "🍎" },
+  { value: "surprise", label: "Überrasch mich!", icon: "🎁" },
+  { value: "smile", label: "Nichts / Nur ein Lächeln (Gratis)", icon: "😊" },
 ];
 
 /**
