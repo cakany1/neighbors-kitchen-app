@@ -11,6 +11,7 @@ import { ChefHat } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { Progress } from '@/components/ui/progress';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -30,6 +31,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [accountType, setAccountType] = useState<'single' | 'couple'>('single');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -40,6 +42,7 @@ const Signup = () => {
     isCouple: false,
     partnerName: '',
     partnerGender: '',
+    partnerPhotoUrl: '',
     phoneNumber: '',
     address: '',
     city: '',
@@ -315,19 +318,34 @@ const Signup = () => {
               <p className="text-xs text-muted-foreground mt-1">{t('signup.genderHint')}</p>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isCouple"
-                checked={formData.isCouple}
-                onCheckedChange={(checked) => setFormData({ ...formData, isCouple: checked as boolean })}
-              />
-              <Label htmlFor="isCouple" className="text-sm font-normal cursor-pointer">
-                {t('signup.isCouple')}
-              </Label>
+            {/* Account Type Selection */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-foreground">Account Typ</Label>
+              <RadioGroup
+                value={accountType}
+                onValueChange={(value: 'single' | 'couple') => {
+                  setAccountType(value);
+                  setFormData({ ...formData, isCouple: value === 'couple' });
+                }}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="single" id="account-single" />
+                  <Label htmlFor="account-single" className="text-sm cursor-pointer">
+                    Single
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="couple" id="account-couple" />
+                  <Label htmlFor="account-couple" className="text-sm cursor-pointer">
+                    Paar / Couple
+                  </Label>
+                </div>
+              </RadioGroup>
             </div>
 
             {/* Partner Fields (Conditional) */}
-            {formData.isCouple && (
+            {accountType === 'couple' && (
               <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
                 <p className="text-sm font-semibold text-foreground">Partner-Angaben</p>
                 
@@ -338,7 +356,7 @@ const Signup = () => {
                     value={formData.partnerName}
                     onChange={(e) => setFormData({ ...formData, partnerName: e.target.value })}
                     placeholder="Maria Müller"
-                    required={formData.isCouple}
+                    required={accountType === 'couple'}
                   />
                 </div>
 
@@ -356,6 +374,16 @@ const Signup = () => {
                       <SelectItem value="female">Weiblich</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="partnerPhotoUrl">Partner Foto URL</Label>
+                  <Input
+                    id="partnerPhotoUrl"
+                    value={formData.partnerPhotoUrl}
+                    onChange={(e) => setFormData({ ...formData, partnerPhotoUrl: e.target.value })}
+                    placeholder="https://..."
+                  />
                 </div>
               </div>
             )}
