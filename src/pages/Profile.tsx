@@ -379,27 +379,45 @@ const Profile = () => {
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
-        {/* Verification Request Card */}
-        {(profile?.verification_status === 'pending' || profile?.verification_status === 'rejected' || !profile?.id_verified) && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-primary" />
-                Nutzer-Verifizierung
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Lade ein Foto mit deinem Ausweis hoch, um dein Profil zu verifizieren und das ✓ Badge zu erhalten.
-              </p>
-              <VerificationDialog
-                userId={currentUser.id}
-                verificationStatus={profile?.verification_status || 'pending'}
-                onSuccess={() => queryClient.invalidateQueries({ queryKey: ['currentUser'] })}
-              />
-            </CardContent>
-          </Card>
-        )}
+        {/* Vertrauen & Sicherheit Card */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-primary" />
+              Vertrauen &amp; Sicherheit
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {profile?.verification_status === 'approved' || profile?.id_verified ? (
+              <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <div className="text-2xl">✅</div>
+                <div>
+                  <p className="font-semibold text-green-600 dark:text-green-400">Verifiziertes Profil</p>
+                  <p className="text-xs text-muted-foreground">Du hast den blauen Haken erhalten</p>
+                </div>
+              </div>
+            ) : profile?.verification_status === 'pending' ? (
+              <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                <div className="text-2xl">⏳</div>
+                <div>
+                  <p className="font-semibold text-yellow-600 dark:text-yellow-400">Überprüfung läuft...</p>
+                  <p className="text-xs text-muted-foreground">Wir prüfen deine Verifizierung</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Lade ein Foto mit deinem Ausweis hoch, um dein Profil zu verifizieren und das ✓ Badge zu erhalten.
+                </p>
+                <VerificationDialog
+                  userId={currentUser.id}
+                  verificationStatus={profile?.verification_status || 'pending'}
+                  onSuccess={() => queryClient.invalidateQueries({ queryKey: ['currentUser'] })}
+                />
+              </>
+            )}
+          </CardContent>
+        </Card>
         
         {/* Admin Dashboard Access */}
         {isAdmin && (
