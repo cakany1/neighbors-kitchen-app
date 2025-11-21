@@ -1,24 +1,33 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { MealCard } from '@/components/MealCard';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Shield } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, Shield, Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { getDistance } from '@/utils/distance';
+import { OnboardingTour } from '@/components/OnboardingTour';
 
 const Feed = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isGuestMode = searchParams.get('guest') === 'true';
   const [showDisclaimer, setShowDisclaimer] = useState(() => {
     return !localStorage.getItem('disclaimerSeen');
   });
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showGuestModal, setShowGuestModal] = useState(false);
 
   // Fetch current user for allergens
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
+      if (isGuestMode) return null; // Skip auth check in guest mode
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
       
@@ -31,6 +40,20 @@ const Feed = () => {
       return { ...user, profile };
     },
   });
+
+  // Check if user just logged in (show onboarding tour)
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('onboardingCompleted');
+    if (currentUser && !hasSeenOnboarding && !isGuestMode) {
+      // Small delay to ensure UI is rendered
+      setTimeout(() => setShowOnboarding(true), 500);
+    }
+  }, [currentUser, isGuestMode]);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('onboardingCompleted', 'true');
+    setShowOnboarding(false);
+  };
 
   // Fetch meals from database with chef data AND coordinates in a single query
   const { data: meals, isLoading } = useQuery({
@@ -205,8 +228,8 @@ const Feed = () => {
                 key={meal.id} 
                 meal={{
                   id: meal.id,
-                  title: meal.title,
-                  description: meal.description,
+                  title: isGuestMode ? meal.title.split(' ').map((_, i) => i < 2 ? '█████' : _).join(' ') : meal.title,
+                  description: isGuestMode ? meal.description.slice(0, 50) + '...' : meal.description,
                   chef: {
                     firstName: meal.chef?.first_name || 'Chef',
                     lastName: meal.chef?.last_name || '',
@@ -230,7 +253,13 @@ const Feed = () => {
                   allergens: meal.allergens || [],
                   scheduledDate: meal.scheduled_date,
                 }}
-                onClick={() => navigate(`/meal/${meal.id}`)}
+                onClick={() => {
+                  if (isGuestMode) {
+                    setShowGuestModal(true);
+                  } else {
+                    navigate(`/meal/${meal.id}`);
+                  }
+                }}
                 userAllergens={userAllergens}
               />
             ))}
@@ -239,6 +268,35 @@ const Feed = () => {
       </main>
 
       <BottomNav />
+
+      {/* Onboarding Tour */}
+      {showOnboarding && <OnboardingTour onComplete={handleOnboardingComplete} />}
+
+      {/* Guest Mode Modal */}
+      <Dialog open={showGuestModal} onOpenChange={setShowGuestModal}>
+        <DialogContent>
+          <DialogHeader>
+            <div className="flex items-center justify-center mb-4">
+              <Lock className="w-12 h-12 text-primary" />
+            </div>
+            <DialogTitle className="text-center text-2xl">
+              Registriere dich, um dieses Essen zu retten!
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Du browsst gerade als Gast. Um Mahlzeiten zu buchen und mit Köchen zu chatten, 
+              musst du dich registrieren.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-4">
+            <Button onClick={() => navigate('/signup')} size="lg">
+              Jetzt registrieren
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/login')} size="lg">
+              Ich habe bereits einen Account
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

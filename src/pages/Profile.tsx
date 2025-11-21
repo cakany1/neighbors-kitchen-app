@@ -303,7 +303,7 @@ const Profile = () => {
                 <p className="text-sm text-muted-foreground">
                   @{formData.nickname || profile?.first_name || 'User'}
                 </p>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-2 mt-1" data-tour="karma">
                   <Star className="w-5 h-5 text-trust-gold fill-current" />
                   <span className="text-lg font-semibold text-trust-gold">
                     {profile?.karma || 0} {t('profile.karma')}
