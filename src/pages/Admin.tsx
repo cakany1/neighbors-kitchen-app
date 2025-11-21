@@ -101,6 +101,53 @@ const Admin = () => {
     enabled: isAdmin,
   });
 
+  // Fetch pending payouts
+  const { data: pendingPayouts, isLoading: payoutsLoading } = useQuery({
+    queryKey: ['pendingPayouts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          id,
+          payment_amount,
+          meal_id,
+          meals!inner (
+            chef_id,
+            title,
+            profiles!inner (
+              id,
+              first_name,
+              last_name,
+              nickname,
+              iban
+            )
+          )
+        `)
+        .eq('payout_status', 'requested');
+
+      if (error) throw error;
+
+      // Group by chef
+      const groupedByChef = data?.reduce((acc: any, booking: any) => {
+        const chefId = booking.meals.profiles.id;
+        if (!acc[chefId]) {
+          acc[chefId] = {
+            chef: booking.meals.profiles,
+            bookings: [],
+            totalAmount: 0,
+          };
+        }
+        const netAmount = (booking.payment_amount || 0) * 0.9;
+        acc[chefId].bookings.push(booking);
+        acc[chefId].totalAmount += netAmount;
+        return acc;
+      }, {});
+
+      return Object.values(groupedByChef || {});
+    },
+    enabled: isAdmin,
+  });
+
   // Approve verification mutation
   const approveMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -158,6 +205,25 @@ const Admin = () => {
     },
     onError: () => {
       toast.error(t('admin.feedback_update_failed'));
+    },
+  });
+
+  // Mark payout as paid mutation
+  const markPaidMutation = useMutation({
+    mutationFn: async (bookingIds: string[]) => {
+      const { error } = await supabase
+        .from('bookings')
+        .update({ payout_status: 'paid' })
+        .in('id', bookingIds);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Auszahlung als bezahlt markiert');
+      queryClient.invalidateQueries({ queryKey: ['pendingPayouts'] });
+    },
+    onError: () => {
+      toast.error('Fehler beim Aktualisieren der Auszahlung');
     },
   });
 
@@ -237,7 +303,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="verifications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="verifications">
               Verifications
               {pendingVerifications && pendingVerifications.length > 0 && (
@@ -255,6 +321,7 @@ const Admin = () => {
                 </Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="payouts">Payouts</TabsTrigger>
             <TabsTrigger value="utilities">Utilities</TabsTrigger>
           </TabsList>
 
@@ -441,6 +508,78 @@ const Admin = () => {
                                 Mark as Resolved
                               </Button>
                             </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Payouts Tab */}
+          <TabsContent value="payouts" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Auszahlungen / Payouts</CardTitle>
+                <CardDescription>
+                  Manage chef payout requests
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {payoutsLoading ? (
+                  <p className="text-muted-foreground text-center py-8">Loading payouts...</p>
+                ) : !pendingPayouts || pendingPayouts.length === 0 ? (
+                  <Alert>
+                    <CheckCircle className="h-4 w-4 text-primary" />
+                    <AlertDescription>
+                      No pending payout requests. All chefs are up to date!
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <div className="space-y-4">
+                    {pendingPayouts.map((payout: any) => (
+                      <Card key={payout.chef.id} className="border-muted">
+                        <CardContent className="pt-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div>
+                              <h3 className="font-semibold text-lg">
+                                {payout.chef.first_name} {payout.chef.last_name}
+                              </h3>
+                              <p className="text-sm text-muted-foreground">
+                                @{payout.chef.nickname}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                IBAN: {payout.chef.iban || '⚠️ Missing'}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-2xl font-bold text-primary">
+                                CHF {payout.totalAmount.toFixed(2)}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {payout.bookings.length} booking(s)
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <Button
+                            onClick={() => markPaidMutation.mutate(payout.bookings.map((b: any) => b.id))}
+                            disabled={markPaidMutation.isPending || !payout.chef.iban}
+                            className="w-full"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Als bezahlt markieren
+                          </Button>
+                          
+                          {!payout.chef.iban && (
+                            <Alert className="mt-3" variant="destructive">
+                              <AlertCircle className="h-4 w-4" />
+                              <AlertDescription className="text-xs">
+                                IBAN fehlt! Chef muss IBAN im Profil hinterlegen.
+                              </AlertDescription>
+                            </Alert>
                           )}
                         </CardContent>
                       </Card>

@@ -113,6 +113,46 @@ const Profile = () => {
     enabled: !!currentUser?.id,
   });
 
+  // Fetch chef's wallet balance
+  const { data: walletData, isLoading: walletLoading } = useQuery({
+    queryKey: ['chefWallet', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return { balance: 0, requestedAmount: 0 };
+      
+      // Get all bookings where this user is the chef and payout_status is 'accumulating'
+      const { data: bookings, error } = await supabase
+        .from('bookings')
+        .select('payment_amount, meal_id, meals!inner(chef_id)')
+        .eq('meals.chef_id', currentUser.id)
+        .eq('payout_status', 'accumulating');
+      
+      if (error) throw error;
+      
+      // Calculate balance (payment_amount - 10% platform fee)
+      const balance = bookings?.reduce((sum, booking) => {
+        const amount = booking.payment_amount || 0;
+        const netAmount = amount * 0.9; // Chef gets 90%, platform takes 10%
+        return sum + netAmount;
+      }, 0) || 0;
+      
+      // Get requested amount
+      const { data: requestedBookings } = await supabase
+        .from('bookings')
+        .select('payment_amount, meal_id, meals!inner(chef_id)')
+        .eq('meals.chef_id', currentUser.id)
+        .eq('payout_status', 'requested');
+      
+      const requestedAmount = requestedBookings?.reduce((sum, booking) => {
+        const amount = booking.payment_amount || 0;
+        const netAmount = amount * 0.9;
+        return sum + netAmount;
+      }, 0) || 0;
+      
+      return { balance, requestedAmount };
+    },
+    enabled: !!currentUser?.id,
+  });
+
   // Initialize form data when profile loads
   useEffect(() => {
     if (currentUser?.profile) {
@@ -153,9 +193,9 @@ const Profile = () => {
     return null;
   };
 
-  // Update profile mutation
+  // Update profile mutation (including IBAN)
   const updateProfileMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (ibanUpdate?: string) => {
       if (!currentUser?.id) throw new Error('Not authenticated');
       
       let latitude = currentUser.profile?.latitude || null;
@@ -190,27 +230,33 @@ const Profile = () => {
         }
       }
       
+      const updateData: any = {
+        nickname: formData.nickname || null,
+        age: formData.age || null,
+        gender: formData.gender || null,
+        vacation_mode: formData.vacation_mode,
+        notification_radius: formData.notification_radius,
+        allergens: formData.allergens,
+        dislikes: formData.dislikes,
+        languages: formData.languages,
+        phone_number: formData.phone_number || null,
+        private_address: formData.private_address || null,
+        private_city: formData.private_city || null,
+        private_postal_code: formData.private_postal_code || null,
+        partner_photo_url: formData.partner_photo_url || null,
+        partner_name: formData.partner_name || null,
+        partner_gender: formData.partner_gender || null,
+        latitude,
+        longitude,
+      };
+
+      if (ibanUpdate !== undefined) {
+        updateData.iban = ibanUpdate;
+      }
+      
       const { error } = await supabase
         .from('profiles')
-        .update({
-          nickname: formData.nickname || null,
-          age: formData.age || null,
-          gender: formData.gender || null,
-          vacation_mode: formData.vacation_mode,
-          notification_radius: formData.notification_radius,
-          allergens: formData.allergens,
-          dislikes: formData.dislikes,
-          languages: formData.languages,
-          phone_number: formData.phone_number || null,
-          private_address: formData.private_address || null,
-          private_city: formData.private_city || null,
-          private_postal_code: formData.private_postal_code || null,
-          partner_photo_url: formData.partner_photo_url || null,
-          partner_name: formData.partner_name || null,
-          partner_gender: formData.partner_gender || null,
-          latitude,
-          longitude,
-        })
+        .update(updateData)
         .eq('id', currentUser.id);
 
       if (error) throw error;
@@ -218,9 +264,43 @@ const Profile = () => {
     onSuccess: () => {
       toast.success(t('toast.profile_updated'));
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      queryClient.invalidateQueries({ queryKey: ['chefWallet'] });
     },
     onError: (error: any) => {
       toast.error(error.message || t('toast.profile_update_failed'));
+    },
+  });
+
+  // Request payout mutation
+  const requestPayoutMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser?.id) throw new Error('Not authenticated');
+      
+      // First get all meal IDs for this chef
+      const { data: meals } = await supabase
+        .from('meals')
+        .select('id')
+        .eq('chef_id', currentUser.id);
+      
+      if (!meals || meals.length === 0) return;
+      
+      const mealIds = meals.map(m => m.id);
+      
+      // Update all 'accumulating' bookings to 'requested'
+      const { error } = await supabase
+        .from('bookings')
+        .update({ payout_status: 'requested' })
+        .eq('payout_status', 'accumulating')
+        .in('meal_id', mealIds);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Auszahlung beantragt! Wir überweisen innerhalb von 7 Tagen.');
+      queryClient.invalidateQueries({ queryKey: ['chefWallet'] });
+    },
+    onError: (error: any) => {
+      toast.error('Fehler beim Beantragen der Auszahlung: ' + error.message);
     },
   });
 
@@ -343,6 +423,79 @@ const Profile = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Chef Wallet Section */}
+        <Card className="mb-6 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              💰 Dein Guthaben / Wallet
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {walletLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : (
+              <>
+                <div className="text-center py-6 bg-background/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-2">Verfügbares Guthaben</p>
+                  <p className="text-4xl font-bold text-primary">
+                    CHF {walletData?.balance.toFixed(2) || '0.00'}
+                  </p>
+                  {walletData && walletData.requestedAmount > 0 && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      🕐 CHF {walletData.requestedAmount.toFixed(2)} in Bearbeitung
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="iban">IBAN für Auszahlung</Label>
+                    <Input
+                      id="iban"
+                      type="text"
+                      placeholder="CH00 0000 0000 0000 0000 0"
+                      defaultValue={profile?.iban || ''}
+                      onBlur={(e) => {
+                        if (e.target.value !== profile?.iban) {
+                          updateProfileMutation.mutate(e.target.value);
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <Button
+                    onClick={() => requestPayoutMutation.mutate()}
+                    disabled={
+                      !walletData || 
+                      walletData.balance < 10 || 
+                      !profile?.iban || 
+                      requestPayoutMutation.isPending
+                    }
+                    className="w-full"
+                  >
+                    {requestPayoutMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Wird beantragt...
+                      </>
+                    ) : (
+                      'Auszahlung beantragen'
+                    )}
+                  </Button>
+
+                  <Alert>
+                    <AlertDescription className="text-xs">
+                      💡 <strong>Info:</strong> Dein Guthaben sammelt sich hier. Du kannst es dir ab CHF 10.- auf deine hinterlegte IBAN auszahlen lassen. Wir überweisen 1x monatlich gebündelt.
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
         
         {/* Verification Incentive Banner */}
         {!profile?.id_verified && !profile?.phone_verified && (
@@ -888,7 +1041,7 @@ const Profile = () => {
         {/* Save Button */}
         <div className="mt-6">
           <Button 
-            onClick={() => updateProfileMutation.mutate()}
+            onClick={() => updateProfileMutation.mutate(undefined)}
             disabled={updateProfileMutation.isPending}
             className="w-full"
             size="lg"

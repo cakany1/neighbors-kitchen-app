@@ -70,6 +70,7 @@ export type Database = {
           id: string
           meal_id: string
           payment_amount: number | null
+          payout_status: string | null
           status: string
           updated_at: string
         }
@@ -80,6 +81,7 @@ export type Database = {
           id?: string
           meal_id: string
           payment_amount?: number | null
+          payout_status?: string | null
           status?: string
           updated_at?: string
         }
@@ -90,6 +92,7 @@ export type Database = {
           id?: string
           meal_id?: string
           payment_amount?: number | null
+          payout_status?: string | null
           status?: string
           updated_at?: string
         }
@@ -284,6 +287,7 @@ export type Database = {
           display_real_name: boolean | null
           first_name: string
           gender: string | null
+          iban: string | null
           id: string
           id_verified: boolean | null
           is_couple: boolean | null
@@ -315,6 +319,7 @@ export type Database = {
           display_real_name?: boolean | null
           first_name: string
           gender?: string | null
+          iban?: string | null
           id: string
           id_verified?: boolean | null
           is_couple?: boolean | null
@@ -346,6 +351,7 @@ export type Database = {
           display_real_name?: boolean | null
           first_name?: string
           gender?: string | null
+          iban?: string | null
           id?: string
           id_verified?: boolean | null
           is_couple?: boolean | null
