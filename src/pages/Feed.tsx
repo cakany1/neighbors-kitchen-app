@@ -4,7 +4,7 @@ import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { getDistance } from '@/utils/distance';
@@ -145,6 +145,17 @@ const Feed = () => {
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
+        {/* Verification Pending Banner */}
+        {currentUser?.profile?.verification_status === 'pending' && (
+          <Alert className="mb-6 border-warning bg-warning/10">
+            <Shield className="h-4 w-4 text-warning" />
+            <AlertDescription className="text-sm">
+              <strong>Dein Profil wird gerade von unserem Team überprüft.</strong> Danke für deine Geduld! 
+              Du kannst Mahlzeiten ansehen, aber noch nicht buchen oder teilen.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {showDisclaimer && (
           <Alert className="mb-6 border-primary bg-primary-light" onClick={handleDismissDisclaimer}>
             <AlertCircle className="h-4 w-4 text-primary" />

@@ -37,6 +37,9 @@ const Payment = () => {
   };
 
   const maxPayment = Math.max((meal.pricing.suggested || 20) * 2, 50);
+  const serviceFee = 2.00;
+  const totalAmount = paymentAmount + serviceFee;
+  const minTotal = 7.00;
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -86,6 +89,27 @@ const Payment = () => {
                   Minimum: CHF {meal.pricing.minimum}
                   {meal.pricing.suggested && ` • Suggested: CHF ${meal.pricing.suggested}`}
                 </p>
+              </div>
+              
+              {/* Payment Breakdown */}
+              <div className="bg-secondary-light p-4 rounded-lg space-y-2 border border-border">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Beitrag an Koch:</span>
+                  <span className="font-medium">CHF {paymentAmount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Servicegebühr:</span>
+                  <span className="font-medium">CHF {serviceFee.toFixed(2)}</span>
+                </div>
+                <div className="pt-2 border-t border-border flex justify-between">
+                  <span className="font-bold">Total:</span>
+                  <span className="font-bold text-lg text-primary">CHF {totalAmount.toFixed(2)}</span>
+                </div>
+                {totalAmount < minTotal && (
+                  <p className="text-xs text-destructive mt-2">
+                    ⚠️ Minimum total is CHF {minTotal.toFixed(2)}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-4">
@@ -157,8 +181,9 @@ const Payment = () => {
             onClick={handlePayment}
             size="lg"
             className="w-full h-14 text-lg"
+            disabled={totalAmount < minTotal}
           >
-            Complete Payment - CHF {paymentAmount}
+            Complete Payment - CHF {totalAmount.toFixed(2)}
           </Button>
 
           <p className="text-center text-xs text-muted-foreground">

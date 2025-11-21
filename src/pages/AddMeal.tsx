@@ -47,7 +47,7 @@ const AddMeal = () => {
     pickupInstructions: '',
   });
 
-  // Fetch current user's gender for Ladies Only feature
+  // Fetch current user's gender and verification status for Ladies Only feature
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
@@ -56,11 +56,11 @@ const AddMeal = () => {
       
       const { data: profile } = await supabase
         .from('profiles')
-        .select('gender')
+        .select('gender, verification_status')
         .eq('id', user.id)
         .single();
       
-      return { id: user.id, gender: profile?.gender };
+      return { id: user.id, gender: profile?.gender, verification_status: profile?.verification_status };
     },
   });
 
@@ -113,6 +113,12 @@ const AddMeal = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check verification status
+    if (currentUser?.verification_status === 'pending') {
+      toast.error('Dein Profil wird noch überprüft. Bitte warte auf die Freigabe.');
+      return;
+    }
+    
     if (!formData.title || !formData.description || !formData.scheduledDate || !formData.scheduledTime) {
       toast.error('Please fill in all required fields including date and time');
       return;
@@ -144,6 +150,16 @@ const AddMeal = () => {
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
+        {/* Verification Pending Banner */}
+        {currentUser?.verification_status === 'pending' && (
+          <Alert className="mb-6 border-warning bg-warning/10">
+            <Shield className="h-4 w-4 text-warning" />
+            <AlertDescription className="text-sm">
+              <strong>Dein Profil wird gerade überprüft.</strong> Du kannst noch keine Mahlzeiten teilen, bis dein Profil freigegeben wurde.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground mb-2">Share a Meal</h1>
           <p className="text-muted-foreground">Create a listing for your home-cooked dish</p>
@@ -656,8 +672,15 @@ const AddMeal = () => {
             </CardContent>
           </Card>
 
-          <Button type="submit" className="w-full" size="lg">
-            Create Meal Listing
+          <Button 
+            type="submit" 
+            className="w-full" 
+            size="lg"
+            disabled={currentUser?.verification_status === 'pending'}
+          >
+            {currentUser?.verification_status === 'pending' 
+              ? 'Warte auf Verifizierung...' 
+              : 'Create Meal Listing'}
           </Button>
         </form>
       </main>
