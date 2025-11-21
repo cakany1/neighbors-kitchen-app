@@ -12,27 +12,27 @@ interface TourStep {
 
 const tourSteps: TourStep[] = [
   {
-    target: '[data-tour="add-meal"]',
-    title: 'Essen teilen',
-    description: 'Hier kannst du Essen teilen und deine Nachbarn einladen.',
-    position: 'top',
+    target: 'body',
+    title: 'Willkommen bei Neighbors Kitchen',
+    description: 'Entdecke übrig gebliebenes Essen in deiner Nachbarschaft und lerne neue Menschen kennen.',
+    position: 'bottom',
   },
   {
     target: '[data-tour="feed"]',
-    title: 'Mahlzeiten entdecken',
+    title: 'Essen finden',
     description: 'Durchsuche verfügbare Mahlzeiten in deiner Nachbarschaft.',
     position: 'bottom',
   },
   {
-    target: '[data-tour="map"]',
-    title: 'Karte ansehen',
-    description: 'Finde Nachbarn in deinem Radius auf der Karte.',
+    target: '[data-tour="add-meal"]',
+    title: 'Selbst kochen',
+    description: 'Teile deine eigenen Gerichte und lade Nachbarn ein.',
     position: 'top',
   },
   {
-    target: '[data-tour="karma"]',
-    title: 'Karma Punkte',
-    description: 'Hier siehst du deine Punkte. Verdiene Karma durch Teilen!',
+    target: '[data-tour="profile"]',
+    title: 'Profil & Karma',
+    description: 'Verwalte dein Profil, deine Sicherheitseinstellungen und sammle Karma-Punkte.',
     position: 'bottom',
   },
 ];
