@@ -85,7 +85,7 @@ export const OnboardingTour = ({ onComplete }: OnboardingTourProps) => {
 
   const handleNext = () => {
     if (currentStep < tourSteps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      setCurrentStep((prev) => prev + 1);
     } else {
       localStorage.setItem('tour_completed', 'true');
       onComplete();
