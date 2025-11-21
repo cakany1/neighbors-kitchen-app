@@ -87,11 +87,13 @@ export const OnboardingTour = ({ onComplete }: OnboardingTourProps) => {
     if (currentStep < tourSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
+      localStorage.setItem('tour_completed', 'true');
       onComplete();
     }
   };
 
   const handleSkip = () => {
+    localStorage.setItem('tour_completed', 'true');
     onComplete();
   };
 
