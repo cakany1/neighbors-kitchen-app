@@ -136,3 +136,46 @@ All colors MUST be HSL.
     pointer-events: none !important;
   }
 }
+
+/* Print-optimized layout for QR code flyers */
+@media print {
+  /* Hide navigation, buttons, and interactive elements */
+  header,
+  button,
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Reset colors to print-friendly black and white */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Center QR code section */
+  main {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 2rem !important;
+  }
+
+  /* Make QR code prominent */
+  img[alt="QR Code"] {
+    width: 400px !important;
+    height: 400px !important;
+    margin: 2rem auto !important;
+  }
+
+  /* Hide non-essential sections */
+  section:not(:has(img[alt="QR Code"])) {
+    display: none !important;
+  }
+
+  /* Keep logo and tagline visible */
+  h1 {
+    font-size: 3rem !important;
+    margin-bottom: 1rem !important;
+  }
+}

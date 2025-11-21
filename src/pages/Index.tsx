@@ -88,7 +88,9 @@ const Index = () => {
                 Neighbors Kitchen
               </h1>
             </div>
-            <p className="text-2xl text-muted-foreground mb-2">Basel</p>
+            <Badge variant="secondary" className="text-lg px-4 py-2 mb-4">
+              📍 {i18n.language === 'de' ? 'Exklusiv in Basel' : 'Exclusive to Basel'}
+            </Badge>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               {i18n.language === 'de' 
                 ? 'Teile Essen, baue Vertrauen, rette Lebensmittel in deiner Nachbarschaft'
@@ -181,12 +183,12 @@ const Index = () => {
                   <Shield className="w-6 h-6 text-primary mt-1" />
                   <div>
                     <h4 className="font-semibold mb-1">
-                      {i18n.language === 'de' ? 'Verifizierung erforderlich' : 'Verification Required'}
+                      {i18n.language === 'de' ? 'Vertrauens-Community' : 'Trust Community'}
                     </h4>
                     <p className="text-sm text-muted-foreground">
                       {i18n.language === 'de'
-                        ? 'Alle Nutzer werden manuell überprüft, bevor sie buchen oder teilen können.'
-                        : 'All users are manually verified before they can book or share.'}
+                        ? 'Verifizierte Profile (Blauer Haken) schaffen Sicherheit. Jeder kann sofort loslegen, Verifizierung ist optional.'
+                        : 'Verified profiles (Blue Badge) create trust. Everyone can start immediately, verification is optional.'}
                     </p>
                   </div>
                 </div>
