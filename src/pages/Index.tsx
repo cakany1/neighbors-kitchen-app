@@ -3,14 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChefHat, Shield, Heart, Globe, QrCode, Smartphone } from 'lucide-react';
+import { ChefHat, Shield, Heart, Globe } from 'lucide-react';
+import { HeroFeedTeaser } from '@/components/HeroFeedTeaser';
 import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState('');
+  
 
   useEffect(() => {
     // Device detection
@@ -20,10 +21,6 @@ const Index = () => {
     
     checkDevice();
     window.addEventListener('resize', checkDevice);
-    
-    // Generate QR code URL (using qrcode.react or similar service)
-    const currentUrl = window.location.origin;
-    setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(currentUrl)}`);
     
     return () => window.removeEventListener('resize', checkDevice);
   }, []);
@@ -81,46 +78,33 @@ const Index = () => {
 
         <main className="container mx-auto px-4 py-16">
           {/* Hero Section */}
-          <div className="text-center mb-16">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <ChefHat className="w-16 h-16 text-primary" />
-              <h1 className="text-6xl font-bold text-foreground">
-                Neighbors Kitchen
-              </h1>
-            </div>
-            <Badge variant="secondary" className="text-lg px-4 py-2 mb-4">
-              📍 {i18n.language === 'de' ? 'Exklusiv in Basel' : 'Exclusive to Basel'}
-            </Badge>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              {i18n.language === 'de' 
-                ? 'Teile Essen, baue Vertrauen, rette Lebensmittel in deiner Nachbarschaft'
-                : 'Share food, build trust, save meals in your neighborhood'}
-            </p>
-          </div>
-
-          {/* QR Code Centerpiece - Hidden on Mobile */}
-          <Card className="max-w-md mx-auto mb-16 shadow-2xl hidden md:block">
-            <CardHeader>
-              <CardTitle className="text-center flex items-center justify-center gap-2">
-                <Smartphone className="w-6 h-6" />
-                {i18n.language === 'de' ? 'Jetzt beitreten' : 'Join Now'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <div className="bg-white p-6 rounded-lg inline-block mb-4">
-                <img 
-                  src={qrCodeUrl} 
-                  alt="QR Code" 
-                  className="w-64 h-64 mx-auto"
-                />
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-16">
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-3 mb-6">
+                <ChefHat className="w-16 h-16 text-primary" />
+                <h1 className="text-6xl font-bold text-foreground">
+                  Neighbors Kitchen
+                </h1>
               </div>
-              <p className="text-muted-foreground">
-                {i18n.language === 'de'
-                  ? 'Scanne diesen Code mit deinem Handy, um der Community beizutreten'
-                  : 'Scan this code with your phone to join the community'}
+              <Badge variant="secondary" className="text-lg px-4 py-2 mb-4">
+                📍 {i18n.language === 'de' ? 'Exklusiv in Basel' : 'Exclusive to Basel'}
+              </Badge>
+              <p className="text-xl text-muted-foreground max-w-2xl mb-6">
+                {i18n.language === 'de' 
+                  ? 'Teile Essen, baue Vertrauen, rette Lebensmittel in deiner Nachbarschaft'
+                  : 'Share food, build trust, save meals in your neighborhood'}
               </p>
-            </CardContent>
-          </Card>
+              <Button
+                className="md:hidden w-full max-w-sm"
+                size="lg"
+                onClick={() => navigate('/feed')}
+              >
+                {i18n.language === 'de' ? 'Alle Gerichte ansehen' : 'View All Meals'}
+              </Button>
+            </div>
+            
+            <HeroFeedTeaser />
+          </div>
 
           {/* How it Works */}
           <section className="mb-16">

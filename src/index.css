@@ -179,3 +179,17 @@ All colors MUST be HSL.
     margin-bottom: 1rem !important;
   }
 }
+
+/* Floating animation for hero meal cards */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
