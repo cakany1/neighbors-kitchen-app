@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_feedback: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          status: string
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          status?: string
+          subject: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          status?: string
+          subject?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       blocked_users: {
         Row: {
           blocked_id: string

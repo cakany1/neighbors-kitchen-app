@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import MealDetail from "./pages/MealDetail";
 import Payment from "./pages/Payment";
 import Chat from "./pages/Chat";
+import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/meal/:id" element={<MealDetail />} />
           <Route path="/payment/:id" element={<Payment />} />
           <Route path="/chat/:bookingId" element={<Chat />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

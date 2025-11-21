@@ -23,6 +23,7 @@ import RadiusSliderMap from '@/components/maps/RadiusSliderMap';
 import GalleryUpload from '@/components/GalleryUpload';
 import GalleryGrid from '@/components/GalleryGrid';
 import { BlockedUsersList } from '@/components/BlockedUsersList';
+import { FeedbackDialog } from '@/components/FeedbackDialog';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -765,6 +766,16 @@ const Profile = () => {
 
         {/* Blocked Users Management */}
         <BlockedUsersList currentUserId={currentUser.id} />
+
+        {/* App Feedback / Bug Report */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Help Us Improve</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FeedbackDialog userId={currentUser.id} />
+          </CardContent>
+        </Card>
 
         {/* Community Guidelines */}
         <Card>
