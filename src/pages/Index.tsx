@@ -77,32 +77,43 @@ const Index = () => {
         </div>
 
         <main className="container mx-auto px-4 py-16">
-          {/* Hero Section */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-16">
-            <div className="flex-1 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-6">
-                <ChefHat className="w-16 h-16 text-primary" />
-                <h1 className="text-6xl font-bold text-foreground">
-                  Neighbors Kitchen
-                </h1>
-              </div>
-              <Badge variant="secondary" className="text-lg px-4 py-2 mb-4">
-                📍 {i18n.language === 'de' ? 'Exklusiv in Basel' : 'Exclusive to Basel'}
-              </Badge>
-              <p className="text-xl text-muted-foreground max-w-2xl mb-6">
-                {i18n.language === 'de' 
-                  ? 'Teile Essen, baue Vertrauen, rette Lebensmittel in deiner Nachbarschaft'
-                  : 'Share food, build trust, save meals in your neighborhood'}
-              </p>
+          {/* Hero Section - Centered Vertical Layout */}
+          <div className="flex flex-col items-center text-center mb-16">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <ChefHat className="w-16 h-16 text-primary" />
+              <h1 className="text-6xl font-bold text-foreground">
+                Neighbors Kitchen
+              </h1>
+            </div>
+            <Badge variant="secondary" className="text-lg px-4 py-2 mb-4">
+              📍 {i18n.language === 'de' ? 'Exklusiv in Basel' : 'Exclusive to Basel'}
+            </Badge>
+            <p className="text-xl text-muted-foreground max-w-2xl mb-8">
+              {i18n.language === 'de' 
+                ? 'Teile Essen, baue Vertrauen, rette Lebensmittel in deiner Nachbarschaft'
+                : 'Share food, build trust, save meals in your neighborhood'}
+            </p>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Button
-                className="md:hidden w-full max-w-sm"
                 size="lg"
+                className="text-lg px-8 py-6 h-auto bg-primary hover:bg-primary/90"
                 onClick={() => navigate('/feed')}
               >
-                {i18n.language === 'de' ? 'Alle Gerichte ansehen' : 'View All Meals'}
+                {i18n.language === 'de' ? 'App Starten' : 'Start App'}
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-lg px-8 py-6 h-auto"
+                onClick={() => navigate('/signup')}
+              >
+                {i18n.language === 'de' ? 'Der Community beitreten' : 'Join Community'}
               </Button>
             </div>
             
+            {/* Meal Preview Cards */}
             <HeroFeedTeaser />
           </div>
 
