@@ -6,10 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
-import { Send, Globe } from 'lucide-react';
+import { Send, Globe, MoreVertical, Flag, Ban } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { BlockUserDialog } from '@/components/BlockUserDialog';
+import { ReportDialog } from '@/components/ReportDialog';
 
 interface Message {
   id: string;
@@ -26,6 +34,8 @@ const Chat = () => {
   const [messageText, setMessageText] = useState('');
   const [showTranslations, setShowTranslations] = useState(true);
   const [translations, setTranslations] = useState<Record<string, string>>({});
+  const [showBlockDialog, setShowBlockDialog] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Get current user
@@ -168,6 +178,19 @@ const Chat = () => {
     mutationFn: async (text: string) => {
       if (!currentUser) throw new Error('Not authenticated');
       
+      // Check if the other person has blocked the current user
+      const otherPersonId = currentUser.id === booking?.meal.chef_id ? booking?.guest_id : booking?.meal.chef_id;
+      
+      const { data: blockCheck } = await supabase
+        .from('blocked_users')
+        .select('id')
+        .or(`and(blocker_id.eq.${currentUser.id},blocked_id.eq.${otherPersonId}),and(blocker_id.eq.${otherPersonId},blocked_id.eq.${currentUser.id})`)
+        .limit(1);
+      
+      if (blockCheck && blockCheck.length > 0) {
+        throw new Error('BLOCKED');
+      }
+      
       const { error } = await supabase
         .from('messages')
         .insert({
@@ -183,8 +206,12 @@ const Chat = () => {
       setMessageText('');
       queryClient.invalidateQueries({ queryKey: ['messages', bookingId] });
     },
-    onError: (error) => {
-      toast.error('Failed to send message');
+    onError: (error: any) => {
+      if (error.message === 'BLOCKED') {
+        toast.error('Nachricht kann nicht gesendet werden. There is a block between you and this user.');
+      } else {
+        toast.error('Failed to send message');
+      }
       console.error(error);
     },
   });
@@ -223,17 +250,63 @@ const Chat = () => {
                 <p className="text-xs text-muted-foreground">{booking.meal.title}</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowTranslations(!showTranslations)}
-              className="gap-2"
-            >
-              <Globe className="w-4 h-4" />
-              {showTranslations ? 'Hide' : 'Show'} Translation
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowTranslations(!showTranslations)}
+                className="gap-2"
+              >
+                <Globe className="w-4 h-4" />
+                {showTranslations ? 'Hide' : 'Show'}
+              </Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-background border-border z-50">
+                  <DropdownMenuItem
+                    onClick={() => setShowReportDialog(true)}
+                    className="gap-2 cursor-pointer"
+                  >
+                    <Flag className="w-4 h-4" />
+                    Report User
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setShowBlockDialog(true)}
+                    className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+                  >
+                    <Ban className="w-4 h-4" />
+                    Block User
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
+
+        {/* Block User Dialog */}
+        <BlockUserDialog
+          open={showBlockDialog}
+          onOpenChange={setShowBlockDialog}
+          blockedUserId={otherPerson.id}
+          blockedUserName={`${otherPerson.first_name} ${otherPerson.last_name}`}
+          currentUserId={currentUser.id}
+          onBlockComplete={() => {
+            navigate('/');
+            toast.success('User blocked. Redirecting to feed...');
+          }}
+        />
+
+        {/* Report Dialog */}
+        <ReportDialog
+          open={showReportDialog}
+          onOpenChange={setShowReportDialog}
+          reportedUserId={otherPerson.id}
+        />
 
         {/* Messages */}
         <div className="px-4 py-6 space-y-4">
