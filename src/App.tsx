@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import Impressum from "./pages/Impressum";
 import AGB from "./pages/AGB";
 import { Footer } from "./components/Footer";
+import { InstallPrompt } from "./components/InstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <InstallPrompt />
       <BrowserRouter>
         <div className="flex flex-col min-h-screen pb-24">
           <Routes>
