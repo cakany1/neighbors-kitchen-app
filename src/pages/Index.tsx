@@ -98,8 +98,8 @@ const Index = () => {
             </p>
           </div>
 
-          {/* QR Code Centerpiece */}
-          <Card className="max-w-md mx-auto mb-16 shadow-2xl">
+          {/* QR Code Centerpiece - Hidden on Mobile */}
+          <Card className="max-w-md mx-auto mb-16 shadow-2xl hidden md:block">
             <CardHeader>
               <CardTitle className="text-center flex items-center justify-center gap-2">
                 <Smartphone className="w-6 h-6" />
