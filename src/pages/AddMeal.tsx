@@ -322,7 +322,7 @@ const AddMeal = () => {
                     />
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Nur verifizierte Gäste (Telefon oder ID) können dieses Essen buchen. Erhöht Vertrauen und Sicherheit.
+                    Nur verifizierte Gäste (Blauer Haken) können dieses Essen buchen. Erhöht Vertrauen und Sicherheit.
                   </p>
                 </div>
               </div>
@@ -537,6 +537,7 @@ const AddMeal = () => {
                       <Input
                         id="collectionWindowStart"
                         type="time"
+                        step="900"
                         value={formData.collectionWindowStart}
                         onChange={(e) => setFormData({ ...formData, collectionWindowStart: e.target.value })}
                         required
@@ -547,6 +548,7 @@ const AddMeal = () => {
                       <Input
                         id="collectionWindowEnd"
                         type="time"
+                        step="900"
                         value={formData.collectionWindowEnd}
                         onChange={(e) => setFormData({ ...formData, collectionWindowEnd: e.target.value })}
                       />
@@ -610,7 +612,20 @@ const AddMeal = () => {
               </div>
 
               <div>
-                <Label htmlFor="scheduledDate">Geplantes Datum *</Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="scheduledDate">Geplantes Datum *</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const today = new Date().toISOString().split('T')[0];
+                      setFormData({ ...formData, scheduledDate: today });
+                    }}
+                  >
+                    Heute
+                  </Button>
+                </div>
                 <Input
                   id="scheduledDate"
                   type="date"
@@ -625,6 +640,7 @@ const AddMeal = () => {
                 <Input
                   id="scheduledTime"
                   type="time"
+                  step="900"
                   value={formData.scheduledTime}
                   onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
                   required
@@ -642,6 +658,7 @@ const AddMeal = () => {
                     <Input
                       id="arrivalTime"
                       type="time"
+                      step="900"
                       value={formData.arrivalTime}
                       onChange={(e) => setFormData({ ...formData, arrivalTime: e.target.value })}
                       required
