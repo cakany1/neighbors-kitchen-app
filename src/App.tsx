@@ -20,7 +20,7 @@ import AGB from "./pages/AGB";
 import FAQ from "./pages/FAQ";
 import { Footer } from "./components/Footer";
 import { InstallPrompt } from "./components/InstallPrompt";
-import { CookieBanner } from "./components/layout/CookieBanner";
+import { CookieBanner } from "./components/CookieBanner";
 
 const queryClient = new QueryClient();
 
