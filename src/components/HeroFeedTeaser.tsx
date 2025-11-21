@@ -1,4 +1,4 @@
-import { MapPin, User } from 'lucide-react';
+import { MapPin, User, Heart } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -7,7 +7,7 @@ const mockMeals = [
     id: 1,
     image: 'https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=800&q=80',
     title: 'Hausgemachte Kürbis-Lasagne 🎃',
-    price: 'CHF 9.00',
+    restaurantValue: 'CHF 25.-',
     chef: 'Nonna Rosa',
     location: 'Gundeli',
     delay: '0s'
@@ -16,7 +16,7 @@ const mockMeals = [
     id: 2,
     image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&q=80',
     title: 'Frisches Thai Green Curry 🌶️',
-    price: 'CHF 12.50',
+    restaurantValue: 'CHF 22.-',
     chef: 'Mai L.',
     location: 'St. Johann',
     delay: '0.2s'
@@ -25,7 +25,7 @@ const mockMeals = [
     id: 3,
     image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=80',
     title: 'Sonntagszopf (frisch gebacken)',
-    price: 'CHF 6.00',
+    restaurantValue: 'CHF 12.-',
     chef: 'Lukas',
     location: 'Kleinbasel',
     delay: '0.4s'
@@ -59,8 +59,12 @@ export const HeroFeedTeaser = () => {
                 <h3 className="font-semibold text-base text-foreground line-clamp-1">
                   {meal.title}
                 </h3>
-                <Badge variant="secondary" className="bg-primary/20 text-primary">
-                  {meal.price}
+                <p className="text-xs text-muted-foreground">
+                  ~ Restaurant-Wert: {meal.restaurantValue}
+                </p>
+                <Badge variant="secondary" className="bg-primary/20 text-primary flex items-center gap-1 w-fit">
+                  <Heart className="w-3 h-3" />
+                  <span>Zahl was du willst</span>
                 </Badge>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
