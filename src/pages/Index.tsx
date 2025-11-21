@@ -37,8 +37,32 @@ const Index = () => {
   if (!isMobile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
+        {/* Navigation Header */}
+        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ChefHat className="w-8 h-8 text-primary" />
+              <span className="text-2xl font-bold text-foreground">Neighbors Kitchen</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/login')}
+              >
+                Einloggen
+              </Button>
+              <Button
+                variant="default"
+                onClick={() => navigate('/feed')}
+              >
+                App Starten
+              </Button>
+            </div>
+          </div>
+        </header>
+
         {/* Language Switcher */}
-        <div className="absolute top-4 right-4 flex gap-2">
+        <div className="absolute top-20 right-4 flex gap-2">
           <Button
             variant={i18n.language === 'de' ? 'default' : 'outline'}
             size="sm"

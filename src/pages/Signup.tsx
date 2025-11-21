@@ -72,6 +72,7 @@ const Signup = () => {
     setLoading(true);
 
     try {
+      // Step 1: Create Auth User
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -87,11 +88,56 @@ const Signup = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        // Handle duplicate user error
+        if (error.message.includes('already registered') || error.message.includes('User already registered')) {
+          toast.error('Dieses Konto existiert bereits. Bitte melde dich an.');
+          navigate('/login');
+          return;
+        }
+        throw error;
+      }
 
-      // Update profile with additional fields after signup
-      if (data.user) {
-        const { error: profileError } = await supabase
+      if (!data.user) {
+        throw new Error('Signup failed: No user returned');
+      }
+
+      // Step 2: Wait a moment for trigger to fire
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Step 3: Check if profile was created by trigger
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+      // Step 4: If no profile exists, create it manually
+      if (!existingProfile) {
+        console.log('Profile not auto-created, inserting manually...');
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            languages: [formData.language],
+            gender: formData.gender || null,
+            is_couple: formData.isCouple,
+            phone_number: formData.phoneNumber || null,
+            private_address: formData.address || null,
+            private_city: formData.city || null,
+            private_postal_code: formData.postalCode || null,
+          });
+
+        if (insertError) {
+          console.error('Manual profile creation failed:', insertError);
+          toast.error('Profil konnte nicht erstellt werden. Bitte kontaktiere den Support.');
+          throw insertError;
+        }
+      } else {
+        // Step 5: Update existing profile with additional fields
+        const { error: updateError } = await supabase
           .from('profiles')
           .update({
             phone_number: formData.phoneNumber || null,
@@ -101,14 +147,15 @@ const Signup = () => {
           })
           .eq('id', data.user.id);
 
-        if (profileError) {
-          console.error('Profile update error:', profileError);
+        if (updateError) {
+          console.error('Profile update error:', updateError);
         }
       }
 
       toast.success(t('auth.account_created'));
       navigate('/');
     } catch (error: any) {
+      console.error('Signup error:', error);
       toast.error(error.message || t('auth.account_creation_failed'));
     } finally {
       setLoading(false);
