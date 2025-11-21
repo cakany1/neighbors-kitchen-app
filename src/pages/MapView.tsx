@@ -1,16 +1,66 @@
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
-import { mockMeals } from '@/data/mockMeals';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import InteractiveMap from '@/components/maps/InteractiveMap';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import { Meal } from '@/types/meal';
 
 const MapView = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  // Fetch meals from Supabase
+  const { data: meals = [] } = useQuery({
+    queryKey: ['mapMeals'],
+    queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      
+      const { data, error } = await supabase
+        .from('meals')
+        .select(`
+          *,
+          chef:profiles!chef_id(id, first_name, last_name, nickname, karma)
+        `)
+        .gte('scheduled_date', today)
+        .gt('available_portions', 0)
+        .order('scheduled_date', { ascending: true });
+
+      if (error) throw error;
+
+      // Transform to Meal type with location structure
+      return (data || []).map((meal: any) => ({
+        id: meal.id,
+        title: meal.title,
+        description: meal.description,
+        imageUrl: meal.image_url || '/placeholder-meal-1.jpg',
+        chef: {
+          firstName: meal.chef.first_name,
+          lastName: meal.chef.last_name,
+          karma: meal.chef.karma,
+        },
+        location: {
+          fuzzyLat: meal.fuzzy_lat,
+          fuzzyLng: meal.fuzzy_lng,
+          neighborhood: meal.neighborhood,
+        },
+        distance: 0,
+        pricing: {
+          minimum: meal.pricing_minimum || 0,
+          suggested: meal.pricing_suggested,
+        },
+        isCookingExperience: meal.is_cooking_experience,
+        availablePortions: meal.available_portions,
+        allergens: meal.allergens || [],
+        tags: meal.tags || [],
+        scheduledDate: meal.scheduled_date,
+      })) as Meal[];
+    },
+  });
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -38,7 +88,7 @@ const MapView = () => {
         </div>
 
         <div className="mb-6 h-[400px]">
-          <InteractiveMap meals={mockMeals} />
+          <InteractiveMap meals={meals} />
         </div>
       </main>
 

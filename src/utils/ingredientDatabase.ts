@@ -129,7 +129,7 @@ export const dislikeCategories = {
 };
 
 export const exchangeOptions = [
-  { value: "money", label: "Geld (via Twint/Bar)", note: "min. CHF 7.-" },
+  { value: "money", label: "Geld (Online Bezahlung)", note: "min. CHF 7.-" },
   { value: "wine", label: "Eine Flasche Wein", icon: "🍷" },
   { value: "dessert", label: "Dessert / Süsses", icon: "🍰" },
   { value: "produce", label: "Früchte / Gemüse", icon: "🍎" },
