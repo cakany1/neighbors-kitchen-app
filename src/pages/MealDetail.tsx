@@ -250,7 +250,7 @@ const MealDetail = () => {
   });
 
   const handleCancelBooking = () => {
-    if (window.confirm('Are you sure you want to cancel this booking?')) {
+    if (window.confirm('Möchtest du diese Buchung wirklich stornieren?')) {
       cancelBookingMutation.mutate();
     }
   };
@@ -350,10 +350,10 @@ const MealDetail = () => {
             ))}
           </div>
 
-          {/* Description */}
+          {/* Beschreibung */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">About this dish</CardTitle>
+              <CardTitle className="text-lg">Über dieses Gericht</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">{meal.description}</p>
@@ -361,20 +361,20 @@ const MealDetail = () => {
                 <Alert className="mt-4 border-destructive/50 bg-destructive/5">
                   <AlertTriangle className="h-4 w-4 text-destructive" />
                   <AlertDescription className="text-sm">
-                    <strong>Allergens:</strong> {meal.allergens.join(', ')}
+                    <strong>Allergene:</strong> {meal.allergens.join(', ')}
                   </AlertDescription>
                 </Alert>
               )}
             </CardContent>
           </Card>
 
-          {/* Scheduled Date */}
+          {/* Geplantes Datum */}
           {meal.scheduled_date && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-primary" />
-                  Available On
+                  Verfügbar am
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -397,12 +397,12 @@ const MealDetail = () => {
             </Card>
           )}
 
-          {/* Location */}
+          {/* Standort */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-primary" />
-                Location
+                Standort
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -415,10 +415,10 @@ const MealDetail = () => {
                     <AlertDescription>
                       <div className="space-y-2">
                         <p className="text-foreground">
-                          <strong className="text-secondary">Contact:</strong> {meal.chef?.first_name} {meal.chef?.last_name}
+                          <strong className="text-secondary">Kontakt:</strong> {meal.chef?.first_name} {meal.chef?.last_name}
                         </p>
                          <p className="text-foreground">
-                          <strong className="text-secondary">Address:</strong> {confirmedAddress?.exact_address}
+                          <strong className="text-secondary">Adresse:</strong> {confirmedAddress?.exact_address}
                         </p>
                       </div>
                     </AlertDescription>
@@ -436,22 +436,22 @@ const MealDetail = () => {
             </CardContent>
           </Card>
 
-          {/* Pricing */}
+          {/* Austausch */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Gift className="w-5 h-5 text-primary" />
-                Exchange
+                Austausch
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <Badge variant="outline" className="text-base py-1">
-                  ❤️ Pay what you want
+                  ❤️ Zahl was du willst
                 </Badge>
                 {meal.pricing_suggested && (
                   <p className="text-sm text-muted-foreground">
-                    ~ Restaurant Value: CHF {meal.pricing_suggested}.-
+                    ~ Restaurant Wert: CHF {meal.pricing_suggested}.-
                   </p>
                 )}
                 {meal.pricing_minimum > 0 && (
@@ -463,15 +463,15 @@ const MealDetail = () => {
             </CardContent>
           </Card>
 
-          {/* Available Portions */}
+          {/* Verfügbare Portionen */}
           <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-            <span className="text-sm text-muted-foreground">Available Portions</span>
+            <span className="text-sm text-muted-foreground">Verfügbare Portionen</span>
             <span className="text-lg font-semibold text-foreground">{meal.available_portions}</span>
           </div>
         </div>
       </main>
 
-      {/* Action Button */}
+      {/* Aktionsbuttons */}
       <div className="fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t border-border">
         <div className="max-w-lg mx-auto flex gap-2">
           <Button
@@ -480,7 +480,7 @@ const MealDetail = () => {
             className="flex-1"
           >
             <MessageCircle className="w-4 h-4 mr-2" />
-            Ask Chef
+            Chef fragen
           </Button>
           
           {bookingStatus === 'none' && (
@@ -489,7 +489,7 @@ const MealDetail = () => {
               disabled={meal.available_portions === 0 || bookingMutation.isPending}
               className="flex-1"
             >
-              {meal.available_portions === 0 ? 'Sold Out' : 'Request Booking'}
+              {meal.available_portions === 0 ? 'Ausverkauft' : 'Buchung anfragen'}
             </Button>
           )}
           
@@ -502,12 +502,12 @@ const MealDetail = () => {
                   disabled={cancelBookingMutation.isPending}
                   className="flex-1"
                 >
-                  {cancelBookingMutation.isPending ? 'Cancelling...' : 'Cancel Booking'}
+                  {cancelBookingMutation.isPending ? 'Wird storniert...' : 'Buchung stornieren'}
                 </Button>
               ) : (
                 <Button disabled className="flex-1">
                   <Clock className="w-4 h-4 mr-2" />
-                  Pending...
+                  Ausstehend...
                 </Button>
               )}
             </>
@@ -517,10 +517,10 @@ const MealDetail = () => {
             <div className="flex-1 space-y-2">
               <Button disabled className="w-full bg-secondary">
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Booking Confirmed
+                Buchung bestätigt
               </Button>
               <p className="text-xs text-center text-muted-foreground">
-                Contact chef to cancel
+                Kontaktiere Koch zum Stornieren
               </p>
             </div>
           )}

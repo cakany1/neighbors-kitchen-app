@@ -79,13 +79,13 @@ export function TagSelector({
       {/* Section 1: Allergens */}
       <Card>
         <CardHeader>
-          <CardTitle>Allergene (EU 14)</CardTitle>
+          <CardTitle>Allergene</CardTitle>
           <CardDescription>
             Wähle alle Allergene, die in deinem Gericht enthalten sind
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {allergenOptions.map((allergen) => (
               <div key={allergen.value} className="flex items-center space-x-2">
                 <Checkbox
@@ -95,7 +95,7 @@ export function TagSelector({
                 />
                 <Label
                   htmlFor={`allergen-${allergen.value}`}
-                  className="text-sm font-normal cursor-pointer"
+                  className="text-sm font-normal cursor-pointer leading-tight"
                 >
                   {allergen.label}
                 </Label>
@@ -114,7 +114,7 @@ export function TagSelector({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {commonTags.map((tag) => (
               <div key={tag.value} className="flex items-center space-x-2">
                 <Checkbox
@@ -124,7 +124,7 @@ export function TagSelector({
                 />
                 <Label
                   htmlFor={`tag-${tag.value}`}
-                  className="text-sm font-normal cursor-pointer"
+                  className="text-sm font-normal cursor-pointer leading-tight"
                 >
                   {tag.label}
                 </Label>
