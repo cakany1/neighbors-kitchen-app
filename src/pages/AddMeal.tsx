@@ -12,7 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload, ChefHat, Gift, AlertCircle, Shield } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Upload, ChefHat, Gift, AlertCircle, Shield, Plus, Minus } from 'lucide-react';
 import { toast } from 'sonner';
 import { exchangeOptions } from '@/utils/ingredientDatabase';
 import { TagSelector } from '@/components/meals/TagSelector';
@@ -39,10 +40,10 @@ const AddMeal = () => {
     ingredients: '', // Add ingredients field for auto-detection
     minimumPrice: '',
     restaurantReferencePrice: '',
-    portions: '',
+    portions: '1', // Default to 1 portion
     unitType: 'portions' as 'portions' | 'slices' | 'items' | 'whole',
     maxSeats: '',
-    scheduledDate: '',
+    scheduledDate: new Date().toISOString().split('T')[0], // Default to today
     scheduledTime: '',
     arrivalTime: '',
     collectionWindowStart: '',
@@ -113,21 +114,81 @@ const AddMeal = () => {
     }
   };
 
+  // Smart Allergen Auto-Detection
+  const detectAllergens = (text: string) => {
+    const lowerText = text.toLowerCase();
+    const detectedAllergens: string[] = [];
+    
+    const allergenKeywords: Record<string, string[]> = {
+      'Milch/Laktose': ['milch', 'sahne', 'käse', 'butter', 'joghurt', 'rahm', 'quark', 'schmand'],
+      'Eier': ['ei', 'eier', 'spätzle'],
+      'Schalenfrüchte (Nüsse)': ['nuss', 'nüsse', 'mandel', 'walnuss', 'haselnuss', 'cashew', 'pistazie'],
+      'Erdnüsse': ['erdnuss', 'erdnüsse'],
+      'Gluten (Getreide)': ['mehl', 'weizen', 'brot', 'pasta', 'lasagne', 'teig', 'nudel', 'spaghetti'],
+      'Fisch': ['fisch', 'thunfisch', 'lachs', 'forelle', 'sardine'],
+      'Soja': ['soja', 'tofu'],
+      'Senf': ['senf'],
+      'Sellerie': ['sellerie'],
+      'Sesam': ['sesam'],
+      'Lupinen': ['lupine', 'lupinen'],
+      'Weichtiere': ['muschel', 'muscheln', 'schnecke', 'schnecken', 'tintenfisch'],
+      'Sulfite': ['sulfit', 'sulfite', 'schwefeldioxid'],
+      'Krebstiere': ['garnele', 'garnelen', 'krebs', 'hummer', 'shrimp', 'krabbe'],
+    };
+
+    Object.entries(allergenKeywords).forEach(([allergen, keywords]) => {
+      if (keywords.some(keyword => lowerText.includes(keyword))) {
+        if (!detectedAllergens.includes(allergen)) {
+          detectedAllergens.push(allergen);
+        }
+      }
+    });
+
+    if (detectedAllergens.length > 0) {
+      setSelectedAllergens(prev => {
+        const newAllergens = [...new Set([...prev, ...detectedAllergens])];
+        return newAllergens;
+      });
+      toast.success(`⚡ Allergene automatisch erkannt: ${detectedAllergens.join(', ')}`, {
+        duration: 4000,
+      });
+    }
+  };
+
+  // Trigger allergen detection when title or description changes
+  useEffect(() => {
+    const textToScan = `${formData.title} ${formData.description}`.trim();
+    if (textToScan.length > 3) {
+      const timer = setTimeout(() => {
+        detectAllergens(textToScan);
+      }, 1500); // Debounce
+      return () => clearTimeout(timer);
+    }
+  }, [formData.title, formData.description]);
+
+  // Portion counter helpers
+  const incrementPortions = () => {
+    const current = parseInt(formData.portions) || 0;
+    setFormData({ ...formData, portions: (current + 1).toString() });
+  };
+
+  const decrementPortions = () => {
+    const current = parseInt(formData.portions) || 0;
+    if (current > 1) {
+      setFormData({ ...formData, portions: (current - 1).toString() });
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.description || !formData.scheduledDate || !formData.scheduledTime) {
+    if (!formData.title || !formData.scheduledDate || !formData.scheduledTime) {
       toast.error(t('toast.fill_required_fields'));
       return;
     }
 
-    if (!formData.collectionWindowStart && (handoverMode === 'pickup_box' || handoverMode === 'neighbor_plate' || handoverMode === 'ghost_mode')) {
+    if (!formData.collectionWindowStart) {
       toast.error(t('toast.set_collection_window'));
-      return;
-    }
-
-    if (handoverMode === 'dine_in' && (!formData.arrivalTime || !formData.maxSeats)) {
-      toast.error(t('toast.set_arrival_time'));
       return;
     }
 
@@ -153,224 +214,116 @@ const AddMeal = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Photo Upload */}
+          {/* ==== TOP SECTION: VISIBLE & REQUIRED ==== */}
+          
+          {/* Title */}
           <Card>
-            <CardContent className="pt-6">
-              <Label htmlFor="photo" className="block mb-2 font-medium">Foto vom Gericht</Label>
-              {!useStockPhoto ? (
-                <>
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
-                    <Upload className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-1">Klicke zum Hochladen</p>
-                    <p className="text-xs text-muted-foreground">PNG, JPG bis 10MB</p>
-                    <input 
-                      type="file" 
-                      id="photo" 
-                      accept="image/*" 
-                      className="hidden"
-                    />
-                  </div>
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setUseStockPhoto(true)}
-                    className="w-full mt-2"
-                  >
-                    Noch nicht gekocht? Symbolbild verwenden
-                  </Button>
-                </>
-              ) : (
-                <div className="space-y-3">
-                  <Alert>
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      📷 Ein Symbolbild wird mit dem Badge "Symbolbild" angezeigt
-                    </AlertDescription>
-                  </Alert>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setUseStockPhoto(false)}
-                    className="w-full"
-                  >
-                    Eigenes Foto hochladen
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Basic Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Grundinformationen</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-6 space-y-4">
               <div>
-                <Label htmlFor="title">Name des Gerichts *</Label>
+                <Label htmlFor="title" className="text-lg font-semibold">Was gibt's heute? *</Label>
                 <Input
                   id="title"
-                  placeholder="z.B. Vietnamesische Sommerrollen"
+                  placeholder="z.B. Hausgemachte Kürbis-Lasagne"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="text-base h-12"
                   required
                 />
               </div>
+            </CardContent>
+          </Card>
 
-              <div>
-                <Label htmlFor="description">Beschreibung *</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Beschreibe dein Gericht, Zutaten und besondere Details..."
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="ingredients">Zutaten (optional, für Allergen-Erkennung)</Label>
-                <Textarea
-                  id="ingredients"
-                  placeholder="z.B. Mehl, Milch, Eier, Butter, Nüsse..."
-                  value={formData.ingredients}
-                  onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
-                  rows={3}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Tippe Zutaten ein und wir erkennen automatisch Allergene
-                </p>
+          {/* Portions Counter */}
+          <Card>
+            <CardContent className="pt-6">
+              <Label className="text-lg font-semibold mb-3 block">Anzahl Portionen *</Label>
+              <div className="flex items-center justify-center gap-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-12 w-12 rounded-full"
+                  onClick={decrementPortions}
+                  disabled={parseInt(formData.portions) <= 1}
+                >
+                  <Minus className="h-5 w-5" />
+                </Button>
+                <div className="text-4xl font-bold text-primary min-w-[80px] text-center">
+                  {formData.portions || '1'}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-12 w-12 rounded-full"
+                  onClick={incrementPortions}
+                >
+                  <Plus className="h-5 w-5" />
+                </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Allergens & Tags Selector */}
-          <TagSelector
-            selectedAllergens={selectedAllergens}
-            onAllergensChange={setSelectedAllergens}
-            selectedTags={tags}
-            onTagsChange={setTags}
-            ingredientText={formData.ingredients}
-          />
-
-          {/* Cooking Experience */}
-          <Card className="border-secondary">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <ChefHat className="w-6 h-6 text-secondary mt-1" />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <Label htmlFor="cooking-experience" className="text-base font-semibold">
-                      Koch-Erlebnis
-                    </Label>
-                    <Switch
-                      id="cooking-experience"
-                      checked={isCookingExperience}
-                      onCheckedChange={setIsCookingExperience}
+          {/* Time Selection - Smart Chips */}
+          <Card>
+            <CardContent className="pt-6 space-y-4">
+              <Label className="text-lg font-semibold">Abholzeit * (24h Format)</Label>
+              <div className="grid grid-cols-2 gap-3">
+                {['17:00', '18:00', '19:00', '20:00'].map((time) => (
+                  <Button
+                    key={time}
+                    type="button"
+                    variant={formData.collectionWindowStart === time ? 'default' : 'outline'}
+                    onClick={() => {
+                      const endHour = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
+                      setFormData({ 
+                        ...formData, 
+                        collectionWindowStart: time,
+                        collectionWindowEnd: `${endHour}:00`
+                      });
+                    }}
+                    className="h-12"
+                  >
+                    {time} - {(parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0')}:00 Uhr
+                  </Button>
+                ))}
+              </div>
+              <div className="pt-2">
+                <Label className="text-sm text-muted-foreground">Oder manuell eingeben:</Label>
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  <div>
+                    <Label htmlFor="collectionWindowStart" className="text-xs">Von</Label>
+                    <Input
+                      id="collectionWindowStart"
+                      type="time"
+                      step="900"
+                      value={formData.collectionWindowStart}
+                      onChange={(e) => setFormData({ ...formData, collectionWindowStart: e.target.value })}
+                      required
                     />
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Lade Leute in deine Küche ein, um beim Kochen zuzuschauen und gemeinsam einen Apéro zu genießen
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Ladies Only Mode (Safety Feature for Women Chefs) */}
-          {currentUser?.gender === 'female' && (
-            <Card className="border-destructive/50 bg-destructive/5">
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <Shield className="w-6 h-6 text-destructive mt-1" />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <Label htmlFor="women-only" className="text-base font-semibold">
-                        👩 Ladies Only (Nur für Frauen)
-                      </Label>
-                      <Switch
-                        id="women-only"
-                        checked={womenOnly}
-                        onCheckedChange={setWomenOnly}
-                      />
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Nur weibliche Gäste können dieses Essen buchen. Diese Einstellung hilft, eine sichere und angenehme Umgebung zu schaffen.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Verified Only Mode (Trust Filter) */}
-          <Card className="border-primary/50 bg-primary/5">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <Shield className="w-6 h-6 text-primary mt-1" />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <Label htmlFor="verified-only" className="text-base font-semibold">
-                      ✓ Nur verifizierte Nutzer zulassen?
-                    </Label>
-                    <Switch
-                      id="verified-only"
-                      checked={verifiedOnly}
-                      onCheckedChange={setVerifiedOnly}
+                  <div>
+                    <Label htmlFor="collectionWindowEnd" className="text-xs">Bis</Label>
+                    <Input
+                      id="collectionWindowEnd"
+                      type="time"
+                      step="900"
+                      value={formData.collectionWindowEnd}
+                      onChange={(e) => setFormData({ ...formData, collectionWindowEnd: e.target.value })}
                     />
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Nur verifizierte Gäste (Blauer Haken) können dieses Essen buchen. Erhöht Vertrauen und Sicherheit.
-                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Exchange Options - Unified List */}
+          {/* Exchange Options - Gegenleistung */}
           <Card>
             <CardHeader>
-              <CardTitle>Dein Wunsch an den Gast</CardTitle>
+              <CardTitle>Dein Wunsch an den Gast *</CardTitle>
               <CardDescription>Was akzeptierst du als Gegenleistung?</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Label className="mb-3 block">Wähle alle Optionen, die du akzeptierst:</Label>
-              <p className="text-xs text-muted-foreground mb-3">
-                Gäste können eine dieser Optionen wählen. Mehrfachauswahl möglich.
-              </p>
-              
-              {/* Price Detective - Auto-runs when money is selected */}
-              {selectedExchangeOptions.includes('money') && (priceDetectiveLoading || priceDetectiveResult) && (
-                <div className="border border-border rounded-lg p-4 space-y-3 mb-4">
-                  <Label className="text-sm font-medium">Price Detective 🔍</Label>
-                  {priceDetectiveLoading && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
-                      Scanne Restaurant-Preise in der Nachbarschaft...
-                    </div>
-                  )}
-                  {priceDetectiveResult && !priceDetectiveLoading && (
-                    <Alert className="bg-primary/10 border-primary">
-                      <AlertDescription className="space-y-2">
-                        <p className="text-sm font-medium">
-                          Gefunden! "{formData.title}" in Basel St. Johann kostet zwischen: <strong>CHF {priceDetectiveResult.min.toFixed(2)}</strong> und <strong>CHF {priceDetectiveResult.max.toFixed(2)}</strong>
-                        </p>
-                        <Button 
-                          type="button" 
-                          size="sm" 
-                          onClick={usePriceDetectiveResult}
-                          className="w-full"
-                        >
-                          Durchschnitt als Richtwert verwenden
-                        </Button>
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </div>
-              )}
-              
               <div className="space-y-3">
                 {exchangeOptions.map((option) => (
                   <div key={option.value} className="flex items-start space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors">
@@ -395,225 +348,150 @@ const AddMeal = () => {
                   </div>
                 ))}
               </div>
-
-              {/* Money-specific fields */}
-              {selectedExchangeOptions.includes('money') && (
-                <div className="space-y-4 pt-2 border-t border-border mt-4">
-                  <div>
-                    <Label htmlFor="restaurantReferencePrice">Restaurant-Referenzpreis (CHF)</Label>
-                    <Input
-                      id="restaurantReferencePrice"
-                      type="number"
-                      min="0"
-                      step="0.5"
-                      placeholder="z.B. 24"
-                      value={formData.restaurantReferencePrice}
-                      onChange={(e) => setFormData({ ...formData, restaurantReferencePrice: e.target.value })}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Was würde dieses Gericht im Restaurant kosten? (Optionaler Richtwert)
-                    </p>
-                  </div>
-                  <div>
-                    <Label htmlFor="minimumPrice">Mindestpreis (CHF)</Label>
-                    <Input
-                      id="minimumPrice"
-                      type="number"
-                      min="7"
-                      step="0.50"
-                      placeholder="7.00"
-                      value={formData.minimumPrice || '7.00'}
-                      onChange={(e) => setFormData({ ...formData, minimumPrice: e.target.value })}
-                      onBlur={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (isNaN(value) || value < 7) {
-                          setFormData({ ...formData, minimumPrice: '7.00' });
-                          toast.info('Mindestpreis auf CHF 7.00 gesetzt');
-                        }
-                      }}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Minimumbetrag ist CHF 7.00 (inkl. Gebühr)
-                    </p>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
 
-          {/* Handover Mode */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Übergabe & Ort</CardTitle>
-              <CardDescription>Wie soll das Essen übergeben werden?</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  type="button"
-                  variant={handoverMode === 'pickup_box' ? 'default' : 'outline'}
-                  onClick={() => setHandoverMode('pickup_box')}
-                  className="h-auto min-h-[80px] py-3 flex flex-col justify-center items-center whitespace-normal text-center"
-                >
-                  <span className="text-2xl mb-1">📦</span>
-                  <span className="text-xs sm:text-sm leading-tight">Abholung (Tupperware)</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant={handoverMode === 'neighbor_plate' ? 'default' : 'outline'}
-                  onClick={() => setHandoverMode('neighbor_plate')}
-                  className="h-auto min-h-[80px] py-3 flex flex-col justify-center items-center whitespace-normal text-center"
-                >
-                  <span className="text-2xl mb-1">🍽️</span>
-                  <span className="text-xs sm:text-sm leading-tight">Nachbar (Teller)</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant={handoverMode === 'ghost_mode' ? 'default' : 'outline'}
-                  onClick={() => setHandoverMode('ghost_mode')}
-                  className="h-auto min-h-[80px] py-3 flex flex-col justify-center items-center whitespace-normal text-center"
-                >
-                  <span className="text-2xl mb-1">👻</span>
-                  <span className="text-xs sm:text-sm leading-tight">Kontaktlos (Eingang)</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant={handoverMode === 'dine_in' ? 'default' : 'outline'}
-                  onClick={() => setHandoverMode('dine_in')}
-                  className="h-auto min-h-[80px] py-3 flex flex-col justify-center items-center whitespace-normal text-center"
-                >
-                  <span className="text-2xl mb-1">🍴</span>
-                  <span className="text-xs sm:text-sm leading-tight">Zu Gast (Am Tisch)</span>
-                </Button>
-              </div>
-
-              {/* Identity Reveal Options */}
-              <div className="pt-2">
-                <Label className="text-sm font-medium mb-2 block">Was soll bei Buchungsbestätigung preisgegeben werden?</Label>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      id="real_name"
-                      name="identity"
-                      value="real_name"
-                      checked={identityReveal === 'real_name'}
-                      onChange={() => setIdentityReveal('real_name')}
-                      className="w-4 h-4"
-                    />
-                    <Label htmlFor="real_name" className="text-sm font-normal cursor-pointer">
-                      Echter Name + Adresse
-                    </Label>
+          {/* ==== BOTTOM SECTION: COLLAPSIBLE/OPTIONAL ==== */}
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="details" className="border-none">
+              <Card>
+                <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                  <div className="flex items-center gap-2 text-lg font-semibold">
+                    📸 Foto & Details hinzufügen (Optional)
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      id="nickname"
-                      name="identity"
-                      value="nickname"
-                      checked={identityReveal === 'nickname'}
-                      onChange={() => setIdentityReveal('nickname')}
-                      className="w-4 h-4"
-                    />
-                    <Label htmlFor="nickname" className="text-sm font-normal cursor-pointer">
-                      Nickname + Adresse {handoverMode === 'ghost_mode' && '+ Anweisungen'}
-                    </Label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Collection Window */}
-              {handoverMode !== 'dine_in' && (
-                <div className="pt-2">
-                  <Label className="text-sm font-medium mb-2 block">
-                    Abholzeitraum * (24h Format)
-                  </Label>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Setze ein Zeitfenster, um Störungen zu vermeiden (z.B. 17:00 - 19:00)
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
+                </AccordionTrigger>
+                <AccordionContent>
+                  <CardContent className="space-y-6 pt-2">
+                    {/* Description */}
                     <div>
-                      <Label htmlFor="collectionWindowStart" className="text-xs">Von</Label>
-                      <Input
-                        id="collectionWindowStart"
-                        type="time"
-                        step="900"
-                        value={formData.collectionWindowStart}
-                        onChange={(e) => setFormData({ ...formData, collectionWindowStart: e.target.value })}
-                        required
+                      <Label htmlFor="description">Beschreibung</Label>
+                      <Textarea
+                        id="description"
+                        placeholder="Beschreibe dein Gericht, Zutaten und besondere Details..."
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        rows={4}
                       />
                     </div>
+
+                    {/* Photo Upload - Compact */}
                     <div>
-                      <Label htmlFor="collectionWindowEnd" className="text-xs">Bis</Label>
-                      <Input
-                        id="collectionWindowEnd"
-                        type="time"
-                        step="900"
-                        value={formData.collectionWindowEnd}
-                        onChange={(e) => setFormData({ ...formData, collectionWindowEnd: e.target.value })}
-                      />
+                      <Label className="block mb-2 font-medium">Foto vom Gericht</Label>
+                      {!useStockPhoto ? (
+                        <>
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            className="w-full h-16 flex items-center justify-center gap-2"
+                          >
+                            <Upload className="w-5 h-5" />
+                            <span>Foto hochladen +</span>
+                          </Button>
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => setUseStockPhoto(true)}
+                            className="w-full mt-2"
+                          >
+                            Noch nicht gekocht? Symbolbild verwenden
+                          </Button>
+                        </>
+                      ) : (
+                        <div className="space-y-3">
+                          <Alert>
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription>
+                              📷 Ein Symbolbild wird mit dem Badge "Symbolbild" angezeigt
+                            </AlertDescription>
+                          </Alert>
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            onClick={() => setUseStockPhoto(false)}
+                            className="w-full"
+                          >
+                            Eigenes Foto hochladen
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </div>
-              )}
 
-              {/* Pickup Instructions */}
-              {handoverMode === 'ghost_mode' && (
-                <div>
-                  <Label htmlFor="pickupInstructions">Abholanweisungen</Label>
-                  <Textarea
-                    id="pickupInstructions"
-                    placeholder="z.B. Blaue Box am Eingang, Klingel Nr. 3"
-                    value={formData.pickupInstructions}
-                    onChange={(e) => setFormData({ ...formData, pickupInstructions: e.target.value })}
-                    rows={2}
-                  />
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    {/* Allergens & Tags Selector */}
+                    <TagSelector
+                      selectedAllergens={selectedAllergens}
+                      onAllergensChange={setSelectedAllergens}
+                      selectedTags={tags}
+                      onTagsChange={setTags}
+                      ingredientText={formData.ingredients}
+                    />
 
-          {/* Portions & Schedule */}
+                    {/* Money-specific fields */}
+                    {selectedExchangeOptions.includes('money') && (
+                      <div className="space-y-4 pt-2 border-t border-border">
+                        <div>
+                          <Label htmlFor="restaurantReferencePrice">Restaurant-Referenzpreis (CHF)</Label>
+                          <Input
+                            id="restaurantReferencePrice"
+                            type="number"
+                            min="0"
+                            step="0.5"
+                            placeholder="z.B. 24"
+                            value={formData.restaurantReferencePrice}
+                            onChange={(e) => setFormData({ ...formData, restaurantReferencePrice: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Advanced Options */}
+                    <div className="space-y-4 pt-4 border-t border-border">
+                      <h3 className="text-sm font-semibold text-muted-foreground">Erweiterte Optionen</h3>
+                      
+                      {/* Ladies Only */}
+                      {currentUser?.gender === 'female' && (
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+                          <div className="flex items-center gap-2">
+                            <Shield className="w-4 h-4 text-destructive" />
+                            <Label htmlFor="women-only" className="text-sm cursor-pointer">
+                              👩 Ladies Only
+                            </Label>
+                          </div>
+                          <Switch
+                            id="women-only"
+                            checked={womenOnly}
+                            onCheckedChange={setWomenOnly}
+                          />
+                        </div>
+                      )}
+
+                      {/* Verified Only */}
+                      <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+                        <div className="flex items-center gap-2">
+                          <Shield className="w-4 h-4 text-primary" />
+                          <Label htmlFor="verified-only" className="text-sm cursor-pointer">
+                            ✓ Nur Verifizierte
+                          </Label>
+                        </div>
+                        <Switch
+                          id="verified-only"
+                          checked={verifiedOnly}
+                          onCheckedChange={setVerifiedOnly}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </AccordionContent>
+              </Card>
+            </AccordionItem>
+          </Accordion>
+
+          {/* Date & Time (Hidden in minimal view) */}
           <Card>
-            <CardHeader>
-              <CardTitle>Verfügbarkeit</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="unitType">Einheits-Typ</Label>
-                <select
-                  id="unitType"
-                  value={formData.unitType || 'portions'}
-                  onChange={(e) => setFormData({ ...formData, unitType: e.target.value as 'portions' | 'slices' | 'items' | 'whole' })}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  <option value="portions">Portionen</option>
-                  <option value="slices">Stücke</option>
-                  <option value="items">Einzelne Gerichte</option>
-                  <option value="whole">Ganzes</option>
-                </select>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Wie soll dieses Essen gemessen werden?
-                </p>
-              </div>
-              
-              <div>
-                <Label htmlFor="portions">
-                  Verfügbare {formData.unitType === 'slices' ? 'Stücke' : formData.unitType === 'items' ? 'Gerichte' : formData.unitType === 'whole' ? 'Einheiten' : 'Portionen'}
-                </Label>
-                <Input
-                  id="portions"
-                  type="number"
-                  min="1"
-                  placeholder="1"
-                  value={formData.portions}
-                  onChange={(e) => setFormData({ ...formData, portions: e.target.value })}
-                />
-              </div>
-
+            <CardContent className="pt-6 space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor="scheduledDate">Geplantes Datum *</Label>
+                  <Label htmlFor="scheduledDate">Wann ist es fertig? *</Label>
                   <Button
                     type="button"
                     variant="outline"
@@ -636,7 +514,7 @@ const AddMeal = () => {
               </div>
 
               <div>
-                <Label htmlFor="scheduledTime">Essen fertig um * (24h Format)</Label>
+                <Label htmlFor="scheduledTime">Fertig um * (24h Format)</Label>
                 <Input
                   id="scheduledTime"
                   type="time"
@@ -645,49 +523,11 @@ const AddMeal = () => {
                   onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
                   required
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Wann wird dein Essen fertig sein? (z.B. 20:30)
-                </p>
               </div>
-              
-              {/* Dine In specific fields */}
-              {handoverMode === 'dine_in' && (
-                <>
-                  <div>
-                    <Label htmlFor="arrivalTime">Gäste-Ankunftszeit * (24h Format)</Label>
-                    <Input
-                      id="arrivalTime"
-                      type="time"
-                      step="900"
-                      value={formData.arrivalTime}
-                      onChange={(e) => setFormData({ ...formData, arrivalTime: e.target.value })}
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Wann sollen die Gäste ankommen? (z.B. 19:00)
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="maxSeats">Maximale Gästeanzahl *</Label>
-                    <Input
-                      id="maxSeats"
-                      type="number"
-                      min="1"
-                      placeholder="2"
-                      value={formData.maxSeats}
-                      onChange={(e) => setFormData({ ...formData, maxSeats: e.target.value })}
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Wie viele Personen können an deinem Tisch teilnehmen?
-                    </p>
-                  </div>
-                </>
-              )}
             </CardContent>
           </Card>
 
+          {/* Submit Button */}
           <Button 
             type="submit" 
             className="w-full" 
