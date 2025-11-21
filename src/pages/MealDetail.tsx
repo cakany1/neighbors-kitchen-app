@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { SafetyAlert } from '@/components/SafetyAlert';
 import { TranslateButton } from '@/components/TranslateButton';
 import { checkAllergenMatch } from '@/utils/ingredientDatabase';
@@ -35,6 +37,7 @@ const MealDetail = () => {
   const queryClient = useQueryClient();
   const [bookingStatus, setBookingStatus] = useState<'none' | 'pending' | 'confirmed'>('none');
   const [chatOpen, setChatOpen] = useState(false);
+  const [bookingQuantity, setBookingQuantity] = useState(1);
   
   // Fetch current user - SECURITY: Own profile can access all fields
   const { data: currentUser } = useQuery({
@@ -154,6 +157,13 @@ const MealDetail = () => {
       }
     }
   }, [existingBooking]);
+
+  // Set default quantity for couples
+  useEffect(() => {
+    if (currentUser?.profile?.is_couple) {
+      setBookingQuantity(2);
+    }
+  }, [currentUser?.profile?.is_couple]);
 
   const matchingAllergens = checkAllergenMatch(
     meal?.allergens || [],
@@ -476,6 +486,46 @@ const MealDetail = () => {
             <span className="text-sm text-muted-foreground">Verfügbare Portionen</span>
             <span className="text-lg font-semibold text-foreground">{meal.available_portions}</span>
           </div>
+
+          {/* Couple Booking Selector */}
+          {currentUser?.profile?.is_couple && bookingStatus === 'none' && (
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="pt-6 space-y-3">
+                <Label className="text-sm font-semibold">Portionsanzahl</Label>
+                <RadioGroup 
+                  value={bookingQuantity.toString()} 
+                  onValueChange={(val) => setBookingQuantity(parseInt(val))}
+                  className="space-y-2"
+                >
+                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
+                    <RadioGroupItem value="2" id="couple-both" />
+                    <Label htmlFor="couple-both" className="cursor-pointer flex-1">
+                      👫 Für uns beide (2 Portionen)
+                      <span className="block text-xs text-muted-foreground">
+                        Standard für Paare
+                      </span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
+                    <RadioGroupItem value="1" id="couple-single" />
+                    <Label htmlFor="couple-single" className="cursor-pointer flex-1">
+                      👤 Nur für mich (1 Portion)
+                      <span className="block text-xs text-muted-foreground">
+                        Für einzelne Person
+                      </span>
+                    </Label>
+                  </div>
+                </RadioGroup>
+                {meal.pricing_suggested && bookingQuantity > 1 && (
+                  <Alert className="bg-secondary/10 border-secondary/20">
+                    <AlertDescription className="text-xs">
+                      💡 Geschätzte Kosten: CHF {(meal.pricing_suggested * bookingQuantity).toFixed(2)}.- ({bookingQuantity} Portionen)
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
 

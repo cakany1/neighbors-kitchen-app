@@ -156,24 +156,27 @@ const Payment = () => {
             </CardContent>
           </Card>
 
-          {/* Payment Method (Simulated) */}
+          {/* Payment Method - Online Only */}
           <Card>
             <CardHeader>
               <CardTitle>Payment Method</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-3">
               <Button 
                 variant="outline" 
-                className="w-full h-16 text-lg"
+                className="w-full h-16 text-lg border-primary/50 hover:bg-primary/10"
                 onClick={handlePayment}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold">
-                    T
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
+                    💳
                   </div>
-                  <span>Pay with TWINT</span>
+                  <span>Online Payment (Card / Stripe)</span>
                 </div>
               </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                ℹ️ Only online payments accepted to ensure platform fees and security
+              </p>
             </CardContent>
           </Card>
 
