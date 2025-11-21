@@ -122,6 +122,12 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           )}
         </div>
         
+        {/* Chef Portfolio Badge - Shows trust signal */}
+        <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
+          <Camera className="w-3.5 h-3.5 text-primary" />
+          <span className="text-primary font-medium">Portfolio Available</span>
+        </div>
+        
         {meal.scheduledDate && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3 bg-muted px-2 py-1 rounded-md w-fit">
             <Calendar className="w-3.5 h-3.5" />

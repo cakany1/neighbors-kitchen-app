@@ -191,6 +191,7 @@ export type Database = {
           booking_id: string
           created_at: string
           id: string
+          is_read: boolean
           message_text: string
           original_language: string
           sender_id: string
@@ -199,6 +200,7 @@ export type Database = {
           booking_id: string
           created_at?: string
           id?: string
+          is_read?: boolean
           message_text: string
           original_language: string
           sender_id: string
@@ -207,6 +209,7 @@ export type Database = {
           booking_id?: string
           created_at?: string
           id?: string
+          is_read?: boolean
           message_text?: string
           original_language?: string
           sender_id?: string

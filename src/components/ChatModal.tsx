@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -12,59 +12,164 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'chef';
-  timestamp: Date;
-}
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface ChatModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  chefId: string;
   chefName: string;
+  mealId: string;
   mealTitle: string;
 }
 
-const ChatModal = ({ open, onOpenChange, chefName, mealTitle }: ChatModalProps) => {
+const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: ChatModalProps) => {
   const { t } = useTranslation();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: `Hallo! Ich interessiere mich für "${mealTitle}". Ist es möglich, mehr darüber zu erfahren?`,
-      sender: 'user',
-      timestamp: new Date(),
-    },
-  ]);
+  const queryClient = useQueryClient();
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [inputMessage, setInputMessage] = useState('');
+  
+  // Get current user
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    },
+  });
+
+  // Create or get existing booking for this meal (for message threading)
+  const { data: booking } = useQuery({
+    queryKey: ['prebooking', mealId, currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      
+      // Check if booking exists
+      const { data } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('meal_id', mealId)
+        .eq('guest_id', currentUser.id)
+        .maybeSingle();
+      
+      // If no booking, create a temporary one with status 'inquiry'
+      if (!data) {
+        const { data: newBooking, error } = await supabase
+          .from('bookings')
+          .insert({
+            meal_id: mealId,
+            guest_id: currentUser.id,
+            status: 'inquiry',
+          })
+          .select('id')
+          .single();
+        
+        if (error) {
+          console.error('Error creating inquiry booking:', error);
+          return null;
+        }
+        
+        return newBooking;
+      }
+      
+      return data;
+    },
+    enabled: !!currentUser?.id && open,
+  });
+
+  // Fetch messages for this booking
+  const { data: messages = [] } = useQuery({
+    queryKey: ['messages', booking?.id],
+    queryFn: async () => {
+      if (!booking?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('booking_id', booking.id)
+        .order('created_at', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching messages:', error);
+        return [];
+      }
+      
+      return data;
+    },
+    enabled: !!booking?.id,
+  });
+
+  // Subscribe to realtime messages
+  useEffect(() => {
+    if (!booking?.id) return;
+    
+    const channel = supabase
+      .channel(`messages:${booking.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `booking_id=eq.${booking.id}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['messages', booking.id] });
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [booking?.id, queryClient]);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Send message mutation
+  const sendMessageMutation = useMutation({
+    mutationFn: async (messageText: string) => {
+      if (!currentUser?.id || !booking?.id) throw new Error('Not authenticated');
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      const userLang = user?.user_metadata?.language || 'de';
+      
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          booking_id: booking.id,
+          sender_id: currentUser.id,
+          message_text: messageText,
+          original_language: userLang,
+        });
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setInputMessage('');
+      queryClient.invalidateQueries({ queryKey: ['messages', booking?.id] });
+      toast.success('Nachricht gesendet');
+    },
+    onError: (error) => {
+      console.error('Error sending message:', error);
+      toast.error('Nachricht konnte nicht gesendet werden');
+    },
+  });
 
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
-
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      text: inputMessage,
-      sender: 'user',
-      timestamp: new Date(),
-    };
-
-    setMessages([...messages, newMessage]);
-    setInputMessage('');
-
-    // Simulate chef response
-    setTimeout(() => {
-      const chefResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: 'Vielen Dank für deine Nachricht! Ja, gerne. Was möchtest du wissen?',
-        sender: 'chef',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, chefResponse]);
-    }, 1500);
-
-    toast.success('Nachricht gesendet');
+    sendMessageMutation.mutate(inputMessage);
   };
+
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -76,25 +181,30 @@ const ChatModal = ({ open, onOpenChange, chefName, mealTitle }: ChatModalProps) 
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="h-[300px] pr-4">
+        <ScrollArea className="h-[300px] pr-4" ref={scrollRef}>
           <div className="space-y-4">
+            {messages.length === 0 && (
+              <div className="text-center text-muted-foreground py-8">
+                <p className="text-sm">Starte die Konversation mit {chefName}</p>
+              </div>
+            )}
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${
-                  message.sender === 'user' ? 'justify-end' : 'justify-start'
+                  message.sender_id === currentUser.id ? 'justify-end' : 'justify-start'
                 }`}
               >
                 <div
                   className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                    message.sender === 'user'
+                    message.sender_id === currentUser.id
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted text-foreground'
                   }`}
                 >
-                  <p className="text-sm">{message.text}</p>
+                  <p className="text-sm">{message.message_text}</p>
                   <p className="text-xs opacity-70 mt-1">
-                    {message.timestamp.toLocaleTimeString('de-DE', {
+                    {new Date(message.created_at).toLocaleTimeString('de-DE', {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}
@@ -117,8 +227,14 @@ const ChatModal = ({ open, onOpenChange, chefName, mealTitle }: ChatModalProps) 
               }
             }}
             className="flex-1 min-h-[60px]"
+            disabled={sendMessageMutation.isPending}
           />
-          <Button onClick={handleSendMessage} size="icon" className="self-end">
+          <Button 
+            onClick={handleSendMessage} 
+            size="icon" 
+            className="self-end"
+            disabled={!inputMessage.trim() || sendMessageMutation.isPending}
+          >
             <Send className="w-4 h-4" />
           </Button>
         </div>
