@@ -14,18 +14,23 @@ const AGB = () => {
           <section>
             <h2 className="text-xl font-semibold mb-3">1. Geltungsbereich</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Neighbors Kitchen ist eine Vermittlungsplattform. Die Verträge über den Kauf 
-              von Speisen kommen ausschliesslich zwischen dem anbietenden Nutzer (Koch) und 
-              dem abnehmenden Nutzer (Gast) zustande.
+              Neighbors Kitchen ist eine Vermittlungsplattform für das Teilen von Lebensmitteln 
+              innerhalb einer Gemeinschaft. Neighbors Kitchen vermittelt keine Kaufverträge über 
+              Speisen im gewerblichen Sinne. Es handelt sich um eine Gemeinschaft zur Vermeidung 
+              von Lebensmittelverschwendung. Die Verträge über das Teilen von Lebensmitteln 
+              kommen ausschliesslich zwischen dem anbietenden Nutzer (Koch) und dem abnehmenden 
+              Nutzer (Gast) zustande.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">2. Gebühren & Zahlung</h2>
+            <h2 className="text-xl font-semibold mb-3">2. Unkostenbeiträge & Zahlung</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Die Nutzung der Plattform ist grundsätzlich kostenlos. Bei Transaktionen über 
-              die Plattform wird eine Servicegebühr von CHF 2.00 erhoben. Diese Gebühr dient 
-              dem Betrieb der Plattform und wird bei der Buchung direkt einbehalten.
+              Die Nutzung der Plattform ist grundsätzlich kostenlos. Zahlungen gelten als 
+              freiwillige Unkostenbeiträge (für Zutaten/Energie) oder Schenkungen an den Koch. 
+              Bei Transaktionen über die Plattform wird eine Servicegebühr von CHF 2.00 erhoben. 
+              Diese Gebühr dient dem Betrieb der Plattform und wird bei der Buchung direkt 
+              einbehalten.
             </p>
           </section>
 

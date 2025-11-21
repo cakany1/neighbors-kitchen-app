@@ -6,6 +6,12 @@
     "community": "Community",
     "guidelines": "Guidelines"
   },
+  "feed": {
+    "available_meals": "Available Meals",
+    "fresh_meals_subtitle": "Fresh home-cooked meals from your neighborhood",
+    "portfolio_available": "View Chef Portfolio",
+    "available_date": "Available"
+  },
   "profile": {
     "karma": "Karma",
     "mealsShared": "Meals Shared",
