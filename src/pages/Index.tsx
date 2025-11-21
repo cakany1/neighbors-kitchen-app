@@ -76,15 +76,18 @@ const Index = () => {
           </Button>
         </div>
 
-        <main className="container mx-auto px-4 py-16">
+        <main className="container mx-auto px-4 py-16 pb-24 md:pb-16">
           {/* Hero Section - Centered Vertical Layout */}
           <div className="flex flex-col items-center text-center mb-16">
+            {/* Title */}
             <div className="flex items-center justify-center gap-3 mb-6">
               <ChefHat className="w-16 h-16 text-primary" />
               <h1 className="text-6xl font-bold text-foreground">
                 Neighbors Kitchen
               </h1>
             </div>
+            
+            {/* Subtitle */}
             <Badge variant="secondary" className="text-lg px-4 py-2 mb-4">
               📍 {i18n.language === 'de' ? 'Exklusiv in Basel' : 'Exclusive to Basel'}
             </Badge>
@@ -107,9 +110,9 @@ const Index = () => {
                 size="lg"
                 variant="outline"
                 className="text-lg px-8 py-6 h-auto"
-                onClick={() => navigate('/signup')}
+                onClick={() => navigate('/login')}
               >
-                {i18n.language === 'de' ? 'Der Community beitreten' : 'Join Community'}
+                {i18n.language === 'de' ? 'Einloggen' : 'Login'}
               </Button>
             </div>
             
@@ -238,32 +241,35 @@ const Index = () => {
 
   // Mobile App Entry View
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center px-4 py-8 pb-24">
       <div className="text-center mb-8">
         <ChefHat className="w-20 h-20 text-primary mx-auto mb-4" />
         <h1 className="text-4xl font-bold text-foreground mb-2">
           Neighbors Kitchen
         </h1>
-        <p className="text-lg text-muted-foreground">Basel</p>
+        <p className="text-lg text-muted-foreground mb-4">Basel</p>
+        <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+          Teile Essen, baue Vertrauen, rette Lebensmittel in deiner Nachbarschaft
+        </p>
       </div>
 
       <Card className="w-full max-w-md shadow-xl mb-8">
         <CardContent className="pt-6 space-y-4">
           <Button
-            className="w-full h-12"
-            size="lg"
-            onClick={() => navigate('/login')}
-          >
-            Einloggen
-          </Button>
-          
-          <Button
-            className="w-full h-12"
-            variant="default"
+            className="w-full h-12 bg-primary hover:bg-primary/90"
             size="lg"
             onClick={() => navigate('/feed')}
           >
             App Starten
+          </Button>
+          
+          <Button
+            className="w-full h-12"
+            variant="outline"
+            size="lg"
+            onClick={() => navigate('/login')}
+          >
+            Einloggen
           </Button>
 
           <div className="relative">
@@ -289,13 +295,9 @@ const Index = () => {
       </Card>
 
       {/* Mobile Meal Preview */}
-      <div className="w-full max-w-md mb-8">
+      <div className="w-full max-w-md">
         <HeroFeedTeaser />
       </div>
-
-      <p className="text-sm text-muted-foreground text-center max-w-sm">
-        Teile Essen, baue Vertrauen, rette Lebensmittel in deiner Nachbarschaft
-      </p>
     </div>
   );
 };
