@@ -35,9 +35,11 @@ const Signup = () => {
     password: '',
     firstName: '',
     lastName: '',
-    language: 'en',
+    language: 'de',
     gender: '',
     isCouple: false,
+    partnerName: '',
+    partnerGender: '',
     phoneNumber: '',
     address: '',
     city: '',
@@ -126,18 +128,20 @@ const Signup = () => {
           console.log('Orphan user detected! Creating emergency profile...');
           const { error: repairError } = await supabase
             .from('profiles')
-            .insert({
+            .upsert({
               id: loginData.user.id,
               first_name: formData.firstName,
               last_name: formData.lastName,
               languages: [formData.language],
               gender: formData.gender || null,
               is_couple: formData.isCouple,
+              partner_name: formData.isCouple ? formData.partnerName : null,
+              partner_gender: formData.isCouple ? formData.partnerGender : null,
               phone_number: formData.phoneNumber || null,
               private_address: formData.address || null,
               private_city: formData.city || null,
               private_postal_code: formData.postalCode || null,
-            });
+            }, { onConflict: 'id' });
 
           if (repairError) {
             setLoading(false);
@@ -185,23 +189,25 @@ const Signup = () => {
         .eq('id', data.user.id)
         .maybeSingle();
 
-      // Step 4: If no profile exists, create it manually
+      // Step 4: If no profile exists, create it manually with upsert
       if (!existingProfile) {
         console.log('Profile not auto-created, inserting manually...');
         const { error: insertError } = await supabase
           .from('profiles')
-          .insert({
+          .upsert({
             id: data.user.id,
             first_name: formData.firstName,
             last_name: formData.lastName,
             languages: [formData.language],
             gender: formData.gender || null,
             is_couple: formData.isCouple,
+            partner_name: formData.isCouple ? formData.partnerName : null,
+            partner_gender: formData.isCouple ? formData.partnerGender : null,
             phone_number: formData.phoneNumber || null,
             private_address: formData.address || null,
             private_city: formData.city || null,
             private_postal_code: formData.postalCode || null,
-          });
+          }, { onConflict: 'id' });
 
         if (insertError) {
           setLoading(false);
@@ -319,6 +325,40 @@ const Signup = () => {
                 {t('signup.isCouple')}
               </Label>
             </div>
+
+            {/* Partner Fields (Conditional) */}
+            {formData.isCouple && (
+              <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
+                <p className="text-sm font-semibold text-foreground">Partner-Angaben</p>
+                
+                <div>
+                  <Label htmlFor="partnerName">Partner Name</Label>
+                  <Input
+                    id="partnerName"
+                    value={formData.partnerName}
+                    onChange={(e) => setFormData({ ...formData, partnerName: e.target.value })}
+                    placeholder="Maria Müller"
+                    required={formData.isCouple}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="partnerGender">Partner Geschlecht</Label>
+                  <Select 
+                    value={formData.partnerGender} 
+                    onValueChange={(value) => setFormData({ ...formData, partnerGender: value })}
+                  >
+                    <SelectTrigger id="partnerGender">
+                      <SelectValue placeholder="Auswählen..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Männlich</SelectItem>
+                      <SelectItem value="female">Weiblich</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="phoneNumber">{t('signup.phoneNumber')}</Label>

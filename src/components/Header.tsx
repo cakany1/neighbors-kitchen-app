@@ -1,6 +1,7 @@
 import { ChefHat, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -12,13 +13,16 @@ export const Header = () => {
           <ChefHat className="w-6 h-6 text-primary" />
           <h1 className="font-bold text-xl text-foreground">Neighbors Kitchen</h1>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/login')}
-        >
-          <User className="w-5 h-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/login')}
+          >
+            <User className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
     </header>
   );

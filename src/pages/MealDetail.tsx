@@ -491,6 +491,12 @@ const MealDetail = () => {
           {currentUser?.profile?.is_couple && bookingStatus === 'none' && (
             <Card className="border-primary/20 bg-primary/5">
               <CardContent className="pt-6 space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="secondary" className="text-xs">
+                    👫 Als Paar buchen
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">2 Portionen vorausgewählt</span>
+                </div>
                 <Label className="text-sm font-semibold">Portionsanzahl</Label>
                 <RadioGroup 
                   value={bookingQuantity.toString()} 
