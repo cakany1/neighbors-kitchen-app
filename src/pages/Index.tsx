@@ -102,9 +102,9 @@ const Index = () => {
               <Button
                 size="lg"
                 className="text-lg px-8 py-6 h-auto bg-primary hover:bg-primary/90"
-                onClick={() => navigate('/feed')}
+                onClick={() => navigate('/login')}
               >
-                {i18n.language === 'de' ? 'App Starten' : 'Start App'}
+                {i18n.language === 'de' ? 'Jetzt mitmachen' : 'Join Now'}
               </Button>
               <Button
                 size="lg"
@@ -112,12 +112,14 @@ const Index = () => {
                 className="text-lg px-8 py-6 h-auto"
                 onClick={() => navigate('/login')}
               >
-                {i18n.language === 'de' ? 'Einloggen' : 'Login'}
+                {i18n.language === 'de' ? 'Anmelden' : 'Login'}
               </Button>
             </div>
             
             {/* Meal Preview Cards */}
-            <HeroFeedTeaser />
+            <div onClick={() => navigate('/login')} className="cursor-pointer">
+              <HeroFeedTeaser />
+            </div>
           </div>
 
           {/* How it Works */}
@@ -258,9 +260,9 @@ const Index = () => {
           <Button
             className="w-full h-12 bg-primary hover:bg-primary/90"
             size="lg"
-            onClick={() => navigate('/feed')}
+            onClick={() => navigate('/login')}
           >
-            App Starten
+            Jetzt mitmachen
           </Button>
           
           <Button
@@ -269,7 +271,7 @@ const Index = () => {
             size="lg"
             onClick={() => navigate('/login')}
           >
-            Einloggen
+            Anmelden
           </Button>
 
           <div className="relative">
@@ -295,7 +297,7 @@ const Index = () => {
       </Card>
 
       {/* Mobile Meal Preview */}
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md" onClick={() => navigate('/login')} style={{ cursor: 'pointer' }}>
         <HeroFeedTeaser />
       </div>
     </div>

@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { getDistance } from '@/utils/distance';
 import { OnboardingTour } from '@/components/OnboardingTour';
+import { toast } from 'sonner';
 
 const Feed = () => {
   const { t } = useTranslation();
@@ -196,6 +197,22 @@ const Feed = () => {
     const withinRadius = mealsWithDistance.filter(
       (meal) => meal.calculatedDistance <= userRadius
     );
+
+    // Smart Fallback: If no meals within radius, show 5 most recent meals from anywhere
+    if (withinRadius.length === 0 && mealsWithDistance.length > 0) {
+      const fallbackMeals = mealsWithDistance
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, 5);
+      
+      // Show toast to inform user
+      if (fallbackMeals.length > 0) {
+        setTimeout(() => {
+          toast.info('Keine Treffer in der Nähe – hier sind Angebote aus ganz Basel.', { duration: 5000 });
+        }, 500);
+      }
+      
+      return fallbackMeals;
+    }
 
     // Sort by distance (nearest first)
     return withinRadius.sort((a, b) => a.calculatedDistance - b.calculatedDistance);

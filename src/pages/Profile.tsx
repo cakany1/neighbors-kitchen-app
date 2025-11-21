@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Star, Award, ChefHat, Heart, Globe, Shield, Loader2 } from 'lucide-react';
+import { Star, Award, ChefHat, Heart, Globe, Shield, Loader2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { allergenOptions, dislikeCategories } from '@/utils/ingredientDatabase';
 import { supabase } from '@/integrations/supabase/client';
@@ -526,12 +526,67 @@ const Profile = () => {
         )}
         
         {/* Profile Header */}
-        {/* Profile Header */}
         <Card className="mb-6">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-3xl">
-                👤
+              <div className="relative w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-3xl overflow-hidden group">
+                {profile?.partner_photo_url ? (
+                  <img src={profile.partner_photo_url} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <span>👤</span>
+                )}
+                <label 
+                  htmlFor="avatar-upload" 
+                  className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  <Upload className="w-6 h-6 text-white" />
+                </label>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+
+                    if (file.size > 5 * 1024 * 1024) {
+                      toast.error('Datei zu groß (max 5MB)');
+                      return;
+                    }
+
+                    if (!file.type.startsWith('image/')) {
+                      toast.error('Nur Bilder sind erlaubt');
+                      return;
+                    }
+
+                    try {
+                      const fileExt = file.name.split('.').pop();
+                      const fileName = `${currentUser.id}-avatar-${Date.now()}.${fileExt}`;
+
+                      const { error: uploadError } = await supabase.storage
+                        .from('gallery')
+                        .upload(fileName, file);
+
+                      if (uploadError) throw uploadError;
+
+                      const { data } = supabase.storage
+                        .from('gallery')
+                        .getPublicUrl(fileName);
+
+                      await supabase
+                        .from('profiles')
+                        .update({ partner_photo_url: data.publicUrl })
+                        .eq('id', currentUser.id);
+
+                      toast.success('Profilbild aktualisiert!');
+                      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                    } catch (error) {
+                      console.error('Upload error:', error);
+                      toast.error('Fehler beim Hochladen');
+                    }
+                  }}
+                />
               </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
