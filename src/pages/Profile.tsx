@@ -19,6 +19,8 @@ import { allergenOptions, dislikeCategories } from '@/utils/ingredientDatabase';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import RadiusSliderMap from '@/components/maps/RadiusSliderMap';
+import GalleryUpload from '@/components/GalleryUpload';
+import GalleryGrid from '@/components/GalleryGrid';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -575,6 +577,23 @@ const Profile = () => {
                 <p className="text-xs text-muted-foreground">Respect hosts and bring your own container</p>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Chef Portfolio Gallery */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ChefHat className="w-5 h-5 text-primary" />
+              My Food Gallery
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Show off your cooking skills! Upload photos of your meals to build trust with neighbors.
+            </p>
+            <GalleryUpload userId={currentUser.id} />
+            <GalleryGrid userId={currentUser.id} isOwnProfile={true} />
           </CardContent>
         </Card>
 

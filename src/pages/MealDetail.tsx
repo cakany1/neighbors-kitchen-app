@@ -480,8 +480,10 @@ const MealDetail = () => {
       <BottomNav />
       <ChatModal 
         open={chatOpen} 
-        onOpenChange={setChatOpen} 
+        onOpenChange={setChatOpen}
+        chefId={meal.chef_id}
         chefName={meal.chef?.first_name || 'Chef'}
+        mealId={meal.id}
         mealTitle={meal.title}
       />
     </div>
