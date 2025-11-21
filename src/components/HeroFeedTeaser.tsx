@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 const mockMeals = [
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&q=80',
     title: 'Hausgemachte Kürbis-Lasagne 🎃',
     restaurantValue: 'CHF 25.-',
     chef: 'Nonna Rosa',
