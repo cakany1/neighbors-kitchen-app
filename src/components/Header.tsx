@@ -1,4 +1,4 @@
-import { ChefHat, User } from 'lucide-react';
+import { ChefHat, User, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -15,6 +15,14 @@ export const Header = () => {
         </div>
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/faq')}
+            title="Hilfe &amp; FAQ"
+          >
+            <HelpCircle className="w-5 h-5" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"

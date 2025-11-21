@@ -7,6 +7,8 @@ import { VerificationBadge } from '@/components/VerificationBadge';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDistance } from '@/utils/distance';
+import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 interface MealCardProps {
   meal: Meal;
@@ -88,6 +90,11 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
               Ghost Mode
             </Badge>
           )}
+          {meal.availablePortions > 0 && (
+            <Badge className="bg-primary/90 backdrop-blur text-primary-foreground font-bold">
+              Noch {meal.availablePortions}
+            </Badge>
+          )}
         </div>
       </div>
       
@@ -135,7 +142,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
         {meal.scheduledDate && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3 bg-muted px-2 py-1 rounded-md w-fit">
             <Calendar className="w-3.5 h-3.5" />
-            <span>Available: {new Date(meal.scheduledDate).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+            <span>{format(new Date(meal.scheduledDate), 'EEE, d. MMM', { locale: de })}</span>
           </div>
         )}
         
