@@ -23,17 +23,68 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        setLoading(false);
+        toast.error(error.message || t('auth.login_failed'), {
+          duration: 10000,
+        });
+        return; // Don't navigate on error
+      }
 
-      toast.success(t('auth.welcome_toast'));
-      navigate('/');
+      if (!data.user) {
+        setLoading(false);
+        toast.error('Anmeldung fehlgeschlagen', {
+          duration: 10000,
+        });
+        return;
+      }
+
+      // PROFILE CHECK: Verify profile exists (self-healing for orphaned users)
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+      // REPAIR: If profile is missing, create emergency profile
+      if (!existingProfile) {
+        console.log('Orphan user detected after login! Creating emergency profile...');
+        const { error: repairError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            first_name: data.user.user_metadata?.first_name || 'User',
+            last_name: data.user.user_metadata?.last_name || '',
+            languages: ['de'],
+          });
+
+        if (repairError) {
+          setLoading(false);
+          console.error('Profile repair failed:', repairError);
+          toast.error('Profil-Reparatur fehlgeschlagen. Bitte kontaktiere den Support.', {
+            duration: 10000,
+          });
+          return;
+        }
+
+        toast.success('Profil wiederhergestellt! Willkommen zurück.');
+      } else {
+        toast.success(t('auth.welcome_toast'));
+      }
+
+      navigate('/feed');
     } catch (error: any) {
-      toast.error(error.message || t('auth.login_failed'));
+      setLoading(false);
+      console.error('Login error:', error);
+      toast.error(error.message || t('auth.login_failed'), {
+        duration: 10000,
+      });
+      // Don't navigate on error
     } finally {
       setLoading(false);
     }

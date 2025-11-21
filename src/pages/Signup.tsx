@@ -88,18 +88,91 @@ const Signup = () => {
         },
       });
 
-      if (error) {
-        // Handle duplicate user error
-        if (error.message.includes('already registered') || error.message.includes('User already registered')) {
-          toast.error('Dieses Konto existiert bereits. Bitte melde dich an.');
-          navigate('/login');
+      // AUTO-RECOVERY: If user already exists, try to log them in and repair profile
+      if (error && (error.message.includes('already registered') || error.message.includes('User already registered'))) {
+        console.log('User already exists, attempting auto-recovery...');
+        
+        // Try to log them in
+        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (loginError) {
+          setLoading(false);
+          toast.error('Dieses Konto existiert bereits, aber das Passwort ist falsch. Bitte melde dich an.', {
+            duration: 10000,
+          });
+          return; // Don't navigate, let user see the message
+        }
+
+        if (!loginData.user) {
+          setLoading(false);
+          toast.error('Anmeldung fehlgeschlagen. Bitte versuche es erneut.', {
+            duration: 10000,
+          });
           return;
         }
-        throw error;
+
+        // Check if profile exists
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', loginData.user.id)
+          .maybeSingle();
+
+        // REPAIR: If profile is missing, create it (Emergency Profile Creation)
+        if (!existingProfile) {
+          console.log('Orphan user detected! Creating emergency profile...');
+          const { error: repairError } = await supabase
+            .from('profiles')
+            .insert({
+              id: loginData.user.id,
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              languages: [formData.language],
+              gender: formData.gender || null,
+              is_couple: formData.isCouple,
+              phone_number: formData.phoneNumber || null,
+              private_address: formData.address || null,
+              private_city: formData.city || null,
+              private_postal_code: formData.postalCode || null,
+            });
+
+          if (repairError) {
+            setLoading(false);
+            toast.error('Profil-Reparatur fehlgeschlagen. Bitte kontaktiere den Support.', {
+              duration: 10000,
+            });
+            return;
+          }
+
+          toast.success('Konto wiederhergestellt! Willkommen zurück.');
+          navigate('/feed');
+          return;
+        }
+
+        // Profile exists, just log them in
+        toast.success('Willkommen zurück!');
+        navigate('/feed');
+        return;
+      }
+
+      // Other signup errors
+      if (error) {
+        setLoading(false);
+        toast.error(error.message || 'Registrierung fehlgeschlagen', {
+          duration: 10000,
+        });
+        return; // Don't navigate on error
       }
 
       if (!data.user) {
-        throw new Error('Signup failed: No user returned');
+        setLoading(false);
+        toast.error('Registrierung fehlgeschlagen: Kein Benutzer erstellt', {
+          duration: 10000,
+        });
+        return;
       }
 
       // Step 2: Wait a moment for trigger to fire
@@ -131,9 +204,12 @@ const Signup = () => {
           });
 
         if (insertError) {
+          setLoading(false);
           console.error('Manual profile creation failed:', insertError);
-          toast.error('Profil konnte nicht erstellt werden. Bitte kontaktiere den Support.');
-          throw insertError;
+          toast.error('Profil konnte nicht erstellt werden. Bitte kontaktiere den Support.', {
+            duration: 10000,
+          });
+          return; // Don't navigate on error
         }
       } else {
         // Step 5: Update existing profile with additional fields
@@ -153,10 +229,14 @@ const Signup = () => {
       }
 
       toast.success(t('auth.account_created'));
-      navigate('/');
+      navigate('/feed');
     } catch (error: any) {
+      setLoading(false);
       console.error('Signup error:', error);
-      toast.error(error.message || t('auth.account_creation_failed'));
+      toast.error(error.message || t('auth.account_creation_failed'), {
+        duration: 10000,
+      });
+      // Don't navigate on error - let user read the message
     } finally {
       setLoading(false);
     }
