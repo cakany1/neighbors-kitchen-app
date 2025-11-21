@@ -430,37 +430,37 @@ const AddMeal = () => {
                   type="button"
                   variant={handoverMode === 'pickup_box' ? 'default' : 'outline'}
                   onClick={() => setHandoverMode('pickup_box')}
-                  className="h-auto py-3 flex-col"
+                  className="h-auto min-h-[80px] py-3 flex flex-col justify-center items-center whitespace-normal text-center"
                 >
                   <span className="text-2xl mb-1">📦</span>
-                  <span className="text-xs">Abholung (Tupperware mitbringen)</span>
+                  <span className="text-xs sm:text-sm leading-tight">Abholung (Tupperware)</span>
                 </Button>
                 <Button
                   type="button"
                   variant={handoverMode === 'neighbor_plate' ? 'default' : 'outline'}
                   onClick={() => setHandoverMode('neighbor_plate')}
-                  className="h-auto py-3 flex-col"
+                  className="h-auto min-h-[80px] py-3 flex flex-col justify-center items-center whitespace-normal text-center"
                 >
                   <span className="text-2xl mb-1">🍽️</span>
-                  <span className="text-xs">Nachbar (eigener Teller)</span>
+                  <span className="text-xs sm:text-sm leading-tight">Nachbar (Teller)</span>
                 </Button>
                 <Button
                   type="button"
                   variant={handoverMode === 'ghost_mode' ? 'default' : 'outline'}
                   onClick={() => setHandoverMode('ghost_mode')}
-                  className="h-auto py-3 flex-col"
+                  className="h-auto min-h-[80px] py-3 flex flex-col justify-center items-center whitespace-normal text-center"
                 >
                   <span className="text-2xl mb-1">👻</span>
-                  <span className="text-xs">Kontaktlos (Eingang/Briefkasten)</span>
+                  <span className="text-xs sm:text-sm leading-tight">Kontaktlos (Eingang)</span>
                 </Button>
                 <Button
                   type="button"
                   variant={handoverMode === 'dine_in' ? 'default' : 'outline'}
                   onClick={() => setHandoverMode('dine_in')}
-                  className="h-auto py-3 flex-col"
+                  className="h-auto min-h-[80px] py-3 flex flex-col justify-center items-center whitespace-normal text-center"
                 >
                   <span className="text-2xl mb-1">🍴</span>
-                  <span className="text-xs">Zu Gast (Am Tisch essen)</span>
+                  <span className="text-xs sm:text-sm leading-tight">Zu Gast (Am Tisch)</span>
                 </Button>
               </div>
 
