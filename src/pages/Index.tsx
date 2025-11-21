@@ -238,8 +238,8 @@ const Index = () => {
 
   // Mobile App Entry View
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center px-4">
-      <div className="text-center mb-12">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center px-4 py-8">
+      <div className="text-center mb-8">
         <ChefHat className="w-20 h-20 text-primary mx-auto mb-4" />
         <h1 className="text-4xl font-bold text-foreground mb-2">
           Neighbors Kitchen
@@ -247,23 +247,23 @@ const Index = () => {
         <p className="text-lg text-muted-foreground">Basel</p>
       </div>
 
-      <Card className="w-full max-w-md shadow-xl">
+      <Card className="w-full max-w-md shadow-xl mb-8">
         <CardContent className="pt-6 space-y-4">
           <Button
             className="w-full h-12"
             size="lg"
             onClick={() => navigate('/login')}
           >
-            Anmelden
+            Einloggen
           </Button>
           
           <Button
             className="w-full h-12"
-            variant="outline"
+            variant="default"
             size="lg"
-            onClick={() => navigate('/signup')}
+            onClick={() => navigate('/feed')}
           >
-            Registrieren
+            App Starten
           </Button>
 
           <div className="relative">
@@ -288,7 +288,12 @@ const Index = () => {
         </CardContent>
       </Card>
 
-      <p className="text-sm text-muted-foreground text-center mt-8 max-w-sm">
+      {/* Mobile Meal Preview */}
+      <div className="w-full max-w-md mb-8">
+        <HeroFeedTeaser />
+      </div>
+
+      <p className="text-sm text-muted-foreground text-center max-w-sm">
         Teile Essen, baue Vertrauen, rette Lebensmittel in deiner Nachbarschaft
       </p>
     </div>
