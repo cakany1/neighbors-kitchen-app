@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { allergenOptions, dislikeCategories } from '@/utils/ingredientDatabase';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import RadiusSliderMap from '@/components/maps/RadiusSliderMap';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -383,9 +384,22 @@ const Profile = () => {
               <div className="flex items-center justify-between">
                 <Label htmlFor="notification-radius">Notification Radius</Label>
                 <span className="text-sm font-medium text-primary">
-                  {formData.notification_radius}m
+                  {(formData.notification_radius / 1000).toFixed(1)} km
                 </span>
               </div>
+              
+              {profile?.latitude && profile?.longitude ? (
+                <RadiusSliderMap 
+                  lat={profile.latitude}
+                  lng={profile.longitude}
+                  radius={formData.notification_radius / 1000}
+                />
+              ) : (
+                <div className="w-full h-48 rounded-lg border border-border bg-muted flex items-center justify-center">
+                  <p className="text-sm text-muted-foreground">Add your address to see the map</p>
+                </div>
+              )}
+              
               <Slider
                 id="notification-radius"
                 min={100}
