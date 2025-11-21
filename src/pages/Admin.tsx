@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -161,6 +161,37 @@ const Admin = () => {
     },
   });
 
+  // Generate image mutation
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  
+  const generatePumpkinLasagnaImage = async () => {
+    setIsGeneratingImage(true);
+    toast.loading('Generating authentic pumpkin lasagna image...');
+    
+    try {
+      const prompt = `A rustic, rectangular ceramic baking dish filled with a freshly baked, homemade pumpkin lasagna, sitting on a worn wooden kitchen table. The top layer is bubbling with golden-brown, melted mozzarella and parmesan cheese, with slightly caramelized crispy edges. The garnish is scattered crispy fried sage leaves and a light dusting of nutmeg. A serving spatula is lifting the first corner piece, revealing creamy layers of béchamel sauce, tender pasta sheets, and visible chunks of roasted orange Hokkaido pumpkin. In the soft-focus background, there is a crumpled linen towel, a small bowl of grated parmesan, and natural light coming from a kitchen window. The overall mood is cozy, warm, and inviting, food photography style. No fresh green herbs like basil or parsley. Photorealistic, authentic, rustic.`;
+      
+      const { data, error } = await supabase.functions.invoke('generate-meal-image', {
+        body: { 
+          prompt,
+          mealId: '02794e5e-20c5-412a-89ba-596d6177b4a6'
+        }
+      });
+
+      if (error) throw error;
+      
+      toast.dismiss();
+      toast.success('Image generated and updated successfully!');
+      queryClient.invalidateQueries({ queryKey: ['meals'] });
+    } catch (error) {
+      toast.dismiss();
+      toast.error('Failed to generate image: ' + (error as Error).message);
+      console.error('Image generation error:', error);
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
+
   if (adminCheckLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -206,7 +237,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="verifications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="verifications">
               Verifications
               {pendingVerifications && pendingVerifications.length > 0 && (
@@ -224,6 +255,7 @@ const Admin = () => {
                 </Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="utilities">Utilities</TabsTrigger>
           </TabsList>
 
           {/* Verification Queue Tab */}
@@ -415,6 +447,44 @@ const Admin = () => {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Utilities Tab */}
+          <TabsContent value="utilities" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ImagePlus className="w-5 h-5" />
+                  AI Image Generation
+                </CardTitle>
+                <CardDescription>
+                  Generate authentic meal images using AI for demo content
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    This utility uses Lovable AI to generate photorealistic food images for the Kürbis-Lasagne demo meal.
+                  </AlertDescription>
+                </Alert>
+                
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Generate Pumpkin Lasagna Image</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Creates an authentic, rustic homemade pumpkin lasagna photo to replace the stock image.
+                  </p>
+                  <Button
+                    onClick={generatePumpkinLasagnaImage}
+                    disabled={isGeneratingImage}
+                    className="w-full"
+                  >
+                    <ImagePlus className="w-4 h-4 mr-2" />
+                    {isGeneratingImage ? 'Generating...' : 'Generate Image'}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
