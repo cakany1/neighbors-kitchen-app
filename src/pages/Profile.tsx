@@ -332,28 +332,28 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Personal Details */}
+        {/* Persönliche Angaben */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Personal Details</CardTitle>
+            <CardTitle>Persönliche Angaben</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="nickname">Nickname</Label>
+              <Label htmlFor="nickname">Spitzname</Label>
               <Input
                 id="nickname"
                 type="text"
-                placeholder="How neighbors should call you"
+                placeholder="Wie Nachbarn dich nennen sollen"
                 value={formData.nickname}
                 onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
               />
             </div>
             <div>
-              <Label htmlFor="age">Age (Optional)</Label>
+              <Label htmlFor="age">Alter (Optional)</Label>
               <Input
                 id="age"
                 type="number"
-                placeholder="Your age"
+                placeholder="Dein Alter"
                 value={formData.age || ''}
                 onChange={(e) => setFormData({ 
                   ...formData, 
@@ -363,13 +363,13 @@ const Profile = () => {
             </div>
             
             <div>
-              <Label htmlFor="gender">Gender (for safety features)</Label>
+              <Label htmlFor="gender">Geschlecht (für Sicherheitsfunktionen)</Label>
               <Select
                 value={formData.gender || undefined}
                 onValueChange={(value) => setFormData({ ...formData, gender: value })}
               >
                 <SelectTrigger id="gender">
-                  <SelectValue placeholder="Select gender..." />
+                  <SelectValue placeholder="Geschlecht auswählen..." />
                 </SelectTrigger>
                 <SelectContent className="bg-background border-border z-50">
                   {genderOptions.map((option) => (
@@ -380,20 +380,20 @@ const Profile = () => {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">
-                💡 Enables "Ladies Only" mode for women chefs
+                💡 Ermöglicht "Ladies Only"-Modus für Köchinnen
               </p>
             </div>
             
-            {/* Partner Details (Couples Only) */}
+            {/* Partner-Angaben (Nur für Paare) */}
             {profile?.is_couple && (
               <div className="pt-4 border-t border-border space-y-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Heart className="w-5 h-5 text-primary" />
-                  <Label className="text-base font-semibold">Partner Details (Required for Couples)</Label>
+                  <Label className="text-base font-semibold">Partner-Angaben (Pflichtfeld für Paare)</Label>
                 </div>
                 
                 <div>
-                  <Label htmlFor="partner-photo">Partner's Photo URL</Label>
+                  <Label htmlFor="partner-photo">Partner Foto-URL</Label>
                   <Input
                     id="partner-photo"
                     type="text"
@@ -767,10 +767,10 @@ const Profile = () => {
         {/* Blocked Users Management */}
         <BlockedUsersList currentUserId={currentUser.id} />
 
-        {/* App Feedback / Bug Report */}
+        {/* App-Feedback / Fehlerberichte */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Help Us Improve</CardTitle>
+            <CardTitle>Hilf uns zu verbessern</CardTitle>
           </CardHeader>
           <CardContent>
             <FeedbackDialog userId={currentUser.id} />
@@ -830,7 +830,7 @@ const Profile = () => {
             {updateProfileMutation.isPending && (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             )}
-            {updateProfileMutation.isPending ? 'Saving...' : 'Save Profile'}
+            {updateProfileMutation.isPending ? 'Speichern...' : 'Profil speichern'}
           </Button>
         </div>
       </main>

@@ -77,22 +77,22 @@ export const ingredientDB: Record<string, string[]> = {
   "tempeh": ["soy"],
 };
 
-// The Official 14 EU Allergens
+// The Official 14 EU Allergens - German Labels
 export const allergenOptions = [
-  { value: "gluten", label: "Gluten (Cereals)" },
-  { value: "crustaceans", label: "Crustaceans" },
-  { value: "eggs", label: "Eggs" },
-  { value: "fish", label: "Fish" },
-  { value: "peanuts", label: "Peanuts" },
-  { value: "soy", label: "Soy" },
-  { value: "dairy", label: "Dairy (Milk)" },
-  { value: "nuts", label: "Tree Nuts" },
-  { value: "celery", label: "Celery" },
-  { value: "mustard", label: "Mustard" },
-  { value: "sesame", label: "Sesame Seeds" },
-  { value: "sulphites", label: "Sulphites" },
-  { value: "lupin", label: "Lupin" },
-  { value: "molluscs", label: "Molluscs" },
+  { value: "gluten", label: "Gluten (Getreide)" },
+  { value: "crustaceans", label: "Krebstiere" },
+  { value: "eggs", label: "Eier" },
+  { value: "fish", label: "Fisch" },
+  { value: "peanuts", label: "Erdnüsse" },
+  { value: "soy", label: "Soja" },
+  { value: "dairy", label: "Milch / Laktose" },
+  { value: "nuts", label: "Schalenfrüchte (Nüsse)" },
+  { value: "celery", label: "Sellerie" },
+  { value: "mustard", label: "Senf" },
+  { value: "sesame", label: "Sesam" },
+  { value: "sulphites", label: "Sulfite" },
+  { value: "lupin", label: "Lupinen" },
+  { value: "molluscs", label: "Weichtiere" },
 ];
 
 // Categorized Dislikes (Accordion UI)
