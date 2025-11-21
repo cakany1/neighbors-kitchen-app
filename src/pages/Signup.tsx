@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ChefHat } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui/progress';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -42,6 +43,29 @@ const Signup = () => {
     city: '',
     postalCode: '',
   });
+
+  // Password strength calculation
+  const passwordStrength = useMemo(() => {
+    const pwd = formData.password;
+    if (pwd.length === 0) return { level: 0, label: '', color: '' };
+    
+    if (pwd.length < 6) {
+      return { level: 25, label: 'Zu kurz', color: 'bg-red-500' };
+    }
+    
+    const hasNumber = /\d/.test(pwd);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+    
+    if (pwd.length >= 10 && hasNumber && hasSpecialChar) {
+      return { level: 100, label: 'Sicher', color: 'bg-green-500' };
+    }
+    
+    if (pwd.length >= 8 && hasNumber) {
+      return { level: 65, label: 'Mittel', color: 'bg-yellow-500' };
+    }
+    
+    return { level: 40, label: 'Schwach', color: 'bg-orange-500' };
+  }, [formData.password]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -228,7 +252,7 @@ const Signup = () => {
               />
             </div>
 
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
@@ -239,6 +263,26 @@ const Signup = () => {
                 required
                 minLength={6}
               />
+              {formData.password && (
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">Passwort-Sicherheit:</span>
+                    <span className={`font-medium ${
+                      passwordStrength.level >= 80 ? 'text-green-600' :
+                      passwordStrength.level >= 60 ? 'text-yellow-600' :
+                      'text-red-600'
+                    }`}>
+                      {passwordStrength.label}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-300 ${passwordStrength.color}`}
+                      style={{ width: `${passwordStrength.level}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
