@@ -134,6 +134,7 @@ export const exchangeOptions = [
   { value: "dessert", label: "Dessert / Süsses", icon: "🍰" },
   { value: "produce", label: "Früchte / Gemüse", icon: "🍎" },
   { value: "surprise", label: "Überrasch mich!", icon: "🎁" },
+  { value: "anything", label: "Egal / Überrasch mich", icon: "✨" },
   { value: "smile", label: "Nichts / Nur ein Lächeln (Gratis)", icon: "😊" },
 ];
 

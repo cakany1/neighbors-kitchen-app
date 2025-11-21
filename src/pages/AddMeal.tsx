@@ -216,7 +216,7 @@ const AddMeal = () => {
           {/* Time Selection - Smart Chips */}
           <Card>
             <CardContent className="pt-6 space-y-4">
-              <Label className="text-lg font-semibold">Abholzeit * (24h Format)</Label>
+              <Label className="text-lg font-semibold">Abholzeit *</Label>
               <div className="grid grid-cols-2 gap-3">
                 {['17:00', '18:00', '19:00', '20:00'].map((time) => (
                   <Button
@@ -245,7 +245,6 @@ const AddMeal = () => {
                     <Input
                       id="collectionWindowStart"
                       type="time"
-                      step="900"
                       value={formData.collectionWindowStart}
                       onChange={(e) => setFormData({ ...formData, collectionWindowStart: e.target.value })}
                       required
@@ -256,7 +255,6 @@ const AddMeal = () => {
                     <Input
                       id="collectionWindowEnd"
                       type="time"
-                      step="900"
                       value={formData.collectionWindowEnd}
                       onChange={(e) => setFormData({ ...formData, collectionWindowEnd: e.target.value })}
                     />
