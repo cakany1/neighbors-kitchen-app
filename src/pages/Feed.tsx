@@ -34,9 +34,38 @@ const Feed = () => {
 
   // Fetch meals from database with chef data AND coordinates in a single query
   const { data: meals, isLoading } = useQuery({
-    queryKey: ['meals'],
+    queryKey: ['meals', currentUser?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First, get blocked users list for the current user
+      let blockedUserIds: string[] = [];
+      let usersWhoBlockedMe: string[] = [];
+      
+      if (currentUser?.id) {
+        // Get users that current user has blocked
+        const { data: blockedByMe } = await supabase
+          .from('blocked_users')
+          .select('blocked_id')
+          .eq('blocker_id', currentUser.id);
+        
+        if (blockedByMe) {
+          blockedUserIds = blockedByMe.map(b => b.blocked_id);
+        }
+        
+        // Get users who have blocked the current user (reciprocal blocking)
+        const { data: blockedMe } = await supabase
+          .from('blocked_users')
+          .select('blocker_id')
+          .eq('blocked_id', currentUser.id);
+        
+        if (blockedMe) {
+          usersWhoBlockedMe = blockedMe.map(b => b.blocker_id);
+        }
+      }
+      
+      const allBlockedUsers = [...blockedUserIds, ...usersWhoBlockedMe];
+      
+      // Build the query
+      let query = supabase
         .from('meals')
         .select(`
           *,
@@ -50,6 +79,13 @@ const Feed = () => {
           )
         `)
         .order('created_at', { ascending: false });
+      
+      // Filter out meals from blocked users if there are any
+      if (allBlockedUsers.length > 0) {
+        query = query.not('chef_id', 'in', `(${allBlockedUsers.join(',')})`);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       return data;

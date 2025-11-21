@@ -21,6 +21,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import RadiusSliderMap from '@/components/maps/RadiusSliderMap';
 import GalleryUpload from '@/components/GalleryUpload';
 import GalleryGrid from '@/components/GalleryGrid';
+import { BlockedUsersList } from '@/components/BlockedUsersList';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -680,6 +681,9 @@ const Profile = () => {
             <GalleryGrid userId={currentUser.id} isOwnProfile={true} />
           </CardContent>
         </Card>
+
+        {/* Blocked Users Management */}
+        <BlockedUsersList currentUserId={currentUser.id} />
 
         {/* Community Guidelines */}
         <Card>
