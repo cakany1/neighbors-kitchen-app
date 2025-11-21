@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ interface BlockedUsersListProps {
 }
 
 export function BlockedUsersList({ currentUserId }: BlockedUsersListProps) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [unblockUserId, setUnblockUserId] = useState<string | null>(null);
 
@@ -103,11 +105,11 @@ export function BlockedUsersList({ currentUserId }: BlockedUsersListProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5" />
-            Blocked Users
+            {t('profile.blocked_title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Loading...</p>
+          <p className="text-sm text-muted-foreground">Lädt...</p>
         </CardContent>
       </Card>
     );
@@ -121,16 +123,16 @@ export function BlockedUsersList({ currentUserId }: BlockedUsersListProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-destructive" />
-            Blocked Users
+            {t('profile.blocked_title')}
           </CardTitle>
           <CardDescription>
-            Users you've blocked won't see your meals or be able to contact you
+            {t('profile.blocked_desc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {blockedUsers.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              You haven't blocked anyone yet.
+              {t('profile.no_blocked')}
             </p>
           ) : (
             <div className="space-y-3">
@@ -156,7 +158,7 @@ export function BlockedUsersList({ currentUserId }: BlockedUsersListProps) {
                       )}
                     </div>
                     <Badge variant="destructive" className="ml-2">
-                      Blocked
+                      {t('profile.blocked_badge')}
                     </Badge>
                   </div>
                   <Button
@@ -178,27 +180,24 @@ export function BlockedUsersList({ currentUserId }: BlockedUsersListProps) {
       <AlertDialog open={!!unblockUserId} onOpenChange={(open) => !open && setUnblockUserId(null)}>
         <AlertDialogContent className="bg-background border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle>Unblock User?</AlertDialogTitle>
+            <AlertDialogTitle>{t('profile.unblock_confirm_title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to unblock{' '}
-              {selectedBlockedUser && (
-                <>
-                  {selectedBlockedUser.blocked_user.first_name}{' '}
-                  {selectedBlockedUser.blocked_user.last_name}
-                </>
-              )}
-              ? They will be able to see your meals and contact you again.
+              {t('profile.unblock_confirm_desc', {
+                name: selectedBlockedUser 
+                  ? `${selectedBlockedUser.blocked_user.first_name} ${selectedBlockedUser.blocked_user.last_name}`
+                  : ''
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={unblockMutation.isPending}>
-              Cancel
+              {t('profile.unblock_cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => unblockUserId && handleUnblock(unblockUserId)}
               disabled={unblockMutation.isPending}
             >
-              {unblockMutation.isPending ? 'Unblocking...' : 'Unblock'}
+              {unblockMutation.isPending ? t('profile.unblocking') : t('profile.unblock_action')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
