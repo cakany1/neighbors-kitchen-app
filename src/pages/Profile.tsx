@@ -25,6 +25,9 @@ import GalleryGrid from '@/components/GalleryGrid';
 import { BlockedUsersList } from '@/components/BlockedUsersList';
 import { FeedbackDialog } from '@/components/FeedbackDialog';
 
+import { VerificationBadge } from '@/components/VerificationBadge';
+import { VerificationDialog } from '@/components/VerificationDialog';
+
 const languages = [
   { code: 'en', name: 'English' },
   { code: 'de', name: 'Deutsch (German)' },
@@ -296,6 +299,28 @@ const Profile = () => {
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
+        {/* Verification Request Card */}
+        {(profile?.verification_status === 'pending' || profile?.verification_status === 'rejected' || !profile?.id_verified) && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-primary" />
+                Nutzer-Verifizierung
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Lade ein Foto mit deinem Ausweis hoch, um dein Profil zu verifizieren und das ✓ Badge zu erhalten.
+              </p>
+              <VerificationDialog
+                userId={currentUser.id}
+                verificationStatus={profile?.verification_status || 'pending'}
+                onSuccess={() => queryClient.invalidateQueries({ queryKey: ['currentUser'] })}
+              />
+            </CardContent>
+          </Card>
+        )}
+        
         {/* Admin Dashboard Access */}
         {isAdmin && (
           <Card 

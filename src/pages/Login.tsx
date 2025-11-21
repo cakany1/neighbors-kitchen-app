@@ -99,7 +99,7 @@ const Login = () => {
           onClick={() => navigate('/')}
           className="gap-2"
         >
-          ← Zurück zur Startseite
+          {t('auth.back_to_home')}
         </Button>
       </div>
       <Card className="w-full max-w-md">

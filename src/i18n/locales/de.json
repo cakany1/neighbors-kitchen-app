@@ -38,7 +38,8 @@
     "welcome_toast": "Willkommen zurück!",
     "login_failed": "Anmeldung fehlgeschlagen",
     "account_created": "Konto erstellt! Willkommen bei Neighbors Kitchen 🎉",
-    "account_creation_failed": "Kontoerstellung fehlgeschlagen"
+    "account_creation_failed": "Kontoerstellung fehlgeschlagen",
+    "back_to_home": "← Zurück zur Startseite"
   },
   "chat": {
     "loading": "Lädt...",
