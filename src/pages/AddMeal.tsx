@@ -11,9 +11,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload, ChefHat, X, Gift, AlertCircle } from 'lucide-react';
+import { Upload, ChefHat, Gift, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { detectAllergens, barterOptions } from '@/utils/ingredientDatabase';
+import { barterOptions } from '@/utils/ingredientDatabase';
+import { TagSelector } from '@/components/meals/TagSelector';
 
 const AddMeal = () => {
   const navigate = useNavigate();
@@ -21,16 +22,12 @@ const AddMeal = () => {
   const [exchangeMode, setExchangeMode] = useState<'money' | 'barter'>('money');
   const [handoverMode, setHandoverMode] = useState<'pickup_box' | 'neighbor_plate' | 'ghost_mode' | 'dine_in'>('pickup_box');
   const [identityReveal, setIdentityReveal] = useState<'real_name' | 'nickname'>('nickname');
+  const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
-  const [ingredients, setIngredients] = useState<string[]>([]);
-  const [ingredientInput, setIngredientInput] = useState('');
-  const [detectedAllergens, setDetectedAllergens] = useState<string[]>([]);
   const [selectedBarterItems, setSelectedBarterItems] = useState<string[]>([]);
   const [priceDetectiveLoading, setPriceDetectiveLoading] = useState(false);
   const [priceDetectiveResult, setPriceDetectiveResult] = useState<{ min: number; max: number } | null>(null);
   const [useStockPhoto, setUseStockPhoto] = useState(false);
-  const [ingredientAutoFillLoading, setIngredientAutoFillLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -47,16 +44,6 @@ const AddMeal = () => {
     pickupInstructions: '',
   });
 
-  // Auto-detect allergens when ingredients change
-  useEffect(() => {
-    if (ingredients.length > 0) {
-      const detected = detectAllergens(ingredients);
-      setDetectedAllergens(detected);
-    } else {
-      setDetectedAllergens([]);
-    }
-  }, [ingredients]);
-
   // Auto-run Price Detective when title changes
   useEffect(() => {
     if (formData.title.trim() && exchangeMode === 'money') {
@@ -67,28 +54,6 @@ const AddMeal = () => {
       return () => clearTimeout(timer);
     }
   }, [formData.title, exchangeMode]);
-
-  const handleAddTag = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
-      setTagInput('');
-    }
-  };
-
-  const handleRemoveTag = (tag: string) => {
-    setTags(tags.filter(t => t !== tag));
-  };
-
-  const handleAddIngredient = () => {
-    if (ingredientInput.trim() && !ingredients.includes(ingredientInput.trim())) {
-      setIngredients([...ingredients, ingredientInput.trim()]);
-      setIngredientInput('');
-    }
-  };
-
-  const handleRemoveIngredient = (ingredient: string) => {
-    setIngredients(ingredients.filter(i => i !== ingredient));
-  };
 
   const toggleBarterItem = (item: string) => {
     setSelectedBarterItems(prev =>
@@ -122,60 +87,6 @@ const AddMeal = () => {
       const avgPrice = (priceDetectiveResult.min + priceDetectiveResult.max) / 2;
       setFormData({ ...formData, restaurantReferencePrice: avgPrice.toFixed(2) });
       toast.success('Average price applied!');
-    }
-  };
-
-  // Auto-fill ingredients from recipe database
-  const autoFillIngredients = async () => {
-    if (!formData.title.trim()) {
-      toast.error('Please enter a meal title first');
-      return;
-    }
-    
-    setIngredientAutoFillLoading(true);
-    
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-recipe-ingredients`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ mealTitle: formData.title }),
-        }
-      );
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          toast.error('Rate limit exceeded. Please try again in a moment.');
-          return;
-        }
-        if (response.status === 402) {
-          toast.error('Service unavailable. Please try again later.');
-          return;
-        }
-        throw new Error('Failed to fetch ingredients');
-      }
-
-      const data = await response.json();
-      
-      if (data.ingredients && data.ingredients.length > 0) {
-        // Add only new ingredients that aren't already in the list
-        const newIngredients = data.ingredients.filter(
-          (ing: string) => !ingredients.includes(ing)
-        );
-        setIngredients([...ingredients, ...newIngredients]);
-        toast.success(`Found ${newIngredients.length} ingredients from recipes online!`);
-      } else {
-        toast.info('No ingredients found. Try adding them manually.');
-      }
-    } catch (error) {
-      console.error('Error fetching ingredients:', error);
-      toast.error('Failed to auto-fill ingredients. Please add them manually.');
-    } finally {
-      setIngredientAutoFillLoading(false);
     }
   };
 
@@ -298,106 +209,13 @@ const AddMeal = () => {
             </CardContent>
           </Card>
 
-          {/* Smart Ingredient Input */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Ingredients</CardTitle>
-              <CardDescription>Optional - We can auto-fill from recipes online or detect allergens</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2 mb-2">
-                <Button 
-                  type="button" 
-                  onClick={autoFillIngredients}
-                  disabled={ingredientAutoFillLoading || !formData.title.trim()}
-                  variant="secondary"
-                  className="flex-1"
-                >
-                  {ingredientAutoFillLoading ? (
-                    <>
-                      <span className="animate-spin mr-2">🔄</span>
-                      Searching recipes...
-                    </>
-                  ) : (
-                    <>
-                      🤖 Auto-fill from Recipes
-                    </>
-                  )}
-                </Button>
-              </div>
-              
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Add an ingredient (e.g., flour, milk, eggs)"
-                  value={ingredientInput}
-                  onChange={(e) => setIngredientInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddIngredient())}
-                />
-                <Button type="button" onClick={handleAddIngredient} variant="outline">
-                  Add
-                </Button>
-              </div>
-
-              {ingredients.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {ingredients.map((ingredient) => (
-                    <Badge key={ingredient} variant="secondary" className="gap-1">
-                      {ingredient}
-                      <X 
-                        className="w-3 h-3 cursor-pointer" 
-                        onClick={() => handleRemoveIngredient(ingredient)}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              )}
-
-              {detectedAllergens.length > 0 && (
-                <Alert className="border-alert-danger bg-alert-danger-bg">
-                  <AlertCircle className="h-4 w-4 text-alert-danger" />
-                  <AlertDescription>
-                    <strong>Auto-detected allergens:</strong> {detectedAllergens.join(', ')}
-                    <br />
-                    <span className="text-xs">⚠️ Please verify these are correct. You are responsible for accuracy.</span>
-                  </AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Tags */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Tags</CardTitle>
-              <CardDescription>Help people find your dish (e.g., Vegan, Italian, Spicy)</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Add a tag"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-                />
-                <Button type="button" onClick={handleAddTag} variant="outline">
-                  Add
-                </Button>
-              </div>
-              {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="gap-1">
-                      {tag}
-                      <X 
-                        className="w-3 h-3 cursor-pointer" 
-                        onClick={() => handleRemoveTag(tag)}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {/* Allergens & Tags Selector */}
+          <TagSelector
+            selectedAllergens={selectedAllergens}
+            onAllergensChange={setSelectedAllergens}
+            selectedTags={tags}
+            onTagsChange={setTags}
+          />
 
           {/* Cooking Experience */}
           <Card className="border-secondary">
