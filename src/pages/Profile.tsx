@@ -13,6 +13,7 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Star, Award, ChefHat, Heart, Globe, Shield, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { allergenOptions, dislikeCategories } from '@/utils/ingredientDatabase';
@@ -63,6 +64,9 @@ const Profile = () => {
     private_address: '',
     private_city: '',
     private_postal_code: '',
+    partner_photo_url: '',
+    partner_name: '',
+    partner_gender: null as string | null,
   });
 
   const [customLanguageInput, setCustomLanguageInput] = useState('');
@@ -103,6 +107,9 @@ const Profile = () => {
         private_address: currentUser.profile.private_address || '',
         private_city: currentUser.profile.private_city || '',
         private_postal_code: currentUser.profile.private_postal_code || '',
+        partner_photo_url: currentUser.profile.partner_photo_url || '',
+        partner_name: currentUser.profile.partner_name || '',
+        partner_gender: currentUser.profile.partner_gender || null,
       });
     }
   }, [currentUser]);
@@ -176,6 +183,9 @@ const Profile = () => {
           private_address: formData.private_address || null,
           private_city: formData.private_city || null,
           private_postal_code: formData.private_postal_code || null,
+          partner_photo_url: formData.partner_photo_url || null,
+          partner_name: formData.partner_name || null,
+          partner_gender: formData.partner_gender || null,
           latitude,
           longitude,
         })
@@ -267,6 +277,18 @@ const Profile = () => {
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
+        {/* Verification Pending Banner */}
+        {profile?.verification_status === 'pending' && (
+          <Alert className="mb-6 border-warning bg-warning/10">
+            <Shield className="h-4 w-4 text-warning" />
+            <AlertDescription className="text-sm">
+              <strong>Dein Profil wird gerade von unserem Team überprüft.</strong> Danke für deine Geduld! 
+              Du kannst Mahlzeiten ansehen, aber noch nicht buchen oder teilen.
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {/* Profile Header */}
         {/* Profile Header */}
         <Card className="mb-6">
           <CardContent className="pt-6">
@@ -358,6 +380,63 @@ const Profile = () => {
                 💡 Enables "Ladies Only" mode for women chefs
               </p>
             </div>
+            
+            {/* Partner Details (Couples Only) */}
+            {profile?.is_couple && (
+              <div className="pt-4 border-t border-border space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Heart className="w-5 h-5 text-primary" />
+                  <Label className="text-base font-semibold">Partner Details (Required for Couples)</Label>
+                </div>
+                
+                <div>
+                  <Label htmlFor="partner-photo">Partner's Photo URL</Label>
+                  <Input
+                    id="partner-photo"
+                    type="text"
+                    placeholder="https://..."
+                    value={formData.partner_photo_url}
+                    onChange={(e) => setFormData({ ...formData, partner_photo_url: e.target.value })}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    📸 Required for verification and safety
+                  </p>
+                </div>
+                
+                <div>
+                  <Label htmlFor="partner-name">Partner's Name</Label>
+                  <Input
+                    id="partner-name"
+                    type="text"
+                    placeholder="Partner's first name"
+                    value={formData.partner_name}
+                    onChange={(e) => setFormData({ ...formData, partner_name: e.target.value })}
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="partner-gender">Partner's Gender</Label>
+                  <Select
+                    value={formData.partner_gender || undefined}
+                    onValueChange={(value) => setFormData({ ...formData, partner_gender: value })}
+                  >
+                    <SelectTrigger id="partner-gender">
+                      <SelectValue placeholder="Select partner's gender..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border-border z-50">
+                      {genderOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    💡 For "Ladies Only" bookings, the female partner must attend
+                  </p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 

@@ -267,6 +267,9 @@ export type Database = {
           longitude: number | null
           nickname: string | null
           notification_radius: number | null
+          partner_gender: string | null
+          partner_name: string | null
+          partner_photo_url: string | null
           phone_number: string | null
           phone_verified: boolean | null
           private_address: string | null
@@ -275,6 +278,7 @@ export type Database = {
           role: string | null
           updated_at: string
           vacation_mode: boolean | null
+          verification_status: Database["public"]["Enums"]["verification_status"]
         }
         Insert: {
           age?: number | null
@@ -294,6 +298,9 @@ export type Database = {
           longitude?: number | null
           nickname?: string | null
           notification_radius?: number | null
+          partner_gender?: string | null
+          partner_name?: string | null
+          partner_photo_url?: string | null
           phone_number?: string | null
           phone_verified?: boolean | null
           private_address?: string | null
@@ -302,6 +309,7 @@ export type Database = {
           role?: string | null
           updated_at?: string
           vacation_mode?: boolean | null
+          verification_status?: Database["public"]["Enums"]["verification_status"]
         }
         Update: {
           age?: number | null
@@ -321,6 +329,9 @@ export type Database = {
           longitude?: number | null
           nickname?: string | null
           notification_radius?: number | null
+          partner_gender?: string | null
+          partner_name?: string | null
+          partner_photo_url?: string | null
           phone_number?: string | null
           phone_verified?: boolean | null
           private_address?: string | null
@@ -329,6 +340,7 @@ export type Database = {
           role?: string | null
           updated_at?: string
           vacation_mode?: boolean | null
+          verification_status?: Database["public"]["Enums"]["verification_status"]
         }
         Relationships: []
       }
@@ -423,6 +435,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      verification_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -551,6 +564,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      verification_status: ["pending", "approved", "rejected"],
     },
   },
 } as const
