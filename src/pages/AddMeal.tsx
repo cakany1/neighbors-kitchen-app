@@ -9,11 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Upload, ChefHat, Gift, AlertCircle, Shield, Plus, Minus } from 'lucide-react';
+import { Upload, Shield, Plus, Minus } from 'lucide-react';
 import { toast } from 'sonner';
 import { exchangeOptions } from '@/utils/ingredientDatabase';
 import { TagSelector } from '@/components/meals/TagSelector';
@@ -23,35 +22,25 @@ import { useQuery } from '@tanstack/react-query';
 const AddMeal = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [isCookingExperience, setIsCookingExperience] = useState(false);
   const [womenOnly, setWomenOnly] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [handoverMode, setHandoverMode] = useState<'pickup_box' | 'neighbor_plate' | 'ghost_mode' | 'dine_in'>('pickup_box');
-  const [identityReveal, setIdentityReveal] = useState<'real_name' | 'nickname'>('nickname');
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [selectedExchangeOptions, setSelectedExchangeOptions] = useState<string[]>([]);
-  const [priceDetectiveLoading, setPriceDetectiveLoading] = useState(false);
-  const [priceDetectiveResult, setPriceDetectiveResult] = useState<{ min: number; max: number } | null>(null);
   const [useStockPhoto, setUseStockPhoto] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    ingredients: '', // Add ingredients field for auto-detection
-    minimumPrice: '',
+    ingredients: '',
     restaurantReferencePrice: '',
-    portions: '1', // Default to 1 portion
-    unitType: 'portions' as 'portions' | 'slices' | 'items' | 'whole',
-    maxSeats: '',
-    scheduledDate: new Date().toISOString().split('T')[0], // Default to today
+    portions: '1',
+    scheduledDate: new Date().toISOString().split('T')[0],
     scheduledTime: '',
-    arrivalTime: '',
     collectionWindowStart: '',
     collectionWindowEnd: '',
-    pickupInstructions: '',
   });
 
-  // Fetch current user's gender and verification status for Ladies Only feature
+  // Fetch current user's gender for Ladies Only feature
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
@@ -60,58 +49,18 @@ const AddMeal = () => {
       
       const { data: profile } = await supabase
         .from('profiles')
-        .select('gender, verification_status')
+        .select('gender')
         .eq('id', user.id)
         .single();
       
-      return { id: user.id, gender: profile?.gender, verification_status: profile?.verification_status };
+      return { id: user.id, gender: profile?.gender };
     },
   });
-
-  // Auto-run Price Detective when title changes
-  useEffect(() => {
-    if (formData.title.trim() && selectedExchangeOptions.includes('money')) {
-      const timer = setTimeout(() => {
-        runPriceDetective();
-      }, 1000); // Debounce for 1 second
-      
-      return () => clearTimeout(timer);
-    }
-  }, [formData.title, selectedExchangeOptions]);
 
   const toggleExchangeOption = (option: string) => {
     setSelectedExchangeOptions(prev =>
       prev.includes(option) ? prev.filter(i => i !== option) : [...prev, option]
     );
-  };
-
-  // Price Detective - Auto-detect restaurant prices
-  const runPriceDetective = () => {
-    if (!formData.title.trim()) {
-      toast.error(t('toast.meal_title_required'));
-      return;
-    }
-    
-    setPriceDetectiveLoading(true);
-    
-    // Mock API call - simulate price range discovery
-    setTimeout(() => {
-      // Mock price range based on meal title length (simulation)
-      const basePrice = formData.title.length * 2 + Math.random() * 5;
-      const minPrice = Math.round(basePrice * 100) / 100;
-      const maxPrice = Math.round((basePrice + 3 + Math.random() * 3) * 100) / 100;
-      setPriceDetectiveResult({ min: minPrice, max: maxPrice });
-      setPriceDetectiveLoading(false);
-      toast.success(t('toast.price_range_found'));
-    }, 1500);
-  };
-
-  const usePriceDetectiveResult = () => {
-    if (priceDetectiveResult) {
-      const avgPrice = (priceDetectiveResult.min + priceDetectiveResult.max) / 2;
-      setFormData({ ...formData, restaurantReferencePrice: avgPrice.toFixed(2) });
-      toast.success(t('toast.price_applied'));
-    }
   };
 
   // Smart Allergen Auto-Detection
@@ -161,7 +110,7 @@ const AddMeal = () => {
     if (textToScan.length > 3) {
       const timer = setTimeout(() => {
         detectAllergens(textToScan);
-      }, 1500); // Debounce
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [formData.title, formData.description]);
@@ -214,13 +163,13 @@ const AddMeal = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* ==== TOP SECTION: VISIBLE & REQUIRED ==== */}
-          
           {/* Title */}
           <Card>
             <CardContent className="pt-6 space-y-4">
               <div>
-                <Label htmlFor="title" className="text-lg font-semibold">Was gibt's heute? *</Label>
+                <Label htmlFor="title" className="text-lg font-semibold">
+                  Was gibt&apos;s heute? *
+                </Label>
                 <Input
                   id="title"
                   placeholder="z.B. Hausgemachte Kürbis-Lasagne"
@@ -284,7 +233,7 @@ const AddMeal = () => {
                     }}
                     className="h-12"
                   >
-                    {time} - {(parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0')}:00 Uhr
+                    {`${time} - ${(parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0')}:00 Uhr`}
                   </Button>
                 ))}
               </div>
@@ -317,7 +266,7 @@ const AddMeal = () => {
             </CardContent>
           </Card>
 
-          {/* Exchange Options - Gegenleistung */}
+          {/* Exchange Options */}
           <Card>
             <CardHeader>
               <CardTitle>Dein Wunsch an den Gast *</CardTitle>
@@ -351,13 +300,13 @@ const AddMeal = () => {
             </CardContent>
           </Card>
 
-          {/* ==== BOTTOM SECTION: COLLAPSIBLE/OPTIONAL ==== */}
+          {/* Optional Details - Collapsible */}
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="details" className="border-none">
               <Card>
                 <AccordionTrigger className="px-6 py-4 hover:no-underline">
                   <div className="flex items-center gap-2 text-lg font-semibold">
-                    📸 Foto & Details hinzufügen (Optional)
+                    📸 Foto &amp; Details hinzufügen (Optional)
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -374,7 +323,7 @@ const AddMeal = () => {
                       />
                     </div>
 
-                    {/* Photo Upload - Compact */}
+                    {/* Photo Upload */}
                     <div>
                       <Label className="block mb-2 font-medium">Foto vom Gericht</Label>
                       {!useStockPhoto ? (
@@ -400,9 +349,8 @@ const AddMeal = () => {
                       ) : (
                         <div className="space-y-3">
                           <Alert>
-                            <AlertCircle className="h-4 w-4" />
                             <AlertDescription>
-                              📷 Ein Symbolbild wird mit dem Badge "Symbolbild" angezeigt
+                              📷 Ein Symbolbild wird mit dem Badge &quot;Symbolbild&quot; angezeigt
                             </AlertDescription>
                           </Alert>
                           <Button 
@@ -417,7 +365,7 @@ const AddMeal = () => {
                       )}
                     </div>
 
-                    {/* Allergens & Tags Selector */}
+                    {/* Allergens & Tags */}
                     <TagSelector
                       selectedAllergens={selectedAllergens}
                       onAllergensChange={setSelectedAllergens}
@@ -426,7 +374,7 @@ const AddMeal = () => {
                       ingredientText={formData.ingredients}
                     />
 
-                    {/* Money-specific fields */}
+                    {/* Restaurant Reference Price */}
                     {selectedExchangeOptions.includes('money') && (
                       <div className="space-y-4 pt-2 border-t border-border">
                         <div>
@@ -486,7 +434,7 @@ const AddMeal = () => {
             </AccordionItem>
           </Accordion>
 
-          {/* Date & Time (Hidden in minimal view) */}
+          {/* Date & Time */}
           <Card>
             <CardContent className="pt-6 space-y-4">
               <div>
