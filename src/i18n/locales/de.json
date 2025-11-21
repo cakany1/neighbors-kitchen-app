@@ -5,9 +5,13 @@
     "portions": "Portionen",
     "community": "Gemeinschaft",
     "guidelines": "Richtlinien",
+    "by": "von",
     "loading": "Lädt...",
     "error": "Fehler",
     "success": "Erfolg"
+  },
+  "actions": {
+    "view_details": "Details ansehen"
   },
   "auth": {
     "welcome_back": "Willkommen zurück!",

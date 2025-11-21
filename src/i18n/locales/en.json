@@ -4,13 +4,27 @@
     "orBring": "Or bring",
     "portions": "portions",
     "community": "Community",
-    "guidelines": "Guidelines"
+    "guidelines": "Guidelines",
+    "by": "by",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
   },
   "feed": {
     "available_meals": "Available Meals",
     "fresh_meals_subtitle": "Fresh home-cooked meals from your neighborhood",
     "portfolio_available": "View Chef Portfolio",
-    "available_date": "Available"
+    "available_date": "Available",
+    "loading_meals": "Loading meals...",
+    "no_meals_yet": "No meals available yet. Be the first to share!",
+    "no_meals_radius": "No meals available within your {radius}km radius. Try increasing your notification radius in profile settings.",
+    "set_location": "Set Location",
+    "set_location_desc": "Set your location in profile settings to see meals filtered by distance.",
+    "guest_login_required": "Sign up to save this meal!",
+    "guest_login_desc": "Create a free account to book meals and share with your neighborhood."
+  },
+  "actions": {
+    "view_details": "View Details"
   },
   "profile": {
     "karma": "Karma",
