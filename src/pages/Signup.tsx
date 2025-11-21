@@ -82,10 +82,10 @@ const Signup = () => {
         }
       }
 
-      toast.success('Account created! Welcome to Neighbors Kitchen 🎉');
+      toast.success(t('auth.account_created'));
       navigate('/');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create account');
+      toast.error(error.message || t('auth.account_creation_failed'));
     } finally {
       setLoading(false);
     }
@@ -100,27 +100,27 @@ const Signup = () => {
               <ChefHat className="w-8 h-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl">Join Neighbors Kitchen</CardTitle>
-          <CardDescription>Share meals, build community</CardDescription>
+          <CardTitle className="text-2xl">{t('auth.join_title')}</CardTitle>
+          <CardDescription>{t('auth.join_desc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName">{t('auth.first_name')}</Label>
                 <Input
                   id="firstName"
-                  placeholder="Alex"
+                  placeholder={t('auth.first_name_placeholder')}
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                   required
                 />
               </div>
               <div>
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="lastName">{t('auth.last_name')}</Label>
                 <Input
                   id="lastName"
-                  placeholder="Chen"
+                  placeholder={t('auth.last_name_placeholder')}
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                   required
@@ -129,7 +129,7 @@ const Signup = () => {
             </div>
 
             <div>
-              <Label htmlFor="language">I speak</Label>
+              <Label htmlFor="language">{t('auth.i_speak')}</Label>
               <Select value={formData.language} onValueChange={(value) => setFormData({ ...formData, language: value })}>
                 <SelectTrigger id="language">
                   <SelectValue />
@@ -217,11 +217,11 @@ const Signup = () => {
             </div>
 
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t('auth.email_placeholder')}
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
@@ -229,11 +229,11 @@ const Signup = () => {
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder={t('auth.password_placeholder')}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
@@ -242,18 +242,18 @@ const Signup = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Creating account...' : 'Create Account'}
+              {loading ? t('auth.creating_account') : t('auth.create_account')}
             </Button>
 
             <div className="text-center text-sm text-muted-foreground">
-              Already have an account?{' '}
+              {t('auth.already_have_account')}{' '}
               <Button
                 type="button"
                 variant="link"
                 className="p-0 h-auto font-semibold text-primary"
                 onClick={() => navigate('/login')}
               >
-                Sign in
+                {t('auth.sign_in_link')}
               </Button>
             </div>
           </form>

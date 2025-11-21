@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ interface Message {
 }
 
 const Chat = () => {
+  const { t } = useTranslation();
   const { bookingId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -210,9 +212,9 @@ const Chat = () => {
     },
     onError: (error: any) => {
       if (error.message === 'BLOCKED') {
-        toast.error('Nachricht kann nicht gesendet werden. There is a block between you and this user.');
+        toast.error(t('chat.send_blocked'));
       } else {
-        toast.error('Failed to send message');
+        toast.error(t('chat.send_failed'));
       }
       console.error(error);
     },
@@ -226,7 +228,7 @@ const Chat = () => {
   };
 
   if (!booking || !currentUser) {
-    return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-screen bg-background flex items-center justify-center">{t('common.loading')}</div>;
   }
 
   const otherPerson = currentUser.id === booking.meal.chef.id ? booking.guest : booking.meal.chef;
@@ -260,7 +262,7 @@ const Chat = () => {
                 className="gap-2"
               >
                 <Globe className="w-4 h-4" />
-                {showTranslations ? 'Hide' : 'Show'}
+                {showTranslations ? t('chat.hide_translations') : t('chat.show_translations')}
               </Button>
               
               <DropdownMenu>
@@ -275,14 +277,14 @@ const Chat = () => {
                     className="gap-2 cursor-pointer"
                   >
                     <Flag className="w-4 h-4" />
-                    Report User
+                    {t('chat.report_user')}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => setShowBlockDialog(true)}
                     className="gap-2 cursor-pointer text-destructive focus:text-destructive"
                   >
                     <Ban className="w-4 h-4" />
-                    Block User
+                    {t('chat.block_user')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -299,7 +301,7 @@ const Chat = () => {
           currentUserId={currentUser.id}
           onBlockComplete={() => {
             navigate('/');
-            toast.success('User blocked. Redirecting to feed...');
+            toast.success(t('chat.user_blocked_redirect'));
           }}
         />
 
@@ -318,8 +320,7 @@ const Chat = () => {
             <div className="bg-muted/50 border border-border rounded-lg p-3 mb-4 flex items-start gap-2">
               <Globe className="w-4 h-4 text-primary mt-0.5 shrink-0" />
               <div className="text-xs text-muted-foreground">
-                <strong className="text-foreground">Auto-Translation Active:</strong> You and your chat partner speak different languages. 
-                Messages will be automatically translated to help you communicate.
+                <strong className="text-foreground">{t('chat.auto_translation_active')}</strong> {t('chat.auto_translation_desc')}
               </div>
             </div>
           )}
@@ -343,7 +344,7 @@ const Chat = () => {
                     <div className={`mt-2 pt-2 border-t ${isCurrentUser ? 'border-primary-foreground/20' : 'border-border'}`}>
                       <div className="flex items-center gap-1 mb-1">
                         <Globe className="w-3 h-3 opacity-70" />
-                        <span className="text-xs opacity-70">Translated:</span>
+                        <span className="text-xs opacity-70">{t('chat.translated')}</span>
                       </div>
                       <p className="text-sm opacity-90">{translatedText}</p>
                     </div>
@@ -365,7 +366,7 @@ const Chat = () => {
             <Input
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
-              placeholder="Type a message..."
+              placeholder={t('chat.type_message')}
               className="flex-1"
             />
             <Button type="submit" size="icon" disabled={!messageText.trim() || sendMessageMutation.isPending}>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { ChefHat } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Login = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -28,10 +30,10 @@ const Login = () => {
 
       if (error) throw error;
 
-      toast.success('Welcome back!');
+      toast.success(t('auth.welcome_toast'));
       navigate('/');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to log in');
+      toast.error(error.message || t('auth.login_failed'));
     } finally {
       setLoading(false);
     }
@@ -46,17 +48,17 @@ const Login = () => {
               <ChefHat className="w-8 h-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl">Welcome Back!</CardTitle>
-          <CardDescription>Sign in to Neighbors Kitchen</CardDescription>
+          <CardTitle className="text-2xl">{t('auth.welcome_back')}</CardTitle>
+          <CardDescription>{t('auth.sign_in_desc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t('auth.email_placeholder')}
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
@@ -64,11 +66,11 @@ const Login = () => {
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder={t('auth.password_placeholder')}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
@@ -76,18 +78,18 @@ const Login = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? t('auth.signing_in') : t('auth.sign_in')}
             </Button>
 
             <div className="text-center text-sm text-muted-foreground">
-              Don't have an account?{' '}
+              {t('auth.no_account')}{' '}
               <Button
                 type="button"
                 variant="link"
                 className="p-0 h-auto font-semibold text-primary"
                 onClick={() => navigate('/signup')}
               >
-                Sign up
+                {t('auth.sign_up')}
               </Button>
             </div>
           </form>

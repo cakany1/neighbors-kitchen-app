@@ -159,7 +159,7 @@ const Profile = () => {
           console.log('Address geocoded successfully:', { latitude, longitude });
         } else {
           // Address not found - warn user but still allow save
-          toast.error('Address could not be located on the map. Please check spelling.', {
+          toast.error(t('toast.address_geocode_failed'), {
             duration: 5000,
           });
           console.warn('Geocoding returned no results for:', fullAddress);
@@ -195,11 +195,11 @@ const Profile = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Profile updated successfully');
+      toast.success(t('toast.profile_updated'));
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to update profile');
+      toast.error(error.message || t('toast.profile_update_failed'));
     },
   });
 
@@ -251,11 +251,11 @@ const Profile = () => {
       
       if (error) throw error;
       
-      toast.success(`Language request "${customLanguageInput}" submitted! We'll add it if there's demand.`);
+      toast.success(t('toast.language_request_submitted', { language: customLanguageInput }));
       setCustomLanguageInput('');
     } catch (error) {
       console.error('Error submitting language request:', error);
-      toast.error('Failed to submit language request');
+      toast.error(t('toast.language_request_failed'));
     }
   };
 
