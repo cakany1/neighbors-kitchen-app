@@ -391,6 +391,11 @@ const Signup = () => {
                 className="cursor-pointer"
               />
               <p className="text-xs text-muted-foreground">Max 5MB, JPG/PNG</p>
+              <Alert className="bg-yellow-500/10 border-yellow-500/30 mt-2">
+                <AlertDescription className="text-xs text-foreground">
+                  Hinweis: Dein Profilbild muss manuell verifiziert werden. Dies kann etwas Zeit in Anspruch nehmen, bevor du Mahlzeiten anbieten kannst.
+                </AlertDescription>
+              </Alert>
             </div>
 
             {/* Account Type Selection */}
@@ -511,7 +516,9 @@ const Signup = () => {
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                 placeholder="+41 79 123 45 67"
               />
-              <p className="text-xs text-muted-foreground">{t('signup.phoneHint')}</p>
+              <p className="text-xs text-muted-foreground">
+                Ihre Telefonnummer dient ausschliesslich zur direkten Koordination bei der Abholung (z.B. "Bin in 5 Minuten da").
+              </p>
             </div>
 
             <div className="space-y-2">

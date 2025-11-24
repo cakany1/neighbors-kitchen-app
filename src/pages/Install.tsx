@@ -41,7 +41,7 @@ const Install = () => {
               <div className="flex-1">
                 <p className="font-medium mb-1">Öffne das Teilen-Menü</p>
                 <p className="text-sm text-muted-foreground">
-                  Tippe auf den Teilen-Button <Share2 className="inline w-4 h-4" /> unten in der Mitte (Box mit Pfeil nach oben)
+                  Tippe auf den Teilen-Button 📤 unten in der Mitte (Box mit Pfeil nach oben)
                 </p>
               </div>
             </div>

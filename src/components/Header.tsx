@@ -50,6 +50,22 @@ export const Header = () => {
           <h1 className="font-bold text-xl text-foreground">Neighbors Kitchen</h1>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/story')}
+            className="hidden md:flex"
+          >
+            Über uns
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/install')}
+            className="hidden md:flex"
+          >
+            App installieren
+          </Button>
           <LanguageSwitcher />
           <Button
             variant="ghost"
