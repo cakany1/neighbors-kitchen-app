@@ -210,15 +210,23 @@ const AddMeal = () => {
         }
       });
 
-      if (geoError || !geoData?.lat || !geoData?.lng) {
+      // Handle geocoding response with robust null checks
+      if (geoError) {
         console.error('Geocoding error:', geoError);
         toast.error('Adresse konnte nicht gefunden werden. Bitte prüfe deine Profiladresse.');
         return;
       }
 
+      // Check for valid coordinates (response uses 'latitude' and 'longitude', not 'lat' and 'lng')
+      if (!geoData || typeof geoData.latitude !== 'number' || typeof geoData.longitude !== 'number') {
+        console.error('Invalid geocoding response:', geoData);
+        toast.error('Adresse konnte nicht in Koordinaten umgewandelt werden. Bitte prüfe deine Profiladresse.');
+        return;
+      }
+
       // 2. Add random offset for fuzzy location (±200m ≈ ±0.002 degrees)
-      const fuzzyLat = geoData.lat + (Math.random() * 0.004 - 0.002);
-      const fuzzyLng = geoData.lng + (Math.random() * 0.004 - 0.002);
+      const fuzzyLat = geoData.latitude + (Math.random() * 0.004 - 0.002);
+      const fuzzyLng = geoData.longitude + (Math.random() * 0.004 - 0.002);
 
       // 3. Combine scheduled date and collection start time
       const scheduledDateTime = `${formData.scheduledDate}T${formData.collectionWindowStart || '18:00'}:00`;
