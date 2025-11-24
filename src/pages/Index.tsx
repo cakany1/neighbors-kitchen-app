@@ -98,25 +98,6 @@ const Index = () => {
                 : 'Share food, build trust, save meals in your neighborhood'}
             </p>
             
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Button
-                size="lg"
-                className="text-lg px-8 py-6 h-auto bg-primary hover:bg-primary/90"
-                onClick={() => navigate('/login')}
-              >
-                {i18n.language === 'de' ? 'Jetzt mitmachen' : 'Join Now'}
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-lg px-8 py-6 h-auto"
-                onClick={() => navigate('/login')}
-              >
-                {i18n.language === 'de' ? 'Anmelden' : 'Login'}
-              </Button>
-            </div>
-            
             {/* Meal Preview Cards */}
             <div>
               <HeroFeedTeaser />
@@ -223,10 +204,10 @@ const Index = () => {
             </Card>
           </section>
 
-          {/* About */}
+          {/* About - Unsere Geschichte */}
           <section className="text-center">
             <h2 className="text-4xl font-bold mb-6">
-              {i18n.language === 'de' ? 'Über uns' : 'About Us'}
+              {i18n.language === 'de' ? 'Unsere Geschichte' : 'Our Story'}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
               {i18n.language === 'de'
@@ -238,8 +219,6 @@ const Index = () => {
             </Badge>
           </section>
         </main>
-        
-        <Footer />
       </div>
     );
   }
@@ -305,8 +284,6 @@ const Index = () => {
         <HeroFeedTeaser />
       </div>
       </div>
-      
-      <Footer />
     </div>
   );
 };

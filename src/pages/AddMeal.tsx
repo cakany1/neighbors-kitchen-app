@@ -54,7 +54,7 @@ const AddMeal = () => {
     { value: '45', label: ':45' },
   ];
 
-  // Fetch current user's gender for Ladies Only feature
+  // Fetch current user's gender for Ladies Only feature AND check auth status
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
@@ -70,18 +70,6 @@ const AddMeal = () => {
       return { id: user.id, gender: profile?.gender };
     },
   });
-
-  // AUTH GATE: Redirect to login if not authenticated
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error('Bitte melde dich an, um Essen anzubieten.');
-        navigate('/login');
-      }
-    };
-    checkAuth();
-  }, [navigate]);
 
   const toggleExchangeOption = (option: string) => {
     setSelectedExchangeOptions(prev =>
@@ -157,6 +145,14 @@ const AddMeal = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check if user is authenticated FIRST
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error('Bitte melde dich an, um ein Gericht zu teilen.');
+      navigate('/login');
+      return;
+    }
+    
     // Validation
     if (!formData.title || !formData.scheduledDate) {
       toast.error(t('toast.fill_required_fields'));
@@ -190,13 +186,6 @@ const AddMeal = () => {
 
     try {
       // Get current user profile with address
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error('Bitte melde dich an, um ein Gericht zu teilen.');
-        navigate('/login');
-        return;
-      }
-
       const { data: profile } = await supabase
         .from('profiles')
         .select('private_address, private_city, private_postal_code')
@@ -771,7 +760,7 @@ const AddMeal = () => {
             className="w-full" 
             size="lg"
           >
-            Mahlzeit erstellen
+            {currentUser ? 'Mahlzeit erstellen' : 'Einloggen zum Veröffentlichen'}
           </Button>
         </form>
       </main>
