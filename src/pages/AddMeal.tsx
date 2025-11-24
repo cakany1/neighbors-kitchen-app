@@ -380,12 +380,15 @@ const AddMeal = () => {
                           <Input
                             id="restaurantReferencePrice"
                             type="number"
-                            min="0"
-                            step="0.5"
+                            min="7.00"
+                            step="0.50"
                             placeholder="z.B. 24"
                             value={formData.restaurantReferencePrice}
                             onChange={(e) => setFormData({ ...formData, restaurantReferencePrice: e.target.value })}
                           />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Mindestpreis: CHF 7.00 (inkl. Gebühr)
+                          </p>
                         </div>
                       </div>
                     )}

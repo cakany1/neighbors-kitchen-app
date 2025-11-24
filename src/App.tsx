@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Feed from "./pages/Feed";
 import MapView from "./pages/MapView";
@@ -52,6 +52,7 @@ const App = () => {
           <div className="flex flex-col min-h-screen pb-24">
             <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/app" element={<Navigate to="/feed" replace />} />
             <Route path="/feed" element={<Feed />} />
             <Route path="/map" element={<MapView />} />
             <Route path="/add-meal" element={<AddMeal />} />
