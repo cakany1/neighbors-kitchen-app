@@ -319,12 +319,12 @@ const MealDetail = () => {
       
       <main className="max-w-lg mx-auto pb-32 md:pb-4">
         {/* Hero Image */}
-        <div className="relative h-64 bg-muted">
+        <div className="relative h-64 md:h-auto md:max-h-[500px] bg-muted md:flex md:items-center md:justify-center">
           {meal.image_url ? (
             <img 
               src={meal.image_url} 
               alt={meal.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover md:object-contain md:max-h-[500px]"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -435,13 +435,13 @@ const MealDetail = () => {
                     <p className="font-semibold text-foreground">
                       {format(new Date(meal.scheduled_date), 'EEEE, d. MMMM yyyy', { locale: de })}
                     </p>
-                    {(meal.collection_window_start || meal.arrival_time) && (
+                    {(meal.collection_window_start || (meal as any).arrival_time) && (
                       <p className="text-sm text-muted-foreground mt-1">
                         <Clock className="w-3.5 h-3.5 inline mr-1" />
                         {meal.collection_window_start && meal.collection_window_end 
                           ? `${meal.collection_window_start.slice(0, 5)} - ${meal.collection_window_end.slice(0, 5)} Uhr`
-                          : meal.arrival_time 
-                          ? `${meal.arrival_time.slice(0, 5)} Uhr`
+                          : (meal as any).arrival_time 
+                          ? `${(meal as any).arrival_time.slice(0, 5)} Uhr`
                           : ''}
                       </p>
                     )}
