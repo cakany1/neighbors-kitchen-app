@@ -19,7 +19,6 @@ import Impressum from "./pages/Impressum";
 import AGB from "./pages/AGB";
 import FAQ from "./pages/FAQ";
 import Install from "./pages/Install";
-import { Footer } from "./components/Footer";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
 import { OnboardingTour } from "./components/OnboardingTour";
