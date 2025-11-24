@@ -45,6 +45,18 @@ const Index = () => {
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
+                onClick={() => navigate('/story')}
+              >
+                Über uns
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/install')}
+              >
+                App installieren
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={() => navigate('/login')}
               >
                 Einloggen
