@@ -22,6 +22,7 @@ import Install from "./pages/Install";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
 import { OnboardingTour } from "./components/OnboardingTour";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
@@ -83,13 +84,15 @@ const AppRoutes = () => {
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
