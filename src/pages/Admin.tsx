@@ -37,13 +37,13 @@ const Admin = () => {
     },
   });
 
-  // Fetch pending verifications
+  // Fetch pending verifications (sorted by newest first)
   const { data: pendingVerifications, isLoading: verificationsLoading } = useQuery({
     queryKey: ['pendingVerifications'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, nickname, gender, phone_number, verification_status, partner_name, partner_photo_url, partner_gender, created_at')
+        .select('id, first_name, last_name, nickname, gender, phone_number, avatar_url, verification_status, partner_name, partner_photo_url, partner_gender, created_at')
         .eq('verification_status', 'pending')
         .order('created_at', { ascending: false });
 
@@ -302,6 +302,79 @@ const Admin = () => {
           <p className="text-muted-foreground">Manage verifications, analytics, and feedback</p>
         </div>
 
+        {/* Pending Approvals Widget - Always Visible at Top */}
+        {pendingVerifications && pendingVerifications.length > 0 && (
+          <Card className="mb-6 border-2 border-primary/20 bg-primary/5">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-primary" />
+                    Wartet auf Überprüfung
+                  </CardTitle>
+                  <CardDescription>
+                    {pendingVerifications.length} {pendingVerifications.length === 1 ? 'Nutzer wartet' : 'Nutzer warten'} auf Verifizierung
+                  </CardDescription>
+                </div>
+                <Badge variant="destructive" className="text-lg px-3 py-1">
+                  {pendingVerifications.length}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {pendingVerifications.slice(0, 3).map((user) => (
+                <Card key={user.id} className="border-border bg-background">
+                  <CardContent className="pt-4">
+                    <div className="flex items-start gap-4">
+                      <Avatar className="w-16 h-16 cursor-pointer hover:ring-2 ring-primary" onClick={() => {
+                        window.open(`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`, '_blank');
+                      }}>
+                        <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} />
+                        <AvatarFallback>{user.first_name?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-base">
+                          {user.first_name} {user.last_name}
+                        </h3>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          <Badge variant="outline" className="text-xs">
+                            {user.gender === 'female' ? '👩' : user.gender === 'male' ? '👨' : '🌈'} {user.gender}
+                          </Badge>
+                          {user.phone_number && (
+                            <Badge variant="secondary" className="text-xs">📱 Verified</Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => approveMutation.mutate(user.id)}
+                          disabled={approveMutation.isPending}
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => rejectMutation.mutate(user.id)}
+                          disabled={rejectMutation.isPending}
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              {pendingVerifications.length > 3 && (
+                <p className="text-sm text-muted-foreground text-center pt-2">
+                  + {pendingVerifications.length - 3} weitere Anfragen im Verifications Tab
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         <Tabs defaultValue="verifications" className="space-y-6">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="verifications">
@@ -350,8 +423,11 @@ const Admin = () => {
                       <Card key={user.id} className="border-muted">
                         <CardContent className="pt-6">
                           <div className="flex items-start gap-4">
-                            <Avatar className="w-16 h-16">
-                              <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} />
+                            <Avatar className="w-16 h-16 cursor-pointer hover:ring-2 ring-primary" onClick={() => {
+                              const imageUrl = user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`;
+                              window.open(imageUrl, '_blank');
+                            }}>
+                              <AvatarImage src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} />
                               <AvatarFallback>{user.first_name?.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className="flex-1 space-y-2">
