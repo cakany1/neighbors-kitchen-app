@@ -1,47 +1,37 @@
 import { MapPin, User, Heart } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
+import { DEMO_MEALS } from '@/data/demoMeals';
 
-const mockMeals = [
-  {
-    id: 1,
-    image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&q=80',
-    title: 'Hausgemachte Kürbis-Lasagne 🎃',
-    badgeText: '💸 Bezahle nach dem Essen, was du willst',
-    subtext: '~ Restaurant-Wert: CHF 25.-',
-    chef: 'Nonna Rosa',
-    location: 'Gundeli',
-    delay: '0s'
-  },
-  {
-    id: 2,
-    image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&q=80',
-    title: 'Frisches Thai Green Curry 🌶️',
-    badgeText: '🎁 Überrasch mich! (Wein / Dessert)',
-    subtext: '~ Restaurant-Wert: CHF 18.-',
-    chef: 'Mai L.',
-    location: 'St. Johann',
-    delay: '0.2s'
-  },
-  {
-    id: 3,
-    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=80',
-    title: 'Sonntagszopf (frisch gebacken)',
-    badgeText: '😊 Nichts, nur ein Lächeln (Gratis)',
-    subtext: 'Nachbarschafts-Geschenk',
-    chef: 'Lukas',
-    location: 'Kleinbasel',
-    delay: '0.4s'
-  }
-];
+// Transform demo meals for hero display
+const heroMeals = DEMO_MEALS.map((meal, index) => ({
+  id: meal.id,
+  image: meal.image_url,
+  title: meal.title,
+  badgeText: meal.exchange_mode === 'money' 
+    ? '💸 Bezahle nach dem Essen, was du willst'
+    : meal.exchange_mode === 'barter'
+    ? '🎁 Überrasch mich! (Wein/Dessert)'
+    : '😊 Nichts, nur ein Lächeln (Gratis)',
+  subtext: meal.estimated_restaurant_value 
+    ? `~ Restaurant-Wert: CHF ${meal.estimated_restaurant_value}.-`
+    : '',
+  chef: meal.chef.nickname || meal.chef.first_name,
+  location: meal.neighborhood,
+  delay: `${index * 0.2}s`
+}));
 
 export const HeroFeedTeaser = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="w-full max-w-6xl">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {mockMeals.map((meal) => (
+        {heroMeals.map((meal) => (
           <Card
             key={meal.id}
+            onClick={() => navigate(`/meal/${meal.id}`)}
             className="group relative overflow-hidden bg-background/60 backdrop-blur-md border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-float cursor-pointer"
             style={{ animationDelay: meal.delay }}
           >

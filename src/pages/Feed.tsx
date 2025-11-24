@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getDistance } from '@/utils/distance';
 import { OnboardingTour } from '@/components/OnboardingTour';
 import { toast } from 'sonner';
+import { DEMO_MEALS } from '@/data/demoMeals';
 
 const Feed = () => {
   const { t } = useTranslation();
@@ -165,88 +166,7 @@ const Feed = () => {
   const userLon = currentUser?.profile?.longitude;
   const userRadius = currentUser?.profile?.notification_radius || 5000; // Default 5km
 
-  // FAILSAFE: Force Demo Data if DB is empty
-  const DEMO_MEALS = [
-    {
-      id: 'demo-1',
-      title: 'Hausgemachte Lasagne',
-      description: 'Klassische italienische Lasagne mit Ragu Bolognese und Béchamelsauce',
-      chef: { 
-        first_name: 'Maria', 
-        last_name: 'R.', 
-        karma: 280, 
-        id_verified: true, 
-        phone_verified: true,
-        latitude: 47.5596,
-        longitude: 7.5886,
-      },
-      neighborhood: 'St. Johann',
-      fuzzy_lat: 47.5596,
-      fuzzy_lng: 7.5886,
-      tags: ['Italienisch', 'Vegetarisch'],
-      image_url: '/placeholder-meal-1.jpg',
-      pricing_minimum: 0,
-      pricing_suggested: 18,
-      is_cooking_experience: false,
-      available_portions: 4,
-      allergens: ['Milch/Laktose', 'Gluten (Getreide)', 'Eier'],
-      scheduled_date: new Date(Date.now() + 86400000).toISOString(),
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: 'demo-2',
-      title: 'Thai Red Curry',
-      description: 'Scharfes Curry mit Kokosmilch, Gemüse und Basmatireis',
-      chef: { 
-        first_name: 'Siri', 
-        last_name: 'K.', 
-        karma: 450, 
-        id_verified: true, 
-        phone_verified: true,
-        latitude: 47.5416,
-        longitude: 7.5894,
-      },
-      neighborhood: 'Gundeldingen',
-      fuzzy_lat: 47.5416,
-      fuzzy_lng: 7.5894,
-      tags: ['Thailändisch', 'Vegan', 'Scharf'],
-      image_url: '/placeholder-meal-2.jpg',
-      pricing_minimum: 0,
-      pricing_suggested: 15,
-      is_cooking_experience: true,
-      available_portions: 2,
-      allergens: ['Soja'],
-      scheduled_date: new Date(Date.now() + 86400000).toISOString(),
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: 'demo-3',
-      title: 'Schweizer Zopf (frisch gebacken)',
-      description: 'Traditioneller Sonntagszopf aus Schweizer Mehl, noch warm vom Ofen',
-      chef: { 
-        first_name: 'Hans', 
-        last_name: 'M.', 
-        karma: 190, 
-        id_verified: false, 
-        phone_verified: false,
-        latitude: 47.5667,
-        longitude: 7.5953,
-      },
-      neighborhood: 'Kleinbasel',
-      fuzzy_lat: 47.5667,
-      fuzzy_lng: 7.5953,
-      tags: ['Schweiz', 'Frühstück', 'Hausgemacht'],
-      image_url: '/placeholder-meal-3.jpg',
-      pricing_minimum: 0,
-      pricing_suggested: 8,
-      is_cooking_experience: false,
-      available_portions: 1,
-      allergens: ['Gluten (Getreide)', 'Milch/Laktose', 'Eier'],
-      scheduled_date: new Date(Date.now() + 86400000).toISOString(),
-      created_at: new Date().toISOString(),
-    },
-  ];
-
+  // FAILSAFE: Use imported demo meals if DB is empty
   const finalMeals = (meals && meals.length > 0) ? meals : DEMO_MEALS;
 
   // Calculate distances, filter by radius, and sort
