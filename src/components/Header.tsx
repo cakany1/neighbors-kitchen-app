@@ -55,7 +55,8 @@ export const Header = () => {
             variant="ghost"
             size="icon"
             onClick={() => navigate('/faq')}
-            title="Hilfe &amp; FAQ"
+            title="Hilfe & FAQ"
+            aria-label="Hilfe & FAQ öffnen"
           >
             <HelpCircle className="w-5 h-5" />
           </Button>
@@ -66,6 +67,7 @@ export const Header = () => {
               onClick={() => navigate('/admin')}
               title="Admin Dashboard"
               className="relative"
+              aria-label="Admin Dashboard öffnen"
             >
               <Shield className="w-5 h-5" />
               {pendingCount && pendingCount > 0 && (
@@ -82,6 +84,7 @@ export const Header = () => {
             variant="ghost"
             size="icon"
             onClick={() => navigate('/login')}
+            aria-label="Profil und Login"
           >
             <User className="w-5 h-5" />
           </Button>

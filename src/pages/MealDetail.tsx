@@ -302,10 +302,10 @@ const MealDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 md:pb-20">
       <Header />
       
-      <main className="max-w-lg mx-auto">
+      <main className="max-w-lg mx-auto pb-32 md:pb-4">
         {/* Hero Image */}
         <div className="relative h-64 bg-muted">
           {meal.image_url ? (
@@ -559,13 +559,14 @@ const MealDetail = () => {
         </div>
       </main>
 
-      {/* Aktionsbuttons */}
-      <div className="fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t border-border">
+      {/* Aktionsbuttons - Sticky on Mobile */}
+      <div className="fixed md:sticky bottom-16 md:bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t border-border z-40">
         <div className="max-w-lg mx-auto flex gap-2">
           <Button
             variant="outline"
             onClick={() => setChatOpen(true)}
             className="flex-1"
+            aria-label="Koch kontaktieren"
           >
             <MessageCircle className="w-4 h-4 mr-2" />
             Chef fragen
@@ -576,8 +577,9 @@ const MealDetail = () => {
               onClick={handleRequestBooking}
               disabled={meal.available_portions === 0 || bookingMutation.isPending}
               className="flex-1"
+              aria-label="Mahlzeit jetzt reservieren"
             >
-              {meal.available_portions === 0 ? 'Ausverkauft' : 'Buchung anfragen'}
+              {meal.available_portions === 0 ? 'Ausverkauft' : 'Jetzt reservieren'}
             </Button>
           )}
           

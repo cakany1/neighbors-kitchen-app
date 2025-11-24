@@ -1,13 +1,14 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MealCard } from '@/components/MealCard';
+import { SkeletonMealCard } from '@/components/SkeletonMealCard';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, Shield, Lock } from 'lucide-react';
+import { AlertCircle, Shield, Lock, ChefHat } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { getDistance } from '@/utils/distance';
@@ -256,11 +257,32 @@ const Feed = () => {
         ) : null}
 
         {isLoading ? (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">{t('feed.loading_meals')}</p>
+          <div className="grid gap-4">
+            <SkeletonMealCard />
+            <SkeletonMealCard />
+            <SkeletonMealCard />
           </div>
         ) : !meals || meals.length === 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {/* Friendly Empty State */}
+            <div className="text-center py-12 space-y-4">
+              <div className="w-24 h-24 mx-auto bg-muted rounded-full flex items-center justify-center">
+                <ChefHat className="w-12 h-12 text-muted-foreground" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Der Ofen ist noch kalt
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  Sei der Erste, der kocht und Essen teilt!
+                </p>
+                <Button onClick={() => navigate('/add-meal')} size="lg">
+                  <ChefHat className="w-4 h-4 mr-2" />
+                  Essen teilen
+                </Button>
+              </div>
+            </div>
+            
             <Alert className="border-primary/50 bg-primary/5">
               <AlertCircle className="h-4 w-4 text-primary" />
               <AlertDescription className="text-sm">
