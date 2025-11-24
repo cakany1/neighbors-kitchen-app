@@ -97,8 +97,7 @@ const FAQ = () => {
               <AccordionItem value="item-1">
                 <AccordionTrigger>Wie funktioniert das Bezahlen?</AccordionTrigger>
                 <AccordionContent>
-                  Aktuell zahlst du digital per Kreditkarte oder über digitale Wallets (Apple Pay, Google Pay). 
-                  Der Mindestbetrag deckt die Zutaten und unterstützt die Community.
+                  Die Registrierung ist kostenlos. Zahlen musst du nur, wenn der Koch die Option <strong>&quot;Online Zahlung (Apple Pay / Karte)&quot;</strong> gewählt hat. Die Bezahlung erfolgt dann digital bei der Reservierung.
                 </AccordionContent>
               </AccordionItem>
 
