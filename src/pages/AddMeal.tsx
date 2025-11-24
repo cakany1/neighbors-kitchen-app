@@ -388,16 +388,25 @@ const AddMeal = () => {
                   >
                     Morgen
                   </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      const dateInput = document.getElementById('scheduledDate') as HTMLInputElement;
-                      dateInput?.showPicker?.();
-                    }}
-                  >
-                    <CalendarIcon className="w-4 h-4" />
-                  </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const dateInput = document.createElement('input');
+                    dateInput.type = 'date';
+                    dateInput.value = formData.scheduledDate;
+                    dateInput.onchange = (e) => {
+                      const target = e.target as HTMLInputElement;
+                      if (target.value) {
+                        setFormData({ ...formData, scheduledDate: target.value });
+                      }
+                    };
+                    dateInput.showPicker?.();
+                    dateInput.click();
+                  }}
+                >
+                  <CalendarIcon className="w-4 h-4" />
+                </Button>
                 </div>
                 
                 {/* Date Input - DD.MM.YYYY Format */}
