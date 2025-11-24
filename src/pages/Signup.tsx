@@ -59,22 +59,22 @@ const Signup = () => {
     if (pwd.length === 0) return { level: 0, label: '', color: '' };
     
     if (pwd.length < 6) {
-      return { level: 25, label: 'Zu kurz', color: 'bg-red-500' };
+      return { level: 25, label: t('signup.password_too_short'), color: 'bg-red-500' };
     }
     
     const hasNumber = /\d/.test(pwd);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
     
     if (pwd.length >= 10 && hasNumber && hasSpecialChar) {
-      return { level: 100, label: 'Sicher', color: 'bg-green-500' };
+      return { level: 100, label: t('signup.password_strong'), color: 'bg-green-500' };
     }
     
     if (pwd.length >= 8 && hasNumber) {
-      return { level: 65, label: 'Mittel', color: 'bg-yellow-500' };
+      return { level: 65, label: t('signup.password_medium'), color: 'bg-yellow-500' };
     }
     
-    return { level: 40, label: 'Schwach', color: 'bg-orange-500' };
-  }, [formData.password]);
+    return { level: 40, label: t('signup.password_weak'), color: 'bg-orange-500' };
+  }, [formData.password, t]);
 
   const handlePartnerPhotoUpload = async (file: File) => {
     setUploadingPartnerPhoto(true);
@@ -95,9 +95,9 @@ const Signup = () => {
 
       setFormData({ ...formData, partnerPhotoUrl: publicUrl });
       setPartnerPhotoPreview(URL.createObjectURL(file));
-      toast.success('Partner Foto hochgeladen');
+      toast.success(t('signup.upload_success'));
     } catch (error: any) {
-      toast.error('Foto-Upload fehlgeschlagen: ' + error.message);
+      toast.error(t('signup.upload_failed') + ': ' + error.message);
     } finally {
       setUploadingPartnerPhoto(false);
     }
@@ -108,12 +108,12 @@ const Signup = () => {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Datei zu groß! Max 5MB.');
+      toast.error(t('signup.file_too_large'));
       return;
     }
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Nur Bilder erlaubt!');
+      toast.error(t('signup.images_only'));
       return;
     }
 
@@ -335,7 +335,7 @@ const Signup = () => {
 
             <div className="space-y-2">
               <Label>{t('auth.i_speak')}</Label>
-              <p className="text-xs text-muted-foreground">Wähle alle Sprachen, die du sprichst</p>
+              <p className="text-xs text-muted-foreground">{t('signup.select_languages')}</p>
               <div className="grid grid-cols-2 gap-2">
                 {languages.slice(0, 6).map((lang) => (
                   <div key={lang.code} className="flex items-center space-x-2">
@@ -353,8 +353,7 @@ const Signup = () => {
               <Alert className="mt-2">
                 <Globe className="h-4 w-4" />
                 <AlertDescription className="text-xs">
-                  🇩🇪 Damit übersetzen wir den Chat automatisch für dich. Die App-Sprache bleibt davon unberührt.<br/>
-                  🇬🇧 This enables automatic chat translation. It does not change the app interface language.
+                  {t('signup.chat_translation_note')}
                 </AlertDescription>
               </Alert>
             </div>
@@ -376,11 +375,11 @@ const Signup = () => {
             {/* Mandatory Avatar Upload */}
             <div className="space-y-2">
               <Label htmlFor="avatarPhoto" className="text-base font-semibold text-foreground">
-                📸 Dein Profilfoto (Pflicht) *
+                {t('signup.profile_photo')} *
               </Label>
               <Alert className="bg-destructive/10 border-destructive/30">
                 <AlertDescription className="text-xs text-foreground">
-                  ⚠️ Ohne Foto kannst du nicht bestellen oder anbieten.
+                  {t('signup.photo_required_warning')}
                 </AlertDescription>
               </Alert>
               <Input
@@ -390,17 +389,17 @@ const Signup = () => {
                 required
                 className="cursor-pointer"
               />
-              <p className="text-xs text-muted-foreground">Max 5MB, JPG/PNG</p>
+              <p className="text-xs text-muted-foreground">{t('signup.max_file_size')}</p>
               <Alert className="bg-yellow-500/10 border-yellow-500/30 mt-2">
                 <AlertDescription className="text-xs text-foreground">
-                  Hinweis: Dein Profilbild muss manuell verifiziert werden. Dies kann etwas Zeit in Anspruch nehmen, bevor du Mahlzeiten anbieten kannst.
+                  {t('signup.verification_note')}
                 </AlertDescription>
               </Alert>
             </div>
 
             {/* Account Type Selection */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">Account Typ</Label>
+              <Label className="text-sm font-medium text-foreground">{t('signup.account_type')}</Label>
               <RadioGroup
                 value={accountType}
                 onValueChange={(value: 'single' | 'couple') => {
@@ -412,13 +411,13 @@ const Signup = () => {
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="single" id="account-single" />
                   <Label htmlFor="account-single" className="text-sm cursor-pointer">
-                    Single
+                    {t('signup.single')}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="couple" id="account-couple" />
                   <Label htmlFor="account-couple" className="text-sm cursor-pointer">
-                    Paar / Couple
+                    {t('signup.couple')}
                   </Label>
                 </div>
               </RadioGroup>
@@ -429,11 +428,11 @@ const Signup = () => {
               <div className="space-y-4 p-4 border-2 border-primary/30 rounded-lg bg-primary/5">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">👫</span>
-                  <p className="text-base font-bold text-foreground">Partner-Angaben</p>
+                  <p className="text-base font-bold text-foreground">{t('signup.partner_details')}</p>
                 </div>
                 
                 <div>
-                  <Label htmlFor="partnerName">Partner Name</Label>
+                  <Label htmlFor="partnerName">{t('signup.partner_name')}</Label>
                   <Input
                     id="partnerName"
                     value={formData.partnerName}
@@ -444,24 +443,24 @@ const Signup = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="partnerGender">Partner Geschlecht</Label>
+                  <Label htmlFor="partnerGender">{t('signup.partner_gender')}</Label>
                   <Select 
                     value={formData.partnerGender} 
                     onValueChange={(value) => setFormData({ ...formData, partnerGender: value })}
                   >
                     <SelectTrigger id="partnerGender">
-                      <SelectValue placeholder="Auswählen..." />
+                      <SelectValue placeholder={t('signup.select_gender')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="male">Männlich</SelectItem>
-                      <SelectItem value="female">Weiblich</SelectItem>
+                      <SelectItem value="male">{t('signup.male')}</SelectItem>
+                      <SelectItem value="female">{t('signup.female')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="partnerPhoto" className="text-base font-semibold">
-                    📸 Foto deines Partners (Optional)
+                    {t('signup.partner_photo_required')}
                   </Label>
                   <p className="text-xs text-muted-foreground mb-2">
                     Hilft Nachbarn zu wissen, wer an der Tür stehen könnte

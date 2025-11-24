@@ -244,7 +244,7 @@ const MealDetail = () => {
 
     // DEMO LOCK: Prevent booking demo meals
     if (meal?.tags?.includes('Demo / Beispiel')) {
-      toast.info('👋 Dies ist nur ein Demo-Eintrag. Du kannst ihn nicht wirklich buchen, aber probier es gerne aus!', {
+      toast.info(t('meal_detail.demo_meal_notice'), {
         duration: 5000,
       });
       return;
@@ -286,7 +286,7 @@ const MealDetail = () => {
   });
 
   const handleCancelBooking = () => {
-    if (window.confirm('Möchtest du diese Buchung wirklich stornieren?')) {
+    if (window.confirm(t('meal_detail.confirm_cancel'))) {
       cancelBookingMutation.mutate();
     }
   };
@@ -305,16 +305,16 @@ const MealDetail = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Gericht wurde erfolgreich gelöscht');
+      toast.success(t('meal_detail.delete_success'));
       navigate('/app');
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Löschen fehlgeschlagen');
+      toast.error(error.message || t('meal_detail.delete_failed'));
     },
   });
 
   const handleDeleteMeal = () => {
-    if (window.confirm('Möchtest du dieses Gericht wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) {
+    if (window.confirm(t('meal_detail.confirm_delete'))) {
       deleteMealMutation.mutate();
     }
   };
@@ -327,7 +327,7 @@ const MealDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t('meal_detail.loading')}</p>
       </div>
     );
   }
@@ -336,9 +336,9 @@ const MealDetail = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground">Meal not found</p>
+          <p className="text-muted-foreground">{t('meal_detail.not_found')}</p>
           <Button onClick={() => navigate('/app')} className="mt-4">
-            Zurück zum Feed
+            {t('meal_detail.back_to_feed')}
           </Button>
         </div>
       </div>
@@ -366,17 +366,17 @@ const MealDetail = () => {
           <div className="absolute top-3 right-3 flex flex-col gap-2">
             {meal.is_stock_photo && (
               <Badge className="bg-background/80 backdrop-blur">
-                📷 Symbolic Image
+                {t('meal_card.symbolic_image')}
               </Badge>
             )}
             {meal.available_portions > 0 && (
               <Badge className="bg-primary/90 backdrop-blur text-primary-foreground font-bold text-sm">
-                Noch {meal.available_portions} {meal.unit_type === 'slices' ? 'Stücke' : meal.unit_type === 'items' ? 'Stück' : meal.unit_type === 'whole' ? 'Ganzes' : 'Portionen'}
+                {t('meal_detail.still_available')} {meal.available_portions} {meal.unit_type === 'slices' ? t('meal_detail.pieces') : meal.unit_type === 'items' ? t('meal_detail.items') : meal.unit_type === 'whole' ? t('meal_detail.whole') : t('meal_detail.portions')}
               </Badge>
             )}
             {meal.available_portions === 0 && (
               <Badge className="bg-destructive/90 backdrop-blur text-destructive-foreground font-bold text-sm">
-                Ausverkauft
+                {t('meal_detail.sold_out')}
               </Badge>
             )}
           </div>
@@ -395,7 +395,7 @@ const MealDetail = () => {
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <ChefHat className="w-4 h-4" />
-                <span>by {meal.chef?.first_name} {meal.chef?.last_name?.charAt(0)}.</span>
+                <span>{t('meal_detail.by')} {meal.chef?.first_name} {meal.chef?.last_name?.charAt(0)}.</span>
                 <Star className="w-4 h-4 fill-trust-gold text-trust-gold" />
                 <span className="text-trust-gold font-semibold">{meal.chef?.karma || 0}</span>
               </div>
@@ -409,7 +409,7 @@ const MealDetail = () => {
                   size="icon"
                   onClick={() => handleDeleteMeal()}
                   className="text-muted-foreground hover:text-destructive"
-                  title="Löschen"
+                  title={t('meal_detail.delete')}
                 >
                   <Flag className="w-5 h-5" />
                 </Button>
@@ -419,7 +419,7 @@ const MealDetail = () => {
                   size="icon"
                   onClick={() => setReportDialogOpen(true)}
                   className="text-muted-foreground hover:text-destructive"
-                  title="Melden"
+                  title={t('meal_detail.report')}
                 >
                   <Flag className="w-5 h-5" />
                 </Button>
@@ -437,7 +437,7 @@ const MealDetail = () => {
             <Alert className="border-primary bg-primary/5">
               <Home className="h-4 w-4 text-primary" />
               <AlertDescription>
-                🍽️ <strong>Cooking Experience</strong> - Watch and socialize in the kitchen!
+                🍽️ <strong>{t('meal_card.cooking_experience')}</strong> - Watch and socialize in the kitchen!
               </AlertDescription>
             </Alert>
           )}
@@ -454,7 +454,7 @@ const MealDetail = () => {
           {/* Beschreibung */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Über dieses Gericht</CardTitle>
+              <CardTitle className="text-lg">{t('meal_detail.about_dish')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">{meal.description}</p>
@@ -462,7 +462,7 @@ const MealDetail = () => {
                 <Alert className="mt-4 border-destructive/50 bg-destructive/5">
                   <AlertTriangle className="h-4 w-4 text-destructive" />
                   <AlertDescription className="text-sm">
-                    <strong>Allergene:</strong> {meal.allergens.join(', ')}
+                    <strong>{t('meal_detail.allergens_label')}:</strong> {meal.allergens.join(', ')}
                   </AlertDescription>
                 </Alert>
               )}
@@ -475,7 +475,7 @@ const MealDetail = () => {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-primary" />
-                  Verfügbar am
+                  {t('meal_detail.available_on')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -586,11 +586,11 @@ const MealDetail = () => {
               <CardContent className="pt-6 space-y-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="secondary" className="text-xs">
-                    👫 Als Paar buchen
+                    👫 {t('meal_detail.for_both')}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">2 Portionen vorausgewählt</span>
+                  <span className="text-xs text-muted-foreground">2 {t('meal_detail.portions')}</span>
                 </div>
-                <Label className="text-sm font-semibold">Portionsanzahl</Label>
+                <Label className="text-sm font-semibold">{t('meal_detail.quantity')}</Label>
                 <RadioGroup 
                   value={bookingQuantity.toString()} 
                   onValueChange={(val) => setBookingQuantity(parseInt(val))}
@@ -599,19 +599,13 @@ const MealDetail = () => {
                   <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
                     <RadioGroupItem value="2" id="couple-both" />
                     <Label htmlFor="couple-both" className="cursor-pointer flex-1">
-                      👫 Für uns beide (2 Portionen)
-                      <span className="block text-xs text-muted-foreground">
-                        Standard für Paare
-                      </span>
+                      👫 {t('meal_detail.for_both')}
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
                     <RadioGroupItem value="1" id="couple-single" />
                     <Label htmlFor="couple-single" className="cursor-pointer flex-1">
-                      👤 Nur für mich (1 Portion)
-                      <span className="block text-xs text-muted-foreground">
-                        Für einzelne Person
-                      </span>
+                      👤 {t('meal_detail.for_me')}
                     </Label>
                   </div>
                 </RadioGroup>
@@ -633,12 +627,18 @@ const MealDetail = () => {
         <div className="max-w-lg mx-auto flex gap-2">
           <Button
             variant="outline"
-            onClick={() => setChatOpen(true)}
+            onClick={() => {
+              if (!currentUser) {
+                setAuthModalOpen(true);
+              } else {
+                setChatOpen(true);
+              }
+            }}
             className="flex-1"
-            aria-label="Koch kontaktieren"
+            aria-label={t('meal_detail.chat_with_chef')}
           >
             <MessageCircle className="w-4 h-4 mr-2" />
-            Chef fragen
+            {t('meal_detail.chat_with_chef')}
           </Button>
           
           {bookingStatus === 'none' && (
@@ -646,9 +646,9 @@ const MealDetail = () => {
               onClick={handleRequestBooking}
               disabled={meal.available_portions === 0 || bookingMutation.isPending}
               className="flex-1"
-              aria-label="Mahlzeit jetzt reservieren"
+              aria-label={t('meal_detail.book_now')}
             >
-              {meal.available_portions === 0 ? 'Ausverkauft' : 'Jetzt reservieren'}
+              {meal.available_portions === 0 ? t('meal_detail.sold_out') : t('meal_detail.book_now')}
             </Button>
           )}
           
@@ -661,12 +661,12 @@ const MealDetail = () => {
                   disabled={cancelBookingMutation.isPending}
                   className="flex-1"
                 >
-                  {cancelBookingMutation.isPending ? 'Wird storniert...' : 'Buchung stornieren'}
+                  {cancelBookingMutation.isPending ? t('common.loading') : t('meal_detail.cancel_booking')}
                 </Button>
               ) : (
                 <Button disabled className="flex-1">
                   <Clock className="w-4 h-4 mr-2" />
-                  Ausstehend...
+                  {t('common.loading')}
                 </Button>
               )}
             </>
@@ -676,10 +676,10 @@ const MealDetail = () => {
             <div className="flex-1 space-y-2">
               <Button disabled className="w-full bg-secondary">
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Buchung bestätigt
+                {t('meal_detail.booking_confirmed')}
               </Button>
               <p className="text-xs text-center text-muted-foreground">
-                Kontaktiere Koch zum Stornieren
+                {t('meal_detail.contact_chef_to_cancel')}
               </p>
             </div>
           )}
