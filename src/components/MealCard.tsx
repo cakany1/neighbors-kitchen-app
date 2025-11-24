@@ -155,13 +155,22 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
         </div>
         
         <div className="pt-3 border-t border-border space-y-2">
-          {/* The "No Price Tag" Badge */}
-          <div className="flex items-center justify-center gap-2 py-2 px-3 bg-primary/10 rounded-lg">
-            <Heart className="w-4 h-4 text-primary fill-current" />
-            <span className="text-sm font-semibold text-primary">
-              {t('common.payWhatYouWant')}
-            </span>
-          </div>
+          {/* Free Meal Badge OR Pay What You Want Badge */}
+          {meal.pricing.minimum === 0 ? (
+            <div className="flex items-center justify-center gap-2 py-2 px-3 bg-secondary/10 rounded-lg">
+              <Gift className="w-4 h-4 text-secondary fill-current" />
+              <span className="text-sm font-semibold text-secondary">
+                🎁 Gegen ein Lächeln
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2 py-2 px-3 bg-primary/10 rounded-lg">
+              <Heart className="w-4 h-4 text-primary fill-current" />
+              <span className="text-sm font-semibold text-primary">
+                {t('common.payWhatYouWant')}
+              </span>
+            </div>
+          )}
 
           {/* Barter Info (if applicable) */}
           {exchangeMode === 'barter' && (
