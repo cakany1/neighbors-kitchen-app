@@ -21,19 +21,36 @@ import FAQ from "./pages/FAQ";
 import { Footer } from "./components/Footer";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
+import { OnboardingTour } from "./components/OnboardingTour";
+import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <InstallPrompt />
-      <CookieBanner />
-      <BrowserRouter>
-        <div className="flex flex-col min-h-screen pb-24">
-          <Routes>
+const App = () => {
+  const [showTour, setShowTour] = useState(false);
+
+  useEffect(() => {
+    // Check if user just registered or tour hasn't been completed
+    const justRegistered = localStorage.getItem('just_registered') === 'true';
+    const tourCompleted = localStorage.getItem('tour_completed') === 'true';
+    
+    if (justRegistered || !tourCompleted) {
+      setShowTour(true);
+      localStorage.removeItem('just_registered'); // Clear the flag
+    }
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <InstallPrompt />
+        <CookieBanner />
+        {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
+        <BrowserRouter>
+          <div className="flex flex-col min-h-screen pb-24">
+            <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/feed" element={<Feed />} />
             <Route path="/map" element={<MapView />} />
@@ -56,6 +73,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
