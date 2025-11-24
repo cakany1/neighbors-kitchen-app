@@ -16,11 +16,6 @@ export const InstallPrompt = () => {
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
-  // Don't show on landing page
-  if (location.pathname === '/') {
-    return null;
-  }
-
   useEffect(() => {
     // Check if already installed (standalone mode)
     const standalone = window.matchMedia('(display-mode: standalone)').matches;
@@ -71,7 +66,8 @@ export const InstallPrompt = () => {
     sessionStorage.setItem('pwa-prompt-dismissed', 'true');
   };
 
-  if (isStandalone || !showPrompt) {
+  // Don't show on landing page or if already installed/dismissed
+  if (location.pathname === '/' || isStandalone || !showPrompt) {
     return null;
   }
 
