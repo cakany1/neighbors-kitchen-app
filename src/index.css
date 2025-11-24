@@ -162,6 +162,21 @@ All colors MUST be HSL.
   }
 }
 
+/* Nuclear CSS overrides to kill persistent ghost overlays */
+/* Target Radix Portal backdrops */
+div[data-radix-portal] > div[data-state="open"]:first-child:not([role]) {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Generic backdrop killers - kill OnboardingTour overlay */
+.bg-black\/60,
+.bg-black\/50,
+.bg-gray-500\/50 {
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
 /* Hide Lovable Badge on mobile screens */
 @media (max-width: 768px) {
   div[data-lovable-badge],

@@ -23,13 +23,20 @@ import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [showTour, setShowTour] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
+    // Never show tour on landing page
+    if (location.pathname === '/') {
+      return;
+    }
+    
     // Check if user just registered or tour hasn't been completed
     const justRegistered = localStorage.getItem('just_registered') === 'true';
     const tourCompleted = localStorage.getItem('tour_completed') === 'true';
@@ -38,7 +45,7 @@ const App = () => {
       setShowTour(true);
       localStorage.removeItem('just_registered'); // Clear the flag
     }
-  }, []);
+  }, [location.pathname]);
 
   return (
     <QueryClientProvider client={queryClient}>
