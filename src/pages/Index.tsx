@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChefHat, Shield, Heart, Globe } from 'lucide-react';
 import { HeroFeedTeaser } from '@/components/HeroFeedTeaser';
+import { Footer } from '@/components/Footer';
 import { useTranslation } from 'react-i18next';
 
 const Index = () => {
@@ -162,11 +163,11 @@ const Index = () => {
                   <h3 className="font-bold text-lg mb-2 text-center">
                     {i18n.language === 'de' ? '3. Karma verdienen' : '3. Earn Karma'}
                   </h3>
-                  <p className="text-sm text-muted-foreground text-center">
-                    {i18n.language === 'de'
-                      ? 'Sammle Karma-Punkte durch Teilen und faire Bezahlung.'
-                      : 'Collect Karma points through sharing and fair payment.'}
-                  </p>
+                   <p className="text-sm text-muted-foreground text-center">
+                     {i18n.language === 'de'
+                       ? 'Punkte sammeln durch Teilen und Zuverlässigkeit.'
+                       : 'Collect points through sharing and reliability.'}
+                   </p>
                 </CardContent>
               </Card>
             </div>
@@ -237,13 +238,16 @@ const Index = () => {
             </Badge>
           </section>
         </main>
+        
+        <Footer />
       </div>
     );
   }
 
   // Mobile App Entry View
   return (
-    <div className="min-h-screen w-full bg-[#FDFCFB] flex flex-col items-center justify-center px-4 py-8 pb-24">
+    <div className="min-h-screen w-full bg-[#FDFCFB] flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 pb-24">
       <div className="text-center mb-8">
         <ChefHat className="w-20 h-20 text-primary mx-auto mb-4" />
         <h1 className="text-4xl font-bold text-foreground mb-2">
@@ -300,6 +304,9 @@ const Index = () => {
       <div className="w-full max-w-md">
         <HeroFeedTeaser />
       </div>
+      </div>
+      
+      <Footer />
     </div>
   );
 };

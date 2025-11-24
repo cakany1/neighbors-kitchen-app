@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { SafetyAlert } from '@/components/SafetyAlert';
 import { TranslateButton } from '@/components/TranslateButton';
 import { ReportDialog } from '@/components/ReportDialog';
+import { AuthInterstitialModal } from '@/components/AuthInterstitialModal';
 import { checkAllergenMatch } from '@/utils/ingredientDatabase';
 import FuzzyLocationMap from '@/components/maps/FuzzyLocationMap';
 import ChatModal from '@/components/ChatModal';
@@ -44,6 +45,7 @@ const MealDetail = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const [bookingQuantity, setBookingQuantity] = useState(1);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   
   // Fetch current user - SECURITY: Own profile can access all fields
   const { data: currentUser } = useQuery({
@@ -232,12 +234,9 @@ const MealDetail = () => {
   });
 
   const handleRequestBooking = () => {
-    // AUTH GATEKEEPER: Redirect to signup if not logged in
+    // AUTH GATEKEEPER: Show trust modal first if not logged in
     if (!currentUser) {
-      toast.error('Bitte registriere dich, um dieses Essen zu retten!', {
-        duration: 4000,
-      });
-      navigate('/signup');
+      setAuthModalOpen(true);
       return;
     }
 
@@ -322,12 +321,12 @@ const MealDetail = () => {
       
       <main className="max-w-lg mx-auto pb-32 md:pb-4">
         {/* Hero Image */}
-        <div className="relative h-64 md:h-auto md:max-h-[500px] bg-muted md:flex md:items-center md:justify-center">
+        <div className="relative h-64 md:h-auto md:max-h-[400px] bg-muted md:flex md:items-center md:justify-center">
           {meal.image_url ? (
             <img 
               src={meal.image_url} 
               alt={meal.title}
-              className="w-full h-full object-cover md:object-contain md:max-h-[500px]"
+              className="w-full h-full object-cover md:object-contain md:max-h-[400px]"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -659,6 +658,15 @@ const MealDetail = () => {
         onOpenChange={setReportDialogOpen}
         reportedMealId={meal?.id}
         reportedUserId={meal?.chef_id}
+      />
+
+      <AuthInterstitialModal
+        open={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        onSignup={() => {
+          setAuthModalOpen(false);
+          navigate('/signup');
+        }}
       />
     </div>
   );
