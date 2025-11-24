@@ -260,9 +260,9 @@ const Index = () => {
           <Button
             className="w-full h-12 bg-primary hover:bg-primary/90"
             size="lg"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/feed')}
           >
-            Jetzt mitmachen
+            App starten
           </Button>
           
           <Button
