@@ -51,8 +51,11 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   
   return (
     <Card 
-      className="overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 border-border"
+      className="overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border-border"
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`Mahlzeit ansehen: ${meal.title}`}
     >
       <div className="relative h-48 bg-muted">
         {meal.imageUrl ? (
