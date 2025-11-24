@@ -33,7 +33,7 @@ const Index = () => {
   // Desktop Marketing View
   if (!isMobile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
+      <div className="min-h-screen w-full bg-[#FDFCFB]">
         {/* Navigation Header */}
         <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -243,7 +243,7 @@ const Index = () => {
 
   // Mobile App Entry View
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center px-4 py-8 pb-24">
+    <div className="min-h-screen w-full bg-[#FDFCFB] flex flex-col items-center justify-center px-4 py-8 pb-24">
       <div className="text-center mb-8">
         <ChefHat className="w-20 h-20 text-primary mx-auto mb-4" />
         <h1 className="text-4xl font-bold text-foreground mb-2">
