@@ -334,7 +334,8 @@ const AddMeal = () => {
           {/* Time Selection - Smart Chips */}
           <Card>
             <CardContent className="pt-6 space-y-4">
-              <Label className="text-lg font-semibold">Abholzeit *</Label>
+              <Label className="text-lg font-semibold">Abholzeit (heute) *</Label>
+              <p className="text-sm text-muted-foreground mb-3">Wann können Gäste das Essen abholen?</p>
               <div className="grid grid-cols-2 gap-3">
                 {['17:00', '18:00', '19:00', '20:00'].map((time) => (
                   <Button
@@ -356,25 +357,27 @@ const AddMeal = () => {
                 ))}
               </div>
               <div className="pt-2">
-                <Label className="text-sm text-muted-foreground">Oder manuell eingeben:</Label>
+                <Label className="text-sm text-muted-foreground">Oder manuell eingeben (24h Format):</Label>
                 <div className="grid grid-cols-2 gap-3 mt-2">
                   <div>
-                    <Label htmlFor="collectionWindowStart" className="text-xs">Von</Label>
+                    <Label htmlFor="collectionWindowStart" className="text-xs">Abholbereit von (HH:MM)</Label>
                     <Input
                       id="collectionWindowStart"
                       type="time"
                       value={formData.collectionWindowStart}
                       onChange={(e) => setFormData({ ...formData, collectionWindowStart: e.target.value })}
                       required
+                      step="300"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="collectionWindowEnd" className="text-xs">Bis</Label>
+                    <Label htmlFor="collectionWindowEnd" className="text-xs">Bis (HH:MM)</Label>
                     <Input
                       id="collectionWindowEnd"
                       type="time"
                       value={formData.collectionWindowEnd}
                       onChange={(e) => setFormData({ ...formData, collectionWindowEnd: e.target.value })}
+                      step="300"
                     />
                   </div>
                 </div>
@@ -559,38 +562,9 @@ const AddMeal = () => {
             </AccordionItem>
           </Accordion>
 
-          {/* Date & Time */}
-          <Card>
-            <CardContent className="pt-6 space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor="scheduledDate">Abholbereit ab *</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const today = new Date().toISOString().split('T')[0];
-                      setFormData({ ...formData, scheduledDate: today });
-                    }}
-                  >
-                    Heute
-                  </Button>
-                </div>
-                <Input
-                  id="scheduledDate"
-                  type="date"
-                  value={formData.scheduledDate}
-                  onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
-                  required
-                />
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Submit Button */}
           <Button 
-            type="submit" 
+            type="submit"
             className="w-full" 
             size="lg"
           >
