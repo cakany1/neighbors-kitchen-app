@@ -117,7 +117,7 @@ const Index = () => {
             </div>
             
             {/* Meal Preview Cards */}
-            <div onClick={() => navigate('/login')} className="cursor-pointer">
+            <div>
               <HeroFeedTeaser />
             </div>
           </div>
@@ -297,7 +297,7 @@ const Index = () => {
       </Card>
 
       {/* Mobile Meal Preview */}
-      <div className="w-full max-w-md" onClick={() => navigate('/login')} style={{ cursor: 'pointer' }}>
+      <div className="w-full max-w-md">
         <HeroFeedTeaser />
       </div>
     </div>

@@ -31,6 +31,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { DEMO_MEALS } from '@/data/demoMeals';
 
 const MealDetail = () => {
   const { id } = useParams();
@@ -60,9 +61,17 @@ const MealDetail = () => {
   });
 
   // Fetch meal data with chef - SECURITY: Never fetch exact_address here
+  // GUEST MODE: Check demo meals first
   const { data: meal, isLoading } = useQuery({
     queryKey: ['meal', id],
     queryFn: async () => {
+      // Check if this is a demo meal
+      const demoMeal = DEMO_MEALS.find(m => m.id === id);
+      if (demoMeal) {
+        return demoMeal;
+      }
+
+      // Otherwise fetch from Supabase
       const { data, error } = await supabase
         .from('meals')
         .select(`
@@ -220,9 +229,12 @@ const MealDetail = () => {
   });
 
   const handleRequestBooking = () => {
+    // AUTH GATEKEEPER: Redirect to signup if not logged in
     if (!currentUser) {
-      toast.error('Please log in to book this meal');
-      navigate('/login');
+      toast.error('Bitte registriere dich, um dieses Essen zu retten!', {
+        duration: 4000,
+      });
+      navigate('/signup');
       return;
     }
 
