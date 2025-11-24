@@ -28,24 +28,25 @@ const queryClient = new QueryClient();
 
 // Inner component that uses router hooks
 const AppRoutes = () => {
-  const [showTour, setShowTour] = useState(false);
+  const [showTour, setShowTour] = useState(false); // Disabled by default
   const location = useLocation();
 
-  useEffect(() => {
-    // Never show tour on landing page
-    if (location.pathname === '/') {
-      return;
-    }
-    
-    // Check if user just registered or tour hasn't been completed
-    const justRegistered = localStorage.getItem('just_registered') === 'true';
-    const tourCompleted = localStorage.getItem('tour_completed') === 'true';
-    
-    if (justRegistered || !tourCompleted) {
-      setShowTour(true);
-      localStorage.removeItem('just_registered'); // Clear the flag
-    }
-  }, [location.pathname]);
+  // TOUR LOGIC DISABLED FOR STABILITY
+  // useEffect(() => {
+  //   // Never show tour on landing page
+  //   if (location.pathname === '/') {
+  //     return;
+  //   }
+  //   
+  //   // Check if user just registered or tour hasn't been completed
+  //   const justRegistered = localStorage.getItem('just_registered') === 'true';
+  //   const tourCompleted = localStorage.getItem('tour_completed') === 'true';
+  //   
+  //   if (justRegistered || !tourCompleted) {
+  //     setShowTour(true);
+  //     localStorage.removeItem('just_registered'); // Clear the flag
+  //   }
+  // }, [location.pathname]);
 
   return (
     <>
