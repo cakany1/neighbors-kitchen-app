@@ -129,13 +129,10 @@ export const dislikeCategories = {
 };
 
 export const exchangeOptions = [
-  { value: "money", label: "Geld (Online Bezahlung)", note: "min. CHF 7.-" },
-  { value: "wine", label: "Eine Flasche Wein", icon: "🍷" },
-  { value: "dessert", label: "Dessert / Süsses", icon: "🍰" },
-  { value: "produce", label: "Früchte / Gemüse", icon: "🍎" },
-  { value: "surprise", label: "Überrasch mich!", icon: "🎁" },
-  { value: "anything", label: "Egal / Überrasch mich", icon: "✨" },
-  { value: "smile", label: "Nichts / Nur ein Lächeln (Gratis)", icon: "😊" },
+  { value: "money", label: "Bargeld (CHF)", note: "Zahlung nach dem Essen, min. CHF 7.-", icon: "💵" },
+  { value: "barter", label: "Tausch / Barter", note: "Beschreibe, was du gerne hättest", icon: "🔄" },
+  { value: "surprise", label: "Egal / Überrasch mich", icon: "🎁" },
+  { value: "smile", label: "Nichts / Nur ein Lächeln", note: "Gratis teilen", icon: "😊" },
 ];
 
 /**

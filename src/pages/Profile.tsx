@@ -520,7 +520,7 @@ const Profile = () => {
           <Alert className="mb-6 border-primary bg-primary/10">
             <Shield className="h-4 w-4 text-primary" />
             <AlertDescription className="text-sm">
-              <strong>Get Verified to increase your booking chances!</strong> Verified users get a blue tick badge and more trust from the community.
+              <strong>{t('profile.verification_banner')}</strong> {t('profile.verification_banner_desc')}
             </AlertDescription>
           </Alert>
         )}
