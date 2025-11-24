@@ -239,60 +239,33 @@ const Signup = () => {
         return;
       }
 
-      // Step 2: Wait a moment for trigger to fire
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Step 3: Check if profile was created by trigger
-      const { data: existingProfile } = await supabase
+      // Step 2: IMMEDIATELY create profile with upsert (no trigger dependency)
+      console.log('Creating profile immediately...');
+      const { error: profileError } = await supabase
         .from('profiles')
-        .select('id')
-        .eq('id', data.user.id)
-        .maybeSingle();
+        .upsert({
+          id: data.user.id,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          languages: selectedLanguages,
+          gender: formData.gender || null,
+          is_couple: formData.isCouple,
+          partner_name: formData.isCouple ? formData.partnerName : null,
+          partner_gender: formData.isCouple ? formData.partnerGender : null,
+          partner_photo_url: formData.isCouple ? formData.partnerPhotoUrl : null,
+          phone_number: formData.phoneNumber || null,
+          private_address: formData.address || null,
+          private_city: formData.city || null,
+          private_postal_code: formData.postalCode || null,
+        }, { onConflict: 'id' });
 
-      // Step 4: If no profile exists, create it manually with upsert
-      if (!existingProfile) {
-        console.log('Profile not auto-created, inserting manually...');
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: data.user.id,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            languages: selectedLanguages,
-            gender: formData.gender || null,
-            is_couple: formData.isCouple,
-            partner_name: formData.isCouple ? formData.partnerName : null,
-            partner_gender: formData.isCouple ? formData.partnerGender : null,
-            partner_photo_url: formData.isCouple ? formData.partnerPhotoUrl : null,
-            phone_number: formData.phoneNumber || null,
-            private_address: formData.address || null,
-            private_city: formData.city || null,
-            private_postal_code: formData.postalCode || null,
-          }, { onConflict: 'id' });
-
-        if (insertError) {
-          setLoading(false);
-          console.error('Manual profile creation failed:', insertError);
-          toast.error('Profil konnte nicht erstellt werden. Bitte kontaktiere den Support.', {
-            duration: 10000,
-          });
-          return; // Don't navigate on error
-        }
-      } else {
-        // Step 5: Update existing profile with additional fields
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({
-            phone_number: formData.phoneNumber || null,
-            private_address: formData.address || null,
-            private_city: formData.city || null,
-            private_postal_code: formData.postalCode || null,
-          })
-          .eq('id', data.user.id);
-
-        if (updateError) {
-          console.error('Profile update error:', updateError);
-        }
+      if (profileError) {
+        setLoading(false);
+        console.error('Profile creation failed:', profileError);
+        toast.error('Profil konnte nicht erstellt werden. Bitte kontaktiere den Support.', {
+          duration: 10000,
+        });
+        return;
       }
 
       // Set flag to trigger onboarding tour
