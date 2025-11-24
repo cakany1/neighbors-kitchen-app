@@ -145,7 +145,7 @@
     "languageUpdated": "Sprachen aktualisiert",
     "karma_title": "Über Karma Punkte",
     "karma_share": "Essen teilen",
-    "karma_share_desc": "Verdiene Karma, indem du dein Gekochtes teilst",
+    "karma_share_desc": "Sammle Karma-Punkte durch Teilen und Zuverlässigkeit",
     "karma_pay": "Fair bezahlen",
     "karma_pay_desc": "Baue Vertrauen auf durch faire Beiträge",
     "karma_respect": "Respektvoll sein",
@@ -215,7 +215,7 @@
   "navigation": {
     "feed": "Feed",
     "map": "Karte",
-    "addMeal": "Essen teilen",
+    "addMeal": "Essen anbieten",
     "profile": "Profil"
   },
   "handover": {

@@ -35,7 +35,6 @@ const AddMeal = () => {
     restaurantReferencePrice: '',
     portions: '1',
     scheduledDate: new Date().toISOString().split('T')[0],
-    scheduledTime: '',
     collectionWindowStart: '',
     collectionWindowEnd: '',
   });
@@ -56,6 +55,18 @@ const AddMeal = () => {
       return { id: user.id, gender: profile?.gender };
     },
   });
+
+  // AUTH GATE: Redirect to login if not authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Bitte melde dich an, um Essen anzubieten.');
+        navigate('/login');
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   const toggleExchangeOption = (option: string) => {
     setSelectedExchangeOptions(prev =>
@@ -132,7 +143,7 @@ const AddMeal = () => {
     e.preventDefault();
     
     // Validation
-    if (!formData.title || !formData.scheduledDate || !formData.scheduledTime) {
+    if (!formData.title || !formData.scheduledDate) {
       toast.error(t('toast.fill_required_fields'));
       return;
     }
@@ -199,8 +210,8 @@ const AddMeal = () => {
       const fuzzyLat = geoData.lat + (Math.random() * 0.004 - 0.002);
       const fuzzyLng = geoData.lng + (Math.random() * 0.004 - 0.002);
 
-      // 3. Combine scheduled date and time
-      const scheduledDateTime = `${formData.scheduledDate}T${formData.scheduledTime}:00`;
+      // 3. Combine scheduled date and collection start time
+      const scheduledDateTime = `${formData.scheduledDate}T${formData.collectionWindowStart || '18:00'}:00`;
 
       // 4. Prepare meal data
       const mealData = {
@@ -260,7 +271,7 @@ const AddMeal = () => {
       
       <main className="max-w-lg mx-auto px-4 py-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Essen teilen</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Essen anbieten</h1>
           <p className="text-muted-foreground">Erstelle ein Angebot für dein selbstgekochtes Gericht</p>
         </div>
 
@@ -560,18 +571,6 @@ const AddMeal = () => {
                   type="date"
                   value={formData.scheduledDate}
                   onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="scheduledTime">Fertig um * (24h Format)</Label>
-                <Input
-                  id="scheduledTime"
-                  type="time"
-                  step="900"
-                  value={formData.scheduledTime}
-                  onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
                   required
                 />
               </div>
