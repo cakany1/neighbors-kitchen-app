@@ -73,29 +73,29 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           {isStockPhoto && (
             <Badge className="bg-secondary/90 backdrop-blur-sm text-secondary-foreground flex items-center gap-1">
               <Camera className="w-3 h-3" />
-              Symbolic Image
+              {t('meal_card.symbolic_image')}
             </Badge>
           )}
           {meal.isCookingExperience && (
             <Badge className="bg-secondary text-secondary-foreground">
-              Cooking Experience
+              {t('meal_card.cooking_experience')}
             </Badge>
           )}
           {handoverMode === 'dine_in' && (
             <Badge className="bg-primary text-primary-foreground flex items-center gap-1">
               <UtensilsCrossed className="w-3 h-3" />
-              Dine In
+              {t('meal_card.dine_in')}
             </Badge>
           )}
           {handoverMode === 'anonymous_drop' && (
             <Badge className="bg-muted text-muted-foreground flex items-center gap-1">
               <Ghost className="w-3 h-3" />
-              Ghost Mode
+              {t('meal_card.ghost_mode')}
             </Badge>
           )}
           {meal.availablePortions > 0 && (
             <Badge className="bg-primary/90 backdrop-blur text-primary-foreground font-bold">
-              Noch {meal.availablePortions}
+              {t('meal_card.portions_left')} {meal.availablePortions}
             </Badge>
           )}
         </div>
@@ -139,7 +139,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
         {/* Chef Portfolio Badge - Shows trust signal */}
         <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
           <Camera className="w-3.5 h-3.5 text-primary" />
-          <span className="text-primary font-medium">Portfolio Available</span>
+          <span className="text-primary font-medium">{t('meal_card.portfolio_available')}</span>
         </div>
         
         {meal.scheduledDate && (
@@ -163,7 +163,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
             <div className="flex items-center justify-center gap-2 py-2 px-3 bg-secondary/10 rounded-lg">
               <Gift className="w-4 h-4 text-secondary fill-current" />
               <span className="text-sm font-semibold text-secondary">
-                🎁 Gegen ein Lächeln
+                {t('meal_card.free_with_smile')}
               </span>
             </div>
           ) : (

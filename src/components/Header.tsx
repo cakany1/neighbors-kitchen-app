@@ -5,9 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 export const Header = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Check if current user is admin
   const { data: isAdmin } = useQuery({
@@ -56,7 +58,7 @@ export const Header = () => {
             onClick={() => navigate('/story')}
             className="hidden md:flex"
           >
-            Über uns
+            {t('landing.about_us')}
           </Button>
           <Button
             variant="ghost"
@@ -64,7 +66,7 @@ export const Header = () => {
             onClick={() => navigate('/install')}
             className="hidden md:flex"
           >
-            App installieren
+            {t('landing.install_app')}
           </Button>
           <LanguageSwitcher />
           <Button

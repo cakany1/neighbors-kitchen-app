@@ -150,5 +150,52 @@
     "descriptionLabel": "Additional details (optional)",
     "submitReport": "Submit Report",
     "reportSubmitted": "Report submitted successfully"
+  },
+  "landing": {
+    "about_us": "About Us",
+    "install_app": "Install App",
+    "login": "Login",
+    "join_now": "Join Now",
+    "how_it_works": "How it Works",
+    "safety_rules": "Safety Rules",
+    "share_food": "1. Share Food",
+    "share_food_desc": "Cooked too much? Share excess food with your neighbors.",
+    "meet_neighbors": "2. Meet Neighbors",
+    "meet_neighbors_desc": "Get to know your neighbors and build trust in your community.",
+    "earn_karma": "3. Earn Karma",
+    "earn_karma_desc": "Collect points through sharing and reliability.",
+    "trust_community": "Trust Community",
+    "trust_community_desc": "Verified profiles (Blue Badge) create trust. Everyone can start immediately, verification is optional.",
+    "respect_private_spaces": "Respect Private Spaces",
+    "respect_private_spaces_desc": "Bring your own container. Respect chef homes.",
+    "community_over_commerce": "Community over Commerce",
+    "community_over_commerce_desc": "Pay fairly. This is a sharing community, not a restaurant.",
+    "exclusive_basel": "Exclusive to Basel",
+    "tagline": "Share food, build trust, save meals in your neighborhood",
+    "start_app": "Start App",
+    "browse_guest": "Browse as Guest"
+  },
+  "footer": {
+    "imprint": "Imprint",
+    "terms_privacy": "Terms & Privacy",
+    "contact": "Contact",
+    "install_app": "📱 Install App"
+  },
+  "modal": {
+    "almost_done": "Almost done!",
+    "registration_required": "For the safety of the neighborhood, we need a short registration. Only registered neighbors can pick up food.",
+    "register_now": "Register now",
+    "cancel": "Cancel"
+  },
+  "meal_card": {
+    "symbolic_image": "Symbolic Image",
+    "cooking_experience": "Cooking Experience",
+    "dine_in": "Dine In",
+    "ghost_mode": "Ghost Mode",
+    "portions_left": "Left",
+    "portfolio_available": "Portfolio Available",
+    "free_with_smile": "🎁 For a Smile",
+    "pay_after_meal": "Pay after the meal",
+    "surprise_me": "Surprise me"
   }
 }

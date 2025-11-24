@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { t } = useTranslation();
 
   return (
     <footer className="bg-card border-t border-border py-6 mt-auto">
@@ -14,28 +16,28 @@ export const Footer = () => {
             to="/impressum" 
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
-            Impressum
+            {t('footer.imprint')}
           </Link>
           <span className="text-muted-foreground">|</span>
           <Link 
             to="/agb" 
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
-            AGB & Datenschutz
+            {t('footer.terms_privacy')}
           </Link>
           <span className="text-muted-foreground">|</span>
           <Link 
             to="/contact" 
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
-            Kontakt
+            {t('footer.contact')}
           </Link>
           <span className="text-muted-foreground">|</span>
           <Link 
             to="/install" 
             className="text-muted-foreground hover:text-foreground transition-colors font-medium"
           >
-            📱 App installieren
+            {t('footer.install_app')}
           </Link>
         </div>
       </div>
