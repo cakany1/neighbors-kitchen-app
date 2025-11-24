@@ -18,7 +18,7 @@ export const CookieBanner = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border shadow-lg p-4 pointer-events-auto">
+    <div className="fixed bottom-0 left-0 right-0 z-[60] bg-background border-t border-border shadow-xl p-4">
       <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
         <p className="text-sm text-foreground">
           Wir nutzen essenzielle Cookies für die Funktion der App.{' '}
@@ -26,7 +26,7 @@ export const CookieBanner = () => {
             Infos
           </a>
         </p>
-        <Button onClick={handleAccept} size="sm">
+        <Button onClick={handleAccept} size="sm" className="shrink-0">
           Ok
         </Button>
       </div>
