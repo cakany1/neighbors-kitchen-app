@@ -12,7 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Upload, Shield, Plus, Minus } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Upload, Shield, Plus, Minus, Calendar as CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { exchangeOptions } from '@/utils/ingredientDatabase';
 import { TagSelector } from '@/components/meals/TagSelector';
@@ -38,6 +39,19 @@ const AddMeal = () => {
     collectionWindowStart: '',
     collectionWindowEnd: '',
   });
+
+  // Time dropdown options (24h format)
+  const hourOptions = Array.from({ length: 18 }, (_, i) => {
+    const hour = (i + 6).toString().padStart(2, '0');
+    return { value: hour, label: `${hour} Uhr` };
+  }); // 06:00 - 23:00
+  
+  const minuteOptions = [
+    { value: '00', label: ':00' },
+    { value: '15', label: ':15' },
+    { value: '30', label: ':30' },
+    { value: '45', label: ':45' },
+  ];
 
   // Fetch current user's gender for Ladies Only feature
   const { data: currentUser } = useQuery({
@@ -331,54 +345,156 @@ const AddMeal = () => {
             </CardContent>
           </Card>
 
-          {/* Time Selection - Smart Chips */}
-          <Card>
-            <CardContent className="pt-6 space-y-4">
-              <Label className="text-lg font-semibold">Abholzeit (heute) *</Label>
-              <p className="text-sm text-muted-foreground mb-3">Wann können Gäste das Essen abholen?</p>
-              <div className="grid grid-cols-2 gap-3">
-                {['17:00', '18:00', '19:00', '20:00'].map((time) => (
+          {/* Schedule Card - Date & Time */}
+          <Card className="bg-muted/30">
+            <CardContent className="pt-6 space-y-5">
+              {/* Date Picker */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="scheduledDate" className="text-lg font-semibold flex items-center gap-2">
+                    <CalendarIcon className="w-5 h-5" />
+                    Abholbereit ab *
+                  </Label>
                   <Button
-                    key={time}
                     type="button"
-                    variant={formData.collectionWindowStart === time ? 'default' : 'outline'}
+                    variant="outline"
+                    size="sm"
                     onClick={() => {
-                      const endHour = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
-                      setFormData({ 
-                        ...formData, 
-                        collectionWindowStart: time,
-                        collectionWindowEnd: `${endHour}:00`
-                      });
+                      const today = new Date().toISOString().split('T')[0];
+                      setFormData({ ...formData, scheduledDate: today });
                     }}
-                    className="h-12"
                   >
-                    {`${time} - ${(parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0')}:00 Uhr`}
+                    Heute
                   </Button>
-                ))}
+                </div>
+                <Input
+                  id="scheduledDate"
+                  type="date"
+                  value={formData.scheduledDate}
+                  onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
+                  required
+                  className="h-11"
+                />
               </div>
-              <div className="pt-2">
-                <Label className="text-sm text-muted-foreground">Oder manuell eingeben (24h Format):</Label>
-                <div className="grid grid-cols-2 gap-3 mt-2">
-                  <div>
-                    <Label htmlFor="collectionWindowStart" className="text-xs">Abholbereit von (HH:MM)</Label>
-                    <Input
-                      id="collectionWindowStart"
-                      type="time"
-                      value={formData.collectionWindowStart}
-                      onChange={(e) => setFormData({ ...formData, collectionWindowStart: e.target.value })}
-                      required
-                      step="300"
-                    />
+
+              {/* Divider */}
+              <div className="border-t border-border" />
+
+              {/* Time Selection */}
+              <div className="space-y-4">
+                <Label className="text-lg font-semibold block">Abholzeit *</Label>
+                <p className="text-sm text-muted-foreground">Wann können Gäste das Essen abholen?</p>
+                
+                {/* Smart Time Chips */}
+                <div className="grid grid-cols-2 gap-3">
+                  {['17:00', '18:00', '19:00', '20:00'].map((time) => (
+                    <Button
+                      key={time}
+                      type="button"
+                      variant={formData.collectionWindowStart === time ? 'default' : 'outline'}
+                      onClick={() => {
+                        const endHour = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
+                        setFormData({ 
+                          ...formData, 
+                          collectionWindowStart: time,
+                          collectionWindowEnd: `${endHour}:00`
+                        });
+                      }}
+                      className="h-12"
+                    >
+                      {`${time} - ${(parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0')}:00 Uhr`}
+                    </Button>
+                  ))}
+                </div>
+
+                {/* Manual Time Selection with Dropdowns */}
+                <div className="pt-2">
+                  <Label className="text-sm text-muted-foreground mb-3 block">Oder wähle eine individuelle Zeit:</Label>
+                  
+                  {/* Start Time */}
+                  <div className="mb-4">
+                    <Label className="text-xs text-muted-foreground mb-2 block">Von (Startzeit)</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Select
+                        value={formData.collectionWindowStart.split(':')[0] || ''}
+                        onValueChange={(hour) => {
+                          const minute = formData.collectionWindowStart.split(':')[1] || '00';
+                          setFormData({ ...formData, collectionWindowStart: `${hour}:${minute}` });
+                        }}
+                      >
+                        <SelectTrigger className="h-11">
+                          <SelectValue placeholder="Stunde" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {hourOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select
+                        value={formData.collectionWindowStart.split(':')[1] || ''}
+                        onValueChange={(minute) => {
+                          const hour = formData.collectionWindowStart.split(':')[0] || '18';
+                          setFormData({ ...formData, collectionWindowStart: `${hour}:${minute}` });
+                        }}
+                      >
+                        <SelectTrigger className="h-11">
+                          <SelectValue placeholder="Minute" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {minuteOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
+
+                  {/* End Time */}
                   <div>
-                    <Label htmlFor="collectionWindowEnd" className="text-xs">Bis (HH:MM)</Label>
-                    <Input
-                      id="collectionWindowEnd"
-                      type="time"
-                      value={formData.collectionWindowEnd}
-                      onChange={(e) => setFormData({ ...formData, collectionWindowEnd: e.target.value })}
-                      step="300"
-                    />
+                    <Label className="text-xs text-muted-foreground mb-2 block">Bis (Endzeit)</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Select
+                        value={formData.collectionWindowEnd.split(':')[0] || ''}
+                        onValueChange={(hour) => {
+                          const minute = formData.collectionWindowEnd.split(':')[1] || '00';
+                          setFormData({ ...formData, collectionWindowEnd: `${hour}:${minute}` });
+                        }}
+                      >
+                        <SelectTrigger className="h-11">
+                          <SelectValue placeholder="Stunde" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {hourOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select
+                        value={formData.collectionWindowEnd.split(':')[1] || ''}
+                        onValueChange={(minute) => {
+                          const hour = formData.collectionWindowEnd.split(':')[0] || '19';
+                          setFormData({ ...formData, collectionWindowEnd: `${hour}:${minute}` });
+                        }}
+                      >
+                        <SelectTrigger className="h-11">
+                          <SelectValue placeholder="Minute" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {minuteOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               </div>
