@@ -712,6 +712,25 @@ const Profile = () => {
                 onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
               />
             </div>
+            
+            <div>
+              <Label htmlFor="name-privacy">Anzeigename / Privatsphäre</Label>
+              <Select
+                defaultValue="first_initial"
+              >
+                <SelectTrigger id="name-privacy">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-background border-border z-50">
+                  <SelectItem value="full_name">Voller Name (Max Mustermann)</SelectItem>
+                  <SelectItem value="first_initial">Vorname & Initiale (Max M.)</SelectItem>
+                  <SelectItem value="nickname_only">Nur Spitzname (@{formData.nickname || 'Max123'})</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                💡 Steuert, wie dein Name auf Mahlzeit-Karten angezeigt wird
+              </p>
+            </div>
             <div>
               <Label htmlFor="age">Alter (Optional)</Label>
               <Input
@@ -743,9 +762,11 @@ const Profile = () => {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground mt-1">
-                💡 Ermöglicht "Ladies Only"-Modus für Köchinnen
-              </p>
+              {formData.gender === 'female' && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  💡 Ermöglicht "Ladies Only"-Modus für Köchinnen
+                </p>
+              )}
             </div>
             
             {/* Partner-Angaben (Nur für Paare) */}
@@ -1251,7 +1272,7 @@ const Profile = () => {
                 ⚠️ Konto unwiderruflich löschen
               </Button>
               <p className="text-xs text-destructive mt-1">
-                ALLE Daten werden permanent gelöscht! Diese Aktion kann nicht rückgängig gemacht werden.
+                ⚠️ Achtung: Dein Konto wird unwiderruflich gelöscht. ALLE Daten werden permanent entfernt! Wenn du später zurückkommst, musst du dich erneut verifizieren (Ausweis/Foto). Diese Aktion kann nicht rückgängig gemacht werden.
               </p>
             </div>
           </CardContent>

@@ -233,16 +233,16 @@ const Feed = () => {
           <Alert className="mb-6 border-primary bg-primary-light" onClick={handleDismissDisclaimer}>
             <AlertCircle className="h-4 w-4 text-primary" />
             <AlertDescription className="text-sm text-foreground">
-              <strong>Welcome to Neighbors Kitchen!</strong> This is a private food-sharing community. 
-              Please bring your own container, respect chef's homes, and pay fairly. Tap to dismiss.
+              <strong>Willkommen bei Neighbors Kitchen!</strong> Dies ist eine private Food-Sharing Community. 
+              Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schließen.
             </AlertDescription>
           </Alert>
         )}
 
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-foreground mb-2">Available Meals</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">{t('feed.available_meals')}</h2>
           <p className="text-muted-foreground">
-            Fresh home-cooked meals from your neighbors
+            {t('feed.fresh_meals_subtitle')}
             {userLat && userLon && ` (within ${userRadius / 1000}km)`}
           </p>
         </div>

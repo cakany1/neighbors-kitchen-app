@@ -129,7 +129,7 @@ export const dislikeCategories = {
 };
 
 export const exchangeOptions = [
-  { value: "money", label: "Bargeld (CHF)", note: "Zahlung nach dem Essen, min. CHF 7.-", icon: "💵" },
+  { value: "online", label: "Online Zahlung (Apple Pay / Karte)", note: "Sicher via Stripe, min. CHF 7.-", icon: "💳" },
   { value: "barter", label: "Tausch / Barter", note: "Beschreibe, was du gerne hättest", icon: "🔄" },
   { value: "surprise", label: "Egal / Überrasch mich", icon: "🎁" },
   { value: "smile", label: "Nichts / Nur ein Lächeln", note: "Gratis teilen", icon: "😊" },
