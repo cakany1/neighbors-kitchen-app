@@ -20,6 +20,7 @@ import AGB from "./pages/AGB";
 import FAQ from "./pages/FAQ";
 import Install from "./pages/Install";
 import Contact from "./pages/Contact";
+import Story from "./pages/Story";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
 import { OnboardingTour } from "./components/OnboardingTour";
@@ -76,6 +77,7 @@ const AppRoutes = () => {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/install" element={<Install />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/story" element={<Story />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
