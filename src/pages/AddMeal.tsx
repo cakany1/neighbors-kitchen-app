@@ -128,9 +128,10 @@ const AddMeal = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validation
     if (!formData.title || !formData.scheduledDate || !formData.scheduledTime) {
       toast.error(t('toast.fill_required_fields'));
       return;
@@ -146,10 +147,111 @@ const AddMeal = () => {
       return;
     }
 
-    toast.success('✅ Gericht erstellt! Dein Essen ist jetzt sichtbar.');
-    setTimeout(() => {
-      navigate('/feed');
-    }, 1500);
+    // Validate minimum price if money is selected
+    const priceCents = formData.restaurantReferencePrice 
+      ? Math.round(parseFloat(formData.restaurantReferencePrice) * 100) 
+      : 0;
+    
+    if (selectedExchangeOptions.includes('money') && priceCents < 700) {
+      toast.error('Mindestpreis: CHF 7.00 (inkl. Gebühr)');
+      return;
+    }
+
+    try {
+      // Get current user profile with address
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Bitte melde dich an, um ein Gericht zu teilen.');
+        navigate('/login');
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('private_address, private_city, private_postal_code')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.private_address || !profile?.private_city) {
+        toast.error('Bitte vervollständige deine Adresse im Profil.');
+        navigate('/profile');
+        return;
+      }
+
+      toast.loading('Gericht wird erstellt...');
+
+      // 1. Geocode chef's exact address
+      const { data: geoData, error: geoError } = await supabase.functions.invoke('geocode-address', {
+        body: {
+          street: profile.private_address,
+          city: profile.private_city,
+          postalCode: profile.private_postal_code || ''
+        }
+      });
+
+      if (geoError || !geoData?.lat || !geoData?.lng) {
+        console.error('Geocoding error:', geoError);
+        toast.error('Adresse konnte nicht gefunden werden. Bitte prüfe deine Profiladresse.');
+        return;
+      }
+
+      // 2. Add random offset for fuzzy location (±200m ≈ ±0.002 degrees)
+      const fuzzyLat = geoData.lat + (Math.random() * 0.004 - 0.002);
+      const fuzzyLng = geoData.lng + (Math.random() * 0.004 - 0.002);
+
+      // 3. Combine scheduled date and time
+      const scheduledDateTime = `${formData.scheduledDate}T${formData.scheduledTime}:00`;
+
+      // 4. Prepare meal data
+      const mealData = {
+        chef_id: user.id,
+        title: formData.title.trim(),
+        description: formData.description.trim() || formData.title.trim(),
+        fuzzy_lat: fuzzyLat,
+        fuzzy_lng: fuzzyLng,
+        exact_address: `${profile.private_address}, ${profile.private_city}`,
+        neighborhood: profile.private_city,
+        scheduled_date: scheduledDateTime,
+        collection_window_start: formData.collectionWindowStart,
+        collection_window_end: formData.collectionWindowEnd || formData.collectionWindowStart,
+        available_portions: parseInt(formData.portions) || 1,
+        women_only: womenOnly,
+        exchange_mode: selectedExchangeOptions.join(','),
+        pricing_minimum: selectedExchangeOptions.includes('money') ? priceCents : 0,
+        pricing_suggested: selectedExchangeOptions.includes('money') ? priceCents : null,
+        restaurant_reference_price: selectedExchangeOptions.includes('money') ? priceCents : null,
+        allergens: selectedAllergens.length > 0 ? selectedAllergens : null,
+        tags: tags.length > 0 ? tags : null,
+        is_stock_photo: useStockPhoto,
+        handover_mode: 'pickup_box',
+        unit_type: 'portions',
+        is_cooking_experience: false,
+      };
+
+      // 5. Insert meal into database
+      const { data: newMeal, error: insertError } = await supabase
+        .from('meals')
+        .insert(mealData)
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        toast.error('Fehler beim Erstellen des Gerichts. Bitte versuche es erneut.');
+        return;
+      }
+
+      toast.success('✅ Gericht ist live! Dein Essen ist jetzt sichtbar.');
+      
+      // Navigate to the new meal detail page
+      setTimeout(() => {
+        navigate(`/meal/${newMeal.id}`);
+      }, 1000);
+
+    } catch (error) {
+      console.error('Error creating meal:', error);
+      toast.error('Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
+    }
   };
 
   return (
