@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import Feed from "./pages/Feed";
 import MapView from "./pages/MapView";
@@ -23,11 +23,11 @@ import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
-const App = () => {
+// Inner component that uses router hooks
+const AppRoutes = () => {
   const [showTour, setShowTour] = useState(false);
   const location = useLocation();
 
@@ -48,39 +48,47 @@ const App = () => {
   }, [location.pathname]);
 
   return (
+    <>
+      <Toaster />
+      <Sonner />
+      <InstallPrompt />
+      <CookieBanner />
+      {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
+      <div className="relative z-0 flex flex-col min-h-screen pb-24">
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/app" element={<Navigate to="/feed" replace />} />
+          <Route path="/feed" element={<Feed />} />
+          <Route path="/map" element={<MapView />} />
+          <Route path="/add-meal" element={<AddMeal />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/meal/:id" element={<MealDetail />} />
+          <Route path="/payment/:id" element={<Payment />} />
+          <Route path="/chat/:bookingId" element={<Chat />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/impressum" element={<Impressum />} />
+          <Route path="/agb" element={<AGB />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/install" element={<Install />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    </>
+  );
+};
+
+const App = () => {
+  return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <BrowserRouter>
-          <Toaster />
-          <Sonner />
-          <InstallPrompt />
-          <CookieBanner />
-          {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
-          <div className="relative z-0 flex flex-col min-h-screen pb-24">
-            <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/app" element={<Navigate to="/feed" replace />} />
-            <Route path="/feed" element={<Feed />} />
-            <Route path="/map" element={<MapView />} />
-            <Route path="/add-meal" element={<AddMeal />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/meal/:id" element={<MealDetail />} />
-            <Route path="/payment/:id" element={<Payment />} />
-            <Route path="/chat/:bookingId" element={<Chat />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/impressum" element={<Impressum />} />
-            <Route path="/agb" element={<AGB />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/install" element={<Install />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+          <AppRoutes />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 

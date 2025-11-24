@@ -13,7 +13,7 @@ export const DEMO_MEALS = [
       nickname: 'Nonna Rosa',
       display_real_name: false,
     },
-    image_url: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=800&q=80',
     chef_id: 'demo-chef-1',
     fuzzy_lat: 47.5596,
     fuzzy_lng: 7.5886,
