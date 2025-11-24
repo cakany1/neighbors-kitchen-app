@@ -28,6 +28,9 @@ export const InstallPrompt = () => {
     // Check if prompt was already dismissed
     const promptDismissed = sessionStorage.getItem('pwa-prompt-dismissed');
 
+    // Always define cleanup to avoid inconsistent returns
+    let cleanup: (() => void) | undefined;
+
     if (!standalone && !promptDismissed) {
       // For Android: Listen for beforeinstallprompt
       const handleBeforeInstallPrompt = (e: Event) => {
@@ -43,10 +46,14 @@ export const InstallPrompt = () => {
         setTimeout(() => setShowPrompt(true), 3000);
       }
 
-      return () => {
+      cleanup = () => {
         window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       };
     }
+
+    return () => {
+      cleanup?.();
+    };
   }, []);
 
   const handleInstallClick = async () => {
