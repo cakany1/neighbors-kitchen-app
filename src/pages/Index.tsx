@@ -204,20 +204,6 @@ const Index = () => {
             </Card>
           </section>
 
-          {/* About - Unsere Geschichte */}
-          <section className="text-center">
-            <h2 className="text-4xl font-bold mb-6">
-              {i18n.language === 'de' ? 'Unsere Geschichte' : 'Our Story'}
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              {i18n.language === 'de'
-                ? 'Neighbors Kitchen ist eine hyperlocale Food-Sharing-Plattform für Basel. Unser Ziel: Lebensmittelverschwendung reduzieren, Nachbarn verbinden und eine multikulturelle Community aufbauen.'
-                : 'Neighbors Kitchen is a hyperlocal food-sharing platform for Basel. Our goal: reduce food waste, connect neighbors, and build a multicultural community.'}
-            </p>
-            <Badge variant="secondary" className="text-sm px-4 py-2">
-              Made with ❤️ in Basel
-            </Badge>
-          </section>
         </main>
       </div>
     );
