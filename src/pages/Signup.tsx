@@ -373,6 +373,26 @@ const Signup = () => {
               <p className="text-xs text-muted-foreground mt-1">{t('signup.genderHint')}</p>
             </div>
 
+            {/* Mandatory Avatar Upload */}
+            <div className="space-y-2">
+              <Label htmlFor="avatarPhoto" className="text-base font-semibold text-foreground">
+                📸 Dein Profilfoto (Pflicht) *
+              </Label>
+              <Alert className="bg-destructive/10 border-destructive/30">
+                <AlertDescription className="text-xs text-foreground">
+                  ⚠️ Ohne Foto kannst du nicht bestellen oder anbieten.
+                </AlertDescription>
+              </Alert>
+              <Input
+                id="avatarPhoto"
+                type="file"
+                accept="image/*"
+                required
+                className="cursor-pointer"
+              />
+              <p className="text-xs text-muted-foreground">Max 5MB, JPG/PNG</p>
+            </div>
+
             {/* Account Type Selection */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-foreground">Account Typ</Label>

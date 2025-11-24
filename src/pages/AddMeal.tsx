@@ -291,7 +291,7 @@ const AddMeal = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title */}
+          {/* Title & Description */}
           <Card>
             <CardContent className="pt-6 space-y-4">
               <div>
@@ -305,6 +305,21 @@ const AddMeal = () => {
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="text-base h-12"
                   required
+                />
+              </div>
+
+              {/* Description - Moved from accordion */}
+              <div>
+                <Label htmlFor="description" className="text-base font-medium">
+                  Kleine Beschreibung (Optional)
+                </Label>
+                <Textarea
+                  id="description"
+                  placeholder="Beschreibe dein Gericht, Zutaten und besondere Details..."
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={3}
+                  className="mt-2"
                 />
               </div>
             </CardContent>
@@ -413,6 +428,18 @@ const AddMeal = () => {
                   className="h-11 font-mono"
                   maxLength={10}
                 />
+                
+                {/* Full German Date Display */}
+                {formData.scheduledDate && (
+                  <p className="text-sm font-medium text-primary mt-2">
+                    {new Date(formData.scheduledDate + 'T00:00:00').toLocaleDateString('de-DE', {
+                      weekday: 'long',
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </p>
+                )}
               </div>
 
               {/* Divider */}
@@ -553,6 +580,7 @@ const AddMeal = () => {
               <div className="space-y-3">
                 {exchangeOptions.map((option) => {
                   const isBarter = option.value === 'barter';
+                  const isOnline = option.value === 'online';
                   const isSelected = selectedExchangeOptions.includes(option.value);
                   return (
                     <div
@@ -576,6 +604,11 @@ const AddMeal = () => {
                           </Label>
                           {option.note && (
                             <p className="text-xs text-muted-foreground mt-1 ml-6">{option.note}</p>
+                          )}
+                          {isOnline && (
+                            <p className="text-xs text-muted-foreground mt-1 ml-6">
+                              (Es werden CHF 2.00 für den App-Service vom Betrag abgezogen.)
+                            </p>
                           )}
                         </div>
                       </div>
@@ -664,18 +697,6 @@ const AddMeal = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <CardContent className="space-y-6 pt-2">
-                    {/* Description */}
-                    <div>
-                      <Label htmlFor="description">Beschreibung</Label>
-                      <Textarea
-                        id="description"
-                        placeholder="Beschreibe dein Gericht, Zutaten und besondere Details..."
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        rows={4}
-                      />
-                    </div>
-
                     {/* Photo Upload */}
                     <div>
                       <Label className="block mb-2 font-medium">Foto vom Gericht</Label>
