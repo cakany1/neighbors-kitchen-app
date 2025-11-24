@@ -167,12 +167,12 @@ const Feed = () => {
   const userRadius = currentUser?.profile?.notification_radius || 5000; // Default 5km
 
   // FAILSAFE: Use imported demo meals if DB is empty (with safety check)
-  const safeDemoMeals = DEMO_MEALS && Array.isArray(DEMO_MEALS) ? DEMO_MEALS : [];
+  const safeDemoMeals = Array.isArray(DEMO_MEALS) ? DEMO_MEALS : [];
   const finalMeals = (meals && meals.length > 0) ? meals : safeDemoMeals;
 
   // Calculate distances, filter by radius, and sort
   const filteredAndSortedMeals = useMemo(() => {
-    if (!finalMeals) return [];
+    if (!finalMeals || finalMeals.length === 0) return [];
 
     // If user has no location, show all meals
     if (!userLat || !userLon) {
@@ -213,7 +213,7 @@ const Feed = () => {
       // Show toast to inform user
       if (fallbackMeals.length > 0) {
         setTimeout(() => {
-          toast.info('Keine Treffer in der Nähe – hier sind Angebote aus ganz Basel.', { duration: 5000 });
+          toast.info(t('feed_page.no_hits_nearby'), { duration: 5000 });
         }, 500);
       }
       
@@ -238,8 +238,7 @@ const Feed = () => {
           <Alert className="mb-6 border-primary bg-primary-light" onClick={handleDismissDisclaimer}>
             <AlertCircle className="h-4 w-4 text-primary" />
             <AlertDescription className="text-sm text-foreground">
-              <strong>Willkommen bei Neighbors Kitchen!</strong> Dies ist eine private Food-Sharing Community. 
-              Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schließen.
+              <strong>{t('feed_page.welcome_message')}</strong>
             </AlertDescription>
           </Alert>
         )}
@@ -332,19 +331,18 @@ const Feed = () => {
               <Lock className="w-12 h-12 text-primary" />
             </div>
             <DialogTitle className="text-center text-2xl">
-              Registriere dich, um dieses Essen zu retten!
+              {t('feed_page.guest_modal_title')}
             </DialogTitle>
             <DialogDescription className="text-center">
-              Du browsst gerade als Gast. Um Mahlzeiten zu buchen und mit Köchen zu chatten, 
-              musst du dich registrieren.
+              {t('feed_page.guest_modal_desc')}
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 mt-4">
             <Button onClick={() => navigate('/signup')} size="lg">
-              Jetzt registrieren
+              {t('feed_page.register_now')}
             </Button>
             <Button variant="outline" onClick={() => navigate('/login')} size="lg">
-              Ich habe bereits einen Account
+              {t('feed_page.already_have_account')}
             </Button>
           </div>
         </DialogContent>
