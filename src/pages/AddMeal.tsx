@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { format, parse } from 'date-fns';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -384,26 +385,34 @@ const AddMeal = () => {
                   </Button>
                 </div>
                 
-                {/* Hidden Date Input */}
+                {/* Date Input - DD.MM.YYYY Format */}
                 <Input
                   id="scheduledDate"
-                  type="date"
-                  value={formData.scheduledDate}
-                  onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
+                  type="text"
+                  placeholder="TT.MM.JJJJ"
+                  value={formData.scheduledDate ? format(parse(formData.scheduledDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy') : ''}
+                  onChange={(e) => {
+                    const input = e.target.value;
+                    // Allow only numbers and dots
+                    if (!/^[\d.]*$/.test(input)) return;
+                    
+                    // Try to parse DD.MM.YYYY format
+                    if (input.length === 10) {
+                      try {
+                        const parsedDate = parse(input, 'dd.MM.yyyy', new Date());
+                        if (!isNaN(parsedDate.getTime())) {
+                          const isoDate = format(parsedDate, 'yyyy-MM-dd');
+                          setFormData({ ...formData, scheduledDate: isoDate });
+                        }
+                      } catch {
+                        // Invalid date format
+                      }
+                    }
+                  }}
                   required
-                  className="h-11"
+                  className="h-11 font-mono"
+                  maxLength={10}
                 />
-                
-                {/* Display Selected Date in DD.MM.YYYY Format */}
-                {formData.scheduledDate && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Gewähltes Datum: {new Date(formData.scheduledDate + 'T00:00:00').toLocaleDateString('de-DE', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric'
-                    })}
-                  </p>
-                )}
               </div>
 
               {/* Divider */}
