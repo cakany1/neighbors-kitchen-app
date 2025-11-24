@@ -282,6 +282,7 @@ export type Database = {
         Row: {
           age: number | null
           allergens: string[] | null
+          avatar_url: string | null
           created_at: string
           dislikes: string[] | null
           display_real_name: boolean | null
@@ -314,6 +315,7 @@ export type Database = {
         Insert: {
           age?: number | null
           allergens?: string[] | null
+          avatar_url?: string | null
           created_at?: string
           dislikes?: string[] | null
           display_real_name?: boolean | null
@@ -346,6 +348,7 @@ export type Database = {
         Update: {
           age?: number | null
           allergens?: string[] | null
+          avatar_url?: string | null
           created_at?: string
           dislikes?: string[] | null
           display_real_name?: boolean | null

@@ -529,15 +529,17 @@ const Profile = () => {
         <Card className="mb-6">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4 mb-4">
+              {/* Main User Avatar */}
               <div className="relative w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-3xl overflow-hidden group">
-                {profile?.partner_photo_url ? (
-                  <img src={profile.partner_photo_url} alt="Profile" className="w-full h-full object-cover" />
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="Dein Profilbild" className="w-full h-full object-cover" />
                 ) : (
                   <span>👤</span>
                 )}
                 <label 
                   htmlFor="avatar-upload" 
                   className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  title="Dein Profilbild"
                 >
                   <Upload className="w-6 h-6 text-white" />
                 </label>
@@ -576,7 +578,7 @@ const Profile = () => {
 
                       await supabase
                         .from('profiles')
-                        .update({ partner_photo_url: data.publicUrl })
+                        .update({ avatar_url: data.publicUrl })
                         .eq('id', currentUser.id);
 
                       toast.success('Profilbild aktualisiert!');
@@ -588,7 +590,73 @@ const Profile = () => {
                   }}
                 />
               </div>
-              <div className="flex-1">
+              
+              {/* Partner Avatar (if couple) */}
+              {profile?.is_couple && (
+                <div className="relative w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-3xl overflow-hidden group border-2 border-dashed border-border">
+                  {profile?.partner_photo_url ? (
+                    <img src={profile.partner_photo_url} alt="Partner Foto" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>👥</span>
+                  )}
+                  <label 
+                    htmlFor="partner-avatar-upload" 
+                    className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    title="Partner Foto"
+                  >
+                    <Upload className="w-6 h-6 text-white" />
+                  </label>
+                  <input
+                    id="partner-avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+
+                      if (file.size > 5 * 1024 * 1024) {
+                        toast.error('Datei zu groß (max 5MB)');
+                        return;
+                      }
+
+                      if (!file.type.startsWith('image/')) {
+                        toast.error('Nur Bilder sind erlaubt');
+                        return;
+                      }
+
+                      try {
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `${currentUser.id}-partner-${Date.now()}.${fileExt}`;
+
+                        const { error: uploadError } = await supabase.storage
+                          .from('gallery')
+                          .upload(fileName, file);
+
+                        if (uploadError) throw uploadError;
+
+                        const { data } = supabase.storage
+                          .from('gallery')
+                          .getPublicUrl(fileName);
+
+                        await supabase
+                          .from('profiles')
+                          .update({ partner_photo_url: data.publicUrl })
+                          .eq('id', currentUser.id);
+
+                        toast.success('Partner Foto aktualisiert!');
+                        queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                      } catch (error) {
+                        console.error('Upload error:', error);
+                        toast.error('Fehler beim Hochladen');
+                      }
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+            
+            <div className="flex-1">
                 <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
                   {profile?.first_name} {profile?.last_name}
                   {(profile?.id_verified || profile?.phone_verified) && (
@@ -603,11 +671,10 @@ const Profile = () => {
                   <span className="text-lg font-semibold text-trust-gold">
                     {profile?.karma || 0} {t('profile.karma')}
                   </span>
-                </div>
-              </div>
-            </div>
+                 </div>
+               </div>
 
-            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
+             <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
               <div className="text-center">
                 <p className="text-2xl font-bold text-primary">0</p>
                 <p className="text-xs text-muted-foreground">{t('profile.mealsShared')}</p>
@@ -685,16 +752,16 @@ const Profile = () => {
                 </div>
                 
                 <div>
-                  <Label htmlFor="partner-photo">Partner Foto-URL</Label>
+                  <Label htmlFor="partner-photo">Partner Foto (optional via URL)</Label>
                   <Input
                     id="partner-photo"
                     type="text"
-                    placeholder="https://..."
+                    placeholder="https://... (oder nutze Upload oben)"
                     value={formData.partner_photo_url}
                     onChange={(e) => setFormData({ ...formData, partner_photo_url: e.target.value })}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    📸 Required for verification and safety
+                    💡 Du kannst das Foto auch oben im Profilbereich hochladen
                   </p>
                 </div>
                 
