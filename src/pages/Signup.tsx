@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ChefHat, Upload, X } from 'lucide-react';
+import { ChefHat, Upload, X, Globe } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { Progress } from '@/components/ui/progress';
@@ -339,6 +340,13 @@ const Signup = () => {
                   </div>
                 ))}
               </div>
+              <Alert className="mt-2">
+                <Globe className="h-4 w-4" />
+                <AlertDescription className="text-xs">
+                  🇩🇪 Damit übersetzen wir den Chat automatisch für dich. Die App-Sprache bleibt davon unberührt.<br/>
+                  🇬🇧 This enables automatic chat translation. It does not change the app interface language.
+                </AlertDescription>
+              </Alert>
             </div>
 
             <div>

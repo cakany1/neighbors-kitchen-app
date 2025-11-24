@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Star, Award, ChefHat, Heart, Globe, Shield, Loader2, Upload } from 'lucide-react';
+import { Star, Award, ChefHat, Heart, Globe, Shield, Loader2, Upload, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { allergenOptions, dislikeCategories } from '@/utils/ingredientDatabase';
 import { supabase } from '@/integrations/supabase/client';
@@ -593,19 +593,20 @@ const Profile = () => {
               
               {/* Partner Avatar (if couple) */}
               {profile?.is_couple && (
-                <div className="relative w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-3xl overflow-hidden group border-2 border-dashed border-border">
-                  {profile?.partner_photo_url ? (
-                    <img src={profile.partner_photo_url} alt="Partner Foto" className="w-full h-full object-cover" />
-                  ) : (
-                    <span>👥</span>
-                  )}
-                  <label 
-                    htmlFor="partner-avatar-upload" 
-                    className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                    title="Partner Foto"
-                  >
-                    <Upload className="w-6 h-6 text-white" />
-                  </label>
+                <div className="space-y-1">
+                  <div className="relative w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-3xl overflow-hidden group border-2 border-dashed border-border">
+                    {profile?.partner_photo_url ? (
+                      <img src={profile.partner_photo_url} alt="Partner Foto" className="w-full h-full object-cover" />
+                    ) : (
+                      <span>👥</span>
+                    )}
+                    <label 
+                      htmlFor="partner-avatar-upload" 
+                      className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                      title="Partner Foto"
+                    >
+                      <Upload className="w-6 h-6 text-white" />
+                    </label>
                   <input
                     id="partner-avatar-upload"
                     type="file"
@@ -652,6 +653,10 @@ const Profile = () => {
                       }
                     }}
                   />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground text-center max-w-[80px]">
+                    💡 Bei Paaren: Foto von euch beiden, damit Nachbarn wissen, wer an der Tür stehen könnte
+                  </p>
                 </div>
               )}
             </div>
@@ -1173,6 +1178,80 @@ const Profile = () => {
             <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
               <p className="text-sm text-foreground leading-relaxed">
                 {t('guidelines.disclaimer')}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Account Management - Danger Zone */}
+        <Card className="mb-6 border-destructive/50 bg-destructive/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="w-5 h-5" />
+              Gefahrenzone / Danger Zone
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <Button
+                variant="outline"
+                className="w-full border-destructive/50 hover:bg-destructive/10"
+                onClick={async () => {
+                  if (!confirm('⚠️ Möchtest du dein Konto wirklich deaktivieren? Deine Daten bleiben gespeichert, aber du bist für andere unsichtbar.')) return;
+                  
+                  try {
+                    await supabase
+                      .from('profiles')
+                      .update({ vacation_mode: true })
+                      .eq('id', currentUser.id);
+                    
+                    toast.success('Konto deaktiviert. Aktiviere es in den Einstellungen wieder.');
+                    queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                  } catch (error: any) {
+                    toast.error('Fehler: ' + error.message);
+                  }
+                }}
+              >
+                Konto deaktivieren
+              </Button>
+              <p className="text-xs text-muted-foreground mt-1">
+                Dein Profil wird versteckt, Daten bleiben erhalten
+              </p>
+            </div>
+
+            <div>
+              <Button
+                variant="destructive"
+                className="w-full"
+                onClick={async () => {
+                  const confirmation = prompt('⚠️ UNWIDERRUFLICH! Tippe "DELETE" um dein Konto endgültig zu löschen:');
+                  if (confirmation !== 'DELETE') {
+                    toast.error('Abgebrochen. Du musst "DELETE" exakt eingeben.');
+                    return;
+                  }
+                  
+                  try {
+                    // Delete user data from profiles table
+                    const { error: profileError } = await supabase
+                      .from('profiles')
+                      .delete()
+                      .eq('id', currentUser.id);
+                    
+                    if (profileError) throw profileError;
+                    
+                    // Sign out and redirect
+                    await supabase.auth.signOut();
+                    toast.success('Konto erfolgreich gelöscht. Auf Wiedersehen.');
+                    navigate('/');
+                  } catch (error: any) {
+                    toast.error('Fehler beim Löschen: ' + error.message);
+                  }
+                }}
+              >
+                ⚠️ Konto unwiderruflich löschen
+              </Button>
+              <p className="text-xs text-destructive mt-1">
+                ALLE Daten werden permanent gelöscht! Diese Aktion kann nicht rückgängig gemacht werden.
               </p>
             </div>
           </CardContent>
