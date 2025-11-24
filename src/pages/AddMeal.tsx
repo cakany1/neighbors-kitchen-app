@@ -146,9 +146,9 @@ const AddMeal = () => {
       return;
     }
 
-    toast.success(t('toast.meal_created'));
+    toast.success('✅ Gericht erstellt! Dein Essen ist jetzt sichtbar.');
     setTimeout(() => {
-      navigate('/');
+      navigate('/feed');
     }, 1500);
   };
 
@@ -437,7 +437,7 @@ const AddMeal = () => {
             <CardContent className="pt-6 space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor="scheduledDate">Wann ist es fertig? *</Label>
+                  <Label htmlFor="scheduledDate">Abholbereit ab *</Label>
                   <Button
                     type="button"
                     variant="outline"
