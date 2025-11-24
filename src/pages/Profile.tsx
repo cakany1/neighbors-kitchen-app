@@ -262,7 +262,7 @@ const Profile = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(t('toast.profile_updated'));
+      toast.success('✅ Gespeichert');
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
       queryClient.invalidateQueries({ queryKey: ['chefWallet'] });
     },

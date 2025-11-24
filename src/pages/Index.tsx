@@ -52,7 +52,7 @@ const Index = () => {
                 variant="default"
                 onClick={() => navigate('/feed')}
               >
-                App Starten
+                Jetzt mitmachen
               </Button>
             </div>
           </div>
