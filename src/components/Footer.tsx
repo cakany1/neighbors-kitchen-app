@@ -9,7 +9,7 @@ export const Footer = () => {
         <p className="text-sm text-muted-foreground mb-2">
           © {currentYear} Neighbors Kitchen Basel
         </p>
-        <div className="flex items-center justify-center gap-4 text-sm">
+        <div className="flex items-center justify-center gap-3 text-sm flex-wrap">
           <Link 
             to="/impressum" 
             className="text-muted-foreground hover:text-foreground transition-colors"
@@ -22,6 +22,13 @@ export const Footer = () => {
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
             AGB & Datenschutz
+          </Link>
+          <span className="text-muted-foreground">|</span>
+          <Link 
+            to="/install" 
+            className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+          >
+            📱 App installieren
           </Link>
         </div>
       </div>

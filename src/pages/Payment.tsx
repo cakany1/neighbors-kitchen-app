@@ -114,6 +114,9 @@ const Payment = () => {
                   <span className="font-bold">Total:</span>
                   <span className="font-bold text-lg text-primary">CHF {totalAmount.toFixed(2)}</span>
                 </div>
+                <p className="text-xs text-muted-foreground mt-2 italic">
+                  💡 Inkl. CHF 2.00 Servicegebühr für den Plattform-Betrieb.
+                </p>
                 {totalAmount < minTotal && (
                   <p className="text-xs text-destructive mt-2">
                     ⚠️ Minimum total is CHF {minTotal.toFixed(2)}

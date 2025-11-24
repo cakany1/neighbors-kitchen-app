@@ -74,6 +74,20 @@ export const ReportDialog = ({
           <div>
             <Label>{t('reporting.reasonLabel')}</Label>
             <RadioGroup value={reason} onValueChange={setReason} className="mt-2">
+              {reportedMealId && (
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="wrong_image" id="wrong_image" />
+                  <Label htmlFor="wrong_image">{t('reporting.wrongImage')}</Label>
+                </div>
+              )}
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="spam" id="spam" />
+                <Label htmlFor="spam">{t('reporting.spam')}</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="inappropriate_content" id="inappropriate" />
+                <Label htmlFor="inappropriate">{t('reporting.inappropriateContent')}</Label>
+              </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="safety_concern" id="safety" />
                 <Label htmlFor="safety">{t('reporting.safetyConcern')}</Label>
@@ -82,18 +96,12 @@ export const ReportDialog = ({
                 <RadioGroupItem value="harassment" id="harassment" />
                 <Label htmlFor="harassment">{t('reporting.harassment')}</Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="fake_profile" id="fake" />
-                <Label htmlFor="fake">{t('reporting.fakeProfile')}</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="inappropriate_content" id="inappropriate" />
-                <Label htmlFor="inappropriate">{t('reporting.inappropriateContent')}</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="spam" id="spam" />
-                <Label htmlFor="spam">{t('reporting.spam')}</Label>
-              </div>
+              {reportedUserId && (
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="fake_profile" id="fake" />
+                  <Label htmlFor="fake">{t('reporting.fakeProfile')}</Label>
+                </div>
+              )}
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="other" id="other" />
                 <Label htmlFor="other">{t('reporting.other')}</Label>
