@@ -176,7 +176,7 @@ const Feed = () => {
 
     // If user has no location, show all meals
     if (!userLat || !userLon) {
-      return meals;
+      return finalMeals || []; // ✅ CRASH FIX: Never return undefined
     }
 
     // Calculate distance for each meal
@@ -266,7 +266,7 @@ const Feed = () => {
             <SkeletonMealCard />
             <SkeletonMealCard />
           </div>
-        ) : filteredAndSortedMeals.length === 0 ? (
+        ) : !filteredAndSortedMeals || filteredAndSortedMeals.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground">
               {t('feed.no_meals_radius', { radius: userRadius / 1000 })}
@@ -274,7 +274,7 @@ const Feed = () => {
           </div>
         ) : (
           <div className="grid gap-4">
-            {filteredAndSortedMeals.map((meal) => (
+            {(filteredAndSortedMeals || []).map((meal) => (
               <MealCard 
                 key={meal.id} 
                 meal={{

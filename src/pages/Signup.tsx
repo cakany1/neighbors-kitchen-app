@@ -337,7 +337,7 @@ const Signup = () => {
               <Label>{t('auth.i_speak')}</Label>
               <p className="text-xs text-muted-foreground">{t('signup.select_languages')}</p>
               <div className="grid grid-cols-2 gap-2">
-                {languages.slice(0, 6).map((lang) => (
+                {(languages || []).slice(0, 6).map((lang) => (
                   <div key={lang.code} className="flex items-center space-x-2">
                     <Checkbox
                       id={`lang-${lang.code}`}

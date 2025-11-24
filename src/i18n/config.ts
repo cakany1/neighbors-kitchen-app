@@ -15,6 +15,20 @@ i18n
     interpolation: {
       escapeValue: false,
     },
+    // Enable React Suspense for proper re-renders
+    react: {
+      useSuspense: false,
+    },
+    // Ensure component re-renders on language change
+    detection: {
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage'],
+    },
   });
+
+// Listen to language changes and trigger storage update
+i18n.on('languageChanged', (lng) => {
+  localStorage.setItem('language', lng);
+});
 
 export default i18n;
