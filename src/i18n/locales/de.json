@@ -185,7 +185,9 @@
     "achievements_chef_master": "Küchen-Meister",
     "achievements_chef_master_desc": "20+ Mahlzeiten geteilt",
     "achievements_fair_payer": "Fairer Zahler",
-    "achievements_fair_payer_desc": "Zahlt immer fair"
+    "achievements_fair_payer_desc": "Zahlt immer fair",
+    "verification_banner": "Verifizieren lassen, um deine Buchungschancen zu erhöhen!",
+    "verification_banner_desc": "Verifizierte Nutzer erhalten ein blaues Häkchen-Badge und mehr Vertrauen von der Community."
   },
   "signup": {
     "gender": "Ich bin",

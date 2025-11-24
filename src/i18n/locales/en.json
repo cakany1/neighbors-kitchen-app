@@ -38,7 +38,9 @@
     "dislikes": "Dislikes",
     "communityGuidelines": "Community Guidelines",
     "badges": "Badges",
-    "languageUpdated": "Languages updated"
+    "languageUpdated": "Languages updated",
+    "verification_banner": "Get Verified to increase your booking chances!",
+    "verification_banner_desc": "Verified users get a blue tick badge and more trust from the community."
   },
   "auth": {
     "welcome_back": "Welcome back!",
