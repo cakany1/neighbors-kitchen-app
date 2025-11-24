@@ -403,5 +403,11 @@
     "booking_cancelled": "Buchung storniert",
     "cancel_failed": "Stornierung fehlgeschlagen",
     "profile_incomplete": "Bitte vervollständige dein Profil (Adresse & Telefon), um Mahlzeiten zu buchen"
+  },
+  "modal": {
+    "almost_done": "Fast geschafft!",
+    "registration_required": "Du browsst gerade als Gast. Um Gerichte zu buchen und mit Köchen zu chatten, musst du dich bei unserer Community von registrierten Nachbarn registrieren.",
+    "register_now": "Jetzt registrieren",
+    "cancel": "Abbrechen"
   }
 }

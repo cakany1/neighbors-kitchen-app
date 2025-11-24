@@ -8,6 +8,7 @@ import Feed from "./pages/Feed";
 import MapView from "./pages/MapView";
 import AddMeal from "./pages/AddMeal";
 import Profile from "./pages/Profile";
+import ChefProfile from "./pages/ChefProfile";
 import MealDetail from "./pages/MealDetail";
 import Payment from "./pages/Payment";
 import Chat from "./pages/Chat";
@@ -66,6 +67,7 @@ const AppRoutes = () => {
           <Route path="/map" element={<MapView />} />
           <Route path="/add-meal" element={<AddMeal />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:chefId" element={<ChefProfile />} />
           <Route path="/meal/:id" element={<MealDetail />} />
           <Route path="/payment/:id" element={<Payment />} />
           <Route path="/chat/:bookingId" element={<Chat />} />

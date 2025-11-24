@@ -395,7 +395,12 @@ const MealDetail = () => {
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <ChefHat className="w-4 h-4" />
-                <span>{t('meal_detail.by')} {meal.chef?.first_name} {meal.chef?.last_name?.charAt(0)}.</span>
+                <span 
+                  className="hover:text-primary cursor-pointer transition-colors"
+                  onClick={() => navigate(`/profile/${meal.chef_id}`)}
+                >
+                  {t('meal_detail.by')} {meal.chef?.first_name} {meal.chef?.last_name?.charAt(0)}.
+                </span>
                 <Star className="w-4 h-4 fill-trust-gold text-trust-gold" />
                 <span className="text-trust-gold font-semibold">{meal.chef?.karma || 0}</span>
               </div>

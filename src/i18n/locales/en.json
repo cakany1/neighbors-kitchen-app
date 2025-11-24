@@ -272,5 +272,11 @@
     "booking_cancelled": "Booking cancelled",
     "cancel_failed": "Cancellation failed",
     "profile_incomplete": "Please complete your profile (Address & Phone) to book meals"
+  },
+  "modal": {
+    "almost_done": "Almost there!",
+    "registration_required": "You're browsing as a guest. To book meals and chat with chefs, you need to register with our community of registered neighbors.",
+    "register_now": "Register now",
+    "cancel": "Cancel"
   }
 }
