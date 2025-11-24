@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { X, Download, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -9,10 +10,16 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export const InstallPrompt = () => {
+  const location = useLocation();
   const [showPrompt, setShowPrompt] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
+
+  // Don't show on landing page
+  if (location.pathname === '/') {
+    return null;
+  }
 
   useEffect(() => {
     // Check if already installed (standalone mode)
