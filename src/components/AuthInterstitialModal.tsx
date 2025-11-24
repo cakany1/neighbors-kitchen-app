@@ -26,7 +26,7 @@ export const AuthInterstitialModal = ({ open, onClose, onSignup }: AuthInterstit
           <DialogTitle className="text-2xl text-center">Fast geschafft!</DialogTitle>
           <DialogDescription className="text-center pt-4">
             Für die Sicherheit der Nachbarschaft benötigen wir eine kurze Registrierung.
-            Nur verifizierte Nachbarn können Essen abholen.
+            Nur registrierte Nachbarn können Essen abholen.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-col sm:flex-col gap-2">
