@@ -113,8 +113,7 @@ const FAQ = () => {
               <AccordionItem value="item-3">
                 <AccordionTrigger>Muss ich die Köchin treffen?</AccordionTrigger>
                 <AccordionContent>
-                  Ja, die Übergabe findet in der Regel persönlich statt (meist an der Haustür). 
-                  Bei &quot;Ghost Mode&quot; Angeboten ist auch anonyme Abholung möglich.
+                  Ja, die Übergabe findet in der Regel persönlich statt. Bei &quot;Ghost Mode&quot; ist auch anonyme Abholung möglich, zum Beispiel am Hauseingang, Briefkasten oder an einer nahen Tramhaltestelle.
                 </AccordionContent>
               </AccordionItem>
 
@@ -129,9 +128,7 @@ const FAQ = () => {
               <AccordionItem value="item-5">
                 <AccordionTrigger>Was passiert, wenn ich nicht erscheine?</AccordionTrigger>
                 <AccordionContent>
-                  Das ist unfair gegenüber dem Koch! Wer nicht erscheint, ohne abzusagen, erhält 
-                  eine schlechte Bewertung und kann im schlimmsten Fall gesperrt werden. 
-                  Du kannst Buchungen innerhalb von 15 Minuten kostenlos stornieren.
+                  Das ist unfair! Wer nicht erscheint, erhält eine schlechte Bewertung. Dies kann zu sofortigen <strong>Karma-Abzügen</strong> führen und im schlimmsten Fall zur Sperrung. Du kannst Buchungen innerhalb von 15 Minuten kostenlos stornieren.
                 </AccordionContent>
               </AccordionItem>
 
@@ -147,26 +144,21 @@ const FAQ = () => {
               <AccordionItem value="item-7">
                 <AccordionTrigger>Sind die Lebensmittel sicher?</AccordionTrigger>
                 <AccordionContent>
-                  Wir setzen auf Vertrauen &amp; Community-Bewertungen. Jeder Koch kann sich 
-                  verifizieren lassen (Telefon + Ausweis), um ein ✓ Verifiziert-Badge zu erhalten. 
-                  Achte auf Karma-Punkte und Portfolio-Fotos.
+                  Wir setzen auf Vertrauen &amp; Community-Bewertungen. Achte auf Karma-Punkte und die positiven <strong>Bewertungen</strong> von anderen Nutzern.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-8">
                 <AccordionTrigger>Wie werde ich Koch?</AccordionTrigger>
                 <AccordionContent>
-                  Einfach im Profil auf &quot;Verifizieren lassen&quot; klicken und dein erstes 
-                  Gericht über den &quot;+ Mahlzeit hinzufügen&quot; Button posten. 
-                  Du kannst sofort loslegen!
+                  Jeder kann sofort Mahlzeiten anbieten, sobald das <strong>Profilfoto hochgeladen</strong> ist (Pflicht). Wenn du zusätzlich das <strong>✓ Verifiziert-Badge</strong> erhalten möchtest, klicke im Profil auf &quot;Verifizieren lassen&quot; (Optionaler ID-Upload).
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-9">
                 <AccordionTrigger>Was kostet die Plattform?</AccordionTrigger>
                 <AccordionContent>
-                  Die Nutzung der App ist kostenlos. Bei digitalen Transaktionen fällt eine 
-                  kleine Servicegebühr (10%) an, um die Plattform zu betreiben und weiterzuentwickeln.
+                  Die Nutzung der App ist kostenlos. Bei digitalen Transaktionen fällt eine <strong>fixe Servicegebühr von CHF 2.00</strong> an, um die Plattform zu betreiben und weiterzuentwickeln.
                 </AccordionContent>
               </AccordionItem>
 
