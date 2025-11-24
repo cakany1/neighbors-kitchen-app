@@ -290,6 +290,34 @@ const MealDetail = () => {
     }
   };
 
+  // Delete meal mutation
+  const deleteMealMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser?.id || !meal) throw new Error('Missing user or meal');
+      
+      const { error } = await supabase
+        .from('meals')
+        .delete()
+        .eq('id', meal.id)
+        .eq('chef_id', currentUser.id); // Security: Only owner can delete
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Gericht wurde erfolgreich gelöscht');
+      navigate('/app');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Löschen fehlgeschlagen');
+    },
+  });
+
+  const handleDeleteMeal = () => {
+    if (window.confirm('Möchtest du dieses Gericht wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) {
+      deleteMealMutation.mutate();
+    }
+  };
+
   // Calculate if booking is within 15-minute grace period
   const isWithinCancellationPeriod = existingBooking
     ? (Date.now() - new Date(existingBooking.created_at).getTime()) < 15 * 60 * 1000
@@ -372,16 +400,30 @@ const MealDetail = () => {
               </div>
             </div>
             
-            {/* Report Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setReportDialogOpen(true)}
-              className="text-muted-foreground hover:text-destructive"
-              title="Melden"
-            >
-              <Flag className="w-5 h-5" />
-            </Button>
+            {/* Report or Delete Button */}
+            <div className="flex gap-2">
+              {currentUser?.id === meal.chef_id ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleDeleteMeal()}
+                  className="text-muted-foreground hover:text-destructive"
+                  title="Löschen"
+                >
+                  <Flag className="w-5 h-5" />
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setReportDialogOpen(true)}
+                  className="text-muted-foreground hover:text-destructive"
+                  title="Melden"
+                >
+                  <Flag className="w-5 h-5" />
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Safety Alert */}

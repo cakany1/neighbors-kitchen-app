@@ -354,17 +354,18 @@ const AddMeal = () => {
           {/* Schedule Card - Date & Time */}
           <Card className="bg-muted/30">
             <CardContent className="pt-6 space-y-5">
-              {/* Date Picker */}
+              {/* Date Picker with Quick Buttons */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor="scheduledDate" className="text-lg font-semibold flex items-center gap-2">
-                    <CalendarIcon className="w-5 h-5" />
-                    Abholbereit ab *
-                  </Label>
+                <Label className="text-lg font-semibold flex items-center gap-2 mb-3">
+                  <CalendarIcon className="w-5 h-5" />
+                  Abholbereit ab *
+                </Label>
+                
+                {/* Quick Date Buttons */}
+                <div className="grid grid-cols-3 gap-2 mb-3">
                   <Button
                     type="button"
-                    variant="outline"
-                    size="sm"
+                    variant={formData.scheduledDate === new Date().toISOString().split('T')[0] ? 'default' : 'outline'}
                     onClick={() => {
                       const today = new Date().toISOString().split('T')[0];
                       setFormData({ ...formData, scheduledDate: today });
@@ -372,7 +373,29 @@ const AddMeal = () => {
                   >
                     Heute
                   </Button>
+                  <Button
+                    type="button"
+                    variant={formData.scheduledDate === new Date(Date.now() + 86400000).toISOString().split('T')[0] ? 'default' : 'outline'}
+                    onClick={() => {
+                      const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+                      setFormData({ ...formData, scheduledDate: tomorrow });
+                    }}
+                  >
+                    Morgen
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      const dateInput = document.getElementById('scheduledDate') as HTMLInputElement;
+                      dateInput?.showPicker?.();
+                    }}
+                  >
+                    <CalendarIcon className="w-4 h-4" />
+                  </Button>
                 </div>
+                
+                {/* Hidden Date Input */}
                 <Input
                   id="scheduledDate"
                   type="date"
@@ -381,6 +404,17 @@ const AddMeal = () => {
                   required
                   className="h-11"
                 />
+                
+                {/* Display Selected Date in DD.MM.YYYY Format */}
+                {formData.scheduledDate && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Gewähltes Datum: {new Date(formData.scheduledDate + 'T00:00:00').toLocaleDateString('de-DE', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                    })}
+                  </p>
+                )}
               </div>
 
               {/* Divider */}
@@ -417,10 +451,10 @@ const AddMeal = () => {
                 <div className="pt-2">
                   <Label className="text-sm text-muted-foreground mb-3 block">Oder wähle eine individuelle Zeit:</Label>
                   
-                  {/* Start Time */}
+                  {/* Start Time - Compact Layout */}
                   <div className="mb-4">
-                    <Label className="text-xs text-muted-foreground mb-2 block">Von (Startzeit)</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <Label className="text-xs text-muted-foreground mb-2 block">Von</Label>
+                    <div className="flex items-center gap-1">
                       <Select
                         value={formData.collectionWindowStart.split(':')[0] || ''}
                         onValueChange={(hour) => {
@@ -428,17 +462,18 @@ const AddMeal = () => {
                           setFormData({ ...formData, collectionWindowStart: `${hour}:${minute}` });
                         }}
                       >
-                        <SelectTrigger className="h-11">
-                          <SelectValue placeholder="Stunde" />
+                        <SelectTrigger className="h-11 w-[90px]">
+                          <SelectValue placeholder="HH" />
                         </SelectTrigger>
                         <SelectContent className="max-h-60">
                           {hourOptions.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
+                              {opt.value}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      <span className="text-lg font-bold px-1">:</span>
                       <Select
                         value={formData.collectionWindowStart.split(':')[1] || ''}
                         onValueChange={(minute) => {
@@ -446,24 +481,25 @@ const AddMeal = () => {
                           setFormData({ ...formData, collectionWindowStart: `${hour}:${minute}` });
                         }}
                       >
-                        <SelectTrigger className="h-11">
-                          <SelectValue placeholder="Minute" />
+                        <SelectTrigger className="h-11 w-[90px]">
+                          <SelectValue placeholder="MM" />
                         </SelectTrigger>
                         <SelectContent>
                           {minuteOptions.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
+                              {opt.value}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      <span className="ml-1 text-sm text-muted-foreground">Uhr</span>
                     </div>
                   </div>
 
-                  {/* End Time */}
+                  {/* End Time - Compact Layout */}
                   <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Bis (Endzeit)</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <Label className="text-xs text-muted-foreground mb-2 block">Bis</Label>
+                    <div className="flex items-center gap-1">
                       <Select
                         value={formData.collectionWindowEnd.split(':')[0] || ''}
                         onValueChange={(hour) => {
@@ -471,17 +507,18 @@ const AddMeal = () => {
                           setFormData({ ...formData, collectionWindowEnd: `${hour}:${minute}` });
                         }}
                       >
-                        <SelectTrigger className="h-11">
-                          <SelectValue placeholder="Stunde" />
+                        <SelectTrigger className="h-11 w-[90px]">
+                          <SelectValue placeholder="HH" />
                         </SelectTrigger>
                         <SelectContent className="max-h-60">
                           {hourOptions.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
+                              {opt.value}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      <span className="text-lg font-bold px-1">:</span>
                       <Select
                         value={formData.collectionWindowEnd.split(':')[1] || ''}
                         onValueChange={(minute) => {
@@ -489,17 +526,18 @@ const AddMeal = () => {
                           setFormData({ ...formData, collectionWindowEnd: `${hour}:${minute}` });
                         }}
                       >
-                        <SelectTrigger className="h-11">
-                          <SelectValue placeholder="Minute" />
+                        <SelectTrigger className="h-11 w-[90px]">
+                          <SelectValue placeholder="MM" />
                         </SelectTrigger>
                         <SelectContent>
                           {minuteOptions.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
+                              {opt.value}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      <span className="ml-1 text-sm text-muted-foreground">Uhr</span>
                     </div>
                   </div>
                 </div>
@@ -558,6 +596,62 @@ const AddMeal = () => {
                   );
                 })}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* NEW: Audience & Safety Section */}
+          <Card className="border-primary/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-primary" />
+                Wer darf abholen?
+              </CardTitle>
+              <CardDescription>
+                Hinweis: Einschränkungen können dazu führen, dass sich weniger Nachbarn melden.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Verified Only Toggle */}
+              <div className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-primary" />
+                  <div>
+                    <Label htmlFor="verified-only" className="text-sm font-medium cursor-pointer">
+                      ✓ Nur Verifizierte Nutzer
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Nur Gäste mit Verifikation dürfen buchen
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="verified-only"
+                  checked={verifiedOnly}
+                  onCheckedChange={setVerifiedOnly}
+                />
+              </div>
+
+              {/* Ladies Only Toggle - Conditional */}
+              {currentUser?.gender === 'female' && (
+                <div className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-5 h-5 text-destructive" />
+                    <div>
+                      <Label htmlFor="women-only" className="text-sm font-medium cursor-pointer">
+                        👩 Ladies Only
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Nur weibliche Gäste dürfen buchen
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    id="women-only"
+                    checked={womenOnly}
+                    onCheckedChange={setWomenOnly}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -665,42 +759,6 @@ const AddMeal = () => {
                       </div>
                     )}
 
-                    {/* Advanced Options */}
-                    <div className="space-y-4 pt-4 border-t border-border">
-                      <h3 className="text-sm font-semibold text-muted-foreground">Erweiterte Optionen</h3>
-                      
-                      {/* Ladies Only */}
-                      {currentUser?.gender === 'female' && (
-                        <div className="flex items-center justify-between p-3 rounded-lg border border-border">
-                          <div className="flex items-center gap-2">
-                            <Shield className="w-4 h-4 text-destructive" />
-                            <Label htmlFor="women-only" className="text-sm cursor-pointer">
-                              👩 Ladies Only
-                            </Label>
-                          </div>
-                          <Switch
-                            id="women-only"
-                            checked={womenOnly}
-                            onCheckedChange={setWomenOnly}
-                          />
-                        </div>
-                      )}
-
-                      {/* Verified Only */}
-                      <div className="flex items-center justify-between p-3 rounded-lg border border-border">
-                        <div className="flex items-center gap-2">
-                          <Shield className="w-4 h-4 text-primary" />
-                          <Label htmlFor="verified-only" className="text-sm cursor-pointer">
-                            ✓ Nur Verifizierte
-                          </Label>
-                        </div>
-                        <Switch
-                          id="verified-only"
-                          checked={verifiedOnly}
-                          onCheckedChange={setVerifiedOnly}
-                        />
-                      </div>
-                    </div>
                   </CardContent>
                 </AccordionContent>
               </Card>
