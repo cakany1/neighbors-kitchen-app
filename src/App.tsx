@@ -20,6 +20,7 @@ import AGB from "./pages/AGB";
 import FAQ from "./pages/FAQ";
 import Install from "./pages/Install";
 import { InstallPrompt } from "./components/InstallPrompt";
+import { CookieBanner } from "./components/CookieBanner";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -53,6 +54,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <InstallPrompt />
+          <CookieBanner />
           {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
           <div className="relative z-0 flex flex-col min-h-screen pb-24">
             <Routes>
