@@ -168,6 +168,11 @@ const AddMeal = () => {
       return;
     }
 
+    if (selectedExchangeOptions.includes('money') && priceCents > 5000) {
+      toast.error('Maximaler Preis: CHF 50.00. Für Catering kontaktiere uns bitte direkt.');
+      return;
+    }
+
     try {
       // Get current user profile with address
       const { data: { user } } = await supabase.auth.getUser();
@@ -494,14 +499,20 @@ const AddMeal = () => {
                             id="restaurantReferencePrice"
                             type="number"
                             min="7.00"
+                            max="50.00"
                             step="0.50"
                             placeholder="z.B. 24"
                             value={formData.restaurantReferencePrice}
                             onChange={(e) => setFormData({ ...formData, restaurantReferencePrice: e.target.value })}
                           />
                           <p className="text-xs text-muted-foreground mt-1">
-                            Mindestpreis: CHF 7.00 (inkl. Gebühr)
+                            Mindestpreis: CHF 7.00 • Maximaler Preis: CHF 50.00
                           </p>
+                          {parseFloat(formData.restaurantReferencePrice) > 50 && (
+                            <p className="text-xs text-destructive mt-1">
+                              ⚠️ Für Beträge über CHF 50.- (Catering) kontaktiere uns bitte direkt.
+                            </p>
+                          )}
                         </div>
                       </div>
                     )}
