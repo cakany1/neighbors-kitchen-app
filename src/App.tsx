@@ -49,7 +49,7 @@ const App = () => {
           <InstallPrompt />
           <CookieBanner />
           {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
-          <div className="flex flex-col min-h-screen pb-24">
+          <div className="relative z-0 flex flex-col min-h-screen pb-24">
             <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/app" element={<Navigate to="/feed" replace />} />
