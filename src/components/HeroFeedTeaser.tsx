@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { DEMO_MEALS } from '@/data/demoMeals';
 
 // Transform demo meals for hero display
-const heroMeals = DEMO_MEALS.map((meal, index) => ({
+const heroMeals = (DEMO_MEALS && Array.isArray(DEMO_MEALS)) ? DEMO_MEALS.map((meal, index) => ({
   id: meal.id,
   image: meal.image_url,
   title: meal.title,
@@ -20,10 +20,14 @@ const heroMeals = DEMO_MEALS.map((meal, index) => ({
   chef: meal.chef.nickname || meal.chef.first_name,
   location: meal.neighborhood,
   delay: `${index * 0.2}s`
-}));
+})) : [];
 
 export const HeroFeedTeaser = () => {
   const navigate = useNavigate();
+
+  if (!heroMeals || heroMeals.length === 0) {
+    return null;
+  }
 
   return (
     <div className="w-full max-w-6xl">
