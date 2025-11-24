@@ -43,11 +43,11 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <CookieBanner />
         <BrowserRouter>
+          <Toaster />
+          <Sonner />
           <InstallPrompt />
+          <CookieBanner />
           {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
           <div className="flex flex-col min-h-screen pb-24">
             <Routes>
