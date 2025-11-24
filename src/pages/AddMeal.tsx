@@ -29,6 +29,7 @@ const AddMeal = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [selectedExchangeOptions, setSelectedExchangeOptions] = useState<string[]>([]);
   const [useStockPhoto, setUseStockPhoto] = useState(false);
+  const [barterText, setBarterText] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -177,12 +178,12 @@ const AddMeal = () => {
       ? Math.round(parseFloat(formData.restaurantReferencePrice) * 100) 
       : 0;
     
-    if (selectedExchangeOptions.includes('money') && priceCents < 700) {
+    if (selectedExchangeOptions.includes('online') && priceCents < 700) {
       toast.error('Mindestpreis: CHF 7.00 (inkl. Gebühr)');
       return;
     }
 
-    if (selectedExchangeOptions.includes('money') && priceCents > 5000) {
+    if (selectedExchangeOptions.includes('online') && priceCents > 5000) {
       toast.error('Maximaler Preis: CHF 50.00. Für Catering kontaktiere uns bitte direkt.');
       return;
     }
@@ -233,10 +234,15 @@ const AddMeal = () => {
       const scheduledDateTime = `${formData.scheduledDate}T${formData.collectionWindowStart || '18:00'}:00`;
 
       // 4. Prepare meal data
+      const baseDescription = formData.description.trim() || formData.title.trim();
+      const finalDescription = selectedExchangeOptions.includes('barter') && barterText.trim()
+        ? `Gegenleistung: ${barterText.trim()}\n\n${baseDescription}`
+        : baseDescription;
+
       const mealData = {
         chef_id: user.id,
         title: formData.title.trim(),
-        description: formData.description.trim() || formData.title.trim(),
+        description: finalDescription,
         fuzzy_lat: fuzzyLat,
         fuzzy_lng: fuzzyLng,
         exact_address: `${profile.private_address}, ${profile.private_city}`,
@@ -247,9 +253,9 @@ const AddMeal = () => {
         available_portions: parseInt(formData.portions) || 1,
         women_only: womenOnly,
         exchange_mode: selectedExchangeOptions.join(','),
-        pricing_minimum: selectedExchangeOptions.includes('money') ? priceCents : 0,
-        pricing_suggested: selectedExchangeOptions.includes('money') ? priceCents : null,
-        restaurant_reference_price: selectedExchangeOptions.includes('money') ? priceCents : null,
+        pricing_minimum: selectedExchangeOptions.includes('online') ? priceCents : 0,
+        pricing_suggested: selectedExchangeOptions.includes('online') ? priceCents : null,
+        restaurant_reference_price: selectedExchangeOptions.includes('online') ? priceCents : null,
         allergens: selectedAllergens.length > 0 ? selectedAllergens : null,
         tags: tags.length > 0 ? tags : null,
         is_stock_photo: useStockPhoto,
@@ -509,28 +515,48 @@ const AddMeal = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                {exchangeOptions.map((option) => (
-                  <div key={option.value} className="flex items-start space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors">
-                    <Checkbox
-                      id={`exchange-${option.value}`}
-                      checked={selectedExchangeOptions.includes(option.value)}
-                      onCheckedChange={() => toggleExchangeOption(option.value)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <Label
-                        htmlFor={`exchange-${option.value}`}
-                        className="text-sm font-normal cursor-pointer flex items-center gap-2"
-                      >
-                        {option.icon && <span className="text-lg">{option.icon}</span>}
-                        <span>{option.label}</span>
-                      </Label>
-                      {option.note && (
-                        <p className="text-xs text-muted-foreground mt-1 ml-6">{option.note}</p>
+                {exchangeOptions.map((option) => {
+                  const isBarter = option.value === 'barter';
+                  const isSelected = selectedExchangeOptions.includes(option.value);
+                  return (
+                    <div
+                      key={option.value}
+                      className="flex flex-col space-y-2 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+                    >
+                      <div className="flex items-start space-x-3">
+                        <Checkbox
+                          id={`exchange-${option.value}`}
+                          checked={isSelected}
+                          onCheckedChange={() => toggleExchangeOption(option.value)}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <Label
+                            htmlFor={`exchange-${option.value}`}
+                            className="text-sm font-normal cursor-pointer flex items-center gap-2"
+                          >
+                            {option.icon && <span className="text-lg">{option.icon}</span>}
+                            <span>{isBarter ? 'Tausch / Zutaten (Barter)' : option.label}</span>
+                          </Label>
+                          {option.note && (
+                            <p className="text-xs text-muted-foreground mt-1 ml-6">{option.note}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {isBarter && isSelected && (
+                        <div className="pl-8 w-full">
+                          <Input
+                            value={barterText}
+                            onChange={(e) => setBarterText(e.target.value)}
+                            placeholder="z.B. Eine Zwiebel, Schokolade, oder 'Überrasch mich'..."
+                            className="h-10 text-sm"
+                          />
+                        </div>
                       )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -610,7 +636,7 @@ const AddMeal = () => {
                     />
 
                     {/* Restaurant Reference Price */}
-                    {selectedExchangeOptions.includes('money') && (
+                    {selectedExchangeOptions.includes('online') && (
                       <div className="space-y-4 pt-2 border-t border-border">
                         <div>
                           <Label htmlFor="restaurantReferencePrice">Restaurant-Referenzpreis (CHF)</Label>
@@ -626,6 +652,9 @@ const AddMeal = () => {
                           />
                           <p className="text-xs text-muted-foreground mt-1">
                             Mindestpreis: CHF 7.00 • Maximaler Preis: CHF 50.00
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            (Der Mindestbetrag von CHF 7.00 beinhaltet die CHF 2.00 Servicegebühr für den Betrieb der Plattform.)
                           </p>
                           {parseFloat(formData.restaurantReferencePrice) > 50 && (
                             <p className="text-xs text-destructive mt-1">
