@@ -401,8 +401,11 @@ const Signup = () => {
 
             {/* Partner Fields (Conditional) */}
             {accountType === 'couple' && (
-              <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
-                <p className="text-sm font-semibold text-foreground">Partner-Angaben</p>
+              <div className="space-y-4 p-4 border-2 border-primary/30 rounded-lg bg-primary/5">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">👫</span>
+                  <p className="text-base font-bold text-foreground">Partner-Angaben</p>
+                </div>
                 
                 <div>
                   <Label htmlFor="partnerName">Partner Name</Label>
@@ -432,7 +435,12 @@ const Signup = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="partnerPhoto">Partner Foto</Label>
+                  <Label htmlFor="partnerPhoto" className="text-base font-semibold">
+                    📸 Foto deines Partners (Optional)
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Hilft Nachbarn zu wissen, wer an der Tür stehen könnte
+                  </p>
                   <input
                     id="partnerPhoto"
                     type="file"
@@ -441,7 +449,7 @@ const Signup = () => {
                     className="hidden"
                   />
                   {partnerPhotoPreview ? (
-                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-border">
+                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-primary">
                       <img src={partnerPhotoPreview} alt="Partner" className="w-full h-full object-cover" />
                       <Button
                         type="button"
@@ -463,10 +471,10 @@ const Signup = () => {
                       variant="outline"
                       onClick={() => document.getElementById('partnerPhoto')?.click()}
                       disabled={uploadingPartnerPhoto}
-                      className="w-full"
+                      className="w-full border-primary/30 hover:bg-primary/10"
                     >
                       <Upload className="mr-2 h-4 w-4" />
-                      {uploadingPartnerPhoto ? 'Lädt hoch...' : 'Foto hochladen'}
+                      {uploadingPartnerPhoto ? 'Lädt hoch...' : 'Partner-Foto hochladen'}
                     </Button>
                   )}
                   <p className="text-xs text-muted-foreground">Max 5MB, JPG/PNG</p>

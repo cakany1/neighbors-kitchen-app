@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { SafetyAlert } from '@/components/SafetyAlert';
 import { TranslateButton } from '@/components/TranslateButton';
+import { ReportDialog } from '@/components/ReportDialog';
 import { checkAllergenMatch } from '@/utils/ingredientDatabase';
 import FuzzyLocationMap from '@/components/maps/FuzzyLocationMap';
 import ChatModal from '@/components/ChatModal';
@@ -23,7 +24,8 @@ import {
   Home,
   MessageCircle,
   Calendar,
-  Gift
+  Gift,
+  Flag
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +43,7 @@ const MealDetail = () => {
   const [bookingStatus, setBookingStatus] = useState<'none' | 'pending' | 'confirmed'>('none');
   const [chatOpen, setChatOpen] = useState(false);
   const [bookingQuantity, setBookingQuantity] = useState(1);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
   
   // Fetch current user - SECURITY: Own profile can access all fields
   const { data: currentUser } = useQuery({
@@ -352,7 +355,7 @@ const MealDetail = () => {
 
         <div className="p-4 space-y-4">
           {/* Title & Chef */}
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-foreground">{meal.title}</h1>
@@ -368,6 +371,17 @@ const MealDetail = () => {
                 <span className="text-trust-gold font-semibold">{meal.chef?.karma || 0}</span>
               </div>
             </div>
+            
+            {/* Report Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setReportDialogOpen(true)}
+              className="text-muted-foreground hover:text-destructive"
+              title="Melden"
+            >
+              <Flag className="w-5 h-5" />
+            </Button>
           </div>
 
           {/* Safety Alert */}
@@ -630,6 +644,7 @@ const MealDetail = () => {
       </div>
 
       <BottomNav />
+      
       <ChatModal 
         open={chatOpen} 
         onOpenChange={setChatOpen}
@@ -637,6 +652,13 @@ const MealDetail = () => {
         chefName={meal.chef?.first_name || 'Chef'}
         mealId={meal.id}
         mealTitle={meal.title}
+      />
+
+      <ReportDialog
+        open={reportDialogOpen}
+        onOpenChange={setReportDialogOpen}
+        reportedMealId={meal?.id}
+        reportedUserId={meal?.chef_id}
       />
     </div>
   );

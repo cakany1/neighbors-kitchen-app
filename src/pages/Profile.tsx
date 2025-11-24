@@ -528,6 +528,16 @@ const Profile = () => {
         {/* Profile Header */}
         <Card className="mb-6">
           <CardContent className="pt-6">
+            {/* Avatar Warning */}
+            {!profile?.avatar_url && (
+              <Alert className="mb-4 border-orange-500 bg-orange-50 dark:bg-orange-950/20">
+                <AlertCircle className="h-4 w-4 text-orange-600" />
+                <AlertDescription className="text-sm text-orange-800 dark:text-orange-300">
+                  <strong>⚠️ Ohne Profilbild kannst du nicht bestellen.</strong> Das schafft Vertrauen in unserer Nachbarschaft!
+                </AlertDescription>
+              </Alert>
+            )}
+            
             <div className="flex items-center gap-4 mb-4">
               {/* Main User Avatar */}
               <div className="relative w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-3xl overflow-hidden group">
