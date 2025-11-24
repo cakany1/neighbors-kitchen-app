@@ -269,5 +269,52 @@
     "descriptionLabel": "Zusätzliche Details (optional)",
     "submitReport": "Meldung absenden",
     "reportSubmitted": "Meldung erfolgreich eingereicht"
+  },
+  "landing": {
+    "about_us": "Über uns",
+    "install_app": "App installieren",
+    "login": "Einloggen",
+    "join_now": "Jetzt mitmachen",
+    "how_it_works": "Wie es funktioniert",
+    "safety_rules": "Sicherheitsregeln",
+    "share_food": "1. Essen teilen",
+    "share_food_desc": "Koche zu viel? Teile überschüssiges Essen mit deinen Nachbarn.",
+    "meet_neighbors": "2. Nachbarn treffen",
+    "meet_neighbors_desc": "Lerne deine Nachbarn kennen und baue Vertrauen in deiner Community auf.",
+    "earn_karma": "3. Karma verdienen",
+    "earn_karma_desc": "Punkte sammeln durch Teilen und Zuverlässigkeit.",
+    "trust_community": "Vertrauens-Community",
+    "trust_community_desc": "Verifizierte Profile (Blauer Haken) schaffen Sicherheit. Jeder kann sofort loslegen, Verifizierung ist optional.",
+    "respect_private_spaces": "Respektiere private Räume",
+    "respect_private_spaces_desc": "Bring deine eigene Box mit. Respektiere die Wohnungen der Köche.",
+    "community_over_commerce": "Community über Kommerz",
+    "community_over_commerce_desc": "Zahle fair. Dies ist eine Sharing-Community, kein Restaurant.",
+    "exclusive_basel": "Exklusiv in Basel",
+    "tagline": "Teile Essen, baue Vertrauen, rette Lebensmittel in deiner Nachbarschaft",
+    "start_app": "App starten",
+    "browse_guest": "Als Gast umschauen"
+  },
+  "footer": {
+    "imprint": "Impressum",
+    "terms_privacy": "AGB & Datenschutz",
+    "contact": "Kontakt",
+    "install_app": "📱 App installieren"
+  },
+  "modal": {
+    "almost_done": "Fast geschafft!",
+    "registration_required": "Für die Sicherheit der Nachbarschaft benötigen wir eine kurze Registrierung. Nur registrierte Nachbarn können Essen abholen.",
+    "register_now": "Jetzt registrieren",
+    "cancel": "Abbrechen"
+  },
+  "meal_card": {
+    "symbolic_image": "Symbolbild",
+    "cooking_experience": "Koch-Erlebnis",
+    "dine_in": "Vor Ort Essen",
+    "ghost_mode": "Geistmodus",
+    "portions_left": "Noch",
+    "portfolio_available": "Koch-Portfolio verfügbar",
+    "free_with_smile": "🎁 Gegen ein Lächeln",
+    "pay_after_meal": "Zahle nach dem Essen",
+    "surprise_me": "Überrasch mich"
   }
 }

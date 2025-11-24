@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Shield } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface AuthInterstitialModalProps {
   open: boolean;
@@ -16,6 +17,8 @@ interface AuthInterstitialModalProps {
 }
 
 export const AuthInterstitialModal = ({ open, onClose, onSignup }: AuthInterstitialModalProps) => {
+  const { t } = useTranslation();
+  
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -23,18 +26,17 @@ export const AuthInterstitialModal = ({ open, onClose, onSignup }: AuthInterstit
           <div className="flex items-center justify-center mb-4">
             <Shield className="w-16 h-16 text-primary" />
           </div>
-          <DialogTitle className="text-2xl text-center">Fast geschafft!</DialogTitle>
+          <DialogTitle className="text-2xl text-center">{t('modal.almost_done')}</DialogTitle>
           <DialogDescription className="text-center pt-4">
-            Für die Sicherheit der Nachbarschaft benötigen wir eine kurze Registrierung.
-            Nur registrierte Nachbarn können Essen abholen.
+            {t('modal.registration_required')}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-col sm:flex-col gap-2">
           <Button onClick={onSignup} className="w-full" size="lg">
-            Jetzt registrieren
+            {t('modal.register_now')}
           </Button>
           <Button onClick={onClose} variant="ghost" className="w-full">
-            Abbrechen
+            {t('modal.cancel')}
           </Button>
         </DialogFooter>
       </DialogContent>

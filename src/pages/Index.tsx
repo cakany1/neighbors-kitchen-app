@@ -47,25 +47,25 @@ const Index = () => {
                 variant="ghost"
                 onClick={() => navigate('/story')}
               >
-                Über uns
+                {t('landing.about_us')}
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => navigate('/install')}
               >
-                App installieren
+                {t('landing.install_app')}
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => navigate('/login')}
               >
-                Einloggen
+                {t('landing.login')}
               </Button>
               <Button
                 variant="default"
                 onClick={() => navigate('/feed')}
               >
-                Jetzt mitmachen
+                {t('landing.join_now')}
               </Button>
             </div>
           </div>
@@ -102,12 +102,10 @@ const Index = () => {
             
             {/* Subtitle */}
             <Badge variant="secondary" className="text-lg px-4 py-2 mb-4">
-              📍 {i18n.language === 'de' ? 'Exklusiv in Basel' : 'Exclusive to Basel'}
+              📍 {t('landing.exclusive_basel')}
             </Badge>
             <p className="text-xl text-muted-foreground max-w-2xl mb-8">
-              {i18n.language === 'de' 
-                ? 'Teile Essen, baue Vertrauen, rette Lebensmittel in deiner Nachbarschaft'
-                : 'Share food, build trust, save meals in your neighborhood'}
+              {t('landing.tagline')}
             </p>
             
             {/* Meal Preview Cards */}
@@ -119,19 +117,17 @@ const Index = () => {
           {/* How it Works */}
           <section className="mb-16">
             <h2 className="text-4xl font-bold text-center mb-12">
-              {i18n.language === 'de' ? 'Wie es funktioniert' : 'How it Works'}
+              {t('landing.how_it_works')}
             </h2>
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               <Card>
                 <CardContent className="pt-6">
                   <div className="text-5xl mb-4 text-center">🍝</div>
                   <h3 className="font-bold text-lg mb-2 text-center">
-                    {i18n.language === 'de' ? '1. Essen teilen' : '1. Share Food'}
+                    {t('landing.share_food')}
                   </h3>
                   <p className="text-sm text-muted-foreground text-center">
-                    {i18n.language === 'de'
-                      ? 'Koche zu viel? Teile überschüssiges Essen mit deinen Nachbarn.'
-                      : 'Cooked too much? Share excess food with your neighbors.'}
+                    {t('landing.share_food_desc')}
                   </p>
                 </CardContent>
               </Card>
@@ -140,12 +136,10 @@ const Index = () => {
                 <CardContent className="pt-6">
                   <div className="text-5xl mb-4 text-center">🤝</div>
                   <h3 className="font-bold text-lg mb-2 text-center">
-                    {i18n.language === 'de' ? '2. Nachbarn treffen' : '2. Meet Neighbors'}
+                    {t('landing.meet_neighbors')}
                   </h3>
                   <p className="text-sm text-muted-foreground text-center">
-                    {i18n.language === 'de'
-                      ? 'Lerne deine Nachbarn kennen und baue Vertrauen in deiner Community auf.'
-                      : 'Get to know your neighbors and build trust in your community.'}
+                    {t('landing.meet_neighbors_desc')}
                   </p>
                 </CardContent>
               </Card>
@@ -154,12 +148,10 @@ const Index = () => {
                 <CardContent className="pt-6">
                   <div className="text-5xl mb-4 text-center">⭐</div>
                   <h3 className="font-bold text-lg mb-2 text-center">
-                    {i18n.language === 'de' ? '3. Karma verdienen' : '3. Earn Karma'}
+                    {t('landing.earn_karma')}
                   </h3>
                    <p className="text-sm text-muted-foreground text-center">
-                     {i18n.language === 'de'
-                       ? 'Punkte sammeln durch Teilen und Zuverlässigkeit.'
-                       : 'Collect points through sharing and reliability.'}
+                     {t('landing.earn_karma_desc')}
                    </p>
                 </CardContent>
               </Card>
@@ -169,7 +161,7 @@ const Index = () => {
           {/* Safety Rules */}
           <section className="mb-16">
             <h2 className="text-4xl font-bold text-center mb-12">
-              {i18n.language === 'de' ? 'Sicherheitsregeln' : 'Safety Rules'}
+              {t('landing.safety_rules')}
             </h2>
             <Card className="max-w-3xl mx-auto">
               <CardContent className="pt-6 space-y-4">
@@ -177,12 +169,10 @@ const Index = () => {
                   <Shield className="w-6 h-6 text-primary mt-1" />
                   <div>
                     <h4 className="font-semibold mb-1">
-                      {i18n.language === 'de' ? 'Vertrauens-Community' : 'Trust Community'}
+                      {t('landing.trust_community')}
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      {i18n.language === 'de'
-                        ? 'Verifizierte Profile (Blauer Haken) schaffen Sicherheit. Jeder kann sofort loslegen, Verifizierung ist optional.'
-                        : 'Verified profiles (Blue Badge) create trust. Everyone can start immediately, verification is optional.'}
+                      {t('landing.trust_community_desc')}
                     </p>
                   </div>
                 </div>
@@ -190,12 +180,10 @@ const Index = () => {
                   <Heart className="w-6 h-6 text-primary mt-1" />
                   <div>
                     <h4 className="font-semibold mb-1">
-                      {i18n.language === 'de' ? 'Respektiere private Räume' : 'Respect Private Spaces'}
+                      {t('landing.respect_private_spaces')}
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      {i18n.language === 'de'
-                        ? 'Bring deine eigene Box mit. Respektiere die Wohnungen der Köche.'
-                        : 'Bring your own container. Respect chef homes.'}
+                      {t('landing.respect_private_spaces_desc')}
                     </p>
                   </div>
                 </div>
@@ -203,12 +191,10 @@ const Index = () => {
                   <Globe className="w-6 h-6 text-primary mt-1" />
                   <div>
                     <h4 className="font-semibold mb-1">
-                      {i18n.language === 'de' ? 'Community über Kommerz' : 'Community over Commerce'}
+                      {t('landing.community_over_commerce')}
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      {i18n.language === 'de'
-                        ? 'Zahle fair. Dies ist eine Sharing-Community, kein Restaurant.'
-                        : 'Pay fairly. This is a sharing community, not a restaurant.'}
+                      {t('landing.community_over_commerce_desc')}
                     </p>
                   </div>
                 </div>
@@ -243,7 +229,7 @@ const Index = () => {
             size="lg"
             onClick={() => navigate('/feed')}
           >
-            App starten
+            {t('landing.start_app')}
           </Button>
           
           <Button
@@ -252,7 +238,7 @@ const Index = () => {
             size="lg"
             onClick={() => navigate('/login')}
           >
-            Anmelden
+            {t('landing.login')}
           </Button>
 
           <div className="relative">
@@ -261,7 +247,7 @@ const Index = () => {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                oder
+                {i18n.language === 'de' ? 'oder' : 'or'}
               </span>
             </div>
           </div>
@@ -272,7 +258,7 @@ const Index = () => {
             size="lg"
             onClick={() => navigate('/feed?guest=true')}
           >
-            Als Gast umschauen
+            {t('landing.browse_guest')}
           </Button>
         </CardContent>
       </Card>
