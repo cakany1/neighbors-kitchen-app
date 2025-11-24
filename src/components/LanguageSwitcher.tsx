@@ -16,9 +16,11 @@ const languages = [
 export const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
+  const changeLanguage = async (lng: string) => {
+    await i18n.changeLanguage(lng);
     localStorage.setItem('language', lng);
+    // Trigger React re-render by dispatching event
+    window.dispatchEvent(new Event('languageChanged'));
   };
 
   const currentLang = languages.find(lang => lang.code === i18n.language) || languages[0];

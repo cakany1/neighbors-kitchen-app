@@ -26,8 +26,8 @@ const Index = () => {
     return () => window.removeEventListener('resize', checkDevice);
   }, []);
 
-  const changeLanguage = (lang: string) => {
-    i18n.changeLanguage(lang);
+  const changeLanguage = async (lang: string) => {
+    await i18n.changeLanguage(lang);
     localStorage.setItem('language', lang);
   };
 

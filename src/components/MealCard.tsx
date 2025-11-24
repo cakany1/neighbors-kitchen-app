@@ -150,7 +150,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
         )}
         
         <div className="flex flex-wrap gap-2 mb-3">
-          {meal.tags.map((tag) => (
+          {(meal.tags || []).map((tag) => (
             <Badge key={tag} variant="outline" className="text-xs">
               {tag}
             </Badge>
