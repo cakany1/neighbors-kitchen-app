@@ -71,8 +71,9 @@ const MealDetail = () => {
   const { data: meal, isLoading } = useQuery({
     queryKey: ['meal', id],
     queryFn: async () => {
-      // Check if this is a demo meal
-      const demoMeal = DEMO_MEALS.find(m => m.id === id);
+      // Check if this is a demo meal (with safety check)
+      const safeDemoMeals = DEMO_MEALS && Array.isArray(DEMO_MEALS) ? DEMO_MEALS : [];
+      const demoMeal = safeDemoMeals.find(m => m.id === id);
       if (demoMeal) {
         return demoMeal;
       }

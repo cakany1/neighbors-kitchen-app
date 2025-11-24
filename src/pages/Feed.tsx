@@ -166,8 +166,9 @@ const Feed = () => {
   const userLon = currentUser?.profile?.longitude;
   const userRadius = currentUser?.profile?.notification_radius || 5000; // Default 5km
 
-  // FAILSAFE: Use imported demo meals if DB is empty
-  const finalMeals = (meals && meals.length > 0) ? meals : DEMO_MEALS;
+  // FAILSAFE: Use imported demo meals if DB is empty (with safety check)
+  const safeDemoMeals = DEMO_MEALS && Array.isArray(DEMO_MEALS) ? DEMO_MEALS : [];
+  const finalMeals = (meals && meals.length > 0) ? meals : safeDemoMeals;
 
   // Calculate distances, filter by radius, and sort
   const filteredAndSortedMeals = useMemo(() => {
