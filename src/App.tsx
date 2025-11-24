@@ -45,10 +45,10 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <InstallPrompt />
         <CookieBanner />
-        {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
         <BrowserRouter>
+          <InstallPrompt />
+          {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
           <div className="flex flex-col min-h-screen pb-24">
             <Routes>
             <Route path="/" element={<Index />} />
