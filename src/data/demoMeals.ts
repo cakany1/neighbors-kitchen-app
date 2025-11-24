@@ -88,7 +88,7 @@ export const DEMO_MEALS = [
       nickname: 'Back-Meister',
       display_real_name: false,
     },
-    image_url: 'https://images.unsplash.com/photo-1533134242116-f8c519664faf?w=800&q=80',
+    image_url: 'https://images.unsplash.com/photo-1508737027454-e6454ef45afd?w=800&q=80',
     chef_id: 'demo-chef-3',
     fuzzy_lat: 47.5580,
     fuzzy_lng: 7.5920,
