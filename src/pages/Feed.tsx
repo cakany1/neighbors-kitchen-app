@@ -260,8 +260,69 @@ const Feed = () => {
             <p className="text-muted-foreground">{t('feed.loading_meals')}</p>
           </div>
         ) : !meals || meals.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">{t('feed.no_meals_yet')}</p>
+          <div className="space-y-4">
+            <Alert className="border-primary/50 bg-primary/5">
+              <AlertCircle className="h-4 w-4 text-primary" />
+              <AlertDescription className="text-sm">
+                <strong>📍 Beispiel-Vorschau / Demo Preview</strong><br />
+                Noch keine echten Gerichte verfügbar. Hier siehst du 3 Beispiel-Angebote, wie die App aussehen wird.
+              </AlertDescription>
+            </Alert>
+            <div className="grid gap-4">
+              {[
+                {
+                  id: 'demo-1',
+                  title: 'Hausgemachte Lasagne',
+                  description: 'Klassische italienische Lasagne mit Ragu Bolognese und Béchamelsauce',
+                  chef: { firstName: 'Maria', lastName: 'R.', karma: 280, isVerified: true },
+                  location: { neighborhood: 'St. Johann', fuzzyLat: 47.5596, fuzzyLng: 7.5886 },
+                  tags: ['Italienisch', 'Vegetarisch'],
+                  imageUrl: '/placeholder-meal-1.jpg',
+                  pricing: { minimum: 0, suggested: 18 },
+                  isCookingExperience: false,
+                  availablePortions: 4,
+                  allergens: ['Milch/Laktose', 'Gluten (Getreide)', 'Eier'],
+                  scheduledDate: new Date().toISOString(),
+                },
+                {
+                  id: 'demo-2',
+                  title: 'Thai Red Curry',
+                  description: 'Scharfes Curry mit Kokosmilch, Gemüse und Basmatireis',
+                  chef: { firstName: 'Siri', lastName: 'K.', karma: 450, isVerified: true },
+                  location: { neighborhood: 'Gundeldingen', fuzzyLat: 47.5416, fuzzyLng: 7.5894 },
+                  tags: ['Thailändisch', 'Vegan', 'Scharf'],
+                  imageUrl: '/placeholder-meal-2.jpg',
+                  pricing: { minimum: 0, suggested: 15 },
+                  isCookingExperience: true,
+                  availablePortions: 2,
+                  allergens: ['Soja'],
+                  scheduledDate: new Date().toISOString(),
+                },
+                {
+                  id: 'demo-3',
+                  title: 'Schweizer Zopf (frisch gebacken)',
+                  description: 'Traditioneller Sonntagszopf aus Schweizer Mehl, noch warm vom Ofen',
+                  chef: { firstName: 'Hans', lastName: 'M.', karma: 190, isVerified: false },
+                  location: { neighborhood: 'Kleinbasel', fuzzyLat: 47.5667, fuzzyLng: 7.5953 },
+                  tags: ['Schweiz', 'Frühstück', 'Hausgemacht'],
+                  imageUrl: '/placeholder-meal-3.jpg',
+                  pricing: { minimum: 0, suggested: 8 },
+                  isCookingExperience: false,
+                  availablePortions: 1,
+                  allergens: ['Gluten (Getreide)', 'Milch/Laktose', 'Eier'],
+                  scheduledDate: new Date().toISOString(),
+                },
+              ].map((meal) => (
+                <MealCard 
+                  key={meal.id} 
+                  meal={meal}
+                  onClick={() => {
+                    toast.info('Dies ist ein Demo-Gericht. Registriere dich, um echte Angebote zu sehen!');
+                  }}
+                  userAllergens={userAllergens}
+                />
+              ))}
+            </div>
           </div>
         ) : filteredAndSortedMeals.length === 0 ? (
           <div className="text-center py-8">
