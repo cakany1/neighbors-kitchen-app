@@ -19,6 +19,7 @@ import Impressum from "./pages/Impressum";
 import AGB from "./pages/AGB";
 import FAQ from "./pages/FAQ";
 import Install from "./pages/Install";
+import Contact from "./pages/Contact";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
 import { OnboardingTour } from "./components/OnboardingTour";
@@ -74,6 +75,7 @@ const AppRoutes = () => {
           <Route path="/agb" element={<AGB />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/install" element={<Install />} />
+          <Route path="/contact" element={<Contact />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

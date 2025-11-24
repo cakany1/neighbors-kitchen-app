@@ -24,12 +24,12 @@ export const Footer = () => {
             AGB & Datenschutz
           </Link>
           <span className="text-muted-foreground">|</span>
-          <a 
-            href="mailto:support@neighbors-kitchen.ch" 
+          <Link 
+            to="/contact" 
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
             Kontakt
-          </a>
+          </Link>
           <span className="text-muted-foreground">|</span>
           <Link 
             to="/install" 
