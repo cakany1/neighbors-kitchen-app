@@ -150,11 +150,15 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
         )}
         
         <div className="flex flex-wrap gap-2 mb-3">
-          {(meal.tags || []).map((tag) => (
-            <Badge key={tag} variant="outline" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
+          {(meal.tags || []).map((tag) => {
+            // Check if tag is a translation key (starts with 'tag_')
+            const displayTag = tag.startsWith('tag_') ? t(`tags.${tag}`) : tag;
+            return (
+              <Badge key={tag} variant="outline" className="text-xs">
+                {displayTag}
+              </Badge>
+            );
+          })}
         </div>
         
         <div className="pt-3 border-t border-border space-y-2">

@@ -2,28 +2,30 @@ import { MapPin, User, Heart } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { DEMO_MEALS } from '@/data/demoMeals';
-
-// Transform demo meals for hero display
-const heroMeals = (DEMO_MEALS && Array.isArray(DEMO_MEALS)) ? DEMO_MEALS.map((meal, index) => ({
-  id: meal.id,
-  image: meal.image_url,
-  title: meal.title,
-  badgeText: meal.exchange_mode === 'money' 
-    ? '💸 Bezahle nach dem Essen, was du willst'
-    : meal.exchange_mode === 'barter'
-    ? '🎁 Überrasch mich! (Wein/Dessert)'
-    : '😊 Nichts, nur ein Lächeln (Gratis)',
-  subtext: meal.estimated_restaurant_value 
-    ? `~ Restaurant-Wert: CHF ${meal.estimated_restaurant_value}.-`
-    : '',
-  chef: meal.chef.nickname || meal.chef.first_name,
-  location: meal.neighborhood,
-  delay: `${index * 0.2}s`
-})) : [];
 
 export const HeroFeedTeaser = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  // Transform demo meals for hero display with translations
+  const heroMeals = (DEMO_MEALS && Array.isArray(DEMO_MEALS)) ? DEMO_MEALS.map((meal, index) => ({
+    id: meal.id,
+    image: meal.image_url,
+    title: meal.title,
+    badgeText: meal.exchange_mode === 'money' 
+      ? t('landing.badge_pay_what_you_want')
+      : meal.exchange_mode === 'barter'
+      ? t('landing.badge_surprise_me')
+      : t('landing.badge_free_smile'),
+    subtext: meal.estimated_restaurant_value 
+      ? `~ ${t('landing.restaurant_value')}: CHF ${meal.estimated_restaurant_value}.-`
+      : '',
+    chef: meal.chef.nickname || meal.chef.first_name,
+    location: meal.neighborhood,
+    delay: `${index * 0.2}s`
+  })) : [];
 
   if (!heroMeals || heroMeals.length === 0) {
     return null;
@@ -48,7 +50,7 @@ export const HeroFeedTeaser = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <span className="text-foreground font-semibold text-lg">
-                    Jetzt reservieren
+                    {t('landing.book_now')}
                   </span>
                 </div>
               </div>
