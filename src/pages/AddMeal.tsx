@@ -146,11 +146,10 @@ const AddMeal = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check if user is authenticated FIRST
+    // AUTH GATEKEEPER: Redirect to signup if not authenticated
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      toast.error('Bitte melde dich an, um ein Gericht zu teilen.');
-      navigate('/login');
+      navigate('/signup');
       return;
     }
     
@@ -663,11 +662,6 @@ const AddMeal = () => {
                           </Label>
                           {option.note && (
                             <p className="text-xs text-muted-foreground mt-1 ml-6">{option.note}</p>
-                          )}
-                          {isOnline && (
-                            <p className="text-xs text-muted-foreground mt-1 ml-6">
-                              (Es werden CHF 2.00 für den App-Service vom Betrag abgezogen.)
-                            </p>
                           )}
                         </div>
                       </div>
