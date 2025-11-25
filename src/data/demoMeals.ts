@@ -96,7 +96,7 @@ export const DEMO_MEALS = [
     tags: ['tag_dessert', 'tag_vegetarian', 'tag_demo'],
     allergens: ['Milch/Laktose', 'Gluten (Getreide)', 'Eier'],
     available_portions: 8,
-    pricing_minimum: 7,
+    pricing_minimum: 4,
     pricing_suggested: 4,
     is_cooking_experience: false,
     scheduled_date: new Date(Date.now() + 86400000 * 3).toISOString(),
