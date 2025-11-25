@@ -136,6 +136,7 @@ const Feed = () => {
           ingredients,
           is_stock_photo,
           women_only,
+          visibility_mode,
           chef:profiles!chef_id (
             first_name,
             last_name,
@@ -144,7 +145,8 @@ const Feed = () => {
             latitude,
             longitude,
             id_verified,
-            phone_verified
+            phone_verified,
+            gender
           )
         `)
         .order('created_at', { ascending: false });
@@ -174,16 +176,35 @@ const Feed = () => {
   const filteredAndSortedMeals = useMemo(() => {
     if (!finalMeals || finalMeals.length === 0) return [];
 
-    // If user has no location, show all meals
+    // Apply visibility filtering based on viewer's gender
+    const viewerGender = currentUser?.profile?.gender;
+    const visibilityFilteredMeals = finalMeals.filter((meal) => {
+      const mealVisibility = (meal as any).visibility_mode || 'all'; // Default to 'all' for legacy meals
+      
+      // women_only: Only visible to women
+      if (mealVisibility === 'women_only') {
+        return viewerGender === 'woman';
+      }
+      
+      // women_fli: Visible to women OR diverse
+      if (mealVisibility === 'women_fli') {
+        return viewerGender === 'woman' || viewerGender === 'diverse';
+      }
+      
+      // all: Visible to everyone
+      return true;
+    });
+
+    // If user has no location, show all visibility-filtered meals
     if (!userLat || !userLon) {
-      return finalMeals || []; // ✅ CRASH FIX: Never return undefined
+      return visibilityFilteredMeals || [];
     }
 
     // Calculate distance for each meal
-    const mealsWithDistance = finalMeals
+    const mealsWithDistance = visibilityFilteredMeals
       .map((meal) => {
-        const chefLat = meal.chef?.latitude;
-        const chefLon = meal.chef?.longitude;
+        const chefLat = (meal.chef as any)?.latitude;
+        const chefLon = (meal.chef as any)?.longitude;
 
         // If chef has no coordinates, skip this meal
         if (!chefLat || !chefLon) {

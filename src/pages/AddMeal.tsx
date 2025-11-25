@@ -186,10 +186,10 @@ const AddMeal = () => {
     }
 
     try {
-      // Get current user profile with address
+      // Get current user profile with address and visibility_mode
       const { data: profile } = await supabase
         .from('profiles')
-        .select('private_address, private_city, private_postal_code')
+        .select('private_address, private_city, private_postal_code, visibility_mode')
         .eq('id', user.id)
         .single();
 
@@ -250,6 +250,7 @@ const AddMeal = () => {
         collection_window_end: formData.collectionWindowEnd || formData.collectionWindowStart,
         available_portions: parseInt(formData.portions) || 1,
         women_only: womenOnly,
+        visibility_mode: profile.visibility_mode || 'all', // Use chef's visibility preference
         exchange_mode: selectedExchangeOptions.join(','),
         pricing_minimum: selectedExchangeOptions.includes('online') ? priceCents : 0,
         pricing_suggested: selectedExchangeOptions.includes('online') ? priceCents : null,

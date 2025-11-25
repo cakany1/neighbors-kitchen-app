@@ -184,6 +184,7 @@ export type Database = {
           title: string
           unit_type: string | null
           updated_at: string
+          visibility_mode: string | null
           women_only: boolean | null
         }
         Insert: {
@@ -218,6 +219,7 @@ export type Database = {
           title: string
           unit_type?: string | null
           updated_at?: string
+          visibility_mode?: string | null
           women_only?: boolean | null
         }
         Update: {
@@ -252,6 +254,7 @@ export type Database = {
           title?: string
           unit_type?: string | null
           updated_at?: string
+          visibility_mode?: string | null
           women_only?: boolean | null
         }
         Relationships: [
@@ -335,6 +338,7 @@ export type Database = {
           updated_at: string
           vacation_mode: boolean | null
           verification_status: Database["public"]["Enums"]["verification_status"]
+          visibility_mode: string | null
         }
         Insert: {
           age?: number | null
@@ -368,6 +372,7 @@ export type Database = {
           updated_at?: string
           vacation_mode?: boolean | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
+          visibility_mode?: string | null
         }
         Update: {
           age?: number | null
@@ -401,6 +406,7 @@ export type Database = {
           updated_at?: string
           vacation_mode?: boolean | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
+          visibility_mode?: string | null
         }
         Relationships: []
       }
@@ -481,6 +487,10 @@ export type Database = {
         Args: { p_guest_id: string; p_meal_id: string }
         Returns: Json
       }
+      can_view_meal: {
+        Args: { meal_visibility: string; viewer_gender: string }
+        Returns: boolean
+      }
       cancel_booking: {
         Args: { p_booking_id: string; p_guest_id: string }
         Returns: Json
@@ -496,6 +506,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "moderator" | "user"
       verification_status: "pending" | "approved" | "rejected"
+      visibility_mode: "women_only" | "women_fli" | "all"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -625,6 +636,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "moderator", "user"],
       verification_status: ["pending", "approved", "rejected"],
+      visibility_mode: ["women_only", "women_fli", "all"],
     },
   },
 } as const

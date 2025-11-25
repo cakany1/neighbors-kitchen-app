@@ -43,10 +43,16 @@ const languages = [
 ];
 
 const genderOptions = [
-  { value: 'female', label: '👩 Female (Weiblich)' },
-  { value: 'male', label: '👨 Male (Männlich)' },
-  { value: 'diverse', label: '🌈 Diverse' },
-  { value: 'prefer_not_to_say', label: '🔒 Prefer not to say' },
+  { value: 'woman', label: '👩 Woman (Frau)' },
+  { value: 'man', label: '👨 Man (Mann)' },
+  { value: 'diverse', label: '🌈 Diverse / Non-Binary / Inter' },
+  { value: 'none', label: '🔒 Keine Angabe' },
+];
+
+const visibilityModeOptions = [
+  { value: 'women_only', label: '👩 Women Only (Nur Frauen)', allowedFor: ['woman'] },
+  { value: 'women_fli', label: '👩🌈 Women + Diverse/NB/Inter (FLI)', allowedFor: ['woman', 'diverse', 'none'] },
+  { value: 'all', label: '🌍 All Users (Alle Nutzer*innen)', allowedFor: ['woman', 'man', 'diverse', 'none'] },
 ];
 
 const Profile = () => {
@@ -59,6 +65,7 @@ const Profile = () => {
     nickname: '',
     age: null as number | null,
     gender: null as string | null,
+    visibility_mode: 'all' as string,
     vacation_mode: false,
     notification_radius: 1000,
     allergens: [] as string[],
@@ -160,6 +167,7 @@ const Profile = () => {
         nickname: currentUser.profile.nickname || '',
         age: currentUser.profile.age || null,
         gender: currentUser.profile.gender || null,
+        visibility_mode: currentUser.profile.visibility_mode || 'all',
         vacation_mode: currentUser.profile.vacation_mode || false,
         notification_radius: currentUser.profile.notification_radius || 1000,
         allergens: currentUser.profile.allergens || [],
@@ -234,6 +242,7 @@ const Profile = () => {
         nickname: formData.nickname || null,
         age: formData.age || null,
         gender: formData.gender || null,
+        visibility_mode: formData.visibility_mode || 'all',
         vacation_mode: formData.vacation_mode,
         notification_radius: formData.notification_radius,
         allergens: formData.allergens,
@@ -772,12 +781,41 @@ const Profile = () => {
                   ))}
                 </SelectContent>
               </Select>
-              {formData.gender === 'female' && (
+              {formData.gender === 'woman' && (
                 <p className="text-xs text-muted-foreground mt-1">
                   💡 Ermöglicht "Ladies Only"-Modus für Köchinnen
                 </p>
               )}
             </div>
+
+            {/* Visibility Mode Selection - Dynamic based on gender */}
+            {formData.gender && (
+              <div>
+                <Label htmlFor="visibility-mode">Sichtbarkeit deiner Gerichte</Label>
+                <Select
+                  value={formData.visibility_mode}
+                  onValueChange={(value) => setFormData({ ...formData, visibility_mode: value })}
+                >
+                  <SelectTrigger id="visibility-mode">
+                    <SelectValue placeholder="Wähle Sichtbarkeit..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border-border z-50">
+                    {visibilityModeOptions
+                      .filter((option) => option.allowedFor.includes(formData.gender!))
+                      .map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {formData.visibility_mode === 'women_only' && '🔒 Nur weibliche Nutzerinnen sehen deine Gerichte'}
+                  {formData.visibility_mode === 'women_fli' && '🌈 Frauen und Diverse/NB/Inter sehen deine Gerichte'}
+                  {formData.visibility_mode === 'all' && '🌍 Alle Nutzer*innen sehen deine Gerichte'}
+                </p>
+              </div>
+            )}
             
             {/* Partner-Angaben (Nur für Paare) */}
             {profile?.is_couple && (
