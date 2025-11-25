@@ -107,7 +107,9 @@ const Feed = () => {
         .select(`
           id,
           title,
+          title_en,
           description,
+          description_en,
           image_url,
           chef_id,
           fuzzy_lat,

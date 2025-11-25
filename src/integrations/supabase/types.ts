@@ -163,6 +163,7 @@ export type Database = {
           collection_window_start: string | null
           created_at: string
           description: string
+          description_en: string | null
           estimated_restaurant_value: number | null
           exact_address: string
           exchange_mode: string | null
@@ -182,6 +183,7 @@ export type Database = {
           scheduled_date: string
           tags: string[] | null
           title: string
+          title_en: string | null
           unit_type: string | null
           updated_at: string
           visibility_mode: string | null
@@ -198,6 +200,7 @@ export type Database = {
           collection_window_start?: string | null
           created_at?: string
           description: string
+          description_en?: string | null
           estimated_restaurant_value?: number | null
           exact_address: string
           exchange_mode?: string | null
@@ -217,6 +220,7 @@ export type Database = {
           scheduled_date: string
           tags?: string[] | null
           title: string
+          title_en?: string | null
           unit_type?: string | null
           updated_at?: string
           visibility_mode?: string | null
@@ -233,6 +237,7 @@ export type Database = {
           collection_window_start?: string | null
           created_at?: string
           description?: string
+          description_en?: string | null
           estimated_restaurant_value?: number | null
           exact_address?: string
           exchange_mode?: string | null
@@ -252,6 +257,7 @@ export type Database = {
           scheduled_date?: string
           tags?: string[] | null
           title?: string
+          title_en?: string | null
           unit_type?: string | null
           updated_at?: string
           visibility_mode?: string | null
@@ -500,6 +506,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      user_can_view_meal_address: {
+        Args: { meal_id: string; user_id: string }
         Returns: boolean
       }
     }
