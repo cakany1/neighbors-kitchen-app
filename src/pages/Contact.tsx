@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -7,9 +8,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Mail, Send } from 'lucide-react';
+import { Mail, Send, ArrowLeft } from 'lucide-react';
 
 export default function Contact() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -67,6 +69,14 @@ export default function Contact() {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       <main className="flex-1 container max-w-2xl mx-auto px-4 py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-4"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Zurück zur Startseite
+        </Button>
         <div className="space-y-6">
           <div className="text-center space-y-2">
             <Mail className="w-12 h-12 mx-auto text-primary" />

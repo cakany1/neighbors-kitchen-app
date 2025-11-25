@@ -1,11 +1,24 @@
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const AGB = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="max-w-2xl mx-auto px-4 py-8 pb-24">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-4"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Zurück zur Startseite
+        </Button>
         <h1 className="text-3xl font-bold text-foreground mb-6">
           Allgemeine Geschäftsbedingungen (AGB) & Datenschutz
         </h1>
