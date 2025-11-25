@@ -153,7 +153,22 @@
     "submitReport": "Submit Report",
     "reportSubmitted": "Report submitted successfully"
   },
+  "tags": {
+    "tag_italian": "Italian",
+    "tag_pasta": "Pasta",
+    "tag_demo": "Demo / Example",
+    "tag_vegan": "Vegan",
+    "tag_thai": "Thai",
+    "tag_spicy": "Spicy",
+    "tag_dessert": "Dessert",
+    "tag_vegetarian": "Vegetarian"
+  },
   "landing": {
+    "badge_pay_what_you_want": "💸 Pay what you want after eating",
+    "badge_surprise_me": "🎁 Surprise me! (Wine/Dessert)",
+    "badge_free_smile": "😊 Nothing, just a smile (Free)",
+    "restaurant_value": "Restaurant Value",
+    "book_now": "Book Now",
     "about_us": "About Us",
     "install_app": "Install App",
     "login": "Login",

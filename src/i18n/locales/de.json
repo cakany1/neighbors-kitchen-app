@@ -272,7 +272,22 @@
     "submitReport": "Meldung absenden",
     "reportSubmitted": "Meldung erfolgreich eingereicht"
   },
+  "tags": {
+    "tag_italian": "Italienisch",
+    "tag_pasta": "Pasta",
+    "tag_demo": "Demo / Beispiel",
+    "tag_vegan": "Vegan",
+    "tag_thai": "Thailändisch",
+    "tag_spicy": "Scharf",
+    "tag_dessert": "Dessert",
+    "tag_vegetarian": "Vegetarisch"
+  },
   "landing": {
+    "badge_pay_what_you_want": "💸 Bezahle nach dem Essen, was du willst",
+    "badge_surprise_me": "🎁 Überrasch mich! (Wein/Dessert)",
+    "badge_free_smile": "😊 Nichts, nur ein Lächeln (Gratis)",
+    "restaurant_value": "Restaurant-Wert",
+    "book_now": "Jetzt reservieren",
     "about_us": "Über uns",
     "install_app": "App installieren",
     "login": "Einloggen",
