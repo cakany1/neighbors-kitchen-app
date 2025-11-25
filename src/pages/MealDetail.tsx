@@ -27,7 +27,8 @@ import {
   MessageCircle,
   Calendar,
   Gift,
-  Flag
+  Flag,
+  Languages
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -47,10 +48,11 @@ const MealDetail = () => {
   const [bookingQuantity, setBookingQuantity] = useState(1);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [showOriginal, setShowOriginal] = useState(false);
   
-  // Use pre-translated content based on current language
+  // Use pre-translated content based on current language, but respect showOriginal toggle
   const getDisplayText = (originalText: string, translatedText: string | null | undefined) => {
-    return i18n.language === 'en' && translatedText ? translatedText : originalText;
+    return !showOriginal && i18n.language === 'en' && translatedText ? translatedText : originalText;
   };
   
   // Fetch current user - SECURITY: Own profile can access all fields
@@ -393,16 +395,20 @@ const MealDetail = () => {
           {/* Title & Chef */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <h1 className="text-2xl font-bold text-foreground">
                   {getDisplayText(meal.title, (meal as any).title_en)}
                 </h1>
-                {/* Only show translate button if no pre-translation exists */}
-                {!(i18n.language === 'en' && (meal as any).title_en) && (
-                  <TranslateButton 
-                    originalText={meal.title}
-                    onTranslate={(translated) => {}}
-                  />
+                {/* Show original toggle button for meals with translations */}
+                {i18n.language === 'en' && (meal as any).title_en && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowOriginal(!showOriginal)}
+                  >
+                    <Languages className="w-4 h-4 mr-2" />
+                    {showOriginal ? t('meal_detail.show_english') : t('meal_detail.show_original')}
+                  </Button>
                 )}
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">

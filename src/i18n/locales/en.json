@@ -299,7 +299,9 @@
     "contact_chef_to_cancel": "Contact Chef to cancel",
     "quantity": "Quantity",
     "for_both": "For both of us (2 portions)",
-    "for_me": "Just for me (1 portion)"
+    "for_me": "Just for me (1 portion)",
+    "show_original": "Show Original (DE)",
+    "show_english": "Show English"
   },
   "add_meal": {
     "ready_from": "Ready for pickup from",

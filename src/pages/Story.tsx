@@ -21,9 +21,8 @@ const StoryPage = () => {
 
         <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
           <div className="order-2 md:order-1">
-            {/* STABILIES BILD (Unsplash) statt lokaler Pfad */}
             <img
-              src="https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&w=800&q=80"
+              src="https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&w=1000&q=80"
               alt="Neighbors sharing food"
               className="rounded-2xl shadow-xl w-full h-auto object-cover aspect-[4/5]"
             />

@@ -1,7 +1,8 @@
 import { Meal } from '@/types/meal';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, MapPin, ChefHat, Calendar, Gift, Heart, Camera, Package, Home, Ghost, UtensilsCrossed } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Star, MapPin, ChefHat, Calendar, Gift, Heart, Camera, Package, Home, Ghost, UtensilsCrossed, Languages } from 'lucide-react';
 import { TranslateButton } from '@/components/TranslateButton';
 import { VerificationBadge } from '@/components/VerificationBadge';
 import { useState } from 'react';
@@ -19,9 +20,10 @@ interface MealCardProps {
 export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) => {
   const { t, i18n } = useTranslation();
   const [translatedTitle, setTranslatedTitle] = useState(meal.title);
+  const [showOriginal, setShowOriginal] = useState(false);
   
-  // Use pre-translated content if available and language is English
-  const displayTitle = i18n.language === 'en' && (meal as any).title_en 
+  // Use pre-translated content if available and language is English, but respect showOriginal toggle
+  const displayTitle = !showOriginal && i18n.language === 'en' && (meal as any).title_en 
     ? (meal as any).title_en 
     : meal.title;
   
@@ -109,14 +111,22 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2 gap-2">
           <div className="flex-1">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-wrap">
               <h3 className="font-semibold text-lg text-card-foreground">{displayTitle}</h3>
-              {/* Only show translate button if no pre-translation exists */}
-              {!(i18n.language === 'en' && (meal as any).title_en) && (
-                <TranslateButton 
-                  originalText={meal.title} 
-                  onTranslate={setTranslatedTitle} 
-                />
+              {/* Show original toggle button for meals with translations */}
+              {i18n.language === 'en' && (meal as any).title_en && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowOriginal(!showOriginal);
+                  }}
+                >
+                  <Languages className="w-3 h-3 mr-1" />
+                  {showOriginal ? 'EN' : 'DE'}
+                </Button>
               )}
             </div>
           </div>

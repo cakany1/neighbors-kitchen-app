@@ -395,20 +395,17 @@ const Signup = () => {
             {/* Optional Avatar Upload (Gated Later) */}
             <div className="space-y-2">
               <Label htmlFor="avatarPhoto" className="text-base font-semibold text-foreground">
-                {t('signup.photo_optional', 'Dein Profilfoto (Optional)')}
+                Dein Profilfoto
               </Label>
-              <Alert className="bg-yellow-500/10 border-yellow-500/30">
-                <AlertDescription className="text-xs text-foreground">
-                  Photo is optional during signup, but required to book or post meals.
-                </AlertDescription>
-              </Alert>
               <Input
                 id="avatarPhoto"
                 type="file"
                 accept="image/*"
                 className="cursor-pointer"
               />
-              <p className="text-xs text-muted-foreground">{t('signup.max_file_size')}</p>
+              <p className="text-xs text-muted-foreground">
+                Jetzt optional. Später für Bestellungen erforderlich.
+              </p>
               <Alert className="bg-blue-500/10 border-blue-500/30 mt-2">
                 <AlertDescription className="text-xs text-foreground">
                   {t('signup.verification_note')}
@@ -538,12 +535,12 @@ const Signup = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                {t('signup.phone_hint', 'Nur zur Koordination bei Abholung (z.B. "Bin in 5 Min da"). Chat nur via App.')}
+                Nur zur Koordination bei Abholung (z.B. "Bin in 5 Min da"). Chat nur via App.
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">{t('signup.address_required', 'Straße und Hausnummer *')}</Label>
+              <Label htmlFor="address">Straße und Hausnummer *</Label>
               <Input
                 id="address"
                 value={formData.address}
@@ -552,7 +549,7 @@ const Signup = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                {t('signup.address_hint', 'Erforderlich für die Nähesuche.')}
+                Wichtig für die Umkreissuche.
               </p>
             </div>
 
