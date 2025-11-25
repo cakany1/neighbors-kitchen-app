@@ -35,7 +35,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
+import { de, enUS } from 'date-fns/locale';
 import { DEMO_MEALS } from '@/data/demoMeals';
 
 const MealDetail = () => {
@@ -510,15 +510,21 @@ const MealDetail = () => {
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex flex-col items-center justify-center">
                     <span className="text-xs font-medium text-primary">
-                      {format(new Date(meal.scheduled_date), 'MMM', { locale: de }).toUpperCase()}
+                      {format(new Date(meal.scheduled_date), 'MMM', { 
+                        locale: i18n.language === 'en' ? enUS : de 
+                      }).toUpperCase()}
                     </span>
                     <span className="text-lg font-bold text-primary">
-                      {format(new Date(meal.scheduled_date), 'd', { locale: de })}
+                      {format(new Date(meal.scheduled_date), 'd', { 
+                        locale: i18n.language === 'en' ? enUS : de 
+                      })}
                     </span>
                   </div>
                   <div>
                     <p className="font-semibold text-foreground">
-                      {format(new Date(meal.scheduled_date), 'EEEE, d. MMMM yyyy', { locale: de })}
+                      {format(new Date(meal.scheduled_date), 'EEEE, d. MMMM yyyy', { 
+                        locale: i18n.language === 'en' ? enUS : de 
+                      })}
                     </p>
                     {(meal.collection_window_start || (meal as any).arrival_time) && (
                       <p className="text-sm text-muted-foreground mt-1">

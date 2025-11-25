@@ -312,7 +312,7 @@ const Signup = () => {
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="firstName">{t('auth.first_name')}</Label>
+                <Label htmlFor="firstName">Vorname <span className="text-destructive">*</span></Label>
                 <Input
                   id="firstName"
                   placeholder={t('auth.first_name_placeholder')}
@@ -322,7 +322,7 @@ const Signup = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="lastName">{t('auth.last_name')}</Label>
+                <Label htmlFor="lastName">Nachname <span className="text-destructive">*</span></Label>
                 <Input
                   id="lastName"
                   placeholder={t('auth.last_name_placeholder')}
@@ -358,21 +358,22 @@ const Signup = () => {
                   {t('signup.chat_translation_note')}
                 </AlertDescription>
               </Alert>
-              <div className="mt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-full text-xs"
-                  onClick={() => {
-                    const requestedLanguage = prompt(t('profile.settings_language_request_placeholder'));
-                    if (requestedLanguage?.trim()) {
-                      toast.success(t('toast.language_request_submitted', { language: requestedLanguage }));
-                    }
-                  }}
-                >
-                  {t('profile.language_request_button')}
-                </Button>
+              {/* Language Request - Input Field */}
+              <div className="mt-3 space-y-2">
+                <Label htmlFor="languageRequest" className="text-xs">
+                  ➕ Fehlt deine Sprache? Hier anfragen
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="languageRequest"
+                    type="text"
+                    placeholder="z.B. Koreanisch, Hindi"
+                    className="flex-1"
+                  />
+                  <Button type="button" variant="outline" size="sm">
+                    Senden
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -535,12 +536,12 @@ const Signup = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                Nur zur Koordination bei Abholung (z.B. "Bin in 5 Min da"). Chat nur via App.
+                Dient nur zur Absprache bei der Abholung (z.B. 'Bin in 5 Min da'). Kein SMS-Code.
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Straße und Hausnummer *</Label>
+              <Label htmlFor="address">Strasse und Hausnummer <span className="text-destructive">*</span></Label>
               <Input
                 id="address"
                 value={formData.address}
@@ -579,7 +580,7 @@ const Signup = () => {
             </div>
 
             <div>
-              <Label htmlFor="email">{t('auth.email')}</Label>
+              <Label htmlFor="email">E-Mail <span className="text-destructive">*</span></Label>
               <Input
                 id="email"
                 type="email"
@@ -591,7 +592,7 @@ const Signup = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">{t('auth.password')}</Label>
+              <Label htmlFor="password">Passwort <span className="text-destructive">*</span></Label>
               <Input
                 id="password"
                 type="password"

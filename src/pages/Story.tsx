@@ -22,9 +22,13 @@ const StoryPage = () => {
         <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
           <div className="order-2 md:order-1">
             <img
-              src="https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&w=1000&q=80"
+              src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/gallery/neighbors-sharing.jpg`}
               alt="Neighbors sharing food"
               className="rounded-2xl shadow-xl w-full h-auto object-cover aspect-[4/5]"
+              onError={(e) => {
+                // Fallback to Unsplash if Supabase image fails
+                e.currentTarget.src = "https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&w=1000&q=80";
+              }}
             />
           </div>
 

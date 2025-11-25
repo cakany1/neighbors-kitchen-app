@@ -680,7 +680,7 @@ const AddMeal = () => {
                       {isOnline && isSelected && (
                         <div className="pl-8 w-full space-y-2">
                           <Label htmlFor="price" className="text-sm font-medium">
-                            Preis pro Portion (CHF) *
+                            Preis pro Portion (CHF) <span className="text-destructive">*</span>
                           </Label>
                           <Input
                             id="price"
@@ -695,7 +695,7 @@ const AddMeal = () => {
                             required
                           />
                           <p className="text-xs text-muted-foreground">
-                            Mindestpreis: CHF 7.00 | Maximalpreis: CHF 50.00
+                            Mindestpreis CHF 7.00 (CHF 2.00 Servicegebühr wird abgezogen) • Max CHF 50.00
                           </p>
                         </div>
                       )}

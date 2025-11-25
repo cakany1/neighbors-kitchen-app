@@ -19,11 +19,13 @@ export const HeroFeedTeaser = () => {
       : meal.exchange_mode === 'barter'
       ? t('landing.badge_surprise_me')
       : t('landing.badge_free_smile'),
-    subtext: meal.estimated_restaurant_value 
-      ? `~ ${t('landing.restaurant_value')}: CHF ${meal.estimated_restaurant_value}.-`
+    // PROMINENT PRICE DISPLAY: Show pricing_minimum for demo meals (e.g., Cheesecake CHF 4.-)
+    subtext: meal.pricing_minimum 
+      ? `CHF ${meal.pricing_minimum}.-`
       : '',
     chef: meal.chef.nickname || meal.chef.first_name,
     location: meal.neighborhood,
+    tags: meal.tags || [],
     delay: `${index * 0.2}s`
   })) : [];
 
@@ -58,12 +60,20 @@ export const HeroFeedTeaser = () => {
                 <h3 className="font-semibold text-base text-foreground line-clamp-1">
                   {meal.title}
                 </h3>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm font-semibold text-primary">
                   {meal.subtext}
                 </p>
                 <Badge variant="secondary" className="bg-primary/20 text-primary w-fit text-xs">
                   {meal.badgeText}
                 </Badge>
+                {/* TAGS: Properly iterate and translate */}
+                <div className="flex flex-wrap gap-2">
+                  {meal.tags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {t(`tags.${tag}`)}
+                    </Badge>
+                  ))}
+                </div>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <User className="w-4 h-4" />

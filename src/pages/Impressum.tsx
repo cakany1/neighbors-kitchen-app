@@ -3,9 +3,11 @@ import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Impressum = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background">
@@ -17,42 +19,30 @@ const Impressum = () => {
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Zurück zur Startseite
+          {t('legal.back_home')}
         </Button>
-        <h1 className="text-3xl font-bold text-foreground mb-6">Impressum</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-6">{t('legal.imprint_title')}</h1>
         
         <div className="space-y-6 text-foreground">
           <section>
-            <h2 className="text-xl font-semibold mb-3">Kontaktadresse</h2>
+            <h2 className="text-xl font-semibold mb-3">{t('legal.contact_title')}</h2>
             <p className="whitespace-pre-line">
-              Neighbors Kitchen
-              Yagiz Cakan
-              Riehenring 174
-              4058 Basel
-              Schweiz
+              {t('legal.contact_address')}
             </p>
-            <p className="mt-2">E-Mail: cakan.yagiz@gmail.com</p>
+            <p className="mt-2">{t('legal.contact_email')}</p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">Haftungsausschluss</h2>
+            <h2 className="text-xl font-semibold mb-3">{t('legal.disclaimer_title')}</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Der Autor übernimmt keinerlei Gewähr hinsichtlich der inhaltlichen Richtigkeit, 
-              Genauigkeit, Aktualität, Zuverlässigkeit und Vollständigkeit der Informationen. 
-              Haftungsansprüche gegen den Autor wegen Schäden materieller oder immaterieller Art, 
-              welche aus dem Zugriff oder der Nutzung bzw. Nichtnutzung der veröffentlichten 
-              Informationen, durch Missbrauch der Verbindung oder durch technische Störungen 
-              entstanden sind, werden ausgeschlossen.
+              {t('legal.disclaimer_text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">Haftung für Links</h2>
+            <h2 className="text-xl font-semibold mb-3">{t('legal.links_title')}</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Verweise und Links auf Webseiten Dritter liegen ausserhalb unseres 
-              Verantwortungsbereichs. Es wird jegliche Verantwortung für solche Webseiten 
-              abgelehnt. Der Zugriff und die Nutzung solcher Webseiten erfolgen auf eigene 
-              Gefahr des Nutzers oder der Nutzerin.
+              {t('legal.links_text')}
             </p>
           </section>
         </div>
