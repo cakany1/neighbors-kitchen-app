@@ -40,13 +40,18 @@ import { DEMO_MEALS } from '@/data/demoMeals';
 const MealDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [bookingStatus, setBookingStatus] = useState<'none' | 'pending' | 'confirmed'>('none');
   const [chatOpen, setChatOpen] = useState(false);
   const [bookingQuantity, setBookingQuantity] = useState(1);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  
+  // Use pre-translated content based on current language
+  const getDisplayText = (originalText: string, translatedText: string | null | undefined) => {
+    return i18n.language === 'en' && translatedText ? translatedText : originalText;
+  };
   
   // Fetch current user - SECURITY: Own profile can access all fields
   const { data: currentUser } = useQuery({
@@ -84,7 +89,9 @@ const MealDetail = () => {
         .select(`
           id,
           title,
+          title_en,
           description,
+          description_en,
           image_url,
           chef_id,
           fuzzy_lat,
@@ -387,11 +394,16 @@ const MealDetail = () => {
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-foreground">{meal.title}</h1>
-                <TranslateButton 
-                  originalText={meal.title}
-                  onTranslate={(translated) => {}}
-                />
+                <h1 className="text-2xl font-bold text-foreground">
+                  {getDisplayText(meal.title, (meal as any).title_en)}
+                </h1>
+                {/* Only show translate button if no pre-translation exists */}
+                {!(i18n.language === 'en' && (meal as any).title_en) && (
+                  <TranslateButton 
+                    originalText={meal.title}
+                    onTranslate={(translated) => {}}
+                  />
+                )}
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <ChefHat className="w-4 h-4" />
@@ -462,7 +474,9 @@ const MealDetail = () => {
               <CardTitle className="text-lg">{t('meal_detail.about_dish')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">{meal.description}</p>
+              <p className="text-muted-foreground">
+                {getDisplayText(meal.description, (meal as any).description_en)}
+              </p>
               {meal.allergens && meal.allergens.length > 0 && (
                 <Alert className="mt-4 border-destructive/50 bg-destructive/5">
                   <AlertTriangle className="h-4 w-4 text-destructive" />

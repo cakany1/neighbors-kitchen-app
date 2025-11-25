@@ -199,7 +199,7 @@ const AddMeal = () => {
         return;
       }
 
-      toast.loading('Gericht wird erstellt...');
+      toast.loading('Gericht wird erstellt und übersetzt...');
 
       // 1. Geocode chef's exact address
       const { data: geoData, error: geoError } = await supabase.functions.invoke('geocode-address', {
@@ -237,10 +237,51 @@ const AddMeal = () => {
         ? `Gegenleistung: ${barterText.trim()}\n\n${baseDescription}`
         : baseDescription;
 
+      // 4.5. Translate title and description to English
+      let titleEn = null;
+      let descriptionEn = null;
+      
+      try {
+        console.log('Translating meal content to English...');
+        
+        // Translate title
+        const { data: titleTranslation } = await supabase.functions.invoke('translate-message', {
+          body: {
+            text: formData.title.trim(),
+            sourceLanguage: 'German',
+            targetLanguage: 'English'
+          }
+        });
+        
+        // Translate description
+        const { data: descTranslation } = await supabase.functions.invoke('translate-message', {
+          body: {
+            text: finalDescription,
+            sourceLanguage: 'German',
+            targetLanguage: 'English'
+          }
+        });
+        
+        if (titleTranslation?.translatedText) {
+          titleEn = titleTranslation.translatedText;
+        }
+        
+        if (descTranslation?.translatedText) {
+          descriptionEn = descTranslation.translatedText;
+        }
+        
+        console.log('Translation successful:', { titleEn, descriptionEn });
+      } catch (translationError) {
+        console.error('Translation failed, continuing without English version:', translationError);
+        // Continue without translations if they fail
+      }
+
       const mealData = {
         chef_id: user.id,
         title: formData.title.trim(),
+        title_en: titleEn,
         description: finalDescription,
+        description_en: descriptionEn,
         fuzzy_lat: fuzzyLat,
         fuzzy_lng: fuzzyLng,
         exact_address: `${profile.private_address}, ${profile.private_city}`,

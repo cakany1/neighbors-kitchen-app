@@ -17,8 +17,13 @@ interface MealCardProps {
 }
 
 export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [translatedTitle, setTranslatedTitle] = useState(meal.title);
+  
+  // Use pre-translated content if available and language is English
+  const displayTitle = i18n.language === 'en' && (meal as any).title_en 
+    ? (meal as any).title_en 
+    : meal.title;
   
   // Mock data - in real app this would come from database
   const exchangeMode = meal.id === 'meal_103' ? 'barter' : 'money';
@@ -105,11 +110,14 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
         <div className="flex items-start justify-between mb-2 gap-2">
           <div className="flex-1">
             <div className="flex items-center gap-1">
-              <h3 className="font-semibold text-lg text-card-foreground">{translatedTitle}</h3>
-              <TranslateButton 
-                originalText={meal.title} 
-                onTranslate={setTranslatedTitle} 
-              />
+              <h3 className="font-semibold text-lg text-card-foreground">{displayTitle}</h3>
+              {/* Only show translate button if no pre-translation exists */}
+              {!(i18n.language === 'en' && (meal as any).title_en) && (
+                <TranslateButton 
+                  originalText={meal.title} 
+                  onTranslate={setTranslatedTitle} 
+                />
+              )}
             </div>
           </div>
           <div className="flex items-center gap-1 text-trust-gold shrink-0">
