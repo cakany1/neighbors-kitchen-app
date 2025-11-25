@@ -199,7 +199,10 @@ const MealDetail = () => {
 
   const bookingMutation = useMutation({
     mutationFn: async () => {
-      if (!currentUser?.id || !meal) throw new Error('Missing user or meal');
+      // CRITICAL: Double-check auth before DB operations
+      if (!currentUser?.id || !meal) {
+        throw new Error('Missing user or meal');
+      }
 
       // BOOKING GATE: Check profile completion
       const profile = currentUser.profile;
