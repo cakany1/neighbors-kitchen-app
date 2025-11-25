@@ -451,6 +451,49 @@ const Profile = () => {
           </Card>
         )}
 
+        {/* Referral System */}
+        {profile?.avatar_url && (
+          <Card className="mb-6 border-green-600/30 bg-gradient-to-br from-green-500/5 to-green-500/10">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                🎁 Nachbarn einladen
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Lade deine Nachbarn ein und erhalte +5 Karma für jede erfolgreiche Anmeldung!
+              </p>
+              <Button
+                variant="default"
+                className="w-full"
+                onClick={async () => {
+                  const referralLink = `${window.location.origin}/signup?ref=${currentUser?.id}`;
+                  
+                  try {
+                    await navigator.clipboard.writeText(referralLink);
+                    
+                    // Add 5 Karma
+                    const currentKarma = profile?.karma || 100;
+                    const { error } = await supabase
+                      .from('profiles')
+                      .update({ karma: currentKarma + 5 })
+                      .eq('id', currentUser?.id || '');
+                    
+                    if (!error) {
+                      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                      toast.success('🎉 Link kopiert! +5 Karma');
+                    }
+                  } catch (err) {
+                    toast.error('Fehler beim Kopieren des Links');
+                  }
+                }}
+              >
+                Link kopieren & Karma verdienen
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Chef Wallet Section */}
         <Card className="mb-6 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
           <CardHeader>

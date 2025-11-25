@@ -63,7 +63,7 @@ const Index = () => {
               </Button>
               <Button
                 variant="default"
-                onClick={() => navigate('/feed')}
+                onClick={() => navigate('/signup')}
               >
                 {t('landing.join_now')}
               </Button>
