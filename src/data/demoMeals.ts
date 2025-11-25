@@ -97,7 +97,7 @@ export const DEMO_MEALS = [
     allergens: ['Milch/Laktose', 'Gluten (Getreide)', 'Eier'],
     available_portions: 8,
     pricing_minimum: 7,
-    pricing_suggested: 15,
+    pricing_suggested: 4,
     is_cooking_experience: false,
     scheduled_date: new Date(Date.now() + 86400000 * 3).toISOString(),
     created_at: new Date().toISOString(),
