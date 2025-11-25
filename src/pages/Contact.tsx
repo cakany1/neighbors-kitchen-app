@@ -138,16 +138,6 @@ export default function Contact() {
               )}
             </Button>
           </form>
-
-          <div className="text-center text-sm text-muted-foreground">
-            <p>Oder schreiben Sie uns direkt an:</p>
-            <a 
-              href="mailto:support@neighbors-kitchen.ch" 
-              className="text-primary hover:underline"
-            >
-              support@neighbors-kitchen.ch
-            </a>
-          </div>
         </div>
       </main>
       <Footer />
