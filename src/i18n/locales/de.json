@@ -187,7 +187,16 @@
     "achievements_fair_payer": "Fairer Zahler",
     "achievements_fair_payer_desc": "Zahlt immer fair",
     "verification_banner": "Verifizieren lassen, um deine Buchungschancen zu erhöhen!",
-    "verification_banner_desc": "Verifizierte Nutzer erhalten ein blaues Häkchen-Badge und mehr Vertrauen von der Community."
+    "verification_banner_desc": "Verifizierte Nutzer erhalten ein blaues Häkchen-Badge und mehr Vertrauen von der Community.",
+    "add_address_for_map": "Füge deine Adresse hinzu, um die Karte zu sehen",
+    "notification_radius_hint": "Du wirst über Gerichte in diesem Radius von deinem Standort benachrichtigt",
+    "visibility_man_hint": "Als Mann ist nur 'Alle Nutzer*innen' wählbar, da dieser Modus die Sicherheitsanforderungen erfüllt.",
+    "partner_name": "Partner Name",
+    "partner_name_placeholder": "Vorname des Partners",
+    "partner_gender": "Partner Geschlecht",
+    "partner_gender_placeholder": "Wähle Geschlecht des Partners...",
+    "partner_gender_hint": "Für 'Ladies Only' Buchungen muss die weibliche Partnerin teilnehmen",
+    "language_request_button": "Sprache anfragen"
   },
   "signup": {
     "gender": "Ich bin",

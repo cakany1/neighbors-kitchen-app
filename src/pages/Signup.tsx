@@ -356,6 +356,22 @@ const Signup = () => {
                   {t('signup.chat_translation_note')}
                 </AlertDescription>
               </Alert>
+              <div className="mt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={() => {
+                    const requestedLanguage = prompt(t('profile.settings_language_request_placeholder'));
+                    if (requestedLanguage?.trim()) {
+                      toast.success(t('toast.language_request_submitted', { language: requestedLanguage }));
+                    }
+                  }}
+                >
+                  {t('profile.language_request_button')}
+                </Button>
+              </div>
             </div>
 
             <div>

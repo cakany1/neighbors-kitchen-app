@@ -40,7 +40,16 @@
     "badges": "Badges",
     "languageUpdated": "Languages updated",
     "verification_banner": "Get Verified to increase your booking chances!",
-    "verification_banner_desc": "Verified users get a blue tick badge and more trust from the community."
+    "verification_banner_desc": "Verified users get a blue tick badge and more trust from the community.",
+    "add_address_for_map": "Add your address to see the map",
+    "notification_radius_hint": "You'll be notified about meals within this radius from your location",
+    "visibility_man_hint": "As a man, only 'All Users' mode is selectable as it meets safety requirements.",
+    "partner_name": "Partner's Name",
+    "partner_name_placeholder": "Partner's first name",
+    "partner_gender": "Partner's Gender",
+    "partner_gender_placeholder": "Select partner's gender...",
+    "partner_gender_hint": "For 'Ladies Only' bookings, the female partner must attend",
+    "language_request_button": "Request Language"
   },
   "auth": {
     "welcome_back": "Welcome back!",
