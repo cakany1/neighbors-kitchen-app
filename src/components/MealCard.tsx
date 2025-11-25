@@ -35,7 +35,8 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   let handoverMode: 'pickup_box' | 'neighbor_plate' | 'anonymous_drop' | 'dine_in' = 'pickup_box';
   if (meal.id === 'meal_102') handoverMode = 'dine_in';
   if (meal.id === 'meal_103') handoverMode = 'anonymous_drop';
-  const estimatedValue = meal.pricing.suggested || 24;
+  // PRICE: Always show pricing_minimum prominently, not estimated restaurant value
+  const displayPrice = meal.pricing.minimum || meal.pricing.suggested || 0;
   
   // Mock chef nickname
   const chefNickname = "FoodieChef";

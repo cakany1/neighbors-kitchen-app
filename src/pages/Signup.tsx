@@ -34,6 +34,7 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [accountType, setAccountType] = useState<'single' | 'couple'>('single');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['de']);
+  const [requestedLanguage, setRequestedLanguage] = useState('');
   const [partnerPhotoFile, setPartnerPhotoFile] = useState<File | null>(null);
   const [partnerPhotoPreview, setPartnerPhotoPreview] = useState<string>('');
   const [uploadingPartnerPhoto, setUploadingPartnerPhoto] = useState(false);
@@ -369,8 +370,20 @@ const Signup = () => {
                     type="text"
                     placeholder="z.B. Koreanisch, Hindi"
                     className="flex-1"
+                    value={requestedLanguage}
+                    onChange={(e) => setRequestedLanguage(e.target.value)}
                   />
-                  <Button type="button" variant="outline" size="sm">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      if (requestedLanguage.trim()) {
+                        toast.success(`Sprachwunsch "${requestedLanguage}" notiert!`);
+                        setRequestedLanguage('');
+                      }
+                    }}
+                  >
                     Senden
                   </Button>
                 </div>

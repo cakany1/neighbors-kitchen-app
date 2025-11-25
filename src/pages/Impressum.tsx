@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 const Impressum = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background">
@@ -22,6 +22,15 @@ const Impressum = () => {
           {t('legal.back_home')}
         </Button>
         <h1 className="text-3xl font-bold text-foreground mb-6">{t('legal.imprint_title')}</h1>
+        
+        {/* English Disclaimer (only shown when language is EN) */}
+        {i18n.language === 'en' && (
+          <div className="mb-6 p-4 bg-muted/50 border border-border rounded-lg">
+            <p className="text-sm text-muted-foreground italic">
+              Note: For legal reasons, this imprint is currently available in German only. In case of doubt, the German version applies.
+            </p>
+          </div>
+        )}
         
         <div className="space-y-6 text-foreground">
           <section>
