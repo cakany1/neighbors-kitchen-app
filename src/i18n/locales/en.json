@@ -269,6 +269,7 @@
     "about_dish": "About this dish",
     "allergens_label": "Allergens",
     "available_on": "Available on",
+    "location": "Location",
     "delete": "Delete",
     "report": "Report",
     "confirm_delete": "Do you really want to delete this meal? This action cannot be undone.",
@@ -285,6 +286,15 @@
     "quantity": "Quantity",
     "for_both": "For both of us (2 portions)",
     "for_me": "Just for me (1 portion)"
+  },
+  "add_meal": {
+    "ready_from": "Ready for pickup from",
+    "pickup_time": "Pickup Time",
+    "pickup_time_hint": "When can guests pick up the food?",
+    "exchange_title": "Your request to the guest",
+    "exchange_desc": "What do you accept in return?",
+    "who_can_pickup": "Who may pick up?",
+    "restrictions_note": "Note: Restrictions may result in fewer neighbors responding."
   },
   "feed_page": {
     "welcome_message": "Welcome to Neighbors Kitchen! This is a private food-sharing community. Please bring your own containers, respect the chefs' homes and pay fairly. Tap to close.",

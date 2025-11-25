@@ -413,7 +413,7 @@ const AddMeal = () => {
               <div>
                 <Label className="text-lg font-semibold flex items-center gap-2 mb-3">
                   <CalendarIcon className="w-5 h-5" />
-                  Abholbereit ab *
+                  {t('add_meal.ready_from')} *
                 </Label>
                 
                 {/* Quick Date Buttons */}
@@ -506,8 +506,8 @@ const AddMeal = () => {
 
               {/* Time Selection */}
               <div className="space-y-4">
-                <Label className="text-lg font-semibold block">Abholzeit *</Label>
-                <p className="text-sm text-muted-foreground">Wann können Gäste das Essen abholen?</p>
+                <Label className="text-lg font-semibold block">{t('add_meal.pickup_time')} *</Label>
+                <p className="text-sm text-muted-foreground">{t('add_meal.pickup_time_hint')}</p>
                 
                 {/* Smart Time Chips */}
                 <div className="grid grid-cols-2 gap-3">
@@ -632,8 +632,8 @@ const AddMeal = () => {
           {/* Exchange Options */}
           <Card>
             <CardHeader>
-              <CardTitle>Dein Wunsch an den Gast *</CardTitle>
-              <CardDescription>Was akzeptierst du als Gegenleistung?</CardDescription>
+              <CardTitle>{t('add_meal.exchange_title')} *</CardTitle>
+              <CardDescription>{t('add_meal.exchange_desc')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
@@ -682,6 +682,29 @@ const AddMeal = () => {
                           />
                         </div>
                       )}
+
+                      {isOnline && isSelected && (
+                        <div className="pl-8 w-full space-y-2">
+                          <Label htmlFor="price" className="text-sm font-medium">
+                            Preis pro Portion (CHF) *
+                          </Label>
+                          <Input
+                            id="price"
+                            type="number"
+                            min="7.00"
+                            max="50.00"
+                            step="0.50"
+                            value={formData.restaurantReferencePrice}
+                            onChange={(e) => setFormData({ ...formData, restaurantReferencePrice: e.target.value })}
+                            placeholder="z.B. 12.00"
+                            className="h-10 text-sm"
+                            required
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Mindestpreis: CHF 7.00 | Maximalpreis: CHF 50.00
+                          </p>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -694,10 +717,10 @@ const AddMeal = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="w-5 h-5 text-primary" />
-                Wer darf abholen?
+                {t('add_meal.who_can_pickup')}
               </CardTitle>
               <CardDescription>
-                Hinweis: Einschränkungen können dazu führen, dass sich weniger Nachbarn melden.
+                {t('add_meal.restrictions_note')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

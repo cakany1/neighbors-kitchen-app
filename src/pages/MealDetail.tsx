@@ -532,7 +532,7 @@ const MealDetail = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-primary" />
-                Standort
+                {t('meal_detail.location')}
               </CardTitle>
             </CardHeader>
             <CardContent>
