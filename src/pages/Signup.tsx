@@ -395,7 +395,7 @@ const Signup = () => {
             {/* Optional Avatar Upload (Gated Later) */}
             <div className="space-y-2">
               <Label htmlFor="avatarPhoto" className="text-base font-semibold text-foreground">
-                {t('signup.profile_photo')} (Optional)
+                {t('signup.photo_optional', 'Dein Profilfoto (Optional)')}
               </Label>
               <Alert className="bg-yellow-500/10 border-yellow-500/30">
                 <AlertDescription className="text-xs text-foreground">
@@ -538,12 +538,12 @@ const Signup = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                Used exclusively for coordination during pickup (e.g. 'Arriving in 5 mins'). Chat is in-app only.
+                {t('signup.phone_hint', 'Nur zur Koordination bei Abholung (z.B. "Bin in 5 Min da"). Chat nur via App.')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">{t('signup.address')} *</Label>
+              <Label htmlFor="address">{t('signup.address_required', 'Straße und Hausnummer *')}</Label>
               <Input
                 id="address"
                 value={formData.address}
@@ -552,7 +552,7 @@ const Signup = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                Required for proximity search.
+                {t('signup.address_hint', 'Erforderlich für die Nähesuche.')}
               </p>
             </div>
 

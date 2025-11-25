@@ -178,7 +178,7 @@
     "badge_free_smile": "😊 Nothing, just a smile (Free)",
     "restaurant_value": "Restaurant Value",
     "book_now": "Book Now",
-    "about_us": "About Us",
+    "about_us": "Our Story",
     "install_app": "Install App",
     "login": "Login",
     "join_now": "Join Now",
@@ -205,7 +205,15 @@
     "imprint": "Imprint",
     "terms_privacy": "Terms & Privacy",
     "contact": "Contact",
-    "install_app": "📱 Install App"
+    "install_app": "Install App"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "name": "Name",
+    "email": "E-Mail",
+    "message": "Message",
+    "submit": "Send Message",
+    "remove_email_text": " "
   },
   "modal": {
     "almost_done": "Almost done!",
@@ -247,6 +255,12 @@
     "genderDiverse": "🌈 Diverse / Non-Binary / Inter",
     "genderNone": "🔒 Prefer not to say",
     "profile_photo": "📸 Your Profile Photo (Required)",
+    "photo_optional": "Profile Photo (Optional)",
+    "photo_label": "Profile Photo (Optional)",
+    "phone_hint": "Used exclusively for coordination during pickup. Chat is in-app only.",
+    "address_required": "Street and House Number *",
+    "address_label": "Street and House Number *",
+    "address_hint": "Required for proximity search.",
     "photo_required_warning": "⚠️ You cannot order or offer meals without a photo.",
     "max_file_size": "Max 5MB, JPG/PNG",
     "verification_note": "Note: Your profile picture must be manually verified. This may take some time before you can offer meals.",
