@@ -365,10 +365,10 @@ const Signup = () => {
                   <SelectValue placeholder={t('signup.genderPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="female">{t('signup.genderFemale')}</SelectItem>
-                  <SelectItem value="male">{t('signup.genderMale')}</SelectItem>
+                  <SelectItem value="woman">{t('signup.genderWoman')}</SelectItem>
+                  <SelectItem value="man">{t('signup.genderMan')}</SelectItem>
                   <SelectItem value="diverse">{t('signup.genderDiverse')}</SelectItem>
-                  <SelectItem value="prefer_not_to_say">{t('signup.genderPreferNotToSay')}</SelectItem>
+                  <SelectItem value="none">{t('signup.genderNone')}</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">{t('signup.genderHint')}</p>
@@ -454,10 +454,10 @@ const Signup = () => {
                       <SelectValue placeholder={t('signup.select_gender')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="female">{t('signup.female')}</SelectItem>
-                      <SelectItem value="male">{t('signup.male')}</SelectItem>
+                      <SelectItem value="woman">{t('signup.genderWoman')}</SelectItem>
+                      <SelectItem value="man">{t('signup.genderMan')}</SelectItem>
                       <SelectItem value="diverse">{t('signup.genderDiverse')}</SelectItem>
-                      <SelectItem value="prefer_not_to_say">{t('signup.genderPreferNotToSay')}</SelectItem>
+                      <SelectItem value="none">{t('signup.genderNone')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
