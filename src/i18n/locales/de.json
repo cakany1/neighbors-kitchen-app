@@ -198,22 +198,6 @@
     "partner_gender_hint": "Für 'Ladies Only' Buchungen muss die weibliche Partnerin teilnehmen",
     "language_request_button": "Sprache anfragen"
   },
-  "signup": {
-    "gender": "Ich bin",
-    "genderWoman": "👩 Frau",
-    "genderMan": "👨 Mann",
-    "genderDiverse": "🌈 Divers / Non-Binary / Inter",
-    "genderNone": "🔒 Keine Angabe",
-    "genderPlaceholder": "Auswählen...",
-    "genderHint": "Für Sicherheit und Matching-Präferenzen",
-    "isCouple": "Wir sind ein Paar (Portionen immer mindestens x2)",
-    "phoneNumber": "Telefonnummer (zur Verifizierung)",
-    "phoneHint": "Wir senden Ihnen einen Bestätigungscode",
-    "address": "Straße und Hausnummer (Optional)",
-    "city": "Stadt",
-    "postalCode": "Postleitzahl",
-    "addressHint": "🔒 Ihre Adresse ist privat und verschlüsselt. Sie wird NUR nach Ihrer Buchungsbestätigung an Gäste weitergegeben."
-  },
   "guidelines": {
     "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (außer beim Vor-Ort-Essen)",
     "bePunctual": "Pünktlich sein und die Zeit des Kochs respektieren",
@@ -344,6 +328,20 @@
     "surprise_me": "Überrasch mich"
   },
   "signup": {
+    "gender": "Ich bin",
+    "genderWoman": "👩 Frau",
+    "genderMan": "👨 Mann",
+    "genderDiverse": "🌈 Divers / Non-Binary / Inter",
+    "genderNone": "🔒 Keine Angabe",
+    "genderPlaceholder": "Auswählen...",
+    "genderHint": "Für Sicherheit und Matching-Präferenzen",
+    "isCouple": "Wir sind ein Paar (Portionen immer mindestens x2)",
+    "phoneNumber": "Telefonnummer (zur Verifizierung)",
+    "phoneHint": "Ihre Telefonnummer dient ausschliesslich zur direkten Koordination bei der Abholung (z.B. 'Bin in 5 Minuten da').",
+    "address": "Straße und Hausnummer (Optional)",
+    "city": "Stadt",
+    "postalCode": "Postleitzahl",
+    "addressHint": "🔒 Ihre Adresse ist privat und verschlüsselt. Sie wird NUR nach Ihrer Buchungsbestätigung an Gäste weitergegeben.",
     "password_too_short": "Zu kurz",
     "password_weak": "Schwach",
     "password_medium": "Mittel",
@@ -368,15 +366,7 @@
     "upload_success": "Partner Foto hochgeladen",
     "upload_failed": "Foto-Upload fehlgeschlagen",
     "file_too_large": "Datei zu groß! Max 5MB.",
-    "images_only": "Nur Bilder erlaubt!",
-    "genderHint": "Für Sicherheit und Matching-Präferenzen",
-    "isCouple": "Wir sind ein Paar (Portionen immer mindestens x2)",
-    "phoneNumber": "Telefonnummer (zur Verifizierung)",
-    "phoneHint": "Wir senden Ihnen einen Bestätigungscode",
-    "address": "Straße und Hausnummer (Optional)",
-    "city": "Stadt",
-    "postalCode": "Postleitzahl",
-    "addressHint": "🔒 Ihre Adresse ist privat und verschlüsselt. Sie wird NUR nach Ihrer Buchungsbestätigung an Gäste weitergegeben."
+    "images_only": "Nur Bilder erlaubt!"
   },
   "meal_detail": {
     "loading": "Lädt...",

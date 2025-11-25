@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const languages = [
-  { code: 'de', name: 'Deutsch' },
-  { code: 'en', name: 'English' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'en', name: 'English', flag: '🇬🇧' },
 ];
 
 export const LanguageSwitcher = () => {
@@ -19,11 +19,16 @@ export const LanguageSwitcher = () => {
   const changeLanguage = async (lng: string) => {
     await i18n.changeLanguage(lng);
     localStorage.setItem('language', lng);
-    // Trigger React re-render by dispatching event
     window.dispatchEvent(new Event('languageChanged'));
   };
 
+  const toggleToOtherLanguage = () => {
+    const otherLang = i18n.language === 'de' ? 'en' : 'de';
+    changeLanguage(otherLang);
+  };
+
   const currentLang = languages.find(lang => lang.code === i18n.language) || languages[0];
+  const otherLang = languages.find(lang => lang.code !== i18n.language) || languages[1];
 
   return (
     <DropdownMenu>
@@ -39,11 +44,21 @@ export const LanguageSwitcher = () => {
           <DropdownMenuItem
             key={lang.code}
             onClick={() => changeLanguage(lang.code)}
-            className="cursor-pointer"
+            className="cursor-pointer flex items-center gap-2"
           >
-            {lang.name}
+            <span>{lang.flag}</span>
+            <span>{lang.name}</span>
+            {lang.code === i18n.language && <span className="ml-auto text-primary">✓</span>}
           </DropdownMenuItem>
         ))}
+        <DropdownMenuItem
+          onClick={toggleToOtherLanguage}
+          className="cursor-pointer border-t mt-1 pt-2 text-muted-foreground"
+        >
+          <span className="text-xs">
+            {i18n.language === 'de' ? '🔄 Show Original (EN)' : '🔄 Original anzeigen (DE)'}
+          </span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
