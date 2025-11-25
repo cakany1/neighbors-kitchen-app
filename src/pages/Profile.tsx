@@ -813,6 +813,11 @@ const Profile = () => {
                   {formData.visibility_mode === 'women_only' && '🔒 Nur weibliche Nutzerinnen sehen deine Gerichte'}
                   {formData.visibility_mode === 'women_fli' && '🌈 Frauen und Diverse/NB/Inter sehen deine Gerichte'}
                   {formData.visibility_mode === 'all' && '🌍 Alle Nutzer*innen sehen deine Gerichte'}
+                  {formData.gender === 'man' && (
+                    <span className="block mt-1 text-xs text-muted-foreground">
+                      💡 {t('profile.visibility_man_hint')}
+                    </span>
+                  )}
                 </p>
               </div>
             )}
@@ -840,24 +845,24 @@ const Profile = () => {
                 </div>
                 
                 <div>
-                  <Label htmlFor="partner-name">Partner's Name</Label>
+                  <Label htmlFor="partner-name">{t('profile.partner_name')}</Label>
                   <Input
                     id="partner-name"
                     type="text"
-                    placeholder="Partner's first name"
+                    placeholder={t('profile.partner_name_placeholder')}
                     value={formData.partner_name}
                     onChange={(e) => setFormData({ ...formData, partner_name: e.target.value })}
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="partner-gender">Partner's Gender</Label>
+                  <Label htmlFor="partner-gender">{t('profile.partner_gender')}</Label>
                   <Select
                     value={formData.partner_gender || undefined}
                     onValueChange={(value) => setFormData({ ...formData, partner_gender: value })}
                   >
                     <SelectTrigger id="partner-gender">
-                      <SelectValue placeholder="Select partner's gender..." />
+                      <SelectValue placeholder={t('profile.partner_gender_placeholder')} />
                     </SelectTrigger>
                     <SelectContent className="bg-background border-border z-50">
                       {genderOptions.map((option) => (
@@ -868,7 +873,7 @@ const Profile = () => {
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground mt-1">
-                    💡 For "Ladies Only" bookings, the female partner must attend
+                    💡 {t('profile.partner_gender_hint')}
                   </p>
                 </div>
               </div>
@@ -961,15 +966,15 @@ const Profile = () => {
                 </span>
               </div>
               
-              {profile?.latitude && profile?.longitude ? (
+              {currentUser?.profile?.latitude && currentUser?.profile?.longitude ? (
                 <RadiusSliderMap 
-                  lat={profile.latitude}
-                  lng={profile.longitude}
+                  lat={currentUser.profile.latitude}
+                  lng={currentUser.profile.longitude}
                   radius={formData.notification_radius / 1000}
                 />
               ) : (
                 <div className="w-full h-48 rounded-lg border border-border bg-muted flex items-center justify-center">
-                  <p className="text-sm text-muted-foreground">Add your address to see the map</p>
+                  <p className="text-sm text-muted-foreground">{t('profile.add_address_for_map')}</p>
                 </div>
               )}
               
@@ -983,7 +988,7 @@ const Profile = () => {
                 className="w-full"
               />
               <p className="text-xs text-muted-foreground">
-                You'll be notified about meals within this radius from your location
+                {t('profile.notification_radius_hint')}
               </p>
             </div>
           </CardContent>
@@ -1293,9 +1298,13 @@ const Profile = () => {
                 variant="destructive"
                 className="w-full"
                 onClick={async () => {
-                  const confirmation = prompt('⚠️ UNWIDERRUFLICH! Tippe "DELETE" um dein Konto endgültig zu löschen:');
+                  const confirmMessage = i18n.language === 'de' 
+                    ? '⚠️ Schade, dass du gehst! Wir hoffen, du kommst bald wieder.\n\nTippe "DELETE" um dein Konto endgültig zu löschen:'
+                    : '⚠️ Sorry to see you go! We hope you come back soon.\n\nType "DELETE" to permanently delete your account:';
+                  
+                  const confirmation = prompt(confirmMessage);
                   if (confirmation !== 'DELETE') {
-                    toast.error('Abgebrochen. Du musst "DELETE" exakt eingeben.');
+                    toast.error(i18n.language === 'de' ? 'Abgebrochen. Du musst "DELETE" exakt eingeben.' : 'Cancelled. You must type "DELETE" exactly.');
                     return;
                   }
                   
@@ -1310,10 +1319,10 @@ const Profile = () => {
                     
                     // Sign out and redirect
                     await supabase.auth.signOut();
-                    toast.success('Konto erfolgreich gelöscht. Auf Wiedersehen.');
+                    toast.success(i18n.language === 'de' ? 'Konto erfolgreich gelöscht. Auf Wiedersehen.' : 'Account successfully deleted. Goodbye.');
                     navigate('/');
                   } catch (error: any) {
-                    toast.error('Fehler beim Löschen: ' + error.message);
+                    toast.error((i18n.language === 'de' ? 'Fehler beim Löschen: ' : 'Deletion error: ') + error.message);
                   }
                 }}
               >
