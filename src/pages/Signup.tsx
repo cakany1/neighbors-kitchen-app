@@ -336,18 +336,20 @@ const Signup = () => {
             <div className="space-y-2">
               <Label>{t('auth.i_speak')}</Label>
               <p className="text-xs text-muted-foreground">{t('signup.select_languages')}</p>
-              <div className="grid grid-cols-2 gap-2">
-                {(languages || []).slice(0, 6).map((lang) => (
-                  <div key={lang.code} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`lang-${lang.code}`}
-                      checked={selectedLanguages.includes(lang.code)}
-                      onCheckedChange={() => toggleLanguage(lang.code)}
-                    />
-                    <Label htmlFor={`lang-${lang.code}`} className="cursor-pointer text-sm">
-                      {lang.name}
-                    </Label>
-                  </div>
+              <div className="flex flex-wrap gap-2">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    onClick={() => toggleLanguage(lang.code)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                      selectedLanguages.includes(lang.code)
+                        ? 'bg-primary text-primary-foreground shadow-md'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    {lang.name}
+                  </button>
                 ))}
               </div>
               <Alert className="mt-2">
@@ -390,25 +392,24 @@ const Signup = () => {
               <p className="text-xs text-muted-foreground mt-1">{t('signup.genderHint')}</p>
             </div>
 
-            {/* Mandatory Avatar Upload */}
+            {/* Optional Avatar Upload (Gated Later) */}
             <div className="space-y-2">
               <Label htmlFor="avatarPhoto" className="text-base font-semibold text-foreground">
-                {t('signup.profile_photo')} *
+                {t('signup.profile_photo')} (Optional)
               </Label>
-              <Alert className="bg-destructive/10 border-destructive/30">
+              <Alert className="bg-yellow-500/10 border-yellow-500/30">
                 <AlertDescription className="text-xs text-foreground">
-                  {t('signup.photo_required_warning')}
+                  Photo is optional during signup, but required to book or post meals.
                 </AlertDescription>
               </Alert>
               <Input
                 id="avatarPhoto"
                 type="file"
                 accept="image/*"
-                required
                 className="cursor-pointer"
               />
               <p className="text-xs text-muted-foreground">{t('signup.max_file_size')}</p>
-              <Alert className="bg-yellow-500/10 border-yellow-500/30 mt-2">
+              <Alert className="bg-blue-500/10 border-blue-500/30 mt-2">
                 <AlertDescription className="text-xs text-foreground">
                   {t('signup.verification_note')}
                 </AlertDescription>
@@ -534,20 +535,25 @@ const Signup = () => {
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                 placeholder="+41 79 123 45 67"
+                required
               />
               <p className="text-xs text-muted-foreground">
-                Ihre Telefonnummer dient ausschliesslich zur direkten Koordination bei der Abholung (z.B. "Bin in 5 Minuten da").
+                Used exclusively for coordination during pickup (e.g. 'Arriving in 5 mins'). Chat is in-app only.
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">{t('signup.address')}</Label>
+              <Label htmlFor="address">{t('signup.address')} *</Label>
               <Input
                 id="address"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 placeholder="Hauptstrasse 123"
+                required
               />
+              <p className="text-xs text-muted-foreground">
+                Required for proximity search.
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
