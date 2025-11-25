@@ -6,24 +6,27 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Smartphone, Bell, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const FAQ = () => {
+  const { t } = useTranslation();
+
   const requestNotificationPermission = async () => {
     if (!('Notification' in window)) {
-      toast.error('Dein Browser unterstützt keine Benachrichtigungen.');
+      toast.error(t('faq.notification_unsupported'));
       return;
     }
 
     const permission = await Notification.requestPermission();
     
     if (permission === 'granted') {
-      toast.success('✓ Benachrichtigungen aktiviert!');
+      toast.success(t('faq.notification_granted'));
       new Notification('Neighbors Kitchen', {
-        body: 'Du erhältst jetzt Benachrichtigungen über neue Mahlzeiten in deiner Umgebung.',
+        body: t('faq.notification_body'),
         icon: '/icon-192.png',
       });
     } else {
-      toast.error('Benachrichtigungen wurden abgelehnt.');
+      toast.error(t('faq.notification_denied'));
     }
   };
 
@@ -35,9 +38,9 @@ const FAQ = () => {
         {/* Page Title */}
         <div className="text-center">
           <HelpCircle className="w-12 h-12 text-primary mx-auto mb-3" />
-          <h1 className="text-3xl font-bold text-foreground mb-2">Hilfe &amp; FAQ</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t('faq.title')}</h1>
           <p className="text-muted-foreground">
-            Alles, was du über Neighbors Kitchen wissen musst
+            {t('faq.subtitle')}
           </p>
         </div>
 
@@ -46,33 +49,33 @@ const FAQ = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Smartphone className="w-5 h-5 text-primary" />
-              App installieren &amp; Benachrichtigungen
+              {t('faq.install_title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h3 className="font-semibold text-foreground mb-2">So nutzt du Neighbors Kitchen richtig</h3>
+              <h3 className="font-semibold text-foreground mb-2">{t('faq.install_guide')}</h3>
               <div className="space-y-3 text-sm text-muted-foreground">
                 <Alert>
                   <AlertDescription>
-                    <strong className="text-foreground">📱 iPhone (iOS):</strong>
+                    <strong className="text-foreground">{t('faq.ios_label')}</strong>
                     <br />
-                    Tippe unten auf &quot;Teilen&quot; (Quadrat mit Pfeil) und wähle &quot;Zum Home-Bildschirm&quot;.
+                    {t('faq.ios_instructions')}
                   </AlertDescription>
                 </Alert>
                 <Alert>
                   <AlertDescription>
-                    <strong className="text-foreground">🤖 Android:</strong>
+                    <strong className="text-foreground">{t('faq.android_label')}</strong>
                     <br />
-                    Tippe oben auf das Menü (3 Punkte) und wähle &quot;App installieren&quot;.
+                    {t('faq.android_instructions')}
                   </AlertDescription>
                 </Alert>
                 <Alert className="border-primary/50 bg-primary/5">
                   <Bell className="w-4 h-4 text-primary" />
                   <AlertDescription>
-                    <strong className="text-foreground">🔔 Benachrichtigungen:</strong>
+                    <strong className="text-foreground">{t('faq.notification_label')}</strong>
                     <br />
-                    Erlaube uns, dich zu benachrichtigen, wenn dein Nachbar kocht!
+                    {t('faq.notification_description')}
                   </AlertDescription>
                 </Alert>
               </div>
@@ -82,7 +85,7 @@ const FAQ = () => {
               className="w-full"
             >
               <Bell className="w-4 h-4 mr-2" />
-              Benachrichtigungen aktivieren
+              {t('faq.enable_notifications')}
             </Button>
           </CardContent>
         </Card>
@@ -90,84 +93,58 @@ const FAQ = () => {
         {/* Section B: FAQ Accordion */}
         <Card>
           <CardHeader>
-            <CardTitle>Häufige Fragen (FAQ)</CardTitle>
+            <CardTitle>{t('faq.questions_title')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1">
-                <AccordionTrigger>Wie funktioniert das Bezahlen?</AccordionTrigger>
-                <AccordionContent>
-                  Die Registrierung ist kostenlos. Zahlen musst du nur, wenn der Koch die Option <strong>&quot;Online Zahlung (Apple Pay / Karte)&quot;</strong> gewählt hat. Die Bezahlung erfolgt dann digital bei der Reservierung.
-                </AccordionContent>
+                <AccordionTrigger>{t('faq.q1')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a1')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-2">
-                <AccordionTrigger>Ist das ein Restaurant?</AccordionTrigger>
-                <AccordionContent>
-                  Nein! Hier kochen private Nachbarn für Nachbarn. Es geht um Gemeinschaft und 
-                  die Vermeidung von Lebensmittelverschwendung, nicht um gewerblichen Verkauf.
-                </AccordionContent>
+                <AccordionTrigger>{t('faq.q2')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a2')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-3">
-                <AccordionTrigger>Muss ich die Köchin treffen?</AccordionTrigger>
-                <AccordionContent>
-                  Ja, die Übergabe findet in der Regel persönlich statt. Bei &quot;Ghost Mode&quot; ist auch anonyme Abholung möglich, zum Beispiel am Hauseingang, Briefkasten oder an einer nahen Tramhaltestelle.
-                </AccordionContent>
+                <AccordionTrigger>{t('faq.q3')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a3')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-4">
-                <AccordionTrigger>Was ist der &apos;Ladies Only&apos; Modus?</AccordionTrigger>
-                <AccordionContent>
-                  Frauen können einstellen, dass ihre Angebote nur für andere Frauen sichtbar sind. 
-                  Dies erhöht die Sicherheit und schafft einen geschützten Raum für weibliche Nutzerinnen.
-                </AccordionContent>
+                <AccordionTrigger>{t('faq.q4')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a4')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-5">
-                <AccordionTrigger>Was passiert, wenn ich nicht erscheine?</AccordionTrigger>
-                <AccordionContent>
-                  Das ist unfair! Wer nicht erscheint, erhält eine schlechte Bewertung. Dies kann zu sofortigen <strong>Karma-Abzügen</strong> führen und im schlimmsten Fall zur Sperrung. Du kannst Buchungen innerhalb von 15 Minuten kostenlos stornieren.
-                </AccordionContent>
+                <AccordionTrigger>{t('faq.q5')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a5')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-6">
-                <AccordionTrigger>Kann ich auch tauschen?</AccordionTrigger>
-                <AccordionContent>
-                  Ja! Viele Köche akzeptieren Tauschhandel (z.B. Dessert gegen Hauptspeise oder 
-                  eine Flasche Wein). Nach dem Essen kannst du wählen, ob du Geld sendest oder 
-                  etwas mitgebracht hast.
-                </AccordionContent>
+                <AccordionTrigger>{t('faq.q6')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a6')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-7">
-                <AccordionTrigger>Sind die Lebensmittel sicher?</AccordionTrigger>
-                <AccordionContent>
-                  Wir setzen auf Vertrauen &amp; Community-Bewertungen. Achte auf Karma-Punkte und die positiven <strong>Bewertungen</strong> von anderen Nutzern.
-                </AccordionContent>
+                <AccordionTrigger>{t('faq.q7')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a7')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-8">
-                <AccordionTrigger>Wie werde ich Koch?</AccordionTrigger>
-                <AccordionContent>
-                  Jeder kann sofort Mahlzeiten anbieten, sobald das <strong>Profilfoto hochgeladen</strong> ist (Pflicht). Wenn du zusätzlich das <strong>✓ Verifiziert-Badge</strong> erhalten möchtest, klicke im Profil auf &quot;Verifizieren lassen&quot; (Optionaler ID-Upload).
-                </AccordionContent>
+                <AccordionTrigger>{t('faq.q8')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a8')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-9">
-                <AccordionTrigger>Was kostet die Plattform?</AccordionTrigger>
-                <AccordionContent>
-                  Die Nutzung der App ist kostenlos. Bei digitalen Transaktionen fällt eine <strong>fixe Servicegebühr von CHF 2.00</strong> an, um die Plattform zu betreiben und weiterzuentwickeln.
-                </AccordionContent>
+                <AccordionTrigger>{t('faq.q9')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a9')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-10">
-                <AccordionTrigger>Wo sehe ich den genauen Standort?</AccordionTrigger>
-                <AccordionContent>
-                  Zum Schutz der Privatsphäre siehst du die genaue Adresse erst nach der 
-                  Buchungsbestätigung durch den Koch. Vorher wird nur die ungefähre 
-                  Nachbarschaft angezeigt.
-                </AccordionContent>
+                <AccordionTrigger>{t('faq.q10')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a10')}</AccordionContent>
               </AccordionItem>
             </Accordion>
           </CardContent>
@@ -177,14 +154,14 @@ const FAQ = () => {
         <Card className="border-muted">
           <CardContent className="pt-6 text-center">
             <p className="text-sm text-muted-foreground mb-4">
-              Weitere Fragen? Kontaktiere uns über das Feedback-Formular im Profil.
+              {t('faq.more_questions')}
             </p>
             <div className="flex gap-2 justify-center">
               <Button variant="outline" onClick={() => window.location.href = '/impressum'}>
-                Impressum
+                {t('footer.imprint')}
               </Button>
               <Button variant="outline" onClick={() => window.location.href = '/agb'}>
-                AGB
+                {t('footer.terms_privacy')}
               </Button>
             </div>
           </CardContent>

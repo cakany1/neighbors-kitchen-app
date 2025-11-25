@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 const AGB = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,6 +24,15 @@ const AGB = () => {
         <h1 className="text-3xl font-bold text-foreground mb-6">
           {t('legal.agb_title')}
         </h1>
+        
+        {/* English Disclaimer (only shown when language is EN) */}
+        {i18n.language === 'en' && (
+          <div className="mb-6 p-4 bg-muted/50 border border-border rounded-lg">
+            <p className="text-sm text-muted-foreground italic">
+              Note: For legal reasons, these terms are currently available in German only. In case of doubt, the German version applies.
+            </p>
+          </div>
+        )}
         
         <div className="space-y-6 text-foreground">
           <section>
