@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Footer } from '@/components/Footer';
@@ -9,7 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VerificationBadge } from '@/components/VerificationBadge';
-import { Star, ChefHat, Award, Camera, ArrowLeft } from 'lucide-react';
+import { ReportDialog } from '@/components/ReportDialog';
+import { Star, ChefHat, Award, Camera, ArrowLeft, Flag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { MealCard } from '@/components/MealCard';
@@ -18,6 +20,7 @@ const ChefProfile = () => {
   const { chefId } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [showReportDialog, setShowReportDialog] = useState(false);
 
   // Fetch chef profile
   const { data: chef, isLoading: chefLoading } = useQuery({
@@ -154,11 +157,21 @@ const ChefProfile = () => {
               </Avatar>
               
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h1 className="text-2xl font-bold">{displayName}</h1>
-                  <VerificationBadge 
-                    isVerified={chef.id_verified || chef.phone_verified || false}
-                  />
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-2xl font-bold">{displayName}</h1>
+                    <VerificationBadge 
+                      isVerified={chef.id_verified || chef.phone_verified || false}
+                    />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowReportDialog(true)}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <Flag className="w-4 h-4" />
+                  </Button>
                 </div>
                 
                 <div className="flex items-center gap-2 mb-2">
@@ -288,6 +301,12 @@ const ChefProfile = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      <ReportDialog
+        open={showReportDialog}
+        onOpenChange={setShowReportDialog}
+        reportedUserId={chefId}
+      />
 
       <Footer />
       <BottomNav />

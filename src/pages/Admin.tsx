@@ -75,6 +75,21 @@ const Admin = () => {
     enabled: isAdmin,
   });
 
+  // Fetch all users for user management
+  const { data: allUsers, isLoading: usersLoading } = useQuery({
+    queryKey: ['allUsers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, nickname, phone_number, created_at, verification_status')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
   // Fetch feedback
   const { data: feedbackList, isLoading: feedbackLoading } = useQuery({
     queryKey: ['feedbackList'],
@@ -227,6 +242,28 @@ const Admin = () => {
     },
   });
 
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const { data, error } = await supabase.rpc('admin_delete_user', {
+        target_user_id: userId
+      });
+
+      if (error) throw error;
+      const result = data as { success: boolean; message: string };
+      if (!result.success) throw new Error(result.message);
+      return result;
+    },
+    onSuccess: () => {
+      toast.success('Benutzer erfolgreich gelöscht');
+      queryClient.invalidateQueries({ queryKey: ['allUsers'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
+    },
+    onError: (error: Error) => {
+      toast.error('Fehler beim Löschen: ' + error.message);
+    },
+  });
+
   // Generate image mutation
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   
@@ -327,9 +364,9 @@ const Admin = () => {
                   <CardContent className="pt-4">
                     <div className="flex items-start gap-4">
                       <Avatar className="w-16 h-16 cursor-pointer hover:ring-2 ring-primary" onClick={() => {
-                        window.open(`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`, '_blank');
+                        window.open(`https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`, '_blank');
                       }}>
-                        <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} />
+                        <AvatarImage src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`} />
                         <AvatarFallback>{user.first_name?.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
@@ -376,7 +413,7 @@ const Admin = () => {
         )}
 
         <Tabs defaultValue="verifications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="verifications">
               Verifications
               {pendingVerifications && pendingVerifications.length > 0 && (
@@ -385,6 +422,7 @@ const Admin = () => {
                 </Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="feedback">
               Feedback
@@ -424,10 +462,10 @@ const Admin = () => {
                         <CardContent className="pt-6">
                           <div className="flex items-start gap-4">
                             <Avatar className="w-16 h-16 cursor-pointer hover:ring-2 ring-primary" onClick={() => {
-                              const imageUrl = user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`;
+                              const imageUrl = user.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`;
                               window.open(imageUrl, '_blank');
                             }}>
-                              <AvatarImage src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} />
+                              <AvatarImage src={user.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`} />
                               <AvatarFallback>{user.first_name?.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className="flex-1 space-y-2">
@@ -482,6 +520,92 @@ const Admin = () => {
                         </CardContent>
                       </Card>
                     ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* User Management Tab */}
+          <TabsContent value="users" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Benutzerverwaltung</CardTitle>
+                <CardDescription>
+                  Alle registrierten Benutzer anzeigen und verwalten
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {usersLoading ? (
+                  <p className="text-muted-foreground text-center py-8">Lade Benutzer...</p>
+                ) : !allUsers || allUsers.length === 0 ? (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>Keine Benutzer gefunden.</AlertDescription>
+                  </Alert>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left p-3 text-sm font-semibold">Name</th>
+                          <th className="text-left p-3 text-sm font-semibold">E-Mail</th>
+                          <th className="text-left p-3 text-sm font-semibold">Telefon</th>
+                          <th className="text-left p-3 text-sm font-semibold">Registriert</th>
+                          <th className="text-left p-3 text-sm font-semibold">Status</th>
+                          <th className="text-right p-3 text-sm font-semibold">Aktionen</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {allUsers.map((user) => (
+                          <tr key={user.id} className="border-b border-border/50 hover:bg-muted/50">
+                            <td className="p-3">
+                              <div className="flex items-center gap-2">
+                                <Avatar className="w-8 h-8">
+                                  <AvatarImage src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`} />
+                                  <AvatarFallback>{user.first_name?.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="text-sm font-medium">
+                                    {user.first_name} {user.last_name}
+                                  </p>
+                                  {user.nickname && (
+                                    <p className="text-xs text-muted-foreground">@{user.nickname}</p>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="p-3 text-sm">-</td>
+                            <td className="p-3 text-sm">{user.phone_number || '-'}</td>
+                            <td className="p-3 text-sm">
+                              {new Date(user.created_at).toLocaleDateString('de-CH')}
+                            </td>
+                            <td className="p-3">
+                              <Badge 
+                                variant={user.verification_status === 'approved' ? 'default' : 
+                                        user.verification_status === 'pending' ? 'secondary' : 'outline'}
+                              >
+                                {user.verification_status}
+                              </Badge>
+                            </td>
+                            <td className="p-3 text-right">
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  if (window.confirm(`Benutzer ${user.first_name} ${user.last_name} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
+                                    deleteUserMutation.mutate(user.id);
+                                  }
+                                }}
+                                disabled={deleteUserMutation.isPending}
+                              >
+                                Löschen
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </CardContent>
