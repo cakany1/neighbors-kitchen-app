@@ -20,6 +20,8 @@ export const LanguageSwitcher = () => {
     await i18n.changeLanguage(lng);
     localStorage.setItem('language', lng);
     window.dispatchEvent(new Event('languageChanged'));
+    // Force reload to ensure 100% translation coverage
+    window.location.reload();
   };
 
   const toggleToOtherLanguage = () => {
