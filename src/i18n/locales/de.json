@@ -392,6 +392,7 @@
     "about_dish": "Über dieses Gericht",
     "allergens_label": "Allergene",
     "available_on": "Verfügbar am",
+    "location": "Standort",
     "delete": "Löschen",
     "report": "Melden",
     "confirm_delete": "Möchtest du dieses Gericht wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
@@ -408,6 +409,15 @@
     "quantity": "Menge",
     "for_both": "Für uns beide (2 Portionen)",
     "for_me": "Nur für mich (1 Portion)"
+  },
+  "add_meal": {
+    "ready_from": "Abholbereit ab",
+    "pickup_time": "Abholzeit",
+    "pickup_time_hint": "Wann können Gäste das Essen abholen?",
+    "exchange_title": "Dein Wunsch an den Gast",
+    "exchange_desc": "Was akzeptierst du als Gegenleistung?",
+    "who_can_pickup": "Wer darf abholen?",
+    "restrictions_note": "Hinweis: Einschränkungen können dazu führen, dass sich weniger Nachbarn melden."
   },
   "feed_page": {
     "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schließen.",
