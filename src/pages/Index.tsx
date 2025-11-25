@@ -203,6 +203,7 @@ const Index = () => {
           </section>
 
         </main>
+        <Footer />
       </div>
     );
   }
@@ -268,6 +269,7 @@ const Index = () => {
         <HeroFeedTeaser />
       </div>
       </div>
+      <Footer />
     </div>
   );
 };
