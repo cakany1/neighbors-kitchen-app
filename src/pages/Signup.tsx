@@ -409,7 +409,7 @@ const Signup = () => {
             {/* Optional Avatar Upload (Gated Later) */}
             <div className="space-y-2">
               <Label htmlFor="avatarPhoto" className="text-base font-semibold text-foreground">
-                Dein Profilfoto
+                {t('signup.profilePhoto')}
               </Label>
               <Input
                 id="avatarPhoto"
@@ -418,7 +418,7 @@ const Signup = () => {
                 className="cursor-pointer"
               />
               <p className="text-xs text-muted-foreground">
-                Jetzt optional. Später für Bestellungen erforderlich.
+                {t('signup.photoOptional')}
               </p>
               <Alert className="bg-blue-500/10 border-blue-500/30 mt-2">
                 <AlertDescription className="text-xs text-foreground">

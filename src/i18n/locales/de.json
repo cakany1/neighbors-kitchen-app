@@ -328,6 +328,8 @@
     "surprise_me": "Überrasch mich"
   },
   "signup": {
+    "profilePhoto": "Dein Profilfoto",
+    "photoOptional": "Jetzt optional. Später für Bestellungen erforderlich.",
     "gender": "Ich bin",
     "genderWoman": "👩 Frau",
     "genderMan": "👨 Mann",
