@@ -36,37 +36,37 @@ const AGB = () => {
         
         <div className="space-y-6 text-foreground">
           <section>
-            <h2 className="text-xl font-semibold mb-3">{t('legal.scope_title')}</h2>
+            <h2 className="text-xl font-semibold mb-3">1. Geltungsbereich</h2>
             <p className="text-muted-foreground leading-relaxed">
-              {t('legal.scope_text')}
+              Neighbors Kitchen ist eine Vermittlungsplattform für das Teilen von Lebensmitteln innerhalb einer Gemeinschaft. Neighbors Kitchen vermittelt keine Kaufverträge über Speisen im gewerblichen Sinne. Es handelt sich um eine Gemeinschaft zur Vermeidung von Lebensmittelverschwendung. Die Verträge über das Teilen von Lebensmitteln kommen ausschliesslich zwischen dem anbietenden Nutzer (Koch) und dem abnehmenden Nutzer (Gast) zustande.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">{t('legal.payment_title')}</h2>
+            <h2 className="text-xl font-semibold mb-3">2. Unkostenbeiträge & Zahlung</h2>
             <p className="text-muted-foreground leading-relaxed">
-              {t('legal.payment_text')}
+              Die Nutzung der Plattform ist grundsätzlich kostenlos. Zahlungen gelten als freiwillige Unkostenbeiträge (für Zutaten/Energie) oder Schenkungen an den Koch. Bei Transaktionen über die Plattform wird eine Servicegebühr von CHF 2.00 erhoben. Diese Gebühr dient dem Betrieb der Plattform und wird bei der Buchung direkt einbehalten.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">{t('legal.liability_title')}</h2>
+            <h2 className="text-xl font-semibold mb-3">3. Haftung & Hygiene</h2>
             <p className="text-muted-foreground leading-relaxed">
-              {t('legal.liability_text')}
+              Die Köche sind allein verantwortlich für die Qualität, Hygiene und Deklaration der Inhaltsstoffe (Allergene) ihrer Speisen. Neighbors Kitchen übernimmt keine Haftung für gesundheitliche Schäden, die aus dem Konsum der vermittelten Speisen entstehen.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">{t('legal.cancellation_title')}</h2>
+            <h2 className="text-xl font-semibold mb-3">4. Stornierung</h2>
             <p className="text-muted-foreground leading-relaxed">
-              {t('legal.cancellation_text')}
+              Buchungen sind verbindlich. Stornierungen sind nur bis zu dem vom Koch festgelegten Zeitpunkt möglich. Bei Nichterscheinen (No-Show) besteht kein Anspruch auf Rückerstattung der Servicegebühr.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">{t('legal.privacy_title')}</h2>
+            <h2 className="text-xl font-semibold mb-3">5. Datenschutz</h2>
             <p className="text-muted-foreground leading-relaxed">
-              {t('legal.privacy_text')}
+              Wir behandeln Ihre Daten vertraulich und geben sie nicht an Dritte weiter, ausser dies ist für die Abwicklung der Buchung notwendig (z.B. Weitergabe der Adresse an den Gast nach Buchung). Wir nutzen Stripe für Zahlungen; es gelten deren Datenschutzbestimmungen.
             </p>
           </section>
         </div>
