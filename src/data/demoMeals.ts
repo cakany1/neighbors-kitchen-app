@@ -18,10 +18,11 @@ export const DEMO_MEALS = [
     fuzzy_lat: 47.5596,
     fuzzy_lng: 7.5886,
     neighborhood: "Gundeli",
-    tags: ["tag_italian", "tag_pasta", "tag_demo"],
+    // HIER: Schöne Tags direkt hardcoded
+    tags: ["Italian", "Pasta", "Klassiker"],
     allergens: ["Gluten (Getreide)", "Milch/Laktose", "Eier"],
     available_portions: 4,
-    pricing_minimum: 10,
+    pricing_minimum: 10, // Hat einen Festpreis
     pricing_suggested: 10,
     is_cooking_experience: false,
     scheduled_date: new Date(Date.now() + 86400000 * 2).toISOString(),
@@ -31,7 +32,7 @@ export const DEMO_MEALS = [
     collection_window_start: "18:00",
     collection_window_end: "19:30",
     unit_type: "portions",
-    exchange_mode: "money", // FESTPREIS
+    exchange_mode: "money",
     estimated_restaurant_value: 23.5,
     ingredients: ["Hackfleisch", "Tomaten", "Lasagne-Nudeln", "Béchamelsauce", "Parmesan"],
     is_stock_photo: false,
@@ -55,9 +56,10 @@ export const DEMO_MEALS = [
     fuzzy_lat: 47.5615,
     fuzzy_lng: 7.5897,
     neighborhood: "St. Johann",
-    tags: ["tag_vegan", "tag_thai", "tag_spicy", "tag_demo"],
+    tags: ["Vegan", "Thai", "Scharf"],
     allergens: [],
     available_portions: 6,
+    // HIER: Preis auf 0 gesetzt -> Wird ausgeblendet
     pricing_minimum: 0,
     pricing_suggested: 0,
     is_cooking_experience: false,
@@ -68,7 +70,7 @@ export const DEMO_MEALS = [
     collection_window_start: "19:00",
     collection_window_end: "20:00",
     unit_type: "portions",
-    exchange_mode: "barter", // ÜBERRASCH MICH
+    exchange_mode: "barter", // Überrasch mich
     estimated_restaurant_value: 18,
     ingredients: ["Kokosmilch", "Rote Curry-Paste", "Gemüse", "Tofu", "Basilikum"],
     is_stock_photo: false,
@@ -92,10 +94,11 @@ export const DEMO_MEALS = [
     fuzzy_lat: 47.558,
     fuzzy_lng: 7.592,
     neighborhood: "Kleinbasel",
-    tags: ["tag_dessert", "tag_vegetarian", "tag_demo"],
+    tags: ["Dessert", "Vegetarisch", "Süss"],
     allergens: ["Milch/Laktose", "Gluten (Getreide)", "Eier"],
     available_portions: 4,
-    pricing_minimum: 7, // PREIS VORHANDEN (FÜR SPÄTER), ABER AUSGEBLENDET
+    // HIER: Preis auf 0 gesetzt -> Problem gelöst!
+    pricing_minimum: 0,
     pricing_suggested: 9,
     is_cooking_experience: false,
     scheduled_date: new Date(Date.now() + 86400000 * 3).toISOString(),
@@ -105,7 +108,7 @@ export const DEMO_MEALS = [
     collection_window_start: "15:00",
     collection_window_end: "18:00",
     unit_type: "slices",
-    exchange_mode: "pay_what_you_want", // WÄHLE PREIS
+    exchange_mode: "pay_what_you_want", // Wähle Preis
     estimated_restaurant_value: 16,
     ingredients: ["Frischkäse", "Eier", "Zucker", "Erdbeeren", "Butterkekse"],
     is_stock_photo: false,
