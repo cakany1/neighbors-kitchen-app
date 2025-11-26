@@ -13,26 +13,12 @@ export const HeroFeedTeaser = () => {
   const heroMeals =
     DEMO_MEALS && Array.isArray(DEMO_MEALS)
       ? DEMO_MEALS.map((meal, index) => {
-          // LOGIC FIX: Determine correct badge text based on mode
-          let badgeText = "";
-
-          if (meal.exchange_mode === "pay_what_you_want") {
-            badgeText = t("landing.badge_pay_what_you_want", "Wähle deinen Preis");
-          } else if (meal.exchange_mode === "money") {
-            badgeText = t("common.fixedPrice", "Festpreis");
-          } else if (meal.exchange_mode === "barter") {
-            badgeText = t("landing.badge_surprise_me", "Surprise me");
-          } else {
-            badgeText = t("landing.badge_free_smile", "Free");
-          }
-
           return {
             id: meal.id,
             image: meal.image_url,
             title: meal.title,
-            badgeText: badgeText,
-            // PROMINENT PRICE DISPLAY: Show pricing_minimum for demo meals
-            subtext: meal.pricing_minimum ? `CHF ${meal.pricing_minimum.toFixed(2)}` : "",
+            exchangeMode: meal.exchange_mode,
+            pricingMinimum: meal.pricing_minimum,
             chef: meal.chef?.nickname || meal.chef?.first_name,
             location: meal.neighborhood,
             tags: meal.tags || [],
@@ -64,12 +50,30 @@ export const HeroFeedTeaser = () => {
               </div>
               <div className="p-4 space-y-2">
                 <h3 className="font-semibold text-base text-foreground line-clamp-1">{meal.title}</h3>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-primary">{meal.subtext}</p>
-                  <Badge variant="secondary" className="bg-primary/20 text-primary w-fit text-xs border-0">
-                    {meal.badgeText}
-                  </Badge>
-                </div>
+                
+                {/* Centered badge for surprise/pwyw modes */}
+                {(meal.exchangeMode === "barter" || meal.exchangeMode === "pay_what_you_want") && (
+                  <div className="w-full flex justify-center mt-1.5">
+                    <Badge variant="secondary" className="bg-primary/20 text-primary text-xs border-0">
+                      {meal.exchangeMode === "barter" 
+                        ? t("landing.badge_surprise_me", "🎁 Überrasch mich!")
+                        : t("landing.badge_pay_what_you_want", "💝 Wähle deinen Preis")
+                      }
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Price display for fixed mode only */}
+                {meal.exchangeMode === "money" && (
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-primary">
+                      {meal.pricingMinimum ? `CHF ${meal.pricingMinimum.toFixed(2)}` : ""}
+                    </p>
+                    <Badge variant="secondary" className="bg-primary/20 text-primary w-fit text-xs border-0">
+                      {t("common.fixedPrice", "Festpreis")}
+                    </Badge>
+                  </div>
+                )}
 
                 {/* TAGS: Properly iterate and translate */}
                 <div className="flex flex-wrap gap-2">
