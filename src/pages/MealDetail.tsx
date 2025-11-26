@@ -582,36 +582,38 @@ const MealDetail = () => {
             </CardContent>
           </Card>
 
-          {/* Austausch */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Gift className="w-5 h-5 text-primary" />
-                Austausch
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <Badge variant="outline" className="text-base py-1">
-                  ❤️ Zahl was du willst
-                </Badge>
-                {meal.pricing_suggested && (
-                  <p className="text-sm text-muted-foreground">
-                    ~ Restaurant Wert: CHF {meal.pricing_suggested}.-
-                  </p>
-                )}
-                {meal.pricing_minimum > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    Minimum: CHF {meal.pricing_minimum}.-
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Exchange/Pricing - Only show for non-money modes */}
+          {(meal.exchange_mode === 'pay_what_you_want' || meal.exchange_mode === 'barter') && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Gift className="w-5 h-5 text-primary" />
+                  {t('meal.exchange')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Badge variant="outline" className="text-base py-1">
+                    {meal.exchange_mode === 'pay_what_you_want' ? '❤️ ' + t('meal.payWhatYouWant') : '🎁 ' + t('meal_card.surprise_me')}
+                  </Badge>
+                  {meal.pricing_suggested && meal.exchange_mode === 'pay_what_you_want' && (
+                    <p className="text-sm text-muted-foreground">
+                      ~ {t('meal.restaurantValue')}: CHF {meal.pricing_suggested}.-
+                    </p>
+                  )}
+                  {meal.pricing_minimum > 0 && meal.exchange_mode === 'pay_what_you_want' && (
+                    <p className="text-xs text-muted-foreground">
+                      {t('meal.minimum')}: CHF {meal.pricing_minimum}.-
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Verfügbare Portionen */}
           <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-            <span className="text-sm text-muted-foreground">Verfügbare Portionen</span>
+            <span className="text-sm text-muted-foreground">{t('meal.availablePortions')}</span>
             <span className="text-lg font-semibold text-foreground">{meal.available_portions}</span>
           </div>
 
