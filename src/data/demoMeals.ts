@@ -1,4 +1,4 @@
-// Central Demo Meals Data - Used for Guest Browse Mode
+// Central Demo Meals Data - Optimized for Display
 export const DEMO_MEALS = [
   {
     id: "demo-1",
@@ -18,11 +18,10 @@ export const DEMO_MEALS = [
     fuzzy_lat: 47.5596,
     fuzzy_lng: 7.5886,
     neighborhood: "Gundeli",
-    // HIER: Schöne Tags direkt hardcoded
     tags: ["Italian", "Pasta", "Klassiker"],
     allergens: ["Gluten (Getreide)", "Milch/Laktose", "Eier"],
     available_portions: 4,
-    pricing_minimum: 10, // Hat einen Festpreis
+    pricing_minimum: 10,
     pricing_suggested: 10,
     is_cooking_experience: false,
     scheduled_date: new Date(Date.now() + 86400000 * 2).toISOString(),
@@ -58,8 +57,7 @@ export const DEMO_MEALS = [
     neighborhood: "St. Johann",
     tags: ["Vegan", "Thai", "Scharf"],
     allergens: [],
-    available_portions: 6,
-    // HIER: Preis auf 0 gesetzt -> Wird ausgeblendet
+    available_portions: 3, // KORRIGIERT: Nur noch 3 Portionen!
     pricing_minimum: 0,
     pricing_suggested: 0,
     is_cooking_experience: false,
@@ -70,7 +68,7 @@ export const DEMO_MEALS = [
     collection_window_start: "19:00",
     collection_window_end: "20:00",
     unit_type: "portions",
-    exchange_mode: "barter", // Überrasch mich
+    exchange_mode: "barter",
     estimated_restaurant_value: 18,
     ingredients: ["Kokosmilch", "Rote Curry-Paste", "Gemüse", "Tofu", "Basilikum"],
     is_stock_photo: false,
@@ -96,8 +94,7 @@ export const DEMO_MEALS = [
     neighborhood: "Kleinbasel",
     tags: ["Dessert", "Vegetarisch", "Süss"],
     allergens: ["Milch/Laktose", "Gluten (Getreide)", "Eier"],
-    available_portions: 4,
-    // HIER: Preis auf 0 gesetzt -> Problem gelöst!
+    available_portions: 2, // KORRIGIERT: 2 Portionen
     pricing_minimum: 0,
     pricing_suggested: 9,
     is_cooking_experience: false,
@@ -108,10 +105,13 @@ export const DEMO_MEALS = [
     collection_window_start: "15:00",
     collection_window_end: "18:00",
     unit_type: "slices",
-    exchange_mode: "pay_what_you_want", // Wähle Preis
+    exchange_mode: "pay_what_you_want",
     estimated_restaurant_value: 16,
     ingredients: ["Frischkäse", "Eier", "Zucker", "Erdbeeren", "Butterkekse"],
     is_stock_photo: false,
     women_only: false,
   },
 ];
+```"
+
+**PROMPT ENDE**
