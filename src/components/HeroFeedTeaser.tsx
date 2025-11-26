@@ -14,11 +14,11 @@ export const HeroFeedTeaser = () => {
     id: meal.id,
     image: meal.image_url,
     title: meal.title,
-    badgeText: meal.exchange_mode === 'money' 
-      ? t('landing.badge_pay_what_you_want')
+    badgeText: (meal.exchange_mode === 'money' || meal.exchange_mode === 'pay_what_you_want')
+      ? t('landing.badge_pay_what_you_want', 'Pay what you want')
       : meal.exchange_mode === 'barter'
-      ? t('landing.badge_surprise_me')
-      : t('landing.badge_free_smile'),
+      ? t('landing.badge_surprise_me', 'Surprise me')
+      : t('landing.badge_free_smile', 'Free'),
     // PROMINENT PRICE DISPLAY: Show pricing_minimum for demo meals (e.g., Cheesecake CHF 4.-)
     subtext: meal.pricing_minimum 
       ? `CHF ${meal.pricing_minimum}.-`
