@@ -52,7 +52,9 @@ const Signup = () => {
     address: '',
     city: '',
     postalCode: '',
+    visibilityMode: 'all' as 'all' | 'women_fli' | 'women_only',
   });
+  const [selfDeclarationChecked, setSelfDeclarationChecked] = useState(false);
 
   // Password strength calculation
   const passwordStrength = useMemo(() => {
@@ -132,6 +134,13 @@ const Signup = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validation: Check if self-declaration is required and checked
+    if ((formData.visibilityMode === 'women_fli' || formData.visibilityMode === 'women_only') && !selfDeclarationChecked) {
+      toast.error(t('signup.selfDeclarationRequired'));
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -203,6 +212,7 @@ const Signup = () => {
               private_address: formData.address || null,
               private_city: formData.city || null,
               private_postal_code: formData.postalCode || null,
+              visibility_mode: formData.visibilityMode,
             }, { onConflict: 'id' });
 
           if (repairError) {
@@ -259,6 +269,7 @@ const Signup = () => {
           private_address: formData.address || null,
           private_city: formData.city || null,
           private_postal_code: formData.postalCode || null,
+          visibility_mode: formData.visibilityMode,
         }, { onConflict: 'id' });
 
       if (profileError) {
@@ -406,10 +417,74 @@ const Signup = () => {
               <p className="text-xs text-muted-foreground mt-1">{t('signup.genderHint')}</p>
             </div>
 
+            {/* Visibility Mode - Security Settings */}
+            <div className="space-y-3 border-l-4 border-primary pl-4 py-2 bg-muted/30 rounded-r">
+              <Label className="text-sm font-semibold">{t('signup.visibilityMode')}</Label>
+              <RadioGroup 
+                value={formData.visibilityMode} 
+                onValueChange={(value: 'all' | 'women_fli' | 'women_only') => {
+                  setFormData({ ...formData, visibilityMode: value });
+                  setSelfDeclarationChecked(false);
+                }}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="all" id="visibility-all" />
+                    <Label htmlFor="visibility-all" className="text-sm cursor-pointer">
+                      {t('signup.visibilityAll')}
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem 
+                      value="women_fli" 
+                      id="visibility-women-fli" 
+                      disabled={formData.gender === 'man'}
+                    />
+                    <Label 
+                      htmlFor="visibility-women-fli" 
+                      className={`text-sm cursor-pointer ${formData.gender === 'man' ? 'opacity-50' : ''}`}
+                    >
+                      {t('signup.visibilityWomenFli')}
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem 
+                      value="women_only" 
+                      id="visibility-women-only" 
+                      disabled={formData.gender === 'man'}
+                    />
+                    <Label 
+                      htmlFor="visibility-women-only" 
+                      className={`text-sm cursor-pointer ${formData.gender === 'man' ? 'opacity-50' : ''}`}
+                    >
+                      {t('signup.visibilityWomenOnly')}
+                    </Label>
+                  </div>
+                </div>
+              </RadioGroup>
+              
+              {/* Self-Declaration Checkbox for Protected Modes */}
+              {(formData.visibilityMode === 'women_fli' || formData.visibilityMode === 'women_only') && (
+                <div className="flex items-start space-x-2 mt-3 pt-3 border-t">
+                  <Checkbox 
+                    id="self-declaration" 
+                    checked={selfDeclarationChecked}
+                    onCheckedChange={(checked) => setSelfDeclarationChecked(checked as boolean)}
+                  />
+                  <Label 
+                    htmlFor="self-declaration" 
+                    className="text-xs leading-relaxed cursor-pointer"
+                  >
+                    {t('signup.selfDeclaration')}
+                  </Label>
+                </div>
+              )}
+            </div>
+
             {/* Optional Avatar Upload (Gated Later) */}
             <div className="space-y-2">
               <Label htmlFor="avatarPhoto" className="text-base font-semibold text-foreground">
-                {t('signup.profilePhoto')}
+                {t('signup.profilePhotoVerification')}
               </Label>
               <Input
                 id="avatarPhoto"
@@ -420,9 +495,9 @@ const Signup = () => {
               <p className="text-xs text-muted-foreground">
                 {t('signup.photoOptional')}
               </p>
-              <Alert className="bg-blue-500/10 border-blue-500/30 mt-2">
+              <Alert className="bg-primary/10 border-primary/30 mt-2">
                 <AlertDescription className="text-xs text-foreground">
-                  {t('signup.verification_note')}
+                  {t('signup.photoSecurityNote')}
                 </AlertDescription>
               </Alert>
             </div>
