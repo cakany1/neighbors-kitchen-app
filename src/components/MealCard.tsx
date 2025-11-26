@@ -117,10 +117,8 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
         <div className="mb-3 w-full">
           {exchangeMode === "barter" ? (
             <div className="flex items-center justify-center w-full gap-2 py-2 px-3 bg-secondary/10 rounded-lg text-center">
-              <Gift className="w-4 h-4 text-secondary fill-current" />
-              {/* FIX: .replace entfernt das Emoji aus der Übersetzung */}
               <span className="text-sm font-semibold text-secondary">
-                {t("landing.badge_surprise_me", "Überrasch mich!").replace(/🎁/g, "").trim()}
+                {t("landing.badge_surprise_me", "🎁 Überrasch mich!")}
               </span>
             </div>
           ) : exchangeMode === "pay_what_you_want" ? (
