@@ -327,6 +327,10 @@
     "pay_after_meal": "Zahle nach dem Essen",
     "surprise_me": "Überrasch mich"
   },
+  "meal": {
+    "portionsAvailable": "Portionen übrig",
+    "exchange": "Austausch"
+  },
   "signup": {
     "phoneNumber": "Telefonnummer",
     "gender": "Geschlecht",
