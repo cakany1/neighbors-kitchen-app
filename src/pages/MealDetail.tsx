@@ -597,14 +597,18 @@ const MealDetail = () => {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Gift className="w-5 h-5 text-primary" />
+                  {/* Hier steht schon "Zahl was du willst" als Überschrift */}
                   {t("meal.payWhatYouWant")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <Badge variant="outline" className="text-base py-1">
-                    ❤️ {t("meal.payWhatYouWant")}
-                  </Badge>
+                  {/* ❌ LÖSCHEN: Dieses Badge ist doppelt gemoppelt */}
+                  {/* <Badge variant="outline" className="text-base py-1">
+          ❤️ {t("meal.payWhatYouWant")}
+        </Badge> */}
+
+                  {/* ✅ BEHALTEN: Die Preis-Infos sind wichtig */}
                   {meal.pricing_suggested && (
                     <p className="text-sm text-muted-foreground">
                       ~ {t("meal.restaurantValue")}: CHF {meal.pricing_suggested}.-
@@ -619,7 +623,6 @@ const MealDetail = () => {
               </CardContent>
             </Card>
           )}
-
           {/* Verfügbare Portionen */}
           <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
             <span className="text-sm text-muted-foreground">{t("meal.availablePortions")}</span>
