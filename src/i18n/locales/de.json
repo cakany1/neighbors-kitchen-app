@@ -1,12 +1,13 @@
 {
   "common": {
     "payWhatYouWant": "Wähle deinen Preis",
-    "orBring": "Oder bringe",
+    "fixedPrice": "Festpreis",
+    "orBring": "Oder bringe mit",
     "portions": "Portionen",
-    "community": "Gemeinschaft",
+    "community": "Community",
     "guidelines": "Richtlinien",
     "by": "von",
-    "loading": "Lädt...",
+    "loading": "Laden...",
     "error": "Fehler",
     "success": "Erfolg"
   },
