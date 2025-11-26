@@ -118,7 +118,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           {exchangeMode === "barter" ? (
             <div className="flex items-center justify-center w-full gap-2 py-2 px-3 bg-secondary/10 rounded-lg text-center">
               <span className="text-sm font-semibold text-secondary">
-                {t("landing.badge_surprise_me", "🎁 Überrasch mich!")}
+                {t("landing.badge_surprise_me")}
               </span>
             </div>
           ) : exchangeMode === "pay_what_you_want" ? (
