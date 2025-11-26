@@ -68,11 +68,17 @@ export const HeroFeedTeaser = () => {
                 </Badge>
                 {/* TAGS: Properly iterate and translate */}
                 <div className="flex flex-wrap gap-2">
-                  {meal.tags.map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-xs">
-                      {t(`tags.${tag}`)}
-                    </Badge>
-                  ))}
+                  {meal.tags.map((tag) => {
+                    // Check if tag is a translation key (starts with 'tag_')
+                    const displayTag = tag.startsWith('tag_') 
+                      ? t(`tags.${tag}`, tag.replace('tag_', '').charAt(0).toUpperCase() + tag.replace('tag_', '').slice(1)) 
+                      : tag;
+                    return (
+                      <Badge key={tag} variant="outline" className="text-xs">
+                        {displayTag}
+                      </Badge>
+                    );
+                  })}
                 </div>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">

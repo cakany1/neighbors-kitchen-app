@@ -402,17 +402,6 @@ const MealDetail = () => {
                 <h1 className="text-2xl font-bold text-foreground">
                   {getDisplayText(meal.title, (meal as any).title_en)}
                 </h1>
-                {/* Show original toggle button for meals with translations */}
-                {i18n.language === 'en' && (meal as any).title_en && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowOriginal(!showOriginal)}
-                  >
-                    <Languages className="w-4 h-4 mr-2" />
-                    {showOriginal ? t('meal_detail.show_english') : t('meal_detail.show_original')}
-                  </Button>
-                )}
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <ChefHat className="w-4 h-4" />
@@ -486,6 +475,18 @@ const MealDetail = () => {
               <p className="text-muted-foreground">
                 {getDisplayText(meal.description, (meal as any).description_en)}
               </p>
+              {/* Show original toggle button for meals with translations */}
+              {i18n.language === 'en' && (meal as any).description_en && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => setShowOriginal(!showOriginal)}
+                >
+                  <Languages className="w-4 h-4 mr-2" />
+                  {showOriginal ? t('meal_detail.show_english') : t('meal_detail.show_original')}
+                </Button>
+              )}
               {meal.allergens && meal.allergens.length > 0 && (
                 <Alert className="mt-4 border-destructive/50 bg-destructive/5">
                   <AlertTriangle className="h-4 w-4 text-destructive" />
