@@ -1,10 +1,10 @@
-import { Meal } from '@/types/meal';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, ChefHat, Gift, Heart, Package, Home, Ghost, UtensilsCrossed, Star } from 'lucide-react';
-import { VerificationBadge } from '@/components/VerificationBadge';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Meal } from "@/types/meal";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { MapPin, ChefHat, Gift, Heart, Package, Home, Ghost, UtensilsCrossed } from "lucide-react";
+import { VerificationBadge } from "@/components/VerificationBadge";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface MealCardProps {
   meal: Meal;
@@ -16,13 +16,33 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   const { t, i18n } = useTranslation();
   const [showOriginal, setShowOriginal] = useState(false);
 
-  const displayTitle =
-    !showOriginal && i18n.language === "en" && (meal as any).title_en ? (meal as any).title_en : meal.title;
+  // Helper to safely access properties
+  const getProp = (obj: any, camelKey: string, snakeKey: string) => {
+    return obj?.[camelKey] !== undefined ? obj[camelKey] : obj?.[snakeKey];
+  };
 
-  // Use REAL data from meal prop (No Mock Data Override!)
-  const exchangeMode = (meal as any).exchange_mode || 'money';
-  const handoverMode = (meal as any).handover_mode || "pickup_box";
-  const chefNickname = (meal.chef as any)?.nickname || meal.chef?.firstName || "Chef";
+  const titleEn = getProp(meal, "titleEn", "title_en");
+  const displayTitle = !showOriginal && i18n.language === "en" && titleEn ? titleEn : meal.title;
+
+  const exchangeMode = getProp(meal, "exchangeMode", "exchange_mode") || "money";
+  const handoverMode = getProp(meal, "handoverMode", "handover_mode") || "pickup_box";
+
+  const chef = meal.chef || {};
+  const chefNickname = getProp(chef, "nickname", "nickname") || getProp(chef, "firstName", "first_name") || "Chef";
+  const chefIsVerified = getProp(chef, "isVerified", "id_verified") || false;
+
+  const imageUrl = getProp(meal, "imageUrl", "image_url");
+  const availablePortions = getProp(meal, "availablePortions", "available_portions");
+
+  // Pricing Logic
+  const pricing = meal.pricing || {};
+  const pricingMin =
+    getProp(pricing, "minimum", "pricing_minimum") ?? getProp(meal, "pricingMinimum", "pricing_minimum") ?? 0;
+  const minPrice = Number(pricingMin).toFixed(2);
+
+  const location = meal.location || {};
+  const neighborhood =
+    getProp(location, "neighborhood", "neighborhood") || getProp(meal, "neighborhood", "neighborhood") || "Basel";
 
   const handoverIcons = {
     pickup_box: Package,
@@ -34,8 +54,6 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   };
   const HandoverIcon = handoverIcons[handoverMode as keyof typeof handoverIcons] || Package;
 
-  const minPrice = (meal.pricing?.minimum || 7).toFixed(2);
-
   return (
     <Card
       className="overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border-border group"
@@ -43,23 +61,17 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
     >
       {/* Image Area */}
       <div className="relative h-48 bg-muted">
-        {meal.imageUrl || (meal as any).image_url ? (
-          <img 
-            src={meal.imageUrl || (meal as any).image_url} 
-            alt={meal.title} 
-            className="w-full h-full object-cover" 
-          />
+        {imageUrl ? (
+          <img src={imageUrl} alt={meal.title} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <ChefHat className="w-16 h-16 text-muted-foreground" />
           </div>
         )}
-
-        {/* Badges Top Right */}
         <div className="absolute top-3 right-3 flex flex-col gap-2">
-          {meal.availablePortions > 0 && (
+          {availablePortions > 0 && (
             <Badge className="bg-primary/90 backdrop-blur text-primary-foreground font-bold shadow-sm">
-              {meal.availablePortions} {t('meal.portionsAvailable', 'left')}
+              {availablePortions} {t("meal.portionsAvailable", "left")}
             </Badge>
           )}
         </div>
@@ -70,42 +82,21 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
         <div className="mb-2">
           <div className="flex justify-between items-start">
             <h3 className="font-semibold text-lg leading-tight mb-1 text-foreground">{displayTitle}</h3>
-            {meal.chef && meal.chef.karma > 0 && (
-              <div className="flex items-center gap-1 text-amber-500 text-xs font-medium bg-amber-50 px-1.5 py-0.5 rounded">
-                <Star className="w-3 h-3 fill-current" /> {meal.chef.karma}
-              </div>
-            )}
           </div>
-
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="font-medium text-foreground flex items-center gap-1">
               {chefNickname}
-              {(meal.chef as any)?.isVerified && <VerificationBadge isVerified={true} size="sm" />}
+              {chefIsVerified && <VerificationBadge isVerified={true} size="sm" />}
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
-              <MapPin className="w-3 h-3" /> 
-              {(meal as any).neighborhood || meal.location?.neighborhood || "Basel"}
+              <MapPin className="w-3 h-3" />
+              {neighborhood}
             </span>
           </div>
         </div>
 
-        {/* CENTERED BADGE - Immediately after title, only for barter/pwyw */}
-        {(exchangeMode === "barter" || exchangeMode === "pay_what_you_want") && (
-          <div className="w-full flex justify-center my-3">
-            {exchangeMode === "barter" ? (
-              <Badge variant="secondary" className="bg-secondary/20 text-secondary text-sm font-semibold border-0 px-4 py-2">
-                {t("meal_card.surprise_me", "🎁 Überrasch mich!")}
-              </Badge>
-            ) : (
-              <Badge variant="secondary" className="bg-primary/20 text-primary text-sm font-semibold border-0 px-4 py-2">
-                {t("meal_card.choose_your_price", "💝 Wähle deinen Preis")}
-              </Badge>
-            )}
-          </div>
-        )}
-
-        {/* Tags - Clean rendering */}
+        {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-3">
           {(meal.tags || []).map((tag, idx) => {
             const cleanTag = tag.replace("tag_", "");
@@ -122,25 +113,42 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           })}
         </div>
 
-        {/* Footer - Price display */}
+        {/* BADGE LOGIC - ZENTRIERT & CLEAN */}
+        <div className="mb-3 w-full">
+          {exchangeMode === "barter" ? (
+            <div className="flex items-center justify-center w-full gap-2 py-2 px-3 bg-secondary/10 rounded-lg text-center">
+              <Gift className="w-4 h-4 text-secondary fill-current" />
+              {/* FIX: .replace entfernt das Emoji aus der Übersetzung */}
+              <span className="text-sm font-semibold text-secondary">
+                {t("landing.badge_surprise_me", "Überrasch mich!").replace(/🎁/g, "").trim()}
+              </span>
+            </div>
+          ) : exchangeMode === "pay_what_you_want" ? (
+            <div className="flex items-center justify-center w-full gap-2 py-2 px-3 bg-primary/10 rounded-lg text-center">
+              <Heart className="w-4 h-4 text-primary fill-current" />
+              <span className="text-sm font-semibold text-primary">{t("common.payWhatYouWant")}</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-full gap-2 py-2 px-3 bg-muted rounded-lg text-center">
+              <Package className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-semibold text-muted-foreground">{t("common.fixedPrice", "Festpreis")}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
         <div className="pt-3 border-t border-border mt-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <HandoverIcon className="w-4 h-4" />
               <span className="capitalize">{handoverMode.replace("_", " ")}</span>
             </div>
-
             <div className="font-semibold text-primary text-right">
-              {(exchangeMode === "money" || exchangeMode === "pay_what_you_want") && (
+              {exchangeMode === "money" && Number(minPrice) > 0 && (
                 <span className="flex flex-col items-end leading-tight">
-                  <span className="text-xs text-muted-foreground font-normal">
-                    {exchangeMode === "money" ? "Online Payment" : t("meal.minimum")}
-                  </span>
+                  <span className="text-xs text-muted-foreground font-normal">Online Payment</span>
                   <span>CHF {minPrice}</span>
                 </span>
-              )}
-              {exchangeMode === "barter" && (
-                <span className="text-sm text-muted-foreground">{t("meal.exchange")}</span>
               )}
             </div>
           </div>
