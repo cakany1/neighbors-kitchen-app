@@ -94,19 +94,13 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
         {(exchangeMode === "barter" || exchangeMode === "pay_what_you_want") && (
           <div className="w-full flex justify-center my-3">
             {exchangeMode === "barter" ? (
-              <div className="inline-flex items-center gap-2 py-2 px-4 bg-secondary/10 rounded-lg">
-                <Gift className="w-4 h-4 text-secondary fill-current" />
-                <span className="text-sm font-semibold text-secondary">
-                  {t("meal_card.surprise_me")}
-                </span>
-              </div>
+              <Badge variant="secondary" className="bg-secondary/20 text-secondary text-sm font-semibold border-0 px-4 py-2">
+                {t("meal_card.surprise_me", "🎁 Überrasch mich!")}
+              </Badge>
             ) : (
-              <div className="inline-flex items-center gap-2 py-2 px-4 bg-primary/10 rounded-lg">
-                <Heart className="w-4 h-4 text-primary fill-current" />
-                <span className="text-sm font-semibold text-primary">
-                  {t("meal_card.choose_your_price")}
-                </span>
-              </div>
+              <Badge variant="secondary" className="bg-primary/20 text-primary text-sm font-semibold border-0 px-4 py-2">
+                {t("meal_card.choose_your_price", "💝 Wähle deinen Preis")}
+              </Badge>
             )}
           </div>
         )}
