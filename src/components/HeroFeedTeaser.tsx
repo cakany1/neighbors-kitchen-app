@@ -1,33 +1,45 @@
-import { MapPin, User, Heart } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { DEMO_MEALS } from '@/data/demoMeals';
+import { MapPin, User } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { DEMO_MEALS } from "@/data/demoMeals";
 
 export const HeroFeedTeaser = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   // Transform demo meals for hero display with translations
-  const heroMeals = (DEMO_MEALS && Array.isArray(DEMO_MEALS)) ? DEMO_MEALS.map((meal, index) => ({
-    id: meal.id,
-    image: meal.image_url,
-    title: meal.title,
-    badgeText: (meal.exchange_mode === 'money' || meal.exchange_mode === 'pay_what_you_want')
-      ? t('landing.badge_pay_what_you_want', 'Pay what you want')
-      : meal.exchange_mode === 'barter'
-      ? t('landing.badge_surprise_me', 'Surprise me')
-      : t('landing.badge_free_smile', 'Free'),
-    // PROMINENT PRICE DISPLAY: Show pricing_minimum for demo meals (e.g., Cheesecake CHF 4.-)
-    subtext: meal.pricing_minimum 
-      ? `CHF ${meal.pricing_minimum}.-`
-      : '',
-    chef: meal.chef.nickname || meal.chef.first_name,
-    location: meal.neighborhood,
-    tags: meal.tags || [],
-    delay: `${index * 0.2}s`
-  })) : [];
+  const heroMeals =
+    DEMO_MEALS && Array.isArray(DEMO_MEALS)
+      ? DEMO_MEALS.map((meal, index) => {
+          // LOGIC FIX: Determine correct badge text based on mode
+          let badgeText = "";
+
+          if (meal.exchange_mode === "pay_what_you_want") {
+            badgeText = t("landing.badge_pay_what_you_want", "Wähle deinen Preis");
+          } else if (meal.exchange_mode === "money") {
+            badgeText = t("common.fixedPrice", "Festpreis");
+          } else if (meal.exchange_mode === "barter") {
+            badgeText = t("landing.badge_surprise_me", "Surprise me");
+          } else {
+            badgeText = t("landing.badge_free_smile", "Free");
+          }
+
+          return {
+            id: meal.id,
+            image: meal.image_url,
+            title: meal.title,
+            badgeText: badgeText,
+            // PROMINENT PRICE DISPLAY: Show pricing_minimum for demo meals
+            subtext: meal.pricing_minimum ? `CHF ${meal.pricing_minimum.toFixed(2)}` : "",
+            chef: meal.chef?.nickname || meal.chef?.first_name,
+            location: meal.neighborhood,
+            tags: meal.tags || [],
+            delay: `${index * 0.2}s`,
+          };
+        })
+      : [];
 
   if (!heroMeals || heroMeals.length === 0) {
     return null;
@@ -45,49 +57,46 @@ export const HeroFeedTeaser = () => {
           >
             <CardContent className="p-0">
               <div className="relative">
-                <img
-                  src={meal.image}
-                  alt={meal.title}
-                  className="w-full h-48 object-cover"
-                />
+                <img src={meal.image} alt={meal.title} className="w-full h-48 object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span className="text-foreground font-semibold text-lg">
-                    {t('landing.book_now')}
-                  </span>
+                  <span className="text-foreground font-semibold text-lg">{t("landing.book_now")}</span>
                 </div>
               </div>
               <div className="p-4 space-y-2">
-                <h3 className="font-semibold text-base text-foreground line-clamp-1">
-                  {meal.title}
-                </h3>
-                <p className="text-sm font-semibold text-primary">
-                  {meal.subtext}
-                </p>
-                <Badge variant="secondary" className="bg-primary/20 text-primary w-fit text-xs">
-                  {meal.badgeText}
-                </Badge>
+                <h3 className="font-semibold text-base text-foreground line-clamp-1">{meal.title}</h3>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-primary">{meal.subtext}</p>
+                  <Badge variant="secondary" className="bg-primary/20 text-primary w-fit text-xs border-0">
+                    {meal.badgeText}
+                  </Badge>
+                </div>
+
                 {/* TAGS: Properly iterate and translate */}
                 <div className="flex flex-wrap gap-2">
-                  {meal.tags.map((tag) => {
+                  {meal.tags.map((tag, idx) => {
                     // Check if tag is a translation key (starts with 'tag_')
-                    const displayTag = tag.startsWith('tag_') 
-                      ? t(`tags.${tag}`, tag.replace('tag_', '').charAt(0).toUpperCase() + tag.replace('tag_', '').slice(1)) 
+                    const displayTag = tag.startsWith("tag_")
+                      ? t(
+                          `tags.${tag}`,
+                          tag.replace("tag_", "").charAt(0).toUpperCase() + tag.replace("tag_", "").slice(1),
+                        )
                       : tag;
                     return (
-                      <Badge key={tag} variant="outline" className="text-xs">
+                      <Badge key={`${tag}-${idx}`} variant="outline" className="text-xs">
                         {displayTag}
                       </Badge>
                     );
                   })}
                 </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+
+                <div className="flex items-center gap-3 text-sm text-muted-foreground pt-1">
                   <div className="flex items-center gap-1">
-                    <User className="w-4 h-4" />
-                    <span>{meal.chef}</span>
+                    <User className="w-3.5 h-3.5" />
+                    <span className="text-xs">{meal.chef}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    <span>{meal.location}</span>
+                    <MapPin className="w-3.5 h-3.5" />
+                    <span className="text-xs">{meal.location}</span>
                   </div>
                 </div>
               </div>
