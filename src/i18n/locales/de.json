@@ -332,9 +332,13 @@
     "choose_your_price": "💗 Wähle deinen Preis"
   },
   "meal": {
-    "portionsAvailable": "Portionen übrig",
+    "portionsAvailable": "Verfügbare Portionen",
     "exchange": "Austausch",
-    "minimum": "Mindestpreis"
+    "surprise": "Überraschung",
+    "minimum": "Mindestpreis",
+    "payWhatYouWant": "Zahl was du willst",
+    "restaurantValue": "Restaurant Wert",
+    "availablePortions": "Verfügbare Portionen"
   },
   "signup": {
     "phoneNumber": "Telefonnummer",
@@ -423,7 +427,9 @@
     "for_both": "Für uns beide (2 Portionen)",
     "for_me": "Nur für mich (1 Portion)",
     "show_original": "Original anzeigen",
-    "show_english": "Englisch anzeigen"
+    "show_english": "Englisch anzeigen",
+    "translate_to_german": "Ins Deutsche übersetzen",
+    "translate_to_english": "Translate to English"
   },
   "add_meal": {
     "ready_from": "Abholbereit ab",
