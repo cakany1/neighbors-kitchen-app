@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -30,10 +30,10 @@ const languages = [
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [accountType, setAccountType] = useState<'single' | 'couple'>('single');
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['de']);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([i18n.language || 'de']);
   const [requestedLanguage, setRequestedLanguage] = useState('');
   const [partnerPhotoFile, setPartnerPhotoFile] = useState<File | null>(null);
   const [partnerPhotoPreview, setPartnerPhotoPreview] = useState<string>('');
@@ -55,6 +55,11 @@ const Signup = () => {
     visibilityMode: 'all' as 'all' | 'women_fli' | 'women_only',
   });
   const [selfDeclarationChecked, setSelfDeclarationChecked] = useState(false);
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Password strength calculation
   const passwordStrength = useMemo(() => {
@@ -414,7 +419,6 @@ const Signup = () => {
                   <SelectItem value="none">{t('signup.genderNone')}</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground mt-1">{t('signup.genderHint')}</p>
             </div>
 
             {/* Visibility Mode - Security Settings */}
@@ -623,9 +627,6 @@ const Signup = () => {
                 placeholder="+41 79 123 45 67"
                 required
               />
-              <p className="text-xs text-muted-foreground">
-                Dient nur zur Absprache bei der Abholung (z.B. 'Bin in 5 Min da'). Kein SMS-Code.
-              </p>
             </div>
 
             <div className="space-y-2">
