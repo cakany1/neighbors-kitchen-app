@@ -274,7 +274,9 @@
     "tag_thai": "Thailändisch",
     "tag_spicy": "Scharf",
     "tag_dessert": "Dessert",
-    "tag_vegetarian": "Vegetarisch"
+    "tag_vegetarian": "Vegetarisch",
+    "tag_sweet": "Süss",
+    "tag_classic": "Klassiker"
   },
   "landing": {
     "badge_pay_what_you_want": "❤️ Wähle deinen Preis",
@@ -326,11 +328,13 @@
     "portfolio_available": "Koch-Portfolio verfügbar",
     "free_with_smile": "🎁 Gegen ein Lächeln",
     "pay_after_meal": "Zahle nach dem Essen",
-    "surprise_me": "Überrasch mich"
+    "surprise_me": "🎁 Überrasch mich!",
+    "choose_your_price": "💗 Wähle deinen Preis"
   },
   "meal": {
     "portionsAvailable": "Portionen übrig",
-    "exchange": "Austausch"
+    "exchange": "Austausch",
+    "minimum": "Mindestpreis"
   },
   "signup": {
     "phoneNumber": "Telefonnummer",
@@ -417,7 +421,9 @@
     "contact_chef_to_cancel": "Kontaktiere Chef zum Stornieren",
     "quantity": "Menge",
     "for_both": "Für uns beide (2 Portionen)",
-    "for_me": "Nur für mich (1 Portion)"
+    "for_me": "Nur für mich (1 Portion)",
+    "show_original": "Original anzeigen",
+    "show_english": "Englisch anzeigen"
   },
   "add_meal": {
     "ready_from": "Abholbereit ab",
