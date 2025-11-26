@@ -1,6 +1,7 @@
 {
   "common": {
     "payWhatYouWant": "Choose your price",
+    "fixedPrice": "Fixed Price",
     "orBring": "Or bring",
     "portions": "portions",
     "community": "Community",
