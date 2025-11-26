@@ -144,7 +144,7 @@
     "payWhatYouWant": "Pay what you want",
     "restaurantValue": "Restaurant Value",
     "minimum": "Minimum",
-    "portionsAvailable": "Portions available"
+    "portionsAvailable": "portions left"
   },
   "form": {
     "title": "Title",
@@ -200,7 +200,9 @@
     "tag_thai": "Thai",
     "tag_spicy": "Spicy",
     "tag_dessert": "Dessert",
-    "tag_vegetarian": "Vegetarian"
+    "tag_vegetarian": "Vegetarian",
+    "tag_sweet": "Sweet",
+    "tag_classic": "Classic"
   },
   "landing": {
     "badge_pay_what_you_want": "❤️ Choose your price (min 7.-)",
@@ -321,7 +323,8 @@
     "portfolio_available": "Portfolio Available",
     "free_with_smile": "🎁 For a Smile",
     "pay_after_meal": "Pay after the meal",
-    "surprise_me": "Surprise me"
+    "surprise_me": "🎁 Surprise me!",
+    "choose_your_price": "💗 Choose your price"
   },
   "signup": {
     "phoneNumber": "Phone Number",
