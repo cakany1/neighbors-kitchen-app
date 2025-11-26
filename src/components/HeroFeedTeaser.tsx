@@ -56,7 +56,7 @@ export const HeroFeedTeaser = () => {
                   <div className="w-full flex justify-center mt-1.5">
                     <Badge variant="secondary" className="bg-primary/20 text-primary text-xs border-0">
                       {meal.exchangeMode === "barter" 
-                        ? t("landing.badge_surprise_me", "🎁 Überrasch mich!")
+                        ? t("landing.badge_surprise_me")
                         : t("landing.badge_pay_what_you_want", "💝 Wähle deinen Preis")
                       }
                     </Badge>
