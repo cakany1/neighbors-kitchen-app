@@ -2,27 +2,11 @@ import { Meal } from "@/types/meal";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Star,
-  MapPin,
-  ChefHat,
-  Calendar,
-  Gift,
-  Heart,
-  Camera,
-  Package,
-  Home,
-  Ghost,
-  UtensilsCrossed,
-  Languages,
-} from "lucide-react";
-import { TranslateButton } from "@/components/TranslateButton";
+import { MapPin, ChefHat, Gift, Heart, Package, Home, Ghost, UtensilsCrossed } from "lucide-react";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { formatDistance } from "@/utils/distance";
-import { format } from "date-fns";
-import { de } from "date-fns/locale";
 
 interface MealCardProps {
   meal: Meal;
@@ -59,6 +43,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
       className="overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border-border group"
       onClick={onClick}
     >
+      {/* Image Area */}
       <div className="relative h-48 bg-muted">
         {meal.image_url || meal.imageUrl ? (
           <img src={meal.image_url || meal.imageUrl} alt={meal.title} className="w-full h-full object-cover" />
@@ -67,6 +52,8 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
             <ChefHat className="w-16 h-16 text-muted-foreground" />
           </div>
         )}
+
+        {/* Badges Top Right */}
         <div className="absolute top-3 right-3 flex flex-col gap-2">
           {meal.availablePortions > 0 && (
             <Badge className="bg-primary/90 backdrop-blur text-primary-foreground font-bold shadow-sm">
@@ -77,10 +64,12 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
       </div>
 
       <CardContent className="p-4">
+        {/* Header */}
         <div className="mb-2">
           <div className="flex justify-between items-start">
             <h3 className="font-semibold text-lg leading-tight mb-1 text-foreground">{displayTitle}</h3>
           </div>
+
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="font-medium text-foreground flex items-center gap-1">
               {chefNickname}
@@ -88,11 +77,13 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
-              <MapPin className="w-3 h-3" /> {(meal as any).neighborhood || meal.location?.neighborhood || "Basel"}
+              <MapPin className="w-3 h-3" />
+              {(meal as any).neighborhood || meal.location?.neighborhood || "Basel"}
             </span>
           </div>
         </div>
 
+        {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-3">
           {(meal.tags || []).map((tag, idx) => {
             const cleanTag = tag.replace("tag_", "");
@@ -109,10 +100,10 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           })}
         </div>
 
-        {/* BADGE LOGIC - ÜBERRASCH MICH */}
+        {/* BADGE LOGIC - ZENTRIERT */}
         <div className="mb-3">
           {exchangeMode === "barter" ? (
-            // Überrasch mich (Thai Curry)
+            // Thai Curry: Überrasch mich (Zentriert)
             <div className="flex items-center justify-center gap-2 py-2 px-3 bg-secondary/10 rounded-lg">
               <Gift className="w-4 h-4 text-secondary fill-current" />
               <span className="text-sm font-semibold text-secondary">
@@ -120,13 +111,13 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
               </span>
             </div>
           ) : exchangeMode === "pay_what_you_want" ? (
-            // Wähle deinen Preis (Cheesecake)
+            // Cheesecake: Wähle Preis (Zentriert)
             <div className="flex items-center justify-center gap-2 py-2 px-3 bg-primary/10 rounded-lg">
               <Heart className="w-4 h-4 text-primary fill-current" />
               <span className="text-sm font-semibold text-primary">{t("common.payWhatYouWant")}</span>
             </div>
           ) : (
-            // Festpreis (Lasagne)
+            // Lasagne: Festpreis (Zentriert)
             <div className="flex items-center justify-center gap-2 py-2 px-3 bg-muted rounded-lg">
               <Package className="w-4 h-4 text-muted-foreground" />
               <span className="text-sm font-semibold text-muted-foreground">{t("common.fixedPrice", "Festpreis")}</span>
@@ -134,7 +125,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           )}
         </div>
 
-        {/* Footer & Price */}
+        {/* Footer - PREIS NUR BEI FESTPREIS ANZEIGEN */}
         <div className="pt-3 border-t border-border mt-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -143,24 +134,14 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
             </div>
 
             <div className="font-semibold text-primary text-right">
-              {exchangeMode === "barter" ? (
-                // KEIN PREIS ANZEIGEN - Nur Text
-                <span className="text-secondary font-medium">
-                  {t("landing.badge_surprise_me", "🎁 Überrasch mich!")}
-                </span>
-              ) : exchangeMode === "pay_what_you_want" ? (
-                // AB X.-
-                <span className="flex flex-col items-end leading-tight">
-                  <span className="text-xs text-muted-foreground font-normal">Online Payment</span>
-                  <span>ab CHF {minPrice}</span>
-                </span>
-              ) : (
-                // FESTPREIS
+              {exchangeMode === "money" && (
+                // NUR BEI 'MONEY' (LASAGNE) ZEIGEN WIR DEN PREIS
                 <span className="flex flex-col items-end leading-tight">
                   <span className="text-xs text-muted-foreground font-normal">Online Payment</span>
                   <span>CHF {minPrice}</span>
                 </span>
               )}
+              {/* Bei Cheesecake & Curry bleibt diese Ecke leer -> Kein "ab 7.-", kein "Surprise" Text */}
             </div>
           </div>
         </div>
