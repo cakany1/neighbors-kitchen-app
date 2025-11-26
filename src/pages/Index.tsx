@@ -219,7 +219,7 @@ const Index = () => {
         </h1>
         <p className="text-lg text-muted-foreground mb-4">Basel</p>
         <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-          Teile Essen, baue Vertrauen, rette Lebensmittel in deiner Nachbarschaft
+          {t('landing.tagline')}
         </p>
       </div>
 
