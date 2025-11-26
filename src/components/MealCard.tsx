@@ -18,14 +18,43 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   const { t, i18n } = useTranslation();
   const [showOriginal, setShowOriginal] = useState(false);
 
-  const displayTitle =
-    !showOriginal && i18n.language === "en" && (meal as any).title_en ? (meal as any).title_en : meal.title;
+  // Helper to safely access properties that might be in camelCase OR snake_case
+  // This fixes the TypeScript errors
+  const getProp = (obj: any, camelKey: string, snakeKey: string) => {
+    return obj?.[camelKey] !== undefined ? obj[camelKey] : obj?.[snakeKey];
+  };
 
-  const exchangeMode = (meal as any).exchange_mode || "money";
-  const isStockPhoto = (meal as any).is_stock_photo || false;
-  const handoverMode = (meal as any).handover_mode || "pickup_box";
-  const chefNickname = (meal.chef as any)?.nickname || meal.chef?.first_name || "Chef";
+  // --- DATA EXTRACTION FIXES ---
+  const titleEn = getProp(meal, "titleEn", "title_en");
+  const displayTitle = !showOriginal && i18n.language === "en" && titleEn ? titleEn : meal.title;
 
+  const exchangeMode = getProp(meal, "exchangeMode", "exchange_mode") || "money";
+  const isStockPhoto = getProp(meal, "isStockPhoto", "is_stock_photo") || false;
+  const handoverMode = getProp(meal, "handoverMode", "handover_mode") || "pickup_box";
+
+  // FIX: Handle Chef Name (firstName vs first_name)
+  const chef = meal.chef || {};
+  const chefNickname = getProp(chef, "nickname", "nickname") || getProp(chef, "firstName", "first_name") || "Chef";
+  const chefIsVerified = getProp(chef, "isVerified", "id_verified") || false;
+
+  // FIX: Handle Image URL (imageUrl vs image_url)
+  const imageUrl = getProp(meal, "imageUrl", "image_url");
+
+  // FIX: Handle Available Portions (availablePortions vs available_portions)
+  const availablePortions = getProp(meal, "availablePortions", "available_portions");
+
+  // FIX: Handle Pricing
+  const pricing = meal.pricing || {};
+  const pricingMin =
+    getProp(pricing, "minimum", "pricing_minimum") ?? getProp(meal, "pricingMinimum", "pricing_minimum") ?? 7;
+  const minPrice = Number(pricingMin).toFixed(2);
+
+  // FIX: Handle Neighborhood
+  const location = meal.location || {};
+  const neighborhood =
+    getProp(location, "neighborhood", "neighborhood") || getProp(meal, "neighborhood", "neighborhood") || "Basel";
+
+  // Icon mapping
   const handoverIcons = {
     pickup_box: Package,
     neighbor_plate: Home,
@@ -36,8 +65,6 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   };
   const HandoverIcon = handoverIcons[handoverMode as keyof typeof handoverIcons] || Package;
 
-  const minPrice = (meal.pricing?.minimum || 7).toFixed(2);
-
   return (
     <Card
       className="overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border-border group"
@@ -45,8 +72,8 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
     >
       {/* Image Area */}
       <div className="relative h-48 bg-muted">
-        {meal.image_url || meal.imageUrl ? (
-          <img src={meal.image_url || meal.imageUrl} alt={meal.title} className="w-full h-full object-cover" />
+        {imageUrl ? (
+          <img src={imageUrl} alt={meal.title} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <ChefHat className="w-16 h-16 text-muted-foreground" />
@@ -55,9 +82,9 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
 
         {/* Badges Top Right */}
         <div className="absolute top-3 right-3 flex flex-col gap-2">
-          {meal.availablePortions > 0 && (
+          {availablePortions > 0 && (
             <Badge className="bg-primary/90 backdrop-blur text-primary-foreground font-bold shadow-sm">
-              {meal.available_portions} {t("meal.portionsAvailable", "left")}
+              {availablePortions} {t("meal.portionsAvailable", "left")}
             </Badge>
           )}
         </div>
@@ -73,12 +100,12 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="font-medium text-foreground flex items-center gap-1">
               {chefNickname}
-              {meal.chef.isVerified && <VerificationBadge isVerified={true} size="sm" />}
+              {chefIsVerified && <VerificationBadge isVerified={true} size="sm" />}
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
               <MapPin className="w-3 h-3" />
-              {(meal as any).neighborhood || meal.location?.neighborhood || "Basel"}
+              {neighborhood}
             </span>
           </div>
         </div>
@@ -141,7 +168,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
                   <span>CHF {minPrice}</span>
                 </span>
               )}
-              {/* Bei Cheesecake & Curry bleibt diese Ecke leer -> Kein "ab 7.-", kein "Surprise" Text */}
+              {/* Bei Cheesecake & Curry bleibt diese Ecke leer */}
             </div>
           </div>
         </div>
