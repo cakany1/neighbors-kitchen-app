@@ -469,24 +469,29 @@ const MealDetail = () => {
           {/* Beschreibung */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">{t('meal_detail.about_dish')}</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">{t('meal_detail.about_dish')}</CardTitle>
+                {/* Show translate button when UI language differs from original language */}
+                {((i18n.language === 'en' && (meal as any).description_en) || 
+                  (i18n.language === 'de' && (meal as any).description_en)) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowOriginal(!showOriginal)}
+                  >
+                    <Languages className="w-4 h-4 mr-2" />
+                    {i18n.language === 'en' 
+                      ? (showOriginal ? t('meal_detail.translate_to_english') : t('meal_detail.show_original'))
+                      : (showOriginal ? t('meal_detail.show_original') : t('meal_detail.translate_to_english'))
+                    }
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
                 {getDisplayText(meal.description, (meal as any).description_en)}
               </p>
-              {/* Show original toggle button for meals with translations */}
-              {i18n.language === 'en' && (meal as any).description_en && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => setShowOriginal(!showOriginal)}
-                >
-                  <Languages className="w-4 h-4 mr-2" />
-                  {showOriginal ? t('meal_detail.show_english') : t('meal_detail.show_original')}
-                </Button>
-              )}
               {meal.allergens && meal.allergens.length > 0 && (
                 <Alert className="mt-4 border-destructive/50 bg-destructive/5">
                   <AlertTriangle className="h-4 w-4 text-destructive" />
@@ -582,26 +587,43 @@ const MealDetail = () => {
             </CardContent>
           </Card>
 
-          {/* Exchange/Pricing - Only show for non-money modes */}
-          {(meal.exchange_mode === 'pay_what_you_want' || meal.exchange_mode === 'barter') && (
+          {/* Surprise Block - Only for barter mode */}
+          {meal.exchange_mode === 'barter' && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Gift className="w-5 h-5 text-primary" />
-                  {t('meal.exchange')}
+                  {t('meal.surprise')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Badge variant="outline" className="text-base py-1">
+                  🎁 {t('meal_card.surprise_me')}
+                </Badge>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Pay What You Want - Only for PWYW mode */}
+          {meal.exchange_mode === 'pay_what_you_want' && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Gift className="w-5 h-5 text-primary" />
+                  {t('meal.payWhatYouWant')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   <Badge variant="outline" className="text-base py-1">
-                    {meal.exchange_mode === 'pay_what_you_want' ? '❤️ ' + t('meal.payWhatYouWant') : '🎁 ' + t('meal_card.surprise_me')}
+                    ❤️ {t('meal.payWhatYouWant')}
                   </Badge>
-                  {meal.pricing_suggested && meal.exchange_mode === 'pay_what_you_want' && (
+                  {meal.pricing_suggested && (
                     <p className="text-sm text-muted-foreground">
                       ~ {t('meal.restaurantValue')}: CHF {meal.pricing_suggested}.-
                     </p>
                   )}
-                  {meal.pricing_minimum > 0 && meal.exchange_mode === 'pay_what_you_want' && (
+                  {meal.pricing_minimum > 0 && (
                     <p className="text-xs text-muted-foreground">
                       {t('meal.minimum')}: CHF {meal.pricing_minimum}.-
                     </p>

@@ -141,10 +141,12 @@
     "pickupBox": "Pickup Box (Anonymous drop)",
     "dineIn": "Dine In (Eat at chef's table)",
     "exchange": "Exchange",
+    "surprise": "Surprise",
     "payWhatYouWant": "Pay what you want",
     "restaurantValue": "Restaurant Value",
     "minimum": "Minimum",
-    "portionsAvailable": "Available Portions"
+    "portionsAvailable": "Available Portions",
+    "availablePortions": "Available Portions"
   },
   "form": {
     "title": "Title",
@@ -408,8 +410,10 @@
     "quantity": "Quantity",
     "for_both": "For both of us (2 portions)",
     "for_me": "Just for me (1 portion)",
-    "show_original": "Show Original (DE)",
-    "show_english": "Show English"
+    "show_original": "Show original",
+    "show_english": "Show English",
+    "translate_to_german": "Ins Deutsche übersetzen",
+    "translate_to_english": "Translate to English"
   },
   "add_meal": {
     "ready_from": "Ready for pickup from",
