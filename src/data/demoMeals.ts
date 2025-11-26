@@ -112,6 +112,3 @@ export const DEMO_MEALS = [
     women_only: false,
   },
 ];
-```"
-
-**PROMPT ENDE**
