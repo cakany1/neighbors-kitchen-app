@@ -76,7 +76,7 @@ export const DEMO_MEALS = [
   },
   {
     id: 'demo-3',
-    title: 'New York Cheesecake (2 Stk.)',
+    title: 'New York Cheesecake (2 Slices)',
     description: 'Cremiger New York Cheesecake mit Erdbeeren. Perfekt zum Dessert!',
     chef: {
       first_name: 'Hans',
