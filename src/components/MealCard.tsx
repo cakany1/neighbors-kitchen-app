@@ -40,7 +40,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   // --- SMART DETECTION LOGIC END ---
 
   const handoverMode = (meal as any).handover_mode || "pickup_box";
-  const chefNickname = (meal.chef as any)?.nickname || meal.chef?.first_name || "Chef";
+  const chefNickname = (meal.chef as any)?.nickname || meal.chef?.firstName || "Chef";
 
   const handoverIcons = {
     pickup_box: Package,
@@ -61,8 +61,8 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
     >
       {/* Image Area */}
       <div className="relative h-48 bg-muted">
-        {meal.image_url || (meal as any).imageUrl ? (
-          <img src={meal.image_url || (meal as any).imageUrl} alt={meal.title} className="w-full h-full object-cover" />
+        {meal.imageUrl || (meal as any).image_url ? (
+          <img src={meal.imageUrl || (meal as any).image_url} alt={meal.title} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <ChefHat className="w-16 h-16 text-muted-foreground" />
