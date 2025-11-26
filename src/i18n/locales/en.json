@@ -1,6 +1,6 @@
 {
   "common": {
-    "payWhatYouWant": "Pay/Bring what you want",
+    "payWhatYouWant": "Choose your price",
     "orBring": "Or bring",
     "portions": "portions",
     "community": "Community",
@@ -202,7 +202,7 @@
     "tag_vegetarian": "Vegetarian"
   },
   "landing": {
-    "badge_pay_what_you_want": "❤️ Pay what you want (Online)",
+    "badge_pay_what_you_want": "❤️ Choose your price (min 7.-)",
     "badge_surprise_me": "🎁 Surprise me! (Wine/Dessert)",
     "badge_free_smile": "😊 Nothing, just a smile (Free)",
     "restaurant_value": "Restaurant Value",
