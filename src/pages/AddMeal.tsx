@@ -26,6 +26,7 @@ const AddMeal = () => {
   const navigate = useNavigate();
   const [womenOnly, setWomenOnly] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [visibilityRadius, setVisibilityRadius] = useState<number | null>(null); // null = no limit
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [selectedExchangeOptions, setSelectedExchangeOptions] = useState<string[]>([]);
@@ -291,6 +292,7 @@ const AddMeal = () => {
         available_portions: parseInt(formData.portions) || 1,
         women_only: womenOnly,
         visibility_mode: profile.visibility_mode || 'all', // Use chef's visibility preference
+        visibility_radius: visibilityRadius, // Chef-set distance limit in meters
         exchange_mode: selectedExchangeOptions.join(','),
         pricing_minimum: selectedExchangeOptions.includes('online') ? priceCents : 0,
         pricing_suggested: selectedExchangeOptions.includes('online') ? priceCents : null,
@@ -715,6 +717,30 @@ const AddMeal = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Visibility Radius - Chef-side distance limit */}
+              <div className="p-3 rounded-lg border border-border">
+                <Label className="text-sm font-medium mb-2 block">
+                  📍 {t('add_meal.visibility_radius_label')}
+                </Label>
+                <p className="text-xs text-muted-foreground mb-3">
+                  {t('add_meal.visibility_radius_hint')}
+                </p>
+                <Select
+                  value={visibilityRadius?.toString() || 'all'}
+                  onValueChange={(val) => setVisibilityRadius(val === 'all' ? null : parseInt(val))}
+                >
+                  <SelectTrigger className="h-11">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">🌍 {t('add_meal.radius_all')}</SelectItem>
+                    <SelectItem value="100">🏠 {t('add_meal.radius_100m')}</SelectItem>
+                    <SelectItem value="500">🏘️ {t('add_meal.radius_500m')}</SelectItem>
+                    <SelectItem value="1000">📍 {t('add_meal.radius_1km')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Verified Only Toggle */}
               <div className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
                 <div className="flex items-center gap-3">

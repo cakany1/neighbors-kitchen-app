@@ -116,6 +116,7 @@ const Feed = () => {
           handover_mode,
           exchange_mode,
           visibility_mode,
+          visibility_radius,
           chef:profiles_public!chef_id (
             first_name,
             last_name,
@@ -162,22 +163,34 @@ const Feed = () => {
 
     const mealsWithDistance = visibilityFilteredMeals
       .map((meal) => {
-        const chefLat = (meal.chef as any)?.latitude;
-        const chefLon = (meal.chef as any)?.longitude;
+        // Use meal's fuzzy location for distance calculation
+        const mealLat = meal.fuzzy_lat;
+        const mealLon = meal.fuzzy_lng;
 
-        if (!chefLat || !chefLon) return null;
+        if (!mealLat || !mealLon) return null;
 
         return {
           ...meal,
-          calculatedDistance: getDistance(userLat, userLon, chefLat, chefLon),
+          calculatedDistance: getDistance(userLat, userLon, mealLat, mealLon),
         };
       })
       .filter((meal): meal is NonNullable<typeof meal> => meal !== null);
 
-    const withinRadius = mealsWithDistance.filter((meal) => meal.calculatedDistance <= userRadius);
+    // Apply chef-side visibility radius filter (if set)
+    const radiusFilteredMeals = mealsWithDistance.filter((meal) => {
+      const chefVisibilityRadius = (meal as any).visibility_radius;
+      // If chef set a visibility radius, only show to users within that distance
+      if (chefVisibilityRadius && chefVisibilityRadius > 0) {
+        return meal.calculatedDistance <= chefVisibilityRadius;
+      }
+      return true; // No chef-side limit
+    });
 
-    if (withinRadius.length === 0 && mealsWithDistance.length > 0) {
-      const fallbackMeals = mealsWithDistance
+    // Apply user-side notification radius filter
+    const withinRadius = radiusFilteredMeals.filter((meal) => meal.calculatedDistance <= userRadius);
+
+    if (withinRadius.length === 0 && radiusFilteredMeals.length > 0) {
+      const fallbackMeals = radiusFilteredMeals
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
         .slice(0, 5);
 
