@@ -609,6 +609,7 @@ const Profile = () => {
                   id="avatar-upload"
                   type="file"
                   accept="image/*"
+                  capture="user"
                   className="hidden"
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
@@ -674,6 +675,7 @@ const Profile = () => {
                     id="partner-avatar-upload"
                     type="file"
                     accept="image/*"
+                    capture="user"
                     className="hidden"
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
