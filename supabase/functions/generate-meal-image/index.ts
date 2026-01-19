@@ -12,6 +12,32 @@ serve(async (req) => {
   }
 
   try {
+    // Authentication check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization', success: false }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', success: false }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userId = claimsData.claims.sub;
+
     const { prompt, mealId } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
@@ -19,6 +45,22 @@ serve(async (req) => {
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
+    // Verify that the user owns the meal they're trying to update
+    if (mealId) {
+      const { data: mealData, error: mealError } = await supabaseClient
+        .from('meals')
+        .select('chef_id')
+        .eq('id', mealId)
+        .single();
+
+      if (mealError || !mealData || mealData.chef_id !== userId) {
+        return new Response(
+          JSON.stringify({ error: 'You can only generate images for your own meals', success: false }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     console.log("Generating image with prompt:", prompt);
@@ -61,11 +103,11 @@ serve(async (req) => {
     const base64Data = imageUrl.split(',')[1];
     const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
-    // Upload to Supabase storage
-    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+    // Upload to Supabase storage using service role for storage operations
+    const supabaseAdmin = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
     const fileName = `meal-${mealId}-${Date.now()}.png`;
     
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
       .from('gallery')
       .upload(fileName, binaryData, {
         contentType: 'image/png',
@@ -78,15 +120,15 @@ serve(async (req) => {
     }
 
     // Get public URL
-    const { data: { publicUrl } } = supabase.storage
+    const { data: { publicUrl } } = supabaseAdmin.storage
       .from('gallery')
       .getPublicUrl(fileName);
 
     console.log("Image uploaded to:", publicUrl);
 
-    // Update meal with new image URL
+    // Update meal with new image URL (using service role since user already verified)
     if (mealId) {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseAdmin
         .from('meals')
         .update({ image_url: publicUrl })
         .eq('id', mealId);
