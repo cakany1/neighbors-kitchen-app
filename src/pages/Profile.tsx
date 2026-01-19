@@ -585,7 +585,7 @@ const Profile = () => {
               <Alert className="mb-4 border-orange-500 bg-orange-50 dark:bg-orange-950/20">
                 <AlertCircle className="h-4 w-4 text-orange-600" />
                 <AlertDescription className="text-sm text-orange-800 dark:text-orange-300">
-                  <strong>⚠️ Ohne Profilbild kannst du nicht bestellen.</strong> Das schafft Vertrauen in unserer Nachbarschaft!
+                  <strong>⚠️ {t('profile.no_photo_warning_short')}</strong> {t('profile.no_photo_builds_trust')}
                 </AlertDescription>
               </Alert>
             )}
@@ -594,14 +594,14 @@ const Profile = () => {
               {/* Main User Avatar */}
               <div className="relative w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-3xl overflow-hidden group">
                 {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="Dein Profilbild" className="w-full h-full object-cover" />
+                  <img src={profile.avatar_url} alt={t('profile.your_profile_photo')} className="w-full h-full object-cover" />
                 ) : (
                   <span>👤</span>
                 )}
                 <label 
                   htmlFor="avatar-upload" 
                   className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                  title="Dein Profilbild"
+                  title={t('profile.your_profile_photo')}
                 >
                   <Upload className="w-6 h-6 text-white" />
                 </label>
@@ -615,12 +615,12 @@ const Profile = () => {
                     if (!file) return;
 
                     if (file.size > 5 * 1024 * 1024) {
-                      toast.error('Datei zu groß (max 5MB)');
+                      toast.error(t('profile.file_too_large'));
                       return;
                     }
 
                     if (!file.type.startsWith('image/')) {
-                      toast.error('Nur Bilder sind erlaubt');
+                      toast.error(t('profile.images_only'));
                       return;
                     }
 
@@ -643,11 +643,11 @@ const Profile = () => {
                         .update({ avatar_url: data.publicUrl })
                         .eq('id', currentUser.id);
 
-                      toast.success('Profilbild aktualisiert!');
+                      toast.success(t('profile.profile_updated'));
                       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
                     } catch (error) {
                       console.error('Upload error:', error);
-                      toast.error('Fehler beim Hochladen');
+                      toast.error(t('profile.upload_error'));
                     }
                   }}
                 />
@@ -658,14 +658,14 @@ const Profile = () => {
                 <div className="space-y-1">
                   <div className="relative w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-3xl overflow-hidden group border-2 border-dashed border-border">
                     {profile?.partner_photo_url ? (
-                      <img src={profile.partner_photo_url} alt="Partner Foto" className="w-full h-full object-cover" />
+                      <img src={profile.partner_photo_url} alt={t('profile.partner_photo_title')} className="w-full h-full object-cover" />
                     ) : (
                       <span>👥</span>
                     )}
                     <label 
                       htmlFor="partner-avatar-upload" 
                       className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                      title="Partner Foto"
+                      title={t('profile.partner_photo_title')}
                     >
                       <Upload className="w-6 h-6 text-white" />
                     </label>
@@ -679,12 +679,12 @@ const Profile = () => {
                       if (!file) return;
 
                       if (file.size > 5 * 1024 * 1024) {
-                        toast.error('Datei zu groß (max 5MB)');
+                        toast.error(t('profile.file_too_large'));
                         return;
                       }
 
                       if (!file.type.startsWith('image/')) {
-                        toast.error('Nur Bilder sind erlaubt');
+                        toast.error(t('profile.images_only'));
                         return;
                       }
 
@@ -707,17 +707,17 @@ const Profile = () => {
                           .update({ partner_photo_url: data.publicUrl })
                           .eq('id', currentUser.id);
 
-                        toast.success('Partner Foto aktualisiert!');
+                        toast.success(t('profile.partner_photo_updated'));
                         queryClient.invalidateQueries({ queryKey: ['currentUser'] });
                       } catch (error) {
                         console.error('Upload error:', error);
-                        toast.error('Fehler beim Hochladen');
+                        toast.error(t('profile.upload_error'));
                       }
                     }}
                   />
                   </div>
                   <p className="text-[10px] text-muted-foreground text-center max-w-[80px]">
-                    💡 Bei Paaren: Foto von euch beiden, damit Nachbarn wissen, wer an der Tür stehen könnte
+                    {t('profile.couple_photo_hint')}
                   </p>
                 </div>
               )}
@@ -761,22 +761,22 @@ const Profile = () => {
         {/* Persönliche Angaben */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Persönliche Angaben</CardTitle>
+            <CardTitle>{t('profile.personal_details')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="nickname">Spitzname</Label>
+              <Label htmlFor="nickname">{t('profile.nickname')}</Label>
               <Input
                 id="nickname"
                 type="text"
-                placeholder="Wie Nachbarn dich nennen sollen"
+                placeholder={t('profile.nickname_placeholder')}
                 value={formData.nickname}
                 onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
               />
             </div>
             
             <div>
-              <Label htmlFor="name-privacy">Anzeigename / Privatsphäre</Label>
+              <Label htmlFor="name-privacy">{t('profile.display_name_privacy')}</Label>
               <Select
                 defaultValue="first_initial"
               >
@@ -784,21 +784,21 @@ const Profile = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-background border-border z-50">
-                  <SelectItem value="full_name">Voller Name (Max Mustermann)</SelectItem>
-                  <SelectItem value="first_initial">Vorname & Initiale (Max M.)</SelectItem>
-                  <SelectItem value="nickname_only">Nur Spitzname (@{formData.nickname || 'Max123'})</SelectItem>
+                  <SelectItem value="full_name">{t('profile.full_name_option')}</SelectItem>
+                  <SelectItem value="first_initial">{t('profile.first_initial_option')}</SelectItem>
+                  <SelectItem value="nickname_only">{t('profile.nickname_only_option', { nickname: formData.nickname || 'Max123' })}</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">
-                💡 Steuert, wie dein Name auf Mahlzeit-Karten angezeigt wird
+                {t('profile.name_display_hint')}
               </p>
             </div>
             <div>
-              <Label htmlFor="age">Alter (Optional)</Label>
+              <Label htmlFor="age">{t('profile.age_optional')}</Label>
               <Input
                 id="age"
                 type="number"
-                placeholder="Dein Alter"
+                placeholder={t('profile.age_placeholder')}
                 value={formData.age || ''}
                 onChange={(e) => setFormData({ 
                   ...formData, 
@@ -808,25 +808,24 @@ const Profile = () => {
             </div>
             
             <div>
-              <Label htmlFor="gender">Geschlecht (für Sicherheitsfunktionen)</Label>
+              <Label htmlFor="gender">{t('profile.gender_label')}</Label>
               <Select
                 value={formData.gender || undefined}
                 onValueChange={(value) => setFormData({ ...formData, gender: value })}
               >
                 <SelectTrigger id="gender">
-                  <SelectValue placeholder="Geschlecht auswählen..." />
+                  <SelectValue placeholder={t('profile.gender_placeholder')} />
                 </SelectTrigger>
                 <SelectContent className="bg-background border-border z-50">
-                  {genderOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="woman">{t('profile.gender_woman')}</SelectItem>
+                  <SelectItem value="man">{t('profile.gender_man')}</SelectItem>
+                  <SelectItem value="diverse">{t('profile.gender_diverse')}</SelectItem>
+                  <SelectItem value="none">{t('profile.gender_none')}</SelectItem>
                 </SelectContent>
               </Select>
               {formData.gender === 'woman' && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  💡 Ermöglicht "Ladies Only"-Modus für Köchinnen
+                  {t('profile.gender_woman_hint')}
                 </p>
               )}
             </div>
@@ -834,31 +833,31 @@ const Profile = () => {
             {/* Visibility Mode Selection - Dynamic based on gender */}
             {formData.gender && (
               <div>
-                <Label htmlFor="visibility-mode">Sichtbarkeit deiner Gerichte</Label>
+                <Label htmlFor="visibility-mode">{t('profile.visibility_label')}</Label>
                 <Select
                   value={formData.visibility_mode}
                   onValueChange={(value) => setFormData({ ...formData, visibility_mode: value })}
                 >
                   <SelectTrigger id="visibility-mode">
-                    <SelectValue placeholder="Wähle Sichtbarkeit..." />
+                    <SelectValue placeholder={t('profile.visibility_placeholder')} />
                   </SelectTrigger>
                   <SelectContent className="bg-background border-border z-50">
-                    {visibilityModeOptions
-                      .filter((option) => option.allowedFor.includes(formData.gender!))
-                      .map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
+                    {formData.gender === 'woman' && (
+                      <SelectItem value="women_only">{t('profile.visibility_women_only')}</SelectItem>
+                    )}
+                    {(formData.gender === 'woman' || formData.gender === 'diverse' || formData.gender === 'none') && (
+                      <SelectItem value="women_fli">{t('profile.visibility_women_fli')}</SelectItem>
+                    )}
+                    <SelectItem value="all">{t('profile.visibility_all')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {formData.visibility_mode === 'women_only' && '🔒 Nur weibliche Nutzerinnen sehen deine Gerichte'}
-                  {formData.visibility_mode === 'women_fli' && '🌈 Frauen und Diverse/NB/Inter sehen deine Gerichte'}
-                  {formData.visibility_mode === 'all' && '🌍 Alle Nutzer*innen sehen deine Gerichte'}
+                  {formData.visibility_mode === 'women_only' && t('profile.visibility_women_only_hint')}
+                  {formData.visibility_mode === 'women_fli' && t('profile.visibility_women_fli_hint')}
+                  {formData.visibility_mode === 'all' && t('profile.visibility_all_hint')}
                   {formData.gender === 'man' && (
                     <span className="block mt-1 text-xs text-muted-foreground">
-                      💡 {t('profile.visibility_man_hint')}
+                      {t('profile.visibility_man_hint')}
                     </span>
                   )}
                 </p>
@@ -870,15 +869,15 @@ const Profile = () => {
               <div className="pt-4 border-t border-border space-y-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Heart className="w-5 h-5 text-primary" />
-                  <Label className="text-base font-semibold">Partner-Angaben (Pflichtfeld für Paare)</Label>
+                  <Label className="text-base font-semibold">{t('profile.partner_details')}</Label>
                 </div>
                 
                 <div>
-                  <Label htmlFor="partner-photo">Partner Foto (optional via URL)</Label>
+                  <Label htmlFor="partner-photo">{t('profile.partner_photo_title')} (URL)</Label>
                   <Input
                     id="partner-photo"
                     type="text"
-                    placeholder="https://... (oder nutze Upload oben)"
+                    placeholder="https://..."
                     value={formData.partner_photo_url}
                     onChange={(e) => setFormData({ ...formData, partner_photo_url: e.target.value })}
                   />
@@ -929,7 +928,7 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="w-5 h-5" />
-              Verifizierung & Standort
+              {t('profile.verification_location')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -1251,7 +1250,7 @@ const Profile = () => {
         {/* App-Feedback / Fehlerberichte */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Hilf uns zu verbessern</CardTitle>
+            <CardTitle>{t('profile.help_us_improve')}</CardTitle>
           </CardHeader>
           <CardContent>
             <FeedbackDialog userId={currentUser.id} />
@@ -1305,7 +1304,7 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
               <AlertCircle className="w-5 h-5" />
-              Gefahrenzone / Danger Zone
+              {t('profile.danger_zone')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -1314,7 +1313,7 @@ const Profile = () => {
                 variant="outline"
                 className="w-full border-destructive/50 hover:bg-destructive/10"
                 onClick={async () => {
-                  if (!confirm('⚠️ Möchtest du dein Konto wirklich deaktivieren? Deine Daten bleiben gespeichert, aber du bist für andere unsichtbar.')) return;
+                  if (!confirm(t('profile.deactivate_confirm_prompt'))) return;
                   
                   try {
                     await supabase
@@ -1322,17 +1321,17 @@ const Profile = () => {
                       .update({ vacation_mode: true })
                       .eq('id', currentUser.id);
                     
-                    toast.success('Konto deaktiviert. Aktiviere es in den Einstellungen wieder.');
+                    toast.success(t('profile.account_deactivated'));
                     queryClient.invalidateQueries({ queryKey: ['currentUser'] });
                   } catch (error: any) {
-                    toast.error('Fehler: ' + error.message);
+                    toast.error(t('profile.account_delete_error') + error.message);
                   }
                 }}
               >
-                Konto deaktivieren
+                {t('profile.deactivate_button')}
               </Button>
               <p className="text-xs text-muted-foreground mt-1">
-                Dein Profil wird versteckt, Daten bleiben erhalten
+                {t('profile.deactivate_hint')}
               </p>
             </div>
 
@@ -1341,13 +1340,9 @@ const Profile = () => {
                 variant="destructive"
                 className="w-full"
                 onClick={async () => {
-                  const confirmMessage = i18n.language === 'de' 
-                    ? '⚠️ Schade, dass du gehst! Wir hoffen, du kommst bald wieder.\n\nTippe "DELETE" um dein Konto endgültig zu löschen:'
-                    : '⚠️ Sorry to see you go! We hope you come back soon.\n\nType "DELETE" to permanently delete your account:';
-                  
-                  const confirmation = prompt(confirmMessage);
+                  const confirmation = prompt(t('profile.account_delete_confirm'));
                   if (confirmation !== 'DELETE') {
-                    toast.error(i18n.language === 'de' ? 'Abgebrochen. Du musst "DELETE" exakt eingeben.' : 'Cancelled. You must type "DELETE" exactly.');
+                    toast.error(t('profile.account_delete_cancelled'));
                     return;
                   }
                   
@@ -1362,17 +1357,17 @@ const Profile = () => {
                     
                     // Sign out and redirect
                     await supabase.auth.signOut();
-                    toast.success(i18n.language === 'de' ? 'Konto erfolgreich gelöscht. Auf Wiedersehen.' : 'Account successfully deleted. Goodbye.');
+                    toast.success(t('profile.account_deleted'));
                     navigate('/');
                   } catch (error: any) {
-                    toast.error((i18n.language === 'de' ? 'Fehler beim Löschen: ' : 'Deletion error: ') + error.message);
+                    toast.error(t('profile.account_delete_error') + error.message);
                   }
                 }}
               >
-                ⚠️ Konto unwiderruflich löschen
+                {t('profile.delete_button')}
               </Button>
               <p className="text-xs text-destructive mt-1">
-                ⚠️ Achtung: Dein Konto wird unwiderruflich gelöscht. ALLE Daten werden permanent entfernt! Wenn du später zurückkommst, musst du dich erneut verifizieren (Ausweis/Foto). Diese Aktion kann nicht rückgängig gemacht werden.
+                {t('profile.delete_warning')}
               </p>
             </div>
           </CardContent>
@@ -1389,7 +1384,7 @@ const Profile = () => {
             {updateProfileMutation.isPending && (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             )}
-            {updateProfileMutation.isPending ? 'Speichern...' : 'Profil speichern'}
+            {updateProfileMutation.isPending ? t('profile.saving') : t('profile.save_changes')}
           </Button>
         </div>
       </main>
