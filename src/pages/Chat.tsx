@@ -77,15 +77,15 @@ const Chat = () => {
       
       if (error) throw error;
       
-      // SECURITY: Only fetch public profile fields for chat participants
+      // SECURITY: Use public view to avoid exposing sensitive PII
       const { data: guestProfile } = await supabase
-        .from('profiles')
+        .from('profiles_public')
         .select('id, first_name, last_name, nickname, languages, id_verified, phone_verified')
         .eq('id', data.guest_id)
         .single();
       
       const { data: chefProfile } = await supabase
-        .from('profiles')
+        .from('profiles_public')
         .select('id, first_name, last_name, nickname, languages, id_verified, phone_verified')
         .eq('id', data.meal.chef_id)
         .single();

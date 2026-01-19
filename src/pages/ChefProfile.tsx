@@ -26,8 +26,9 @@ const ChefProfile = () => {
   const { data: chef, isLoading: chefLoading } = useQuery({
     queryKey: ['chefProfile', chefId],
     queryFn: async () => {
+      // SECURITY: Use public view to avoid exposing sensitive PII
       const { data, error } = await supabase
-        .from('profiles')
+        .from('profiles_public')
         .select('id, first_name, last_name, nickname, display_real_name, avatar_url, karma, id_verified, phone_verified, languages')
         .eq('id', chefId)
         .single();

@@ -104,6 +104,13 @@ export type Database = {
             referencedRelation: "meals"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "bookings_meal_id_fkey"
+            columns: ["meal_id"]
+            isOneToOne: false
+            referencedRelation: "meals_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       contact_requests: {
@@ -310,6 +317,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_meals_profiles"
+            columns: ["chef_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       messages: {
@@ -503,6 +517,13 @@ export type Database = {
             referencedRelation: "meals"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reports_reported_meal_id_fkey"
+            columns: ["reported_meal_id"]
+            isOneToOne: false
+            referencedRelation: "meals_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -528,7 +549,222 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      meals_public: {
+        Row: {
+          allergens: string[] | null
+          arrival_time: string | null
+          available_portions: number | null
+          barter_requests: string[] | null
+          booked_seats: number | null
+          chef_id: string | null
+          collection_window_end: string | null
+          collection_window_start: string | null
+          created_at: string | null
+          description: string | null
+          description_en: string | null
+          estimated_restaurant_value: number | null
+          exchange_mode: string | null
+          fuzzy_lat: number | null
+          fuzzy_lng: number | null
+          handover_mode: string | null
+          id: string | null
+          image_url: string | null
+          ingredients: string[] | null
+          is_cooking_experience: boolean | null
+          is_stock_photo: boolean | null
+          max_seats: number | null
+          neighborhood: string | null
+          pricing_minimum: number | null
+          pricing_suggested: number | null
+          restaurant_reference_price: number | null
+          scheduled_date: string | null
+          tags: string[] | null
+          title: string | null
+          title_en: string | null
+          unit_type: string | null
+          updated_at: string | null
+          visibility_mode: string | null
+          women_only: boolean | null
+        }
+        Insert: {
+          allergens?: string[] | null
+          arrival_time?: string | null
+          available_portions?: number | null
+          barter_requests?: string[] | null
+          booked_seats?: number | null
+          chef_id?: string | null
+          collection_window_end?: string | null
+          collection_window_start?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_en?: string | null
+          estimated_restaurant_value?: number | null
+          exchange_mode?: string | null
+          fuzzy_lat?: number | null
+          fuzzy_lng?: number | null
+          handover_mode?: string | null
+          id?: string | null
+          image_url?: string | null
+          ingredients?: string[] | null
+          is_cooking_experience?: boolean | null
+          is_stock_photo?: boolean | null
+          max_seats?: number | null
+          neighborhood?: string | null
+          pricing_minimum?: number | null
+          pricing_suggested?: number | null
+          restaurant_reference_price?: number | null
+          scheduled_date?: string | null
+          tags?: string[] | null
+          title?: string | null
+          title_en?: string | null
+          unit_type?: string | null
+          updated_at?: string | null
+          visibility_mode?: string | null
+          women_only?: boolean | null
+        }
+        Update: {
+          allergens?: string[] | null
+          arrival_time?: string | null
+          available_portions?: number | null
+          barter_requests?: string[] | null
+          booked_seats?: number | null
+          chef_id?: string | null
+          collection_window_end?: string | null
+          collection_window_start?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_en?: string | null
+          estimated_restaurant_value?: number | null
+          exchange_mode?: string | null
+          fuzzy_lat?: number | null
+          fuzzy_lng?: number | null
+          handover_mode?: string | null
+          id?: string | null
+          image_url?: string | null
+          ingredients?: string[] | null
+          is_cooking_experience?: boolean | null
+          is_stock_photo?: boolean | null
+          max_seats?: number | null
+          neighborhood?: string | null
+          pricing_minimum?: number | null
+          pricing_suggested?: number | null
+          restaurant_reference_price?: number | null
+          scheduled_date?: string | null
+          tags?: string[] | null
+          title?: string | null
+          title_en?: string | null
+          unit_type?: string | null
+          updated_at?: string | null
+          visibility_mode?: string | null
+          women_only?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_meals_profiles"
+            columns: ["chef_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_meals_profiles"
+            columns: ["chef_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles_public: {
+        Row: {
+          age: number | null
+          allergens: string[] | null
+          avatar_url: string | null
+          created_at: string | null
+          dislikes: string[] | null
+          display_real_name: boolean | null
+          first_name: string | null
+          gender: string | null
+          id: string | null
+          id_verified: boolean | null
+          is_couple: boolean | null
+          karma: number | null
+          languages: string[] | null
+          last_name: string | null
+          nickname: string | null
+          notification_radius: number | null
+          partner_gender: string | null
+          partner_name: string | null
+          partner_photo_url: string | null
+          phone_verified: boolean | null
+          role: string | null
+          updated_at: string | null
+          vacation_mode: boolean | null
+          verification_status:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          visibility_mode: string | null
+        }
+        Insert: {
+          age?: number | null
+          allergens?: string[] | null
+          avatar_url?: string | null
+          created_at?: string | null
+          dislikes?: string[] | null
+          display_real_name?: boolean | null
+          first_name?: string | null
+          gender?: string | null
+          id?: string | null
+          id_verified?: boolean | null
+          is_couple?: boolean | null
+          karma?: number | null
+          languages?: string[] | null
+          last_name?: string | null
+          nickname?: string | null
+          notification_radius?: number | null
+          partner_gender?: string | null
+          partner_name?: string | null
+          partner_photo_url?: string | null
+          phone_verified?: boolean | null
+          role?: string | null
+          updated_at?: string | null
+          vacation_mode?: boolean | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          visibility_mode?: string | null
+        }
+        Update: {
+          age?: number | null
+          allergens?: string[] | null
+          avatar_url?: string | null
+          created_at?: string | null
+          dislikes?: string[] | null
+          display_real_name?: boolean | null
+          first_name?: string | null
+          gender?: string | null
+          id?: string | null
+          id_verified?: boolean | null
+          is_couple?: boolean | null
+          karma?: number | null
+          languages?: string[] | null
+          last_name?: string | null
+          nickname?: string | null
+          notification_radius?: number | null
+          partner_gender?: string | null
+          partner_name?: string | null
+          partner_photo_url?: string | null
+          phone_verified?: boolean | null
+          role?: string | null
+          updated_at?: string | null
+          vacation_mode?: boolean | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          visibility_mode?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_delete_user: { Args: { target_user_id: string }; Returns: Json }
