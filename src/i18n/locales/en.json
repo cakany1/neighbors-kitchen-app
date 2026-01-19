@@ -565,7 +565,7 @@
     "account_type": "Account Type",
     "account_type_help_title": "What does this mean?",
     "account_type_single_desc": "You're registering alone. Standard bookings are for 1 person.",
-    "account_type_couple_desc": "You're registering as a couple/household. Bookings default to 2 people. Partner photo and name required.",
+    "account_type_couple_desc": "You're registering as a couple/household. Bookings default to 2 people. Partner photo and name required. For 'Ladies Only' meals, the female partner must pick up the food.",
     "single": "Single",
     "couple": "Couple",
     "your_details": "Your Details",
