@@ -215,6 +215,8 @@
     "settings_language_popular": "🌍 Wir fügen beliebte angefragte Sprachen hinzu!",
     "settings_language_translation": "💬 Sprachen die du sprichst - Nachrichten mit Köchen, die andere Sprachen sprechen, werden automatisch für dich übersetzt",
     "achievements_title": "Erfolge",
+    "achievements_empty_title": "Sammle deine ersten Erfolge!",
+    "achievements_empty_desc": "Teile Mahlzeiten, zahle fair und sei zuverlässig – verdiene Badges und zeige der Community, dass man dir vertrauen kann.",
     "achievements_chef_master": "Küchen-Meister",
     "achievements_chef_master_desc": "20+ Mahlzeiten geteilt",
     "achievements_fair_payer": "Fairer Zahler",

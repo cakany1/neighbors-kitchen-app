@@ -477,88 +477,7 @@ const Profile = () => {
           </Card>
         )}
 
-        {/* Chef Wallet Section */}
-        <Card className="mb-6 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              💰 {t('profile.your_wallet')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {walletLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              </div>
-            ) : (
-              <>
-                <div className="text-center py-6 bg-background/50 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-2">{t('profile.available_balance')}</p>
-                  <p className="text-4xl font-bold text-primary">
-                    CHF {walletData?.balance.toFixed(2) || '0.00'}
-                  </p>
-                  {walletData && walletData.requestedAmount > 0 && (
-                    <p className="text-xs text-muted-foreground mt-2">
-                      🕐 CHF {walletData.requestedAmount.toFixed(2)} {t('profile.in_processing')}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <Label htmlFor="iban">{t('profile.iban_for_payout')}</Label>
-                    <Input
-                      id="iban"
-                      type="text"
-                      placeholder="CH00 0000 0000 0000 0000 0"
-                      defaultValue={profile?.iban || ''}
-                      onBlur={(e) => {
-                        if (e.target.value !== profile?.iban) {
-                          updateProfileMutation.mutate(e.target.value);
-                        }
-                      }}
-                    />
-                  </div>
-
-                  <Button
-                    onClick={() => requestPayoutMutation.mutate()}
-                    disabled={
-                      !walletData || 
-                      walletData.balance < 10 || 
-                      !profile?.iban || 
-                      requestPayoutMutation.isPending
-                    }
-                    className="w-full"
-                  >
-                    {requestPayoutMutation.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        {t('profile.requesting_payout')}
-                      </>
-                    ) : (
-                      t('profile.request_payout')
-                    )}
-                  </Button>
-
-                  <Alert>
-                    <AlertDescription className="text-xs">
-                      💡 <strong>Info:</strong> {t('profile.payout_min_info')}
-                    </AlertDescription>
-                  </Alert>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-        
-        {/* Verification Incentive Banner */}
-        {!profile?.id_verified && !profile?.phone_verified && (
-          <Alert className="mb-6 border-primary bg-primary/10">
-            <Shield className="h-4 w-4 text-primary" />
-            <AlertDescription className="text-sm">
-              <strong>{t('profile.verification_banner')}</strong> {t('profile.verification_banner_desc')}
-            </AlertDescription>
-          </Alert>
-        )}
+        {/* Profile Header continues below */}
         
         {/* Profile Header */}
         <Card className="mb-6">
@@ -1177,7 +1096,7 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Achievements */}
+        {/* Achievements - Motivational when empty */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -1186,17 +1105,12 @@ const Profile = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-secondary-light p-4 rounded-lg text-center">
-                <ChefHat className="w-8 h-8 mx-auto mb-2 text-secondary" />
-                <p className="font-semibold text-sm text-foreground">{t('profile.achievements_chef_master')}</p>
-                <p className="text-xs text-muted-foreground">{t('profile.achievements_chef_master_desc')}</p>
-              </div>
-              <div className="bg-primary-light p-4 rounded-lg text-center">
-                <Heart className="w-8 h-8 mx-auto mb-2 text-primary" />
-                <p className="font-semibold text-sm text-foreground">{t('profile.achievements_fair_payer')}</p>
-                <p className="text-xs text-muted-foreground">{t('profile.achievements_fair_payer_desc')}</p>
-              </div>
+            <div className="text-center py-6 bg-muted/30 rounded-lg">
+              <Award className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
+              <p className="font-medium text-foreground mb-2">{t('profile.achievements_empty_title')}</p>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                {t('profile.achievements_empty_desc')}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -1309,7 +1223,80 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Optional: Trust & Verification (moved to end as optional feature) */}
+        {/* Chef Wallet Section */}
+        <Card className="mb-6 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              💰 {t('profile.your_wallet')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {walletLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : (
+              <>
+                <div className="text-center py-6 bg-background/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-2">{t('profile.available_balance')}</p>
+                  <p className="text-4xl font-bold text-primary">
+                    CHF {walletData?.balance.toFixed(2) || '0.00'}
+                  </p>
+                  {walletData && walletData.requestedAmount > 0 && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      🕐 CHF {walletData.requestedAmount.toFixed(2)} {t('profile.in_processing')}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="iban">{t('profile.iban_for_payout')}</Label>
+                    <Input
+                      id="iban"
+                      type="text"
+                      placeholder="CH00 0000 0000 0000 0000 0"
+                      defaultValue={profile?.iban || ''}
+                      onBlur={(e) => {
+                        if (e.target.value !== profile?.iban) {
+                          updateProfileMutation.mutate(e.target.value);
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <Button
+                    onClick={() => requestPayoutMutation.mutate()}
+                    disabled={
+                      !walletData || 
+                      walletData.balance < 10 || 
+                      !profile?.iban || 
+                      requestPayoutMutation.isPending
+                    }
+                    className="w-full"
+                  >
+                    {requestPayoutMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        {t('profile.requesting_payout')}
+                      </>
+                    ) : (
+                      t('profile.request_payout')
+                    )}
+                  </Button>
+
+                  <Alert>
+                    <AlertDescription className="text-xs">
+                      💡 <strong>Info:</strong> {t('profile.payout_min_info')}
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Optional: Trust & Verification */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -1317,8 +1304,18 @@ const Profile = () => {
               {t('profile.trust_security')} ({t('profile.optional_badge')})
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+          <CardContent className="space-y-4">
+            {/* Verification Incentive Banner - inside Trust section */}
+            {!profile?.id_verified && !profile?.phone_verified && (
+              <Alert className="border-primary bg-primary/10">
+                <Shield className="h-4 w-4 text-primary" />
+                <AlertDescription className="text-sm">
+                  <strong>{t('profile.verification_banner')}</strong> {t('profile.verification_banner_desc')}
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            <p className="text-sm text-muted-foreground">
               {t('profile.verification_optional_desc')}
             </p>
             {profile?.verification_status === 'approved' || profile?.id_verified ? (
