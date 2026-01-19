@@ -626,7 +626,8 @@ const Profile = () => {
 
                     try {
                       const fileExt = file.name.split('.').pop();
-                      const fileName = `${currentUser.id}-avatar-${Date.now()}.${fileExt}`;
+                      // Use folder structure: userId/filename for RLS policy compliance
+                      const fileName = `${currentUser.id}/avatar-${Date.now()}.${fileExt}`;
 
                       const { error: uploadError } = await supabase.storage
                         .from('gallery')
@@ -690,7 +691,8 @@ const Profile = () => {
 
                       try {
                         const fileExt = file.name.split('.').pop();
-                        const fileName = `${currentUser.id}-partner-${Date.now()}.${fileExt}`;
+                        // Use folder structure: userId/filename for RLS policy compliance
+                        const fileName = `${currentUser.id}/partner-${Date.now()}.${fileExt}`;
 
                         const { error: uploadError } = await supabase.storage
                           .from('gallery')
