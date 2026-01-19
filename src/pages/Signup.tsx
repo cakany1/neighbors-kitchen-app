@@ -340,6 +340,21 @@ const Signup = () => {
         return;
       }
 
+      // Step 4: Send welcome email (don't block signup on failure)
+      try {
+        await supabase.functions.invoke('send-welcome-email', {
+          body: {
+            email: formData.email,
+            firstName: formData.firstName,
+            language: i18n.language || 'de',
+          },
+        });
+        console.log('Welcome email sent successfully');
+      } catch (emailError) {
+        console.error('Welcome email failed (non-blocking):', emailError);
+        // Don't block signup if email fails
+      }
+
       // Set flag to trigger onboarding tour
       localStorage.setItem('just_registered', 'true');
       
