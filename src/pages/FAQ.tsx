@@ -97,6 +97,11 @@ const FAQ = () => {
           </CardHeader>
           <CardContent>
             <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-0">
+                <AccordionTrigger>{t('faq.q0')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a0')}</AccordionContent>
+              </AccordionItem>
+
               <AccordionItem value="item-1">
                 <AccordionTrigger>{t('faq.q1')}</AccordionTrigger>
                 <AccordionContent>{t('faq.a1')}</AccordionContent>
