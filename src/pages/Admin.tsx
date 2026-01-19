@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion } from 'lucide-react';
 import { IdDocumentViewer } from '@/components/IdDocumentViewer';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -117,7 +117,23 @@ const Admin = () => {
     enabled: isAdmin,
   });
 
-  // Fetch pending payouts
+  // Fetch FAQ requests
+  const { data: faqRequests, isLoading: faqLoading } = useQuery({
+    queryKey: ['faqRequests'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('faq_requests')
+        .select('*')
+        .in('status', ['pending', 'answered'])
+        .order('similar_count', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
   const { data: pendingPayouts, isLoading: payoutsLoading } = useQuery({
     queryKey: ['pendingPayouts'],
     queryFn: async () => {
@@ -240,6 +256,53 @@ const Admin = () => {
     },
     onError: () => {
       toast.error('Fehler beim Aktualisieren der Auszahlung');
+    },
+  });
+
+  // FAQ request mutations
+  const [faqAnswers, setFaqAnswers] = useState<Record<string, string>>({});
+
+  const publishFaqMutation = useMutation({
+    mutationFn: async ({ id, answer }: { id: string; answer: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from('faq_requests')
+        .update({ 
+          status: 'published',
+          admin_answer: answer,
+          answered_by: user?.id,
+          answered_at: new Date().toISOString(),
+          published_at: new Date().toISOString()
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(t('admin.faq_published'));
+      queryClient.invalidateQueries({ queryKey: ['faqRequests'] });
+      queryClient.invalidateQueries({ queryKey: ['publishedFaqs'] });
+    },
+    onError: () => {
+      toast.error(t('admin.faq_update_failed'));
+    },
+  });
+
+  const rejectFaqMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('faq_requests')
+        .update({ status: 'rejected' })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(t('admin.faq_rejected'));
+      queryClient.invalidateQueries({ queryKey: ['faqRequests'] });
+    },
+    onError: () => {
+      toast.error(t('admin.faq_update_failed'));
     },
   });
 
@@ -414,7 +477,7 @@ const Admin = () => {
         )}
 
         <Tabs defaultValue="verifications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="verifications">
               Verifications
               {pendingVerifications && pendingVerifications.length > 0 && (
@@ -430,6 +493,14 @@ const Admin = () => {
               {feedbackList?.filter(f => f.status === 'pending').length > 0 && (
                 <Badge variant="secondary" className="ml-2">
                   {feedbackList?.filter(f => f.status === 'pending').length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="faq">
+              FAQ
+              {faqRequests && faqRequests.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {faqRequests.length}
                 </Badge>
               )}
             </TabsTrigger>
@@ -796,6 +867,83 @@ const Admin = () => {
                               </AlertDescription>
                             </Alert>
                           )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* FAQ Requests Tab */}
+          <TabsContent value="faq" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircleQuestion className="w-5 h-5" />
+                  {t('admin.faq_requests')}
+                </CardTitle>
+                <CardDescription>
+                  {t('admin.faq_requests_desc')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {faqLoading ? (
+                  <p className="text-muted-foreground text-center py-8">Loading...</p>
+                ) : !faqRequests || faqRequests.length === 0 ? (
+                  <Alert>
+                    <CheckCircle className="h-4 w-4 text-primary" />
+                    <AlertDescription>
+                      {t('admin.faq_no_requests')}
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <div className="space-y-4">
+                    {faqRequests.map((faq) => (
+                      <Card key={faq.id} className="border-muted">
+                        <CardContent className="pt-4 space-y-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1">
+                              <p className="font-medium text-foreground">{faq.question}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {new Date(faq.created_at).toLocaleDateString('de-CH')} • {faq.similar_count}x {t('admin.faq_times_asked')}
+                              </p>
+                            </div>
+                            <Badge variant={faq.status === 'answered' ? 'secondary' : 'outline'}>
+                              {faq.status}
+                            </Badge>
+                          </div>
+                          
+                          <textarea
+                            className="w-full min-h-[80px] p-2 text-sm border rounded-md bg-background resize-none"
+                            placeholder={t('admin.faq_answer_placeholder')}
+                            value={faqAnswers[faq.id] || faq.admin_answer || ''}
+                            onChange={(e) => setFaqAnswers(prev => ({ ...prev, [faq.id]: e.target.value }))}
+                          />
+                          
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => publishFaqMutation.mutate({ 
+                                id: faq.id, 
+                                answer: faqAnswers[faq.id] || faq.admin_answer || '' 
+                              })}
+                              disabled={publishFaqMutation.isPending || !(faqAnswers[faq.id] || faq.admin_answer)}
+                            >
+                              <CheckCircle className="w-4 h-4 mr-1" />
+                              {t('admin.faq_publish')}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => rejectFaqMutation.mutate(faq.id)}
+                              disabled={rejectFaqMutation.isPending}
+                            >
+                              <XCircle className="w-4 h-4 mr-1" />
+                              {t('admin.faq_reject')}
+                            </Button>
+                          </div>
                         </CardContent>
                       </Card>
                     ))}

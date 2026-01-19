@@ -1,15 +1,36 @@
+import { useState } from 'react';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Smartphone, Bell, HelpCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Smartphone, Bell, HelpCircle, Send, MessageCircleQuestion } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 const FAQ = () => {
   const { t } = useTranslation();
+  const [question, setQuestion] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch published community FAQ questions
+  const { data: communityFaqs } = useQuery({
+    queryKey: ['publishedFaqs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('faq_requests')
+        .select('id, question, admin_answer, similar_count')
+        .eq('status', 'published')
+        .order('similar_count', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const requestNotificationPermission = async () => {
     if (!('Notification' in window)) {
@@ -27,6 +48,32 @@ const FAQ = () => {
       });
     } else {
       toast.error(t('faq.notification_denied'));
+    }
+  };
+
+  const handleSubmitQuestion = async () => {
+    if (!question.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { error } = await supabase
+        .from('faq_requests')
+        .insert({
+          question: question.trim(),
+          user_id: user?.id || null,
+        });
+
+      if (error) throw error;
+
+      toast.success(t('faq.ask_question_success'));
+      setQuestion('');
+    } catch (error) {
+      console.error('Error submitting question:', error);
+      toast.error(t('faq.ask_question_error'));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -152,6 +199,59 @@ const FAQ = () => {
                 <AccordionContent>{t('faq.a10')}</AccordionContent>
               </AccordionItem>
             </Accordion>
+          </CardContent>
+        </Card>
+
+        {/* Community FAQ Section - Published Questions */}
+        {communityFaqs && communityFaqs.length > 0 && (
+          <Card className="border-secondary/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircleQuestion className="w-5 h-5 text-secondary" />
+                {t('faq.community_questions_title')}
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {t('faq.community_questions_desc')}
+              </p>
+            </CardHeader>
+            <CardContent>
+              <Accordion type="single" collapsible className="w-full">
+                {communityFaqs.map((faq, index) => (
+                  <AccordionItem key={faq.id} value={`community-${index}`}>
+                    <AccordionTrigger className="text-left">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent>{faq.admin_answer}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Ask Your Question Card */}
+        <Card className="border-muted bg-muted/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Send className="w-5 h-5 text-primary" />
+              {t('faq.ask_question_title')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Input
+              placeholder={t('faq.ask_question_placeholder')}
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmitQuestion()}
+            />
+            <Button 
+              onClick={handleSubmitQuestion}
+              disabled={isSubmitting || !question.trim()}
+              className="w-full"
+            >
+              <Send className="w-4 h-4 mr-2" />
+              {isSubmitting ? t('faq.ask_question_submitting') : t('faq.ask_question_submit')}
+            </Button>
           </CardContent>
         </Card>
 
