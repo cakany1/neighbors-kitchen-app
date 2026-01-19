@@ -145,63 +145,63 @@ const FAQ = () => {
           <CardContent>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-0">
-                <AccordionTrigger>{t('faq.q0')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a0')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q0')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a0')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-1">
-                <AccordionTrigger>{t('faq.q1')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a1')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q1')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a1')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-2">
-                <AccordionTrigger>{t('faq.q2')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a2')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q2')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a2')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-3">
-                <AccordionTrigger>{t('faq.q3')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a3')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q3')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a3')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-4">
-                <AccordionTrigger>{t('faq.q4')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a4')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q4')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a4')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-5">
-                <AccordionTrigger>{t('faq.q5')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a5')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q5')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a5')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-6">
-                <AccordionTrigger>{t('faq.q6')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a6')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q6')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a6')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-7">
-                <AccordionTrigger>{t('faq.q7')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a7')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q7')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a7')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-8">
-                <AccordionTrigger>{t('faq.q8')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a8')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q8')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a8')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-9">
-                <AccordionTrigger>{t('faq.q9')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a9')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q9')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a9')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-10">
-                <AccordionTrigger>{t('faq.q10')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a10')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q10')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a10')}</AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-11">
-                <AccordionTrigger>{t('faq.q11')}</AccordionTrigger>
-                <AccordionContent>{t('faq.a11')}</AccordionContent>
+                <AccordionTrigger className="text-left">{t('faq.q11')}</AccordionTrigger>
+                <AccordionContent className="text-left">{t('faq.a11')}</AccordionContent>
               </AccordionItem>
             </Accordion>
           </CardContent>
