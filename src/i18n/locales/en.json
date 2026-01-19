@@ -338,6 +338,21 @@
     "tag_sweet": "Sweet",
     "tag_classic": "Classic"
   },
+  "install": {
+    "back_to_app": "Back to App",
+    "feels_like_app": "Feels like a real app"
+  },
+  "payment": {
+    "back_to_feed": "Back to Feed",
+    "meal_not_found": "Meal not found"
+  },
+  "error": {
+    "something_went_wrong": "Something went wrong",
+    "unexpected_error": "The application encountered an unexpected error. Please reload the page or go back to the home page.",
+    "technical_details": "Technical Details",
+    "reload_page": "Reload Page",
+    "back_to_home": "Back to Home"
+  },
   "landing": {
     "badge_pay_what_you_want": "❤️ Choose your price (min 7.-)",
     "badge_surprise_me": "🎁 Surprise me!",
@@ -436,10 +451,21 @@
   },
   "contact": {
     "title": "Contact Us",
+    "subtitle": "Do you have questions or suggestions? We look forward to your message!",
+    "back_to_home": "← Back to Home",
     "name": "Name",
+    "name_placeholder": "Your name",
     "email": "E-Mail",
+    "email_placeholder": "your.email@example.com",
     "message": "Message",
+    "message_placeholder": "Your message to us...",
     "submit": "Send Message",
+    "submitting": "Sending...",
+    "success_title": "Message sent!",
+    "success_desc": "We will get back to you soon.",
+    "error_title": "Error",
+    "error_fill_all": "Please fill in all fields.",
+    "error_send_failed": "Message could not be sent. Please try again later.",
     "remove_email_text": " "
   },
   "modal": {

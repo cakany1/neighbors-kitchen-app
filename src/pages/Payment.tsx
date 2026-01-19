@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { mockMeals } from '@/data/mockMeals';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -11,6 +12,7 @@ import { Star, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Payment = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const meal = mockMeals.find(m => m.id === id);
@@ -22,9 +24,9 @@ const Payment = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground">Meal not found</p>
+          <p className="text-muted-foreground">{t('payment.meal_not_found')}</p>
           <Button onClick={() => navigate('/app')} className="mt-4">
-            Zurück zum Feed
+            {t('payment.back_to_feed')}
           </Button>
         </div>
       </div>

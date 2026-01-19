@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Smartphone, Share2, Menu, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Install = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -151,7 +153,7 @@ const Install = () => {
 
         <div className="mt-8 text-center">
           <Button onClick={() => navigate('/feed')} size="lg" className="w-full">
-            Zurück zur App
+            {t('install.back_to_app')}
           </Button>
         </div>
       </main>

@@ -367,6 +367,21 @@
     "tag_sweet": "Süss",
     "tag_classic": "Klassiker"
   },
+  "install": {
+    "back_to_app": "Zurück zur App",
+    "feels_like_app": "Fühlt sich an wie eine echte App"
+  },
+  "payment": {
+    "back_to_feed": "Zurück zum Feed",
+    "meal_not_found": "Gericht nicht gefunden"
+  },
+  "error": {
+    "something_went_wrong": "Etwas ist schiefgelaufen",
+    "unexpected_error": "Die Anwendung ist auf einen unerwarteten Fehler gestoßen. Bitte lade die Seite neu oder kehre zur Startseite zurück.",
+    "technical_details": "Technische Details",
+    "reload_page": "Seite neu laden",
+    "back_to_home": "Zur Startseite"
+  },
   "landing": {
     "badge_pay_what_you_want": "❤️ Wähle deinen Preis",
     "badge_surprise_me": "🎁 Überrasch mich! (Wein/Dessert)",
@@ -401,6 +416,24 @@
     "terms_privacy": "AGB & Datenschutz",
     "contact": "Kontakt",
     "install_app": "📱 App installieren"
+  },
+  "contact": {
+    "title": "Kontakt",
+    "subtitle": "Haben Sie Fragen oder Anregungen? Wir freuen uns auf Ihre Nachricht!",
+    "back_to_home": "← Zurück zur Startseite",
+    "name": "Name",
+    "name_placeholder": "Ihr Name",
+    "email": "E-Mail",
+    "email_placeholder": "ihre.email@beispiel.ch",
+    "message": "Nachricht",
+    "message_placeholder": "Ihre Nachricht an uns...",
+    "submit": "Nachricht senden",
+    "submitting": "Wird gesendet...",
+    "success_title": "Nachricht gesendet!",
+    "success_desc": "Wir melden uns bald.",
+    "error_title": "Fehler",
+    "error_fill_all": "Bitte alle Felder ausfüllen.",
+    "error_send_failed": "Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut."
   },
   "modal": {
     "almost_done": "Fast geschafft!",
