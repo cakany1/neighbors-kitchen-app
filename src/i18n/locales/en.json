@@ -246,6 +246,12 @@
     "addMeal": "Add",
     "profile": "Profile"
   },
+  "map": {
+    "back_to_feed": "← Back to Feed",
+    "meals_nearby": "Meals Nearby",
+    "privacy_first": "Privacy first:",
+    "privacy_desc": "Locations are shown as approximate areas. Exact addresses are only revealed after booking confirmation."
+  },
   "handover": {
     "pickupTupperware": "Pickup (Box)",
     "neighborPlate": "Neighbor (Plate)",

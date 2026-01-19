@@ -72,17 +72,16 @@ const MapView = () => {
           onClick={() => navigate('/app')} 
           className="mb-4"
         >
-          ← Zurück zum Feed
+          {t('map.back_to_feed')}
         </Button>
         <div className="mb-4">
           <h2 className="text-2xl font-bold text-foreground mb-2">
-            Mahlzeiten in der Nähe
+            {t('map.meals_nearby')}
           </h2>
           <Alert className="border-primary/20 bg-primary/10">
             <MapPin className="h-4 w-4 text-primary" />
             <AlertDescription className="text-sm">
-              <strong>Privatsphäre zuerst:</strong> Standorte werden als ungefähre Bereiche angezeigt. 
-              Genaue Adressen werden erst nach Buchungsbestätigung angezeigt.
+              <strong>{t('map.privacy_first')}</strong> {t('map.privacy_desc')}
             </AlertDescription>
           </Alert>
         </div>
