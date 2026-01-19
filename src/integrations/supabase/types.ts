@@ -323,6 +323,7 @@ export type Database = {
           gender: string | null
           iban: string | null
           id: string
+          id_document_url: string | null
           id_verified: boolean | null
           is_couple: boolean | null
           karma: number
@@ -357,6 +358,7 @@ export type Database = {
           gender?: string | null
           iban?: string | null
           id: string
+          id_document_url?: string | null
           id_verified?: boolean | null
           is_couple?: boolean | null
           karma?: number
@@ -391,6 +393,7 @@ export type Database = {
           gender?: string | null
           iban?: string | null
           id?: string
+          id_document_url?: string | null
           id_verified?: boolean | null
           is_couple?: boolean | null
           karma?: number
