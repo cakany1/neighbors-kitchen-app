@@ -388,12 +388,12 @@ const Profile = () => {
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
-        {/* Vertrauen & Sicherheit Card */}
+        {/* Trust & Security Card */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-primary" />
-              Vertrauen &amp; Sicherheit
+              {t('profile.trust_security')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -401,22 +401,22 @@ const Profile = () => {
               <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
                 <div className="text-2xl">✅</div>
                 <div>
-                  <p className="font-semibold text-green-600 dark:text-green-400">Verifiziertes Profil</p>
-                  <p className="text-xs text-muted-foreground">Du hast den blauen Haken erhalten</p>
+                  <p className="font-semibold text-green-600 dark:text-green-400">{t('profile.verified_profile')}</p>
+                  <p className="text-xs text-muted-foreground">{t('profile.blue_tick_received')}</p>
                 </div>
               </div>
             ) : profile?.verification_status === 'pending' ? (
               <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                 <div className="text-2xl">⏳</div>
                 <div>
-                  <p className="font-semibold text-yellow-600 dark:text-yellow-400">Überprüfung läuft...</p>
-                  <p className="text-xs text-muted-foreground">Wir prüfen deine Verifizierung</p>
+                  <p className="font-semibold text-yellow-600 dark:text-yellow-400">{t('profile.verification_pending')}</p>
+                  <p className="text-xs text-muted-foreground">{t('profile.checking_verification')}</p>
                 </div>
               </div>
             ) : (
               <>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Lade ein Foto mit deinem Ausweis hoch, um dein Profil zu verifizieren und das ✓ Badge zu erhalten.
+                  {t('profile.upload_id_desc')}
                 </p>
                 <VerificationDialog
                   userId={currentUser.id}
@@ -456,12 +456,12 @@ const Profile = () => {
           <Card className="mb-6 border-green-600/30 bg-gradient-to-br from-green-500/5 to-green-500/10">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                🎁 Nachbarn einladen
+                🎁 {t('profile.invite_neighbors')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                Lade deine Nachbarn ein und erhalte +5 Karma für jede erfolgreiche Anmeldung!
+                {t('profile.invite_desc')}
               </p>
               <Button
                 variant="default"
@@ -481,14 +481,14 @@ const Profile = () => {
                     
                     if (!error) {
                       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
-                      toast.success('🎉 Link kopiert! +5 Karma');
+                      toast.success(t('profile.link_copied'));
                     }
                   } catch (err) {
-                    toast.error('Fehler beim Kopieren des Links');
+                    toast.error('Error copying link');
                   }
                 }}
               >
-                Link kopieren & Karma verdienen
+                {t('profile.copy_link')}
               </Button>
             </CardContent>
           </Card>
@@ -498,7 +498,7 @@ const Profile = () => {
         <Card className="mb-6 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              💰 Dein Guthaben / Wallet
+              💰 {t('profile.your_wallet')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -509,20 +509,20 @@ const Profile = () => {
             ) : (
               <>
                 <div className="text-center py-6 bg-background/50 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-2">Verfügbares Guthaben</p>
+                  <p className="text-sm text-muted-foreground mb-2">{t('profile.available_balance')}</p>
                   <p className="text-4xl font-bold text-primary">
                     CHF {walletData?.balance.toFixed(2) || '0.00'}
                   </p>
                   {walletData && walletData.requestedAmount > 0 && (
                     <p className="text-xs text-muted-foreground mt-2">
-                      🕐 CHF {walletData.requestedAmount.toFixed(2)} in Bearbeitung
+                      🕐 CHF {walletData.requestedAmount.toFixed(2)} {t('profile.in_processing')}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-3">
                   <div>
-                    <Label htmlFor="iban">IBAN für Auszahlung</Label>
+                    <Label htmlFor="iban">{t('profile.iban_for_payout')}</Label>
                     <Input
                       id="iban"
                       type="text"
@@ -549,16 +549,16 @@ const Profile = () => {
                     {requestPayoutMutation.isPending ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Wird beantragt...
+                        {t('profile.requesting_payout')}
                       </>
                     ) : (
-                      'Auszahlung beantragen'
+                      t('profile.request_payout')
                     )}
                   </Button>
 
                   <Alert>
                     <AlertDescription className="text-xs">
-                      💡 <strong>Info:</strong> Dein Guthaben sammelt sich hier. Du kannst es dir ab CHF 10.- auf deine hinterlegte IBAN auszahlen lassen. Wir überweisen 1x monatlich gebündelt.
+                      💡 <strong>Info:</strong> {t('profile.payout_min_info')}
                     </AlertDescription>
                   </Alert>
                 </div>

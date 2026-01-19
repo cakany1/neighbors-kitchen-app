@@ -335,8 +335,8 @@ const AddMeal = () => {
       
       <main className="max-w-lg mx-auto px-4 py-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Essen anbieten</h1>
-          <p className="text-muted-foreground">Erstelle ein Angebot für dein selbstgekochtes Gericht</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">{t('add_meal.page_title')}</h1>
+          <p className="text-muted-foreground">{t('add_meal.page_subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -345,11 +345,11 @@ const AddMeal = () => {
             <CardContent className="pt-6 space-y-4">
               <div>
                 <Label htmlFor="title" className="text-lg font-semibold">
-                  Was gibt&apos;s heute? *
+                  {t('add_meal.whats_cooking')}
                 </Label>
                 <Input
                   id="title"
-                  placeholder="z.B. Hausgemachte Kürbis-Lasagne"
+                  placeholder={t('add_meal.title_placeholder')}
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="text-base h-12"
@@ -360,11 +360,11 @@ const AddMeal = () => {
               {/* Description - Moved from accordion */}
               <div>
                 <Label htmlFor="description" className="text-base font-medium">
-                  Kleine Beschreibung (Optional)
+                  {t('add_meal.description_label')}
                 </Label>
                 <Textarea
                   id="description"
-                  placeholder="Beschreibe dein Gericht, Zutaten und besondere Details..."
+                  placeholder={t('add_meal.description_placeholder')}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
@@ -377,7 +377,7 @@ const AddMeal = () => {
           {/* Portions Counter */}
           <Card>
             <CardContent className="pt-6">
-              <Label className="text-lg font-semibold mb-3 block">Anzahl Portionen *</Label>
+              <Label className="text-lg font-semibold mb-3 block">{t('add_meal.portions_label')} *</Label>
               <div className="flex items-center justify-center gap-6">
                 <Button
                   type="button"
@@ -425,7 +425,7 @@ const AddMeal = () => {
                       setFormData({ ...formData, scheduledDate: today });
                     }}
                   >
-                    Heute
+                    {t('add_meal.today')}
                   </Button>
                   <Button
                     type="button"
@@ -435,7 +435,7 @@ const AddMeal = () => {
                       setFormData({ ...formData, scheduledDate: tomorrow });
                     }}
                   >
-                    Morgen
+                    {t('add_meal.tomorrow')}
                   </Button>
                 <Button
                   type="button"
