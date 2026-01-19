@@ -580,6 +580,7 @@
     "quantity": "Quantity",
     "for_both": "For both of us (2 portions)",
     "for_me": "Just for me (1 portion)",
+    "estimated_restaurant_value": "This would cost approx. CHF {{amount}}.- in a restaurant ({{portions}} portions)",
     "show_original": "Show original",
     "show_english": "Show English",
     "translate_to_german": "Ins Deutsche übersetzen",
