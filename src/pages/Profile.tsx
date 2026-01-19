@@ -841,7 +841,23 @@ const Profile = () => {
               <Label htmlFor="gender">{t('profile.gender_label')}</Label>
               <Select
                 value={formData.gender || undefined}
-                onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                onValueChange={(value) => {
+                  // Reset visibility_mode if it's no longer valid for the new gender
+                  let newVisibility = formData.visibility_mode;
+                  
+                  if (value === 'man') {
+                    // Men can only have 'all'
+                    newVisibility = 'all';
+                  } else if (value === 'diverse' || value === 'none') {
+                    // Diverse/None cannot have 'women_only'
+                    if (formData.visibility_mode === 'women_only') {
+                      newVisibility = 'all';
+                    }
+                  }
+                  // Women can have any visibility mode, no reset needed
+                  
+                  setFormData({ ...formData, gender: value, visibility_mode: newVisibility });
+                }}
               >
                 <SelectTrigger id="gender">
                   <SelectValue placeholder={t('profile.gender_placeholder')} />
