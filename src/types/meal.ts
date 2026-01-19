@@ -1,12 +1,15 @@
 export interface Meal {
   id: string;
   title: string;
+  titleEn?: string;
   description: string;
+  descriptionEn?: string;
   chef: {
     firstName: string;
     lastName: string;
     karma: number;
     isVerified?: boolean;
+    nickname?: string;
   };
   location: {
     neighborhood: string;
@@ -18,11 +21,13 @@ export interface Meal {
   };
   distance?: number; // Distance in meters (optional, calculated on client)
   tags: string[];
-  imageUrl: string;
+  imageUrl?: string;
   pricing: {
     minimum: number; // Can be 0
     suggested?: number;
   };
+  exchange_mode?: 'money' | 'barter' | 'pay_what_you_want';
+  handover_mode?: 'pickup' | 'pickup_box' | 'neighbor' | 'neighbor_plate' | 'anonymous_drop' | 'dine_in';
   isCookingExperience: boolean;
   availablePortions: number;
   allergens?: string[];

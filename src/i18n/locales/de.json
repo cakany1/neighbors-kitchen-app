@@ -55,7 +55,9 @@
     "2fa_invalid_code": "Ungültiger Code. Bitte erneut versuchen.",
     "google_login": "Mit Google anmelden",
     "google_signup": "Mit Google registrieren",
-    "or_email": "oder mit E-Mail"
+    "or_email": "oder mit E-Mail",
+    "logout": "Ausloggen",
+    "logging_out": "Wird abgemeldet..."
   },
   "chat": {
     "loading": "Lädt...",
@@ -234,6 +236,8 @@
     "verification_pending": "Überprüfung läuft...",
     "checking_verification": "Wir prüfen deine Verifizierung",
     "upload_id_desc": "Lade ein Foto mit deinem Ausweis hoch, um dein Profil zu verifizieren und das ✓ Badge zu erhalten.",
+    "optional_badge": "Optional",
+    "verification_optional_desc": "Die Verifizierung ist optional, erhöht aber deine Buchungschancen und das Vertrauen in der Community.",
     "invite_neighbors": "Nachbarn einladen",
     "invite_desc": "Lade deine Nachbarn ein und erhalte +5 Karma für jede Registrierung!",
     "copy_link": "Link kopieren",
@@ -531,6 +535,7 @@
     "password_medium": "Mittel",
     "password_strong": "Stark",
     "password_hint": "Mindestens 6 Zeichen",
+    "leaked_password_hint": "Verwende ein einzigartiges Passwort - häufig verwendete Passwörter werden aus Sicherheitsgründen abgelehnt.",
     "first_name_required": "Bitte gib deinen Vornamen ein",
     "profile_creation_failed": "Profil konnte nicht erstellt werden",
     "account_exists_wrong_password": "Dieses Konto existiert bereits, aber das Passwort ist falsch. Bitte melde dich an.",

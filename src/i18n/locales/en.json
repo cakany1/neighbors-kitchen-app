@@ -101,6 +101,8 @@
     "verification_pending": "Verification pending...",
     "checking_verification": "We are reviewing your verification",
     "upload_id_desc": "Upload a photo with your ID to verify your profile and receive the ✓ badge.",
+    "optional_badge": "Optional",
+    "verification_optional_desc": "Verification is optional but increases your booking chances and trust in the community.",
     "invite_neighbors": "Invite Neighbors",
     "invite_desc": "Invite your neighbors and earn +5 Karma for each registration!",
     "copy_link": "Copy Link",
@@ -237,7 +239,9 @@
     "2fa_invalid_code": "Invalid code. Please try again.",
     "google_login": "Sign in with Google",
     "google_signup": "Sign up with Google",
-    "or_email": "or with email"
+    "or_email": "or with email",
+    "logout": "Log out",
+    "logging_out": "Logging out..."
   },
   "signup": {
     "phoneNumber": "Phone Number",
@@ -268,6 +272,7 @@
     "password_medium": "Medium",
     "password_strong": "Strong",
     "password_hint": "At least 6 characters",
+    "leaked_password_hint": "Use a unique password - commonly used passwords are rejected for security reasons.",
     "first_name_required": "Please enter your first name",
     "profile_creation_failed": "Could not create profile",
     "account_exists_wrong_password": "This account already exists but the password is wrong. Please log in.",
