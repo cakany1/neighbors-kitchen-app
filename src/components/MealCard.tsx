@@ -24,8 +24,8 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   const titleEn = getProp(meal, "titleEn", "title_en");
   const displayTitle = !showOriginal && i18n.language === "en" && titleEn ? titleEn : meal.title;
 
-  const exchangeMode = getProp(meal, "exchangeMode", "exchange_mode") || "money";
-  const handoverMode = getProp(meal, "handoverMode", "handover_mode") || "pickup_box";
+  const exchangeMode = (meal as any).exchangeMode || (meal as any).exchange_mode || "money";
+  const handoverMode = (meal as any).handoverMode || (meal as any).handover_mode || "pickup_box";
 
   const chef = meal.chef || {};
   const chefNickname = getProp(chef, "nickname", "nickname") || getProp(chef, "firstName", "first_name") || "Chef";
