@@ -67,6 +67,18 @@ const FAQ = () => {
 
       if (error) throw error;
 
+      // Send admin notification (non-blocking)
+      try {
+        await supabase.functions.invoke('send-admin-notification', {
+          body: {
+            type: 'faq',
+            content: question.trim(),
+          },
+        });
+      } catch (notifError) {
+        console.error('Admin notification failed (non-blocking):', notifError);
+      }
+
       toast.success(t('faq.ask_question_success'));
       setQuestion('');
     } catch (error) {

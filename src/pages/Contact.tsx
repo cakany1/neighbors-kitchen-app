@@ -48,6 +48,20 @@ export default function Contact() {
 
       if (error) throw error;
 
+      // Send admin notification (non-blocking)
+      try {
+        await supabase.functions.invoke('send-admin-notification', {
+          body: {
+            type: 'contact',
+            content: formData.message,
+            senderName: formData.name,
+            senderEmail: formData.email,
+          },
+        });
+      } catch (notifError) {
+        console.error('Admin notification failed (non-blocking):', notifError);
+      }
+
       toast({
         title: t('contact.success_title'),
         description: t('contact.success_desc'),
