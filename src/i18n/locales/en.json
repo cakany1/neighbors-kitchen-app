@@ -85,6 +85,8 @@
     "unblock_action": "Unblock",
     "unblocking": "Unblocking...",
     "achievements_title": "Achievements",
+    "achievements_empty_title": "Earn your first achievements!",
+    "achievements_empty_desc": "Share meals, pay fairly, and be reliable – earn badges and show the community you can be trusted.",
     "achievements_chef_master": "Kitchen Master",
     "achievements_chef_master_desc": "20+ meals shared",
     "achievements_fair_payer": "Fair Payer",
