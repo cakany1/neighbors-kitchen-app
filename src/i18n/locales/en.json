@@ -259,7 +259,16 @@
     "visibilityWomenFli": "Women + FLI",
     "visibilityWomenOnly": "Women Only",
     "selfDeclaration": "I confirm that I identify with the selected group and respect the protected space.",
-    "selfDeclarationRequired": "Please confirm the self-declaration to proceed."
+    "selfDeclarationRequired": "Please confirm the self-declaration to proceed.",
+    "password_too_short": "At least 6 characters",
+    "password_weak": "Weak",
+    "password_medium": "Medium",
+    "password_strong": "Strong",
+    "password_hint": "At least 6 characters",
+    "first_name_required": "Please enter your first name",
+    "profile_creation_failed": "Could not create profile",
+    "account_exists_wrong_password": "This account already exists but the password is wrong. Please log in.",
+    "complete_profile_later": "💡 You can complete your profile later. Photo and address are only needed when booking."
   },
   "guidelines": {
     "bringContainer": "Bring your own container or plate for takeaway (except when dining in)",
