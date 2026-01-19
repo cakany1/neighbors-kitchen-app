@@ -1350,6 +1350,26 @@ const Profile = () => {
         {/* Optional: 2FA Settings */}
         <TwoFactorSettings userId={currentUser.id} />
 
+        {/* Restart Onboarding Tour */}
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <Button
+              variant="outline"
+              className="w-full gap-2"
+              onClick={() => {
+                localStorage.removeItem('tour_completed');
+                toast.success(t('profile.tour_restarting'));
+                navigate('/feed');
+              }}
+            >
+              🎓 {t('profile.restart_tour')}
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              {t('profile.restart_tour_hint')}
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Logout Button */}
         <Card className="mb-6">
           <CardContent className="pt-6">
