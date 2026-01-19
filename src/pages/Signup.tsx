@@ -790,8 +790,8 @@ const Signup = () => {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
-                minLength={6}
               />
+              <p className="text-xs text-muted-foreground">Mindestens 6 Zeichen</p>
               {formData.password && (
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
