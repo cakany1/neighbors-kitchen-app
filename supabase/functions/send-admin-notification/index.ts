@@ -12,6 +12,16 @@ interface NotificationRequest {
   senderEmail?: string;
 }
 
+// HTML escape function to prevent HTML injection attacks
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -31,8 +41,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     const isContact = type === 'contact';
     
+    // Sanitize all user inputs before using in HTML
+    const safeSenderName = escapeHtml(senderName || 'Unbekannt');
+    const safeSenderEmail = escapeHtml(senderEmail || 'Keine angegeben');
+    const safeContent = escapeHtml(content || '');
+
     const subject = isContact 
-      ? `📩 Neue Kontaktanfrage von ${senderName || 'Unbekannt'}`
+      ? `📩 Neue Kontaktanfrage von ${safeSenderName}`
       : `❓ Neue FAQ-Frage eingereicht`;
 
     const htmlContent = isContact
@@ -43,10 +58,10 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-            <p style="margin: 0 0 10px 0;"><strong>Von:</strong> ${senderName || 'Unbekannt'}</p>
-            <p style="margin: 0 0 10px 0;"><strong>E-Mail:</strong> ${senderEmail || 'Keine angegeben'}</p>
+            <p style="margin: 0 0 10px 0;"><strong>Von:</strong> ${safeSenderName}</p>
+            <p style="margin: 0 0 10px 0;"><strong>E-Mail:</strong> ${safeSenderEmail}</p>
             <p style="margin: 0;"><strong>Nachricht:</strong></p>
-            <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${content}</p>
+            <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${safeContent}</p>
           </div>
           
           <div style="text-align: center;">
@@ -69,7 +84,7 @@ const handler = async (req: Request): Promise<Response> => {
           
           <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
             <p style="margin: 0;"><strong>Eingereichte Frage:</strong></p>
-            <p style="margin: 10px 0 0 0; font-size: 18px;">"${content}"</p>
+            <p style="margin: 10px 0 0 0; font-size: 18px;">"${safeContent}"</p>
           </div>
           
           <div style="text-align: center;">
