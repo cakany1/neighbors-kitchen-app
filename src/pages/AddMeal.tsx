@@ -680,22 +680,19 @@ const AddMeal = () => {
                       {isOnline && isSelected && (
                         <div className="pl-8 w-full space-y-2">
                           <Label htmlFor="price" className="text-sm font-medium">
-                            Preis pro Portion (CHF) <span className="text-destructive">*</span>
+                            {t('add_meal.price_label')} <span className="text-destructive">*</span>
                           </Label>
                           <Input
                             id="price"
                             type="number"
-                            min="7.00"
-                            max="50.00"
                             step="0.50"
                             value={formData.restaurantReferencePrice}
                             onChange={(e) => setFormData({ ...formData, restaurantReferencePrice: e.target.value })}
                             placeholder="z.B. 12.00"
                             className="h-10 text-sm"
-                            required
                           />
                           <p className="text-xs text-muted-foreground">
-                            Mindestpreis CHF 7.00 (CHF 2.00 Servicegebühr wird abgezogen) • Max CHF 50.00
+                            {t('add_meal.price_hint')}
                           </p>
                         </div>
                       )}

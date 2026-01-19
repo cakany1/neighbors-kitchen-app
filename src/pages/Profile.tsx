@@ -1018,6 +1018,13 @@ const Profile = () => {
                   lng={currentUser.profile.longitude}
                   radius={formData.notification_radius / 1000}
                 />
+              ) : formData.private_address && formData.private_city ? (
+                <div className="w-full h-48 rounded-lg border border-border bg-muted flex flex-col items-center justify-center gap-2 p-4">
+                  <p className="text-sm text-muted-foreground text-center">{t('profile.save_to_see_map')}</p>
+                  <p className="text-xs text-muted-foreground text-center">
+                    {formData.private_address}, {formData.private_postal_code} {formData.private_city}
+                  </p>
+                </div>
               ) : (
                 <div className="w-full h-48 rounded-lg border border-border bg-muted flex items-center justify-center">
                   <p className="text-sm text-muted-foreground">{t('profile.add_address_for_map')}</p>
