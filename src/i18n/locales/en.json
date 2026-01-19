@@ -783,5 +783,24 @@
     "address_required": "Please enter street and city",
     "phone_required": "Please enter your phone number",
     "save_failed": "Save failed"
+  },
+  "onboarding": {
+    "welcome_title": "Welcome to Neighbors Kitchen! 🍲",
+    "welcome_desc": "Discover homemade food from your neighborhood. Share leftover meals and meet new people.",
+    "feed_title": "Find Food",
+    "feed_desc": "Browse all available meals near you. The closer, the fresher!",
+    "map_title": "Map View",
+    "map_desc": "See where neighbors are cooking on the map. Locations are approximate for privacy reasons.",
+    "add_meal_title": "Cook & Share",
+    "add_meal_desc": "Made too much? Share your food with neighbors and earn Karma points!",
+    "profile_title": "Your Profile",
+    "profile_desc": "Manage your settings, allergens, and safety options. The more complete, the more trust!",
+    "karma_title": "Karma Points",
+    "karma_desc": "Earn Karma by sharing and paying fairly. High Karma = more trust in the community!",
+    "step_counter": "Step {{current}} of {{total}}",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Next",
+    "done": "Let's go!"
   }
 }
