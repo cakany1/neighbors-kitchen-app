@@ -427,6 +427,8 @@
     "notification_denied": "Notifications were denied.",
     "notification_body": "You will now receive notifications about new meals in your area.",
     "questions_title": "Frequently Asked Questions (FAQ)",
+    "q0": "Why is there no app in the App Store?",
+    "a0": "Neighbors Kitchen is a Progressive Web App (PWA). This means you install it directly from your browser to your home screen – no App Store needed. This way, we avoid the high store fees (15-30%), can deliver updates instantly, and you don't need storage space for another app. The PWA works just like a native app: with push notifications, offline capability, and fast access.",
     "q1": "How does payment work?",
     "a1": "Registration is free. You only pay if the chef has selected the \"Online Payment (Apple Pay / Card)\" option. Payment is then made digitally during reservation.",
     "q2": "Is this a restaurant?",
