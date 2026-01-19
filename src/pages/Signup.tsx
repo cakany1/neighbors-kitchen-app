@@ -124,10 +124,20 @@ const Signup = () => {
         }
       }
 
-      // Other signup errors
+      // Other signup errors - translate common Supabase messages
       if (error) {
         setLoading(false);
-        toast.error(error.message || t('auth.account_creation_failed'), {
+        let errorMessage = t('auth.account_creation_failed');
+        
+        if (error.message.includes('weak') || error.message.includes('easy to guess')) {
+          errorMessage = t('auth.weak_password');
+        } else if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+          errorMessage = t('auth.email_taken');
+        } else if (error.message.includes('Invalid email')) {
+          errorMessage = t('auth.invalid_email');
+        }
+        
+        toast.error(errorMessage, {
           duration: 10000,
         });
         return;
