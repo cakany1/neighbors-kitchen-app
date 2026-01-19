@@ -88,33 +88,7 @@ const Signup = () => {
     return { level: 40, label: t('signup.password_weak'), color: 'bg-orange-500' };
   }, [formData.password, t]);
 
-  const handlePartnerPhotoUpload = async (file: File) => {
-    setUploadingPartnerPhoto(true);
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `partner_photos/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('gallery')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('gallery')
-        .getPublicUrl(filePath);
-
-      setFormData({ ...formData, partnerPhotoUrl: publicUrl });
-      setPartnerPhotoPreview(URL.createObjectURL(file));
-      toast.success(t('signup.upload_success'));
-    } catch (error: any) {
-      toast.error(t('signup.upload_failed') + ': ' + error.message);
-    } finally {
-      setUploadingPartnerPhoto(false);
-    }
-  };
-
+  // Handle partner photo select and preview (WITHOUT immediate upload - uploaded after auth)
   const handlePartnerPhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -130,7 +104,7 @@ const Signup = () => {
     }
 
     setPartnerPhotoFile(file);
-    handlePartnerPhotoUpload(file);
+    setPartnerPhotoPreview(URL.createObjectURL(file));
   };
 
   // Handle avatar photo select and preview (without immediate upload)
@@ -279,7 +253,7 @@ const Signup = () => {
         return;
       }
 
-      // Step 2: Upload avatar photo if selected
+      // Step 2: Upload avatar photo if selected (AFTER auth creation for RLS)
       let avatarUrl = null;
       if (avatarPhotoFile) {
         try {
@@ -309,6 +283,36 @@ const Signup = () => {
         }
       }
 
+      // Step 2b: Upload partner photo if selected (AFTER auth creation for RLS)
+      let partnerPhotoUrl = null;
+      if (partnerPhotoFile && formData.isCouple) {
+        try {
+          setUploadingPartnerPhoto(true);
+          const fileExt = partnerPhotoFile.name.split('.').pop();
+          // Use folder structure for RLS: userId/filename
+          const fileName = `${data.user.id}/partner-${Date.now()}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('gallery')
+            .upload(fileName, partnerPhotoFile);
+
+          if (uploadError) {
+            console.error('Partner photo upload error:', uploadError);
+            // Continue without partner photo - don't block signup
+          } else {
+            const { data: urlData } = supabase.storage
+              .from('gallery')
+              .getPublicUrl(fileName);
+            partnerPhotoUrl = urlData.publicUrl;
+          }
+        } catch (uploadError) {
+          console.error('Partner photo upload failed:', uploadError);
+          // Continue without partner photo
+        } finally {
+          setUploadingPartnerPhoto(false);
+        }
+      }
+
       // Step 3: IMMEDIATELY create profile with upsert (no trigger dependency)
       console.log('Creating profile immediately...');
       const { error: profileError } = await supabase
@@ -322,7 +326,7 @@ const Signup = () => {
           is_couple: formData.isCouple,
           partner_name: formData.isCouple ? formData.partnerName : null,
           partner_gender: formData.isCouple ? formData.partnerGender : null,
-          partner_photo_url: formData.isCouple ? formData.partnerPhotoUrl : null,
+          partner_photo_url: partnerPhotoUrl,
           avatar_url: avatarUrl,
           phone_number: formData.phoneNumber || null,
           private_address: formData.address || null,
