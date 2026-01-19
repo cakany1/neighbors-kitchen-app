@@ -6,10 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ChefHat, Loader2 } from 'lucide-react';
+import { ChefHat, Loader2, Info, Users, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { Progress } from '@/components/ui/progress';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const Signup = () => {
     email: '',
     password: '',
     firstName: '',
+    isCouple: false,
   });
 
   // Scroll to top on mount
@@ -151,7 +153,7 @@ const Signup = () => {
         return;
       }
 
-      // Step 2: Create minimal profile
+      // Step 2: Create minimal profile with couple info
       console.log('Creating minimal profile...');
       const { error: profileError } = await supabase
         .from('profiles')
@@ -160,6 +162,7 @@ const Signup = () => {
           first_name: formData.firstName,
           last_name: '', // Will be completed later
           languages: [i18n.language || 'de'],
+          is_couple: formData.isCouple,
         }, { onConflict: 'id' });
 
       if (profileError) {
@@ -262,6 +265,45 @@ const Signup = () => {
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 required
               />
+            </div>
+
+            {/* Account Type Selection */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Label>{t('signup.account_type')}</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-5 w-5 rounded-full">
+                      <Info className="h-3 w-3" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 text-sm">
+                    <h4 className="font-semibold mb-2">{t('signup.account_type_help_title')}</h4>
+                    <p className="mb-2"><strong>{t('signup.single')}:</strong> {t('signup.account_type_single_desc')}</p>
+                    <p><strong>{t('signup.couple')}:</strong> {t('signup.account_type_couple_desc')}</p>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  variant={!formData.isCouple ? 'default' : 'outline'}
+                  className="w-full gap-2"
+                  onClick={() => setFormData({ ...formData, isCouple: false })}
+                >
+                  <User className="w-4 h-4" />
+                  {t('signup.single')}
+                </Button>
+                <Button
+                  type="button"
+                  variant={formData.isCouple ? 'default' : 'outline'}
+                  className="w-full gap-2"
+                  onClick={() => setFormData({ ...formData, isCouple: true })}
+                >
+                  <Users className="w-4 h-4" />
+                  {t('signup.couple')}
+                </Button>
+              </div>
             </div>
 
             {/* Email */}

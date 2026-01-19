@@ -494,11 +494,14 @@ const Profile = () => {
             
             <div className="flex items-center gap-4 mb-4">
               {/* Main User Avatar */}
-              <div className="relative w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-3xl overflow-hidden group">
+              <div 
+                className="relative w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-3xl overflow-hidden group cursor-pointer"
+                onClick={() => !profile?.avatar_url && document.getElementById('avatar-upload')?.click()}
+              >
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt={t('profile.your_profile_photo')} className="w-full h-full object-cover" />
                 ) : (
-                  <span>👤</span>
+                  <span className="opacity-60 hover:opacity-100 transition-opacity">📷</span>
                 )}
                 <label 
                   htmlFor="avatar-upload" 
