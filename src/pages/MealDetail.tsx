@@ -13,6 +13,7 @@ import { SafetyAlert } from "@/components/SafetyAlert";
 import { TranslateButton } from "@/components/TranslateButton";
 import { ReportDialog } from "@/components/ReportDialog";
 import { AuthInterstitialModal } from "@/components/AuthInterstitialModal";
+import { ProfileWizard } from "@/components/ProfileWizard";
 import { checkAllergenMatch } from "@/utils/ingredientDatabase";
 import FuzzyLocationMap from "@/components/maps/FuzzyLocationMap";
 import ChatModal from "@/components/ChatModal";
@@ -48,6 +49,7 @@ const MealDetail = () => {
   const [bookingQuantity, setBookingQuantity] = useState(1);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [profileWizardOpen, setProfileWizardOpen] = useState(false);
   const [showOriginal, setShowOriginal] = useState(false);
 
   // Use pre-translated content based on current language, but respect showOriginal toggle
@@ -237,6 +239,18 @@ const MealDetail = () => {
     },
   });
 
+  // Check what profile data is missing
+  const getMissingProfileData = () => {
+    const profile = currentUser?.profile;
+    return {
+      missingPhoto: !profile?.avatar_url,
+      missingAddress: !profile?.private_address || !profile?.private_city,
+      missingPhone: !profile?.phone_number,
+      isCouple: !!profile?.is_couple,
+      partnerPhotoMissing: profile?.is_couple && !profile?.partner_photo_url,
+    };
+  };
+
   const handleRequestBooking = () => {
     // AUTH GATEKEEPER: Show trust modal first if not logged in
     if (!currentUser) {
@@ -252,7 +266,22 @@ const MealDetail = () => {
       return;
     }
 
+    // PROFILE WIZARD: Check if profile is complete
+    const missing = getMissingProfileData();
+    if (missing.missingPhoto || missing.missingAddress || missing.missingPhone || missing.partnerPhotoMissing) {
+      setProfileWizardOpen(true);
+      return;
+    }
+
     bookingMutation.mutate();
+  };
+
+  const handleProfileWizardComplete = () => {
+    setProfileWizardOpen(false);
+    // Refresh user data and trigger booking
+    queryClient.invalidateQueries({ queryKey: ["currentUser"] }).then(() => {
+      bookingMutation.mutate();
+    });
   };
 
   // Cancel booking mutation
@@ -762,6 +791,16 @@ const MealDetail = () => {
           navigate("/signup");
         }}
       />
+
+      {currentUser && (
+        <ProfileWizard
+          open={profileWizardOpen}
+          onClose={() => setProfileWizardOpen(false)}
+          onComplete={handleProfileWizardComplete}
+          userId={currentUser.id}
+          {...getMissingProfileData()}
+        />
+      )}
 
       <Footer />
     </div>
