@@ -160,6 +160,17 @@ const Profile = () => {
     enabled: !!currentUser?.id,
   });
 
+  // Check if user just registered (needs photo upload prompt)
+  const [showPhotoPrompt, setShowPhotoPrompt] = useState(false);
+  
+  useEffect(() => {
+    const needsPhotoUpload = localStorage.getItem('needs_photo_upload');
+    if (needsPhotoUpload === 'true') {
+      setShowPhotoPrompt(true);
+      localStorage.removeItem('needs_photo_upload');
+    }
+  }, []);
+
   // Initialize form data when profile loads
   useEffect(() => {
     if (currentUser?.profile) {
@@ -388,6 +399,17 @@ const Profile = () => {
       <Header />
       
       <main className="max-w-lg mx-auto px-4 py-6">
+        {/* Welcome prompt for new users */}
+        {showPhotoPrompt && (
+          <Alert className="mb-6 border-green-500 bg-green-50 dark:bg-green-950/20">
+            <AlertDescription className="text-sm text-green-800 dark:text-green-200">
+              <strong>🎉 {t('profile.welcome_new_user')}</strong>
+              <br />
+              {t('profile.complete_profile_prompt')}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         {/* Trust & Security Card */}
         <Card className="mb-6">
           <CardHeader>

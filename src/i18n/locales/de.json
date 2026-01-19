@@ -208,6 +208,8 @@
     "achievements_fair_payer_desc": "Zahlt immer fair",
     "verification_banner": "Verifizieren lassen, um deine Buchungschancen zu erhöhen!",
     "verification_banner_desc": "Verifizierte Nutzer erhalten ein blaues Häkchen-Badge und mehr Vertrauen von der Community.",
+    "welcome_new_user": "Willkommen bei Neighbors Kitchen!",
+    "complete_profile_prompt": "Bitte lade jetzt dein Profilfoto hoch, um Mahlzeiten buchen und anbieten zu können. Wenn du ein Paar bist, vergiss nicht auch das Partner-Foto hochzuladen!",
     "add_address_for_map": "Füge deine Adresse hinzu, um die Karte zu sehen",
     "save_to_see_map": "Speichere dein Profil, um die Karte zu aktivieren",
     "notification_radius_hint": "Du wirst über Gerichte in diesem Radius von deinem Standort benachrichtigt",
@@ -537,7 +539,9 @@
     "upload_success": "Partner-Foto hochgeladen",
     "upload_failed": "Foto-Upload fehlgeschlagen",
     "file_too_large": "Datei zu groß! Max 5MB.",
-    "images_only": "Nur Bilder erlaubt!"
+    "images_only": "Nur Bilder erlaubt!",
+    "photo_after_registration": "Dein Profilfoto und Partner-Foto kannst du nach der Registrierung auf deiner Profilseite hochladen.",
+    "partner_photo_after_registration": "Das Partner-Foto kannst du nach der Registrierung hochladen."
   },
   "meal_detail": {
     "loading": "Lädt...",

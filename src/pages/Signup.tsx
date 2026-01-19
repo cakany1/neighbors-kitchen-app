@@ -253,67 +253,8 @@ const Signup = () => {
         return;
       }
 
-      // Step 2: Upload avatar photo if selected (AFTER auth creation for RLS)
-      let avatarUrl = null;
-      if (avatarPhotoFile) {
-        try {
-          setUploadingAvatarPhoto(true);
-          const fileExt = avatarPhotoFile.name.split('.').pop();
-          // Use folder structure for RLS: userId/filename
-          const fileName = `${data.user.id}/avatar-${Date.now()}.${fileExt}`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('gallery')
-            .upload(fileName, avatarPhotoFile);
-
-          if (uploadError) {
-            console.error('Avatar upload error:', uploadError);
-            // Continue without avatar - don't block signup
-          } else {
-            const { data: urlData } = supabase.storage
-              .from('gallery')
-              .getPublicUrl(fileName);
-            avatarUrl = urlData.publicUrl;
-          }
-        } catch (uploadError) {
-          console.error('Avatar upload failed:', uploadError);
-          // Continue without avatar
-        } finally {
-          setUploadingAvatarPhoto(false);
-        }
-      }
-
-      // Step 2b: Upload partner photo if selected (AFTER auth creation for RLS)
-      let partnerPhotoUrl = null;
-      if (partnerPhotoFile && formData.isCouple) {
-        try {
-          setUploadingPartnerPhoto(true);
-          const fileExt = partnerPhotoFile.name.split('.').pop();
-          // Use folder structure for RLS: userId/filename
-          const fileName = `${data.user.id}/partner-${Date.now()}.${fileExt}`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('gallery')
-            .upload(fileName, partnerPhotoFile);
-
-          if (uploadError) {
-            console.error('Partner photo upload error:', uploadError);
-            // Continue without partner photo - don't block signup
-          } else {
-            const { data: urlData } = supabase.storage
-              .from('gallery')
-              .getPublicUrl(fileName);
-            partnerPhotoUrl = urlData.publicUrl;
-          }
-        } catch (uploadError) {
-          console.error('Partner photo upload failed:', uploadError);
-          // Continue without partner photo
-        } finally {
-          setUploadingPartnerPhoto(false);
-        }
-      }
-
-      // Step 3: IMMEDIATELY create profile with upsert (no trigger dependency)
+      // Step 2: Create profile WITHOUT photos (photos will be uploaded on profile page)
+      // This avoids RLS timing issues with storage policies
       console.log('Creating profile immediately...');
       const { error: profileError } = await supabase
         .from('profiles')
@@ -326,8 +267,8 @@ const Signup = () => {
           is_couple: formData.isCouple,
           partner_name: formData.isCouple ? formData.partnerName : null,
           partner_gender: formData.isCouple ? formData.partnerGender : null,
-          partner_photo_url: partnerPhotoUrl,
-          avatar_url: avatarUrl,
+          partner_photo_url: null, // Will be uploaded on profile page
+          avatar_url: null, // Will be uploaded on profile page
           phone_number: formData.phoneNumber || null,
           private_address: formData.address || null,
           private_city: formData.city || null,
@@ -344,7 +285,7 @@ const Signup = () => {
         return;
       }
 
-      // Step 4: Send welcome email (don't block signup on failure)
+      // Step 3: Send welcome email (don't block signup on failure)
       try {
         await supabase.functions.invoke('send-welcome-email', {
           body: {
@@ -359,11 +300,13 @@ const Signup = () => {
         // Don't block signup if email fails
       }
 
-      // Set flag to trigger onboarding tour
+      // Set flag to trigger profile completion prompt
       localStorage.setItem('just_registered', 'true');
+      localStorage.setItem('needs_photo_upload', 'true');
       
       toast.success(t('auth.account_created'));
-      navigate('/feed');
+      // Redirect to profile page to complete photo uploads
+      navigate('/profile');
     } catch (error: any) {
       setLoading(false);
       console.error('Signup error:', error);
@@ -589,47 +532,12 @@ const Signup = () => {
                 )}
               </div>
 
-              {/* Profile Photo */}
-              <div className="space-y-2">
-                <Label htmlFor="avatarPhoto" className="text-base font-semibold text-foreground">
-                  {t('signup.profilePhotoVerification')}
-                </Label>
-                <input
-                  id="avatarPhoto"
-                  type="file"
-                  accept="image/*"
-                  capture="user"
-                  className="hidden"
-                  onChange={handleAvatarPhotoSelect}
-                />
-                {avatarPhotoPreview ? (
-                  <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-primary">
-                    <img src={avatarPhotoPreview} alt="Avatar" className="w-full h-full object-cover" />
-                    <label 
-                      htmlFor="avatarPhoto" 
-                      className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
-                    >
-                      <Upload className="w-6 h-6 text-white" />
-                    </label>
-                  </div>
-                ) : (
-                  <label 
-                    htmlFor="avatarPhoto" 
-                    className="flex items-center gap-3 p-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                  >
-                    <Upload className="w-6 h-6 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">{t('signup.click_to_upload')}</span>
-                  </label>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  {t('signup.photoOptional')}
-                </p>
-                <Alert className="bg-primary/10 border-primary/30 mt-2">
-                  <AlertDescription className="text-xs text-foreground">
-                    {t('signup.photoSecurityNote')}
-                  </AlertDescription>
-                </Alert>
-              </div>
+              {/* Photo Upload Notice - Photos will be uploaded on profile page */}
+              <Alert className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
+                  📸 <strong>{t('signup.photo_after_registration')}</strong>
+                </AlertDescription>
+              </Alert>
             </div>
 
             {/* Partner Fields (Conditional) */}
@@ -669,52 +577,12 @@ const Signup = () => {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="partnerPhoto" className="text-base font-semibold">
-                    {t('signup.partner_photo_required')}
-                  </Label>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Hilft Nachbarn zu wissen, wer an der Tür stehen könnte
-                  </p>
-                  <input
-                    id="partnerPhoto"
-                    type="file"
-                    accept="image/*"
-                    capture="user"
-                    onChange={handlePartnerPhotoSelect}
-                    className="hidden"
-                  />
-                  {partnerPhotoPreview ? (
-                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-primary">
-                      <img src={partnerPhotoPreview} alt="Partner" className="w-full h-full object-cover" />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-1 right-1 h-6 w-6"
-                        onClick={() => {
-                          setPartnerPhotoPreview('');
-                          setPartnerPhotoFile(null);
-                          setFormData({ ...formData, partnerPhotoUrl: '' });
-                        }}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => document.getElementById('partnerPhoto')?.click()}
-                      disabled={uploadingPartnerPhoto}
-                      className="w-full border-primary/30 hover:bg-primary/10"
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      {uploadingPartnerPhoto ? 'Lädt hoch...' : 'Partner-Foto hochladen'}
-                    </Button>
-                  )}
-                  <p className="text-xs text-muted-foreground">Max 5MB, JPG/PNG</p>
-                </div>
+                {/* Partner photo notice - will be uploaded on profile page */}
+                <Alert className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                  <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
+                    📸 {t('signup.partner_photo_after_registration')}
+                  </AlertDescription>
+                </Alert>
               </div>
             )}
 

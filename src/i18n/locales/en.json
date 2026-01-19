@@ -157,6 +157,8 @@
     "first_initial_option": "First Name & Initial (Max S.)",
     "nickname_only_option": "Nickname Only (@{nickname})",
     "couple_photo_hint": "💡 For couples: Photo of both of you, so neighbors know who might be at the door",
+    "welcome_new_user": "Welcome to Neighbors Kitchen!",
+    "complete_profile_prompt": "Please upload your profile photo now to book and offer meals. If you are a couple, don't forget to upload the partner photo too!",
     "profile_photo_title": "Your Profile Photo",
     "partner_photo_title": "Partner Photo",
     "your_profile_photo": "Your Profile Photo",
@@ -557,7 +559,9 @@
     "upload_success": "Partner photo uploaded",
     "upload_failed": "Photo upload failed",
     "file_too_large": "File too large! Max 5MB.",
-    "images_only": "Only images allowed!"
+    "images_only": "Only images allowed!",
+    "photo_after_registration": "You can upload your profile photo and partner photo after registration on your profile page.",
+    "partner_photo_after_registration": "You can upload the partner photo after registration."
   },
   "meal_detail": {
     "loading": "Loading...",
