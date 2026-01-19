@@ -234,7 +234,10 @@
     "2fa_description": "Enter the 6-digit code from your authenticator app.",
     "2fa_verify_button": "Verify Code",
     "2fa_cancel": "Cancel",
-    "2fa_invalid_code": "Invalid code. Please try again."
+    "2fa_invalid_code": "Invalid code. Please try again.",
+    "google_login": "Sign in with Google",
+    "google_signup": "Sign up with Google",
+    "or_email": "or with email"
   },
   "signup": {
     "phoneNumber": "Phone Number",
