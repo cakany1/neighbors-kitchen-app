@@ -40,6 +40,7 @@ export const BottomNav = () => {
         
         <NavLink
           to="/profile"
+          data-tour="profile"
           className="flex flex-col items-center gap-1 text-muted-foreground transition-colors"
           activeClassName="text-primary"
         >

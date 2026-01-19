@@ -794,5 +794,24 @@
     "address_required": "Bitte gib Strasse und Stadt an",
     "phone_required": "Bitte gib deine Telefonnummer an",
     "save_failed": "Speichern fehlgeschlagen"
+  },
+  "onboarding": {
+    "welcome_title": "Willkommen bei Neighbors Kitchen! 🍲",
+    "welcome_desc": "Entdecke hausgemachtes Essen aus deiner Nachbarschaft. Teile übrig gebliebene Mahlzeiten und lerne neue Menschen kennen.",
+    "feed_title": "Essen finden",
+    "feed_desc": "Hier siehst du alle verfügbaren Gerichte in deiner Nähe. Je näher, desto frischer!",
+    "map_title": "Karten-Ansicht",
+    "map_desc": "Sieh auf der Karte, wo Nachbarn kochen. Die Standorte sind aus Datenschutzgründen nur ungefähr angezeigt.",
+    "add_meal_title": "Selbst kochen & teilen",
+    "add_meal_desc": "Zu viel gekocht? Teile dein Essen mit Nachbarn und sammle Karma-Punkte!",
+    "profile_title": "Dein Profil",
+    "profile_desc": "Verwalte deine Einstellungen, Allergene und Sicherheitsoptionen. Je vollständiger, desto mehr Vertrauen!",
+    "karma_title": "Karma-Punkte",
+    "karma_desc": "Sammle Karma durch Teilen und faires Bezahlen. Hohe Karma-Werte = mehr Vertrauen in der Community!",
+    "step_counter": "Schritt {{current}} von {{total}}",
+    "skip": "Überspringen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "done": "Los geht's!"
   }
 }
