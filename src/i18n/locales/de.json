@@ -40,7 +40,14 @@
     "login_failed": "Anmeldung fehlgeschlagen",
     "account_created": "Konto erstellt! Willkommen bei Neighbors Kitchen 🎉",
     "account_creation_failed": "Kontoerstellung fehlgeschlagen",
-    "back_to_home": "← Zurück zur Startseite"
+    "back_to_home": "← Zurück zur Startseite",
+    "forgot_password": "Passwort vergessen?",
+    "reset_password": "Passwort zurücksetzen",
+    "reset_password_desc": "Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen deines Passworts.",
+    "send_reset_link": "Link senden",
+    "reset_email_sent": "E-Mail gesendet! Überprüfe deinen Posteingang.",
+    "reset_failed": "Zurücksetzen fehlgeschlagen",
+    "enter_email_for_reset": "Bitte gib deine E-Mail-Adresse ein"
   },
   "chat": {
     "loading": "Lädt...",

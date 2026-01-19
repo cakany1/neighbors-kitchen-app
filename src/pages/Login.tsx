@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ChefHat } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -13,6 +14,9 @@ const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -90,6 +94,32 @@ const Login = () => {
     }
   };
 
+  const handlePasswordReset = async () => {
+    if (!resetEmail.trim()) {
+      toast.error(t('auth.enter_email_for_reset'));
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success(t('auth.reset_email_sent'));
+        setResetDialogOpen(false);
+        setResetEmail('');
+      }
+    } catch (error: any) {
+      toast.error(error.message || t('auth.reset_failed'));
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="absolute top-4 left-4">
@@ -136,6 +166,47 @@ const Login = () => {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
               />
+            </div>
+
+            <div className="text-right">
+              <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="p-0 h-auto text-xs text-muted-foreground hover:text-primary"
+                  >
+                    {t('auth.forgot_password')}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{t('auth.reset_password')}</DialogTitle>
+                    <DialogDescription>
+                      {t('auth.reset_password_desc')}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <div>
+                      <Label htmlFor="reset-email">{t('auth.email')}</Label>
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        placeholder={t('auth.email_placeholder')}
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                      />
+                    </div>
+                    <Button 
+                      onClick={handlePasswordReset} 
+                      className="w-full"
+                      disabled={resetLoading}
+                    >
+                      {resetLoading ? t('common.loading') : t('auth.send_reset_link')}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>

@@ -204,7 +204,14 @@
     "login_failed": "Login failed",
     "account_created": "Account created! Welcome to Neighbors Kitchen 🎉",
     "account_creation_failed": "Account creation failed",
-    "back_to_home": "← Back to Home"
+    "back_to_home": "← Back to Home",
+    "forgot_password": "Forgot password?",
+    "reset_password": "Reset Password",
+    "reset_password_desc": "Enter your email address and we'll send you a link to reset your password.",
+    "send_reset_link": "Send Reset Link",
+    "reset_email_sent": "Email sent! Check your inbox.",
+    "reset_failed": "Reset failed",
+    "enter_email_for_reset": "Please enter your email address"
   },
   "signup": {
     "phoneNumber": "Phone Number",
