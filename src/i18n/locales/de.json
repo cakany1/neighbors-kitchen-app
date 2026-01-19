@@ -297,6 +297,12 @@
     "addMeal": "Essen anbieten",
     "profile": "Profil"
   },
+  "map": {
+    "back_to_feed": "← Zurück zum Feed",
+    "meals_nearby": "Mahlzeiten in der Nähe",
+    "privacy_first": "Privatsphäre zuerst:",
+    "privacy_desc": "Standorte werden als ungefähre Bereiche angezeigt. Genaue Adressen werden erst nach Buchungsbestätigung angezeigt."
+  },
   "handover": {
     "pickupTupperware": "Abholung (Tupperware mitbringen)",
     "neighborPlate": "Nachbar (eigener Teller)",
