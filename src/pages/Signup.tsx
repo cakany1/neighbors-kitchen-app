@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ChefHat, Upload, X, Globe } from 'lucide-react';
+import { ChefHat, Upload, X, Globe, HelpCircle } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -402,7 +403,23 @@ const Signup = () => {
 
             {/* 2. ACCOUNT TYPE - Single or Couple */}
             <div className="space-y-2 p-4 border-2 border-primary/20 rounded-lg bg-primary/5">
-              <Label className="text-sm font-semibold text-foreground">{t('signup.account_type')}</Label>
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-semibold text-foreground">{t('signup.account_type')}</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-5 w-5 rounded-full">
+                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 text-sm" side="top">
+                    <div className="space-y-2">
+                      <p className="font-semibold">{t('signup.account_type_help_title')}</p>
+                      <p><strong>{t('signup.single')}:</strong> {t('signup.account_type_single_desc')}</p>
+                      <p><strong>{t('signup.couple')}:</strong> {t('signup.account_type_couple_desc')}</p>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
               <RadioGroup
                 value={accountType}
                 onValueChange={(value: 'single' | 'couple') => {
