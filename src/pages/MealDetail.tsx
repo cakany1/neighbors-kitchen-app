@@ -661,8 +661,10 @@ const MealDetail = () => {
                 {meal.pricing_suggested && bookingQuantity > 1 && (
                   <Alert className="bg-secondary/10 border-secondary/20">
                     <AlertDescription className="text-xs">
-                      💡 Geschätzte Kosten: CHF {(meal.pricing_suggested * bookingQuantity).toFixed(2)}.- (
-                      {bookingQuantity} Portionen)
+                      💡 {t("meal_detail.estimated_restaurant_value", { 
+                        amount: (meal.pricing_suggested * bookingQuantity).toFixed(2),
+                        portions: bookingQuantity 
+                      })}
                     </AlertDescription>
                   </Alert>
                 )}
