@@ -680,6 +680,7 @@ const Signup = () => {
                     id="partnerPhoto"
                     type="file"
                     accept="image/*"
+                    capture="user"
                     onChange={handlePartnerPhotoSelect}
                     className="hidden"
                   />
