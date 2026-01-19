@@ -198,6 +198,11 @@ const FAQ = () => {
                 <AccordionTrigger>{t('faq.q10')}</AccordionTrigger>
                 <AccordionContent>{t('faq.a10')}</AccordionContent>
               </AccordionItem>
+
+              <AccordionItem value="item-11">
+                <AccordionTrigger>{t('faq.q11')}</AccordionTrigger>
+                <AccordionContent>{t('faq.a11')}</AccordionContent>
+              </AccordionItem>
             </Accordion>
           </CardContent>
         </Card>
