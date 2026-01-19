@@ -689,6 +689,8 @@
     "a9": "Die Nutzung der App ist kostenlos. Bei digitalen Transaktionen fällt eine fixe Servicegebühr von CHF 2.00 an, um die Plattform zu betreiben und weiterzuentwickeln.",
     "q10": "Wo sehe ich den genauen Standort?",
     "a10": "Zum Schutz der Privatsphäre siehst du die genaue Adresse erst nach der Buchungsbestätigung durch den Koch. Vorher wird nur die ungefähre Nachbarschaft angezeigt.",
+    "q11": "Warum muss ich die Daten meines Partners eingeben?",
+    "a11": "Bei Paar-Registrierung benötigen wir Foto und Namen beider Partner aus Sicherheitsgründen: Köche sollen wissen, wer an der Tür stehen könnte. Bei 'Ladies Only'-Angeboten muss zudem die weibliche Partnerin das Essen abholen – das System erinnert euch automatisch daran. Das schafft Transparenz und Vertrauen in unserer Community.",
     "more_questions": "Weitere Fragen? Kontaktiere uns über das Feedback-Formular im Profil.",
     "ask_question_title": "Deine Frage nicht dabei?",
     "ask_question_placeholder": "Stelle deine Frage hier...",

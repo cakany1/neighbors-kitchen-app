@@ -449,6 +449,8 @@
     "a9": "Using the app is free. For digital transactions, a fixed service fee of CHF 2.00 is charged to operate and further develop the platform.",
     "q10": "Where can I see the exact location?",
     "a10": "To protect privacy, you only see the exact address after booking confirmation by the chef. Before that, only the approximate neighborhood is displayed.",
+    "q11": "Why do I need to enter my partner's details?",
+    "a11": "For couple registrations, we require photos and names of both partners for safety reasons: Chefs should know who might be at their door. For 'Ladies Only' offers, the female partner must pick up the meal – the system automatically reminds you. This creates transparency and trust in our community.",
     "more_questions": "More questions? Contact us via the feedback form in the profile.",
     "ask_question_title": "Your question not listed?",
     "ask_question_placeholder": "Ask your question here...",
