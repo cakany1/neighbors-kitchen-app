@@ -47,7 +47,12 @@
     "send_reset_link": "Link senden",
     "reset_email_sent": "E-Mail gesendet! Überprüfe deinen Posteingang.",
     "reset_failed": "Zurücksetzen fehlgeschlagen",
-    "enter_email_for_reset": "Bitte gib deine E-Mail-Adresse ein"
+    "enter_email_for_reset": "Bitte gib deine E-Mail-Adresse ein",
+    "2fa_title": "Zwei-Faktor-Authentifizierung",
+    "2fa_description": "Gib den 6-stelligen Code aus deiner Authenticator-App ein.",
+    "2fa_verify_button": "Code verifizieren",
+    "2fa_cancel": "Abbrechen",
+    "2fa_invalid_code": "Ungültiger Code. Bitte erneut versuchen."
   },
   "chat": {
     "loading": "Lädt...",
@@ -302,7 +307,22 @@
     "deactivate_button": "Konto deaktivieren",
     "delete_button": "⚠️ Konto unwiderruflich löschen",
     "deactivate_hint": "Dein Profil wird versteckt, Daten bleiben erhalten",
-    "delete_warning": "⚠️ Achtung: Dein Konto wird unwiderruflich gelöscht. ALLE Daten werden permanent entfernt! Wenn du später zurückkommst, musst du dich erneut verifizieren (Ausweis/Foto). Diese Aktion kann nicht rückgängig gemacht werden."
+    "delete_warning": "⚠️ Achtung: Dein Konto wird unwiderruflich gelöscht. ALLE Daten werden permanent entfernt! Wenn du später zurückkommst, musst du dich erneut verifizieren (Ausweis/Foto). Diese Aktion kann nicht rückgängig gemacht werden.",
+    "2fa_title": "Zwei-Faktor-Authentifizierung (2FA)",
+    "2fa_description": "Schütze dein Konto zusätzlich mit einem einmaligen Code aus einer Authenticator-App (z.B. Google Authenticator, Authy).",
+    "2fa_enable": "2FA aktivieren",
+    "2fa_disable": "2FA deaktivieren",
+    "2fa_enabled": "2FA aktiviert",
+    "2fa_enabled_desc": "Dein Konto ist durch Zwei-Faktor-Authentifizierung geschützt.",
+    "2fa_scan_qr": "Scanne diesen QR-Code mit deiner Authenticator-App.",
+    "2fa_manual_entry": "Oder gib diesen Code manuell ein:",
+    "2fa_enter_code": "Gib den 6-stelligen Code ein, um die Einrichtung abzuschließen:",
+    "2fa_verify": "Verifizieren",
+    "2fa_enabled_success": "2FA erfolgreich aktiviert!",
+    "2fa_disabled_success": "2FA deaktiviert.",
+    "2fa_verification_failed": "Verifizierung fehlgeschlagen. Bitte erneut versuchen.",
+    "2fa_enrollment_failed": "2FA-Einrichtung fehlgeschlagen.",
+    "2fa_disable_failed": "2FA konnte nicht deaktiviert werden."
   },
   "guidelines": {
     "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (außer beim Vor-Ort-Essen)",

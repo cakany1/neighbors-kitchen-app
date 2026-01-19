@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ChefHat } from 'lucide-react';
 import { toast } from 'sonner';
+import { TwoFactorVerify } from '@/components/TwoFactorVerify';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -21,6 +22,9 @@ const Login = () => {
     email: '',
     password: '',
   });
+  
+  // 2FA state
+  const [show2FA, setShow2FA] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +41,7 @@ const Login = () => {
         toast.error(error.message || t('auth.login_failed'), {
           duration: 10000,
         });
-        return; // Don't navigate on error
+        return;
       }
 
       if (!data.user) {
@@ -48,11 +52,34 @@ const Login = () => {
         return;
       }
 
+      // Check if user has MFA enabled (AAL1 means password only, AAL2 means MFA verified)
+      const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      
+      if (aalData?.nextLevel === 'aal2' && aalData?.currentLevel === 'aal1') {
+        // User has MFA enabled but hasn't verified yet - show 2FA screen
+        setLoading(false);
+        setShow2FA(true);
+        return;
+      }
+
+      // Continue with normal login flow
+      await completeLogin(data.user);
+    } catch (error: any) {
+      setLoading(false);
+      console.error('Login error:', error);
+      toast.error(error.message || t('auth.login_failed'), {
+        duration: 10000,
+      });
+    }
+  };
+
+  const completeLogin = async (user: any) => {
+    try {
       // PROFILE CHECK: Verify profile exists (self-healing for orphaned users)
       const { data: existingProfile } = await supabase
         .from('profiles')
         .select('id')
-        .eq('id', data.user.id)
+        .eq('id', user.id)
         .maybeSingle();
 
       // REPAIR: If profile is missing, create emergency profile
@@ -61,9 +88,9 @@ const Login = () => {
         const { error: repairError } = await supabase
           .from('profiles')
           .insert({
-            id: data.user.id,
-            first_name: data.user.user_metadata?.first_name || 'User',
-            last_name: data.user.user_metadata?.last_name || '',
+            id: user.id,
+            first_name: user.user_metadata?.first_name || 'User',
+            last_name: user.user_metadata?.last_name || '',
             languages: ['de'],
           });
 
@@ -84,14 +111,25 @@ const Login = () => {
       navigate('/feed');
     } catch (error: any) {
       setLoading(false);
-      console.error('Login error:', error);
+      console.error('Login completion error:', error);
       toast.error(error.message || t('auth.login_failed'), {
         duration: 10000,
       });
-      // Don't navigate on error
     } finally {
       setLoading(false);
     }
+  };
+
+  const handle2FASuccess = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await completeLogin(user);
+    }
+  };
+
+  const handle2FACancel = async () => {
+    await supabase.auth.signOut();
+    setShow2FA(false);
   };
 
   const handlePasswordReset = async () => {
@@ -125,6 +163,18 @@ const Login = () => {
       setResetLoading(false);
     }
   };
+
+  // Show 2FA verification screen
+  if (show2FA) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <TwoFactorVerify
+          onSuccess={handle2FASuccess}
+          onCancel={handle2FACancel}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

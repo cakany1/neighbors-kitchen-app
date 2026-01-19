@@ -27,6 +27,7 @@ import { FeedbackDialog } from '@/components/FeedbackDialog';
 
 import { VerificationBadge } from '@/components/VerificationBadge';
 import { VerificationDialog } from '@/components/VerificationDialog';
+import { TwoFactorSettings } from '@/components/TwoFactorSettings';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -449,6 +450,9 @@ const Profile = () => {
             )}
           </CardContent>
         </Card>
+        
+        {/* 2FA Settings */}
+        <TwoFactorSettings userId={currentUser.id} />
         
         {/* Admin Dashboard Access */}
         {isAdmin && (
