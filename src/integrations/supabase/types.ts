@@ -130,6 +130,45 @@ export type Database = {
         }
         Relationships: []
       }
+      faq_requests: {
+        Row: {
+          admin_answer: string | null
+          answered_at: string | null
+          answered_by: string | null
+          created_at: string
+          id: string
+          published_at: string | null
+          question: string
+          similar_count: number
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_answer?: string | null
+          answered_at?: string | null
+          answered_by?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          question: string
+          similar_count?: number
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_answer?: string | null
+          answered_at?: string | null
+          answered_by?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          question?: string
+          similar_count?: number
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       language_requests: {
         Row: {
           created_at: string | null

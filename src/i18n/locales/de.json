@@ -94,7 +94,19 @@
     "rejection_success": "Nutzer-Verifizierung abgelehnt",
     "rejection_failed": "Verifizierung konnte nicht abgelehnt werden",
     "feedback_updated": "Feedback-Status aktualisiert",
-    "feedback_update_failed": "Feedback konnte nicht aktualisiert werden"
+    "feedback_update_failed": "Feedback konnte nicht aktualisiert werden",
+    "faq_requests": "FAQ Anfragen",
+    "faq_requests_desc": "Community-Fragen prüfen und beantworten",
+    "faq_no_requests": "Keine offenen FAQ-Anfragen",
+    "faq_question": "Frage",
+    "faq_answer_placeholder": "Antwort eingeben...",
+    "faq_publish": "Veröffentlichen",
+    "faq_reject": "Ablehnen",
+    "faq_publishing": "Wird veröffentlicht...",
+    "faq_published": "Frage veröffentlicht!",
+    "faq_rejected": "Frage abgelehnt",
+    "faq_update_failed": "Aktualisierung fehlgeschlagen",
+    "faq_times_asked": "mal gefragt"
   },
   "toast": {
     "profile_incomplete": "Bitte vervollständige dein Profil (Adresse & Telefon), um Gerichte zu buchen.",
@@ -677,6 +689,14 @@
     "a9": "Die Nutzung der App ist kostenlos. Bei digitalen Transaktionen fällt eine fixe Servicegebühr von CHF 2.00 an, um die Plattform zu betreiben und weiterzuentwickeln.",
     "q10": "Wo sehe ich den genauen Standort?",
     "a10": "Zum Schutz der Privatsphäre siehst du die genaue Adresse erst nach der Buchungsbestätigung durch den Koch. Vorher wird nur die ungefähre Nachbarschaft angezeigt.",
-    "more_questions": "Weitere Fragen? Kontaktiere uns über das Feedback-Formular im Profil."
+    "more_questions": "Weitere Fragen? Kontaktiere uns über das Feedback-Formular im Profil.",
+    "ask_question_title": "Deine Frage nicht dabei?",
+    "ask_question_placeholder": "Stelle deine Frage hier...",
+    "ask_question_submit": "Frage einreichen",
+    "ask_question_submitting": "Wird gesendet...",
+    "ask_question_success": "Danke für deine Frage! Wir werden sie prüfen.",
+    "ask_question_error": "Frage konnte nicht gesendet werden. Bitte versuche es erneut.",
+    "community_questions_title": "Community-Fragen",
+    "community_questions_desc": "Häufig gestellte Fragen aus der Community"
   }
 }
