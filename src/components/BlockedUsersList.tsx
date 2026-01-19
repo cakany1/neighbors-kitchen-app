@@ -51,10 +51,10 @@ export function BlockedUsersList({ currentUserId }: BlockedUsersListProps) {
       if (blocksError) throw blocksError;
       if (!blocks || blocks.length === 0) return [];
 
-      // Then get the profile details for each blocked user
+      // SECURITY: Use public view to avoid exposing sensitive PII
       const blockedUserIds = blocks.map(b => b.blocked_id);
       const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
+        .from('profiles_public')
         .select('id, first_name, last_name, nickname')
         .in('id', blockedUserIds);
 

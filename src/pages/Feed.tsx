@@ -116,13 +116,11 @@ const Feed = () => {
           handover_mode,
           exchange_mode,
           visibility_mode,
-          chef:profiles!chef_id (
+          chef:profiles_public!chef_id (
             first_name,
             last_name,
             nickname,
             karma,
-            latitude,
-            longitude,
             id_verified,
             phone_verified,
             gender

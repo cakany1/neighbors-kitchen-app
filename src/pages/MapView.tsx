@@ -20,11 +20,21 @@ const MapView = () => {
     queryFn: async () => {
       const today = new Date().toISOString().split('T')[0];
       
+      // SECURITY: Explicitly select only necessary fields - never use '*' to avoid exposing exact_address
       const { data, error } = await supabase
         .from('meals')
         .select(`
-          *,
-          chef:profiles!chef_id(id, first_name, last_name, nickname, karma)
+          id,
+          title,
+          description,
+          image_url,
+          fuzzy_lat,
+          fuzzy_lng,
+          neighborhood,
+          tags,
+          available_portions,
+          scheduled_date,
+          chef:profiles_public!chef_id(id, first_name, last_name, nickname, karma)
         `)
         .gte('scheduled_date', today)
         .gt('available_portions', 0)

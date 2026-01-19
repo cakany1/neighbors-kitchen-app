@@ -121,7 +121,7 @@ const MealDetail = () => {
           ingredients,
           is_stock_photo,
           women_only,
-          chef:profiles!chef_id (
+          chef:profiles_public!chef_id (
             first_name,
             last_name,
             nickname,
