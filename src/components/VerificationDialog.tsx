@@ -12,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, Upload, CheckCircle2, Loader2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Shield, CheckCircle2, Loader2, Lock, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -25,9 +26,10 @@ interface VerificationDialogProps {
 export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: VerificationDialogProps) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [photoUrl, setPhotoUrl] = useState('');
+  const [filePath, setFilePath] = useState('');
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -48,32 +50,37 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
     setUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}-verification-${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const fileName = `${userId}/id-${Date.now()}.${fileExt}`;
 
+      // Upload to PRIVATE id-documents bucket
       const { error: uploadError } = await supabase.storage
-        .from('gallery')
-        .upload(filePath, file);
+        .from('id-documents')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
       if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage
-        .from('gallery')
-        .getPublicUrl(filePath);
-
-      setPhotoUrl(data.publicUrl);
-      toast.success('Foto hochgeladen!');
+      // Store the file path (NOT public URL since bucket is private)
+      setFilePath(fileName);
+      toast.success('Dokument sicher hochgeladen!');
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Fehler beim Hochladen');
+      toast.error('Fehler beim Hochladen. Bitte erneut versuchen.');
     } finally {
       setUploading(false);
     }
   };
 
   const handleSubmit = async () => {
-    if (!photoUrl) {
-      toast.error('Bitte laden Sie ein Foto hoch');
+    if (!filePath) {
+      toast.error('Bitte lade ein Foto deines Ausweises hoch');
+      return;
+    }
+
+    if (!confirmed) {
+      toast.error('Bitte bestätige, dass dies dein eigener Ausweis ist');
       return;
     }
 
@@ -83,7 +90,7 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
         .from('profiles')
         .update({
           verification_status: 'pending',
-          partner_photo_url: photoUrl, // Reusing this field for verification photo
+          id_document_url: filePath, // Store file path, not public URL
         })
         .eq('id', userId);
 
@@ -110,39 +117,59 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
       <DialogTrigger asChild>
         <Button className="w-full gap-2" variant={verificationStatus === 'pending' ? 'secondary' : 'default'}>
           <Shield className="w-4 h-4" />
-          {verificationStatus === 'pending' ? '⏳ Verifizierung ausstehend' : '✓ Verifizieren lassen'}
+          {verificationStatus === 'pending' ? '⏳ Verifizierung ausstehend' : '🪪 Jetzt verifizieren'}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-primary" />
-            Nutzer-Verifizierung
+            ID-Verifizierung
           </DialogTitle>
           <DialogDescription>
-            Lade ein Selfie mit deinem Ausweis hoch, um dein Profil zu verifizieren. Dies erhöht das Vertrauen
-            in der Community.
+            Lade ein Foto deines Ausweises hoch, um dein Profil zu verifizieren und das ✓ Badge zu erhalten.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
+          {/* Privacy Notice */}
+          <Alert className="bg-primary/5 border-primary/20">
+            <Lock className="h-4 w-4 text-primary" />
+            <AlertDescription className="text-xs">
+              <strong>🔒 Sicher & Privat</strong>
+              <ul className="mt-2 ml-4 space-y-1 list-disc">
+                <li>Dein Dokument wird verschlüsselt gespeichert</li>
+                <li>Nur Admins können es zur Prüfung einsehen</li>
+                <li>Nach Genehmigung wird es automatisch gelöscht</li>
+              </ul>
+            </AlertDescription>
+          </Alert>
+
+          {/* Benefits */}
           <Alert>
             <AlertDescription className="text-xs">
               <strong>Warum verifizieren?</strong>
               <ul className="mt-2 ml-4 space-y-1 list-disc">
-                <li>Erhalte ein ✓ Verifiziert-Badge</li>
+                <li>Erhalte das ✓ Verifiziert-Badge</li>
                 <li>Erhöhe deine Buchungschancen</li>
                 <li>Baue Vertrauen in der Nachbarschaft auf</li>
               </ul>
             </AlertDescription>
           </Alert>
 
+          {/* Upload Section */}
           <div className="space-y-2">
-            <Label htmlFor="verification-photo">Foto hochladen (mit Ausweis)</Label>
+            <Label htmlFor="verification-photo" className="font-medium">
+              Ausweis-Foto hochladen
+            </Label>
+            <p className="text-xs text-muted-foreground mb-2">
+              Pass, ID-Karte oder Führerschein (Foto muss lesbar sein)
+            </p>
             <Input
               id="verification-photo"
               type="file"
               accept="image/*"
+              capture="environment"
               onChange={handlePhotoUpload}
               disabled={uploading || submitting}
             />
@@ -152,14 +179,28 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
                 Hochladen...
               </p>
             )}
-            {photoUrl && (
-              <div className="mt-2 flex items-center gap-2 text-xs text-green-600">
+            {filePath && (
+              <div className="mt-2 flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
                 <CheckCircle2 className="w-4 h-4" />
-                Foto hochgeladen! Bereit zum Absenden.
+                Dokument hochgeladen! Bereit zum Absenden.
               </div>
             )}
           </div>
 
+          {/* Confirmation Checkbox */}
+          <div className="flex items-start space-x-3 p-3 bg-muted/50 rounded-lg">
+            <Checkbox
+              id="confirm-ownership"
+              checked={confirmed}
+              onCheckedChange={(checked) => setConfirmed(checked === true)}
+              disabled={submitting}
+            />
+            <Label htmlFor="confirm-ownership" className="text-xs leading-relaxed cursor-pointer">
+              Ich bestätige, dass dies mein eigener Ausweis ist und dass meine Angaben korrekt sind.
+            </Label>
+          </div>
+
+          {/* Rejection Notice */}
           {verificationStatus === 'rejected' && (
             <Alert variant="destructive">
               <AlertDescription className="text-xs">
@@ -167,20 +208,30 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
               </AlertDescription>
             </Alert>
           )}
+
+          {/* Delete Notice */}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Trash2 className="w-3 h-3" />
+            Dokument wird nach erfolgreicher Prüfung automatisch gelöscht
+          </div>
         </div>
 
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setOpen(false)} className="flex-1" disabled={submitting}>
             Abbrechen
           </Button>
-          <Button onClick={handleSubmit} className="flex-1" disabled={!photoUrl || submitting}>
+          <Button 
+            onClick={handleSubmit} 
+            className="flex-1" 
+            disabled={!filePath || !confirmed || submitting}
+          >
             {submitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
                 Sende...
               </>
             ) : (
-              'Anfrage senden'
+              '📤 Absenden'
             )}
           </Button>
         </div>

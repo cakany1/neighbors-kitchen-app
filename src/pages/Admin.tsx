@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus } from 'lucide-react';
+import { IdDocumentViewer } from '@/components/IdDocumentViewer';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -43,7 +44,7 @@ const Admin = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, nickname, gender, phone_number, avatar_url, verification_status, partner_name, partner_photo_url, partner_gender, created_at')
+        .select('id, first_name, last_name, nickname, gender, phone_number, avatar_url, verification_status, partner_name, partner_photo_url, partner_gender, created_at, id_document_url')
         .eq('verification_status', 'pending')
         .order('created_at', { ascending: false });
 
@@ -485,6 +486,20 @@ const Admin = () => {
                                   <Badge variant="secondary">📱 {user.phone_number}</Badge>
                                 )}
                               </div>
+                              
+                              {/* ID Document Preview for Admin */}
+                              {user.id_document_url && (
+                                <div className="mt-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                                  <p className="text-sm font-medium flex items-center gap-2">
+                                    🪪 ID-Dokument hochgeladen
+                                  </p>
+                                  <IdDocumentViewer 
+                                    filePath={user.id_document_url} 
+                                    userId={user.id}
+                                  />
+                                </div>
+                              )}
+                              
                               {user.partner_name && (
                                 <div className="mt-2 p-3 bg-muted/50 rounded-lg">
                                   <p className="text-sm font-medium">👫 Couple Registration</p>
