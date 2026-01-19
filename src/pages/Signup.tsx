@@ -327,29 +327,7 @@ const Signup = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignup} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="firstName">Vorname <span className="text-destructive">*</span></Label>
-                <Input
-                  id="firstName"
-                  placeholder={t('auth.first_name_placeholder')}
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastName">Nachname <span className="text-destructive">*</span></Label>
-                <Input
-                  id="lastName"
-                  placeholder={t('auth.last_name_placeholder')}
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-
+            {/* 1. LANGUAGE SELECTION - First */}
             <div className="space-y-2">
               <Label>{t('auth.i_speak')}</Label>
               <p className="text-xs text-muted-foreground">{t('signup.select_languages')}</p>
@@ -406,109 +384,9 @@ const Signup = () => {
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="gender">{t('signup.gender')}</Label>
-              <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })} required>
-                <SelectTrigger id="gender">
-                  <SelectValue placeholder={t('signup.genderPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="woman">{t('signup.genderWoman')}</SelectItem>
-                  <SelectItem value="man">{t('signup.genderMan')}</SelectItem>
-                  <SelectItem value="diverse">{t('signup.genderDiverse')}</SelectItem>
-                  <SelectItem value="none">{t('signup.genderNone')}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Visibility Mode - Security Settings */}
-            <div className="space-y-3 border-l-4 border-primary pl-4 py-2 bg-muted/30 rounded-r">
-              <Label className="text-sm font-semibold">{t('signup.visibilityMode')}</Label>
-              <RadioGroup 
-                value={formData.visibilityMode} 
-                onValueChange={(value: 'all' | 'women_fli' | 'women_only') => {
-                  setFormData({ ...formData, visibilityMode: value });
-                  setSelfDeclarationChecked(false);
-                }}
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="all" id="visibility-all" />
-                    <Label htmlFor="visibility-all" className="text-sm cursor-pointer">
-                      {t('signup.visibilityAll')}
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem 
-                      value="women_fli" 
-                      id="visibility-women-fli" 
-                      disabled={formData.gender === 'man'}
-                    />
-                    <Label 
-                      htmlFor="visibility-women-fli" 
-                      className={`text-sm cursor-pointer ${formData.gender === 'man' ? 'opacity-50' : ''}`}
-                    >
-                      {t('signup.visibilityWomenFli')}
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem 
-                      value="women_only" 
-                      id="visibility-women-only" 
-                      disabled={formData.gender === 'man'}
-                    />
-                    <Label 
-                      htmlFor="visibility-women-only" 
-                      className={`text-sm cursor-pointer ${formData.gender === 'man' ? 'opacity-50' : ''}`}
-                    >
-                      {t('signup.visibilityWomenOnly')}
-                    </Label>
-                  </div>
-                </div>
-              </RadioGroup>
-              
-              {/* Self-Declaration Checkbox for Protected Modes */}
-              {(formData.visibilityMode === 'women_fli' || formData.visibilityMode === 'women_only') && (
-                <div className="flex items-start space-x-2 mt-3 pt-3 border-t">
-                  <Checkbox 
-                    id="self-declaration" 
-                    checked={selfDeclarationChecked}
-                    onCheckedChange={(checked) => setSelfDeclarationChecked(checked as boolean)}
-                  />
-                  <Label 
-                    htmlFor="self-declaration" 
-                    className="text-xs leading-relaxed cursor-pointer"
-                  >
-                    {t('signup.selfDeclaration')}
-                  </Label>
-                </div>
-              )}
-            </div>
-
-            {/* Optional Avatar Upload (Gated Later) */}
-            <div className="space-y-2">
-              <Label htmlFor="avatarPhoto" className="text-base font-semibold text-foreground">
-                {t('signup.profilePhotoVerification')}
-              </Label>
-              <Input
-                id="avatarPhoto"
-                type="file"
-                accept="image/*"
-                className="cursor-pointer"
-              />
-              <p className="text-xs text-muted-foreground">
-                {t('signup.photoOptional')}
-              </p>
-              <Alert className="bg-primary/10 border-primary/30 mt-2">
-                <AlertDescription className="text-xs text-foreground">
-                  {t('signup.photoSecurityNote')}
-                </AlertDescription>
-              </Alert>
-            </div>
-
-            {/* Account Type Selection */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">{t('signup.account_type')}</Label>
+            {/* 2. ACCOUNT TYPE - Single or Couple */}
+            <div className="space-y-2 p-4 border-2 border-primary/20 rounded-lg bg-primary/5">
+              <Label className="text-sm font-semibold text-foreground">{t('signup.account_type')}</Label>
               <RadioGroup
                 value={accountType}
                 onValueChange={(value: 'single' | 'couple') => {
@@ -530,6 +408,135 @@ const Signup = () => {
                   </Label>
                 </div>
               </RadioGroup>
+            </div>
+
+            {/* 3. YOUR PERSONAL DETAILS */}
+            <div className="space-y-4 p-4 border rounded-lg">
+              <p className="text-sm font-semibold text-foreground">👤 {t('signup.your_details') || 'Deine Angaben'}</p>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="firstName">Vorname <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="firstName"
+                    placeholder={t('auth.first_name_placeholder')}
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName">Nachname <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="lastName"
+                    placeholder={t('auth.last_name_placeholder')}
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="gender">{t('signup.gender')}</Label>
+                <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })} required>
+                  <SelectTrigger id="gender">
+                    <SelectValue placeholder={t('signup.genderPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="woman">{t('signup.genderWoman')}</SelectItem>
+                    <SelectItem value="man">{t('signup.genderMan')}</SelectItem>
+                    <SelectItem value="diverse">{t('signup.genderDiverse')}</SelectItem>
+                    <SelectItem value="none">{t('signup.genderNone')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Visibility Mode - Security Settings */}
+              <div className="space-y-3 border-l-4 border-primary pl-4 py-2 bg-muted/30 rounded-r">
+                <Label className="text-sm font-semibold">{t('signup.visibilityMode')}</Label>
+                <RadioGroup 
+                  value={formData.visibilityMode} 
+                  onValueChange={(value: 'all' | 'women_fli' | 'women_only') => {
+                    setFormData({ ...formData, visibilityMode: value });
+                    setSelfDeclarationChecked(false);
+                  }}
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="all" id="visibility-all" />
+                      <Label htmlFor="visibility-all" className="text-sm cursor-pointer">
+                        {t('signup.visibilityAll')}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem 
+                        value="women_fli" 
+                        id="visibility-women-fli" 
+                        disabled={formData.gender === 'man'}
+                      />
+                      <Label 
+                        htmlFor="visibility-women-fli" 
+                        className={`text-sm cursor-pointer ${formData.gender === 'man' ? 'opacity-50' : ''}`}
+                      >
+                        {t('signup.visibilityWomenFli')}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem 
+                        value="women_only" 
+                        id="visibility-women-only" 
+                        disabled={formData.gender === 'man'}
+                      />
+                      <Label 
+                        htmlFor="visibility-women-only" 
+                        className={`text-sm cursor-pointer ${formData.gender === 'man' ? 'opacity-50' : ''}`}
+                      >
+                        {t('signup.visibilityWomenOnly')}
+                      </Label>
+                    </div>
+                  </div>
+                </RadioGroup>
+                
+                {/* Self-Declaration Checkbox for Protected Modes */}
+                {(formData.visibilityMode === 'women_fli' || formData.visibilityMode === 'women_only') && (
+                  <div className="flex items-start space-x-2 mt-3 pt-3 border-t">
+                    <Checkbox 
+                      id="self-declaration" 
+                      checked={selfDeclarationChecked}
+                      onCheckedChange={(checked) => setSelfDeclarationChecked(checked as boolean)}
+                    />
+                    <Label 
+                      htmlFor="self-declaration" 
+                      className="text-xs leading-relaxed cursor-pointer"
+                    >
+                      {t('signup.selfDeclaration')}
+                    </Label>
+                  </div>
+                )}
+              </div>
+
+              {/* Profile Photo */}
+              <div className="space-y-2">
+                <Label htmlFor="avatarPhoto" className="text-base font-semibold text-foreground">
+                  {t('signup.profilePhotoVerification')}
+                </Label>
+                <Input
+                  id="avatarPhoto"
+                  type="file"
+                  accept="image/*"
+                  capture="user"
+                  className="cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground">
+                  {t('signup.photoOptional')}
+                </p>
+                <Alert className="bg-primary/10 border-primary/30 mt-2">
+                  <AlertDescription className="text-xs text-foreground">
+                    {t('signup.photoSecurityNote')}
+                  </AlertDescription>
+                </Alert>
+              </div>
             </div>
 
             {/* Partner Fields (Conditional) */}
