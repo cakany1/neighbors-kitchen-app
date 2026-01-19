@@ -67,6 +67,7 @@ const GalleryUpload = ({ userId }: GalleryUploadProps) => {
       <input
         type="file"
         accept="image/*"
+        capture="environment"
         onChange={handleFileSelect}
         disabled={uploading}
         className="hidden"
