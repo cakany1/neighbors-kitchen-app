@@ -11,6 +11,15 @@ export const Header = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  // Check if user is authenticated
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    },
+  });
+
   // Check if current user is admin
   const { data: isAdmin } = useQuery({
     queryKey: ['isAdmin'],
@@ -43,6 +52,15 @@ export const Header = () => {
     },
     enabled: isAdmin === true,
   });
+
+  // Navigate to profile if logged in, otherwise to login
+  const handleUserIconClick = () => {
+    if (currentUser) {
+      navigate('/profile');
+    } else {
+      navigate('/login');
+    }
+  };
 
   return (
     <header className="bg-card border-b border-border sticky top-0 z-40">
@@ -101,8 +119,8 @@ export const Header = () => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/login')}
-            aria-label="Profil und Login"
+            onClick={handleUserIconClick}
+            aria-label={currentUser ? "Profil öffnen" : "Login"}
           >
             <User className="w-5 h-5" />
           </Button>

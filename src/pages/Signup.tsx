@@ -38,6 +38,9 @@ const Signup = () => {
   const [partnerPhotoFile, setPartnerPhotoFile] = useState<File | null>(null);
   const [partnerPhotoPreview, setPartnerPhotoPreview] = useState<string>('');
   const [uploadingPartnerPhoto, setUploadingPartnerPhoto] = useState(false);
+  const [avatarPhotoFile, setAvatarPhotoFile] = useState<File | null>(null);
+  const [avatarPhotoPreview, setAvatarPhotoPreview] = useState<string>('');
+  const [uploadingAvatarPhoto, setUploadingAvatarPhoto] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -48,6 +51,7 @@ const Signup = () => {
     partnerName: '',
     partnerGender: '',
     partnerPhotoUrl: '',
+    avatarUrl: '',
     phoneNumber: '',
     address: '',
     city: '',
@@ -127,6 +131,25 @@ const Signup = () => {
 
     setPartnerPhotoFile(file);
     handlePartnerPhotoUpload(file);
+  };
+
+  // Handle avatar photo select and preview (without immediate upload)
+  const handleAvatarPhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t('signup.file_too_large'));
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      toast.error(t('signup.images_only'));
+      return;
+    }
+
+    setAvatarPhotoFile(file);
+    setAvatarPhotoPreview(URL.createObjectURL(file));
   };
 
   const toggleLanguage = (langCode: string) => {
@@ -256,7 +279,37 @@ const Signup = () => {
         return;
       }
 
-      // Step 2: IMMEDIATELY create profile with upsert (no trigger dependency)
+      // Step 2: Upload avatar photo if selected
+      let avatarUrl = null;
+      if (avatarPhotoFile) {
+        try {
+          setUploadingAvatarPhoto(true);
+          const fileExt = avatarPhotoFile.name.split('.').pop();
+          // Use folder structure for RLS: userId/filename
+          const fileName = `${data.user.id}/avatar-${Date.now()}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('gallery')
+            .upload(fileName, avatarPhotoFile);
+
+          if (uploadError) {
+            console.error('Avatar upload error:', uploadError);
+            // Continue without avatar - don't block signup
+          } else {
+            const { data: urlData } = supabase.storage
+              .from('gallery')
+              .getPublicUrl(fileName);
+            avatarUrl = urlData.publicUrl;
+          }
+        } catch (uploadError) {
+          console.error('Avatar upload failed:', uploadError);
+          // Continue without avatar
+        } finally {
+          setUploadingAvatarPhoto(false);
+        }
+      }
+
+      // Step 3: IMMEDIATELY create profile with upsert (no trigger dependency)
       console.log('Creating profile immediately...');
       const { error: profileError } = await supabase
         .from('profiles')
@@ -270,6 +323,7 @@ const Signup = () => {
           partner_name: formData.isCouple ? formData.partnerName : null,
           partner_gender: formData.isCouple ? formData.partnerGender : null,
           partner_photo_url: formData.isCouple ? formData.partnerPhotoUrl : null,
+          avatar_url: avatarUrl,
           phone_number: formData.phoneNumber || null,
           private_address: formData.address || null,
           private_city: formData.city || null,
@@ -521,13 +575,33 @@ const Signup = () => {
                 <Label htmlFor="avatarPhoto" className="text-base font-semibold text-foreground">
                   {t('signup.profilePhotoVerification')}
                 </Label>
-                <Input
+                <input
                   id="avatarPhoto"
                   type="file"
                   accept="image/*"
                   capture="user"
-                  className="cursor-pointer"
+                  className="hidden"
+                  onChange={handleAvatarPhotoSelect}
                 />
+                {avatarPhotoPreview ? (
+                  <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-primary">
+                    <img src={avatarPhotoPreview} alt="Avatar" className="w-full h-full object-cover" />
+                    <label 
+                      htmlFor="avatarPhoto" 
+                      className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                    >
+                      <Upload className="w-6 h-6 text-white" />
+                    </label>
+                  </div>
+                ) : (
+                  <label 
+                    htmlFor="avatarPhoto" 
+                    className="flex items-center gap-3 p-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                  >
+                    <Upload className="w-6 h-6 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">{t('signup.click_to_upload')}</span>
+                  </label>
+                )}
                 <p className="text-xs text-muted-foreground">
                   {t('signup.photoOptional')}
                 </p>
