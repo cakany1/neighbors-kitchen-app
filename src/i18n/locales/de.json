@@ -537,7 +537,7 @@
     "account_type": "Kontotyp",
     "account_type_help_title": "Was bedeutet das?",
     "account_type_single_desc": "Du registrierst dich alleine. Standard-Buchungen gelten für 1 Person.",
-    "account_type_couple_desc": "Ihr registriert euch als Paar/Haushalt. Buchungen gelten standardmässig für 2 Personen. Partner-Foto und -Name erforderlich.",
+    "account_type_couple_desc": "Ihr registriert euch als Paar/Haushalt. Buchungen gelten standardmässig für 2 Personen. Partner-Foto und -Name erforderlich. Bei 'Ladies Only'-Gerichten muss die Partnerin das Essen abholen.",
     "single": "Einzelperson",
     "couple": "Paar",
     "your_details": "Deine Angaben",
