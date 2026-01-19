@@ -102,18 +102,24 @@ const Login = () => {
 
     setResetLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/login`,
+      // Use our custom edge function for reliable email delivery via Resend
+      const { data, error } = await supabase.functions.invoke('send-password-reset', {
+        body: {
+          email: resetEmail,
+          language: localStorage.getItem('i18nextLng') || 'de',
+        },
       });
 
       if (error) {
-        toast.error(error.message);
+        console.error('Password reset error:', error);
+        toast.error(t('auth.reset_failed'));
       } else {
         toast.success(t('auth.reset_email_sent'));
         setResetDialogOpen(false);
         setResetEmail('');
       }
     } catch (error: any) {
+      console.error('Password reset error:', error);
       toast.error(error.message || t('auth.reset_failed'));
     } finally {
       setResetLoading(false);
