@@ -155,7 +155,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Neighbors Kitchen <onboarding@resend.dev>",
+        from: "Neighbors Kitchen <noreply@send.neighbors-kitchen.ch>",
         to: [email],
         subject: subject,
         html: htmlContent,
