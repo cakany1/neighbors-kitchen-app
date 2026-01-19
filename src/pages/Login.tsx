@@ -168,44 +168,46 @@ const Login = () => {
               />
             </div>
 
-            <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  type="button"
-                  variant="link"
-                  className="p-0 h-auto text-sm text-primary hover:underline"
-                >
-                  {t('auth.forgot_password')}
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>{t('auth.reset_password')}</DialogTitle>
-                  <DialogDescription>
-                    {t('auth.reset_password_desc')}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 pt-4">
-                  <div>
-                    <Label htmlFor="reset-email">{t('auth.email')}</Label>
-                    <Input
-                      id="reset-email"
-                      type="email"
-                      placeholder={t('auth.email_placeholder')}
-                      value={resetEmail}
-                      onChange={(e) => setResetEmail(e.target.value)}
-                    />
-                  </div>
-                  <Button 
-                    onClick={handlePasswordReset} 
-                    className="w-full"
-                    disabled={resetLoading}
+            <div className="flex justify-end">
+              <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="p-0 h-auto text-sm text-primary hover:underline"
                   >
-                    {resetLoading ? t('common.loading') : t('auth.send_reset_link')}
+                    {t('auth.forgot_password')}
                   </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{t('auth.reset_password')}</DialogTitle>
+                    <DialogDescription>
+                      {t('auth.reset_password_desc')}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <div>
+                      <Label htmlFor="reset-email">{t('auth.email')}</Label>
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        placeholder={t('auth.email_placeholder')}
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                      />
+                    </div>
+                    <Button 
+                      onClick={handlePasswordReset} 
+                      className="w-full"
+                      disabled={resetLoading}
+                    >
+                      {resetLoading ? t('common.loading') : t('auth.send_reset_link')}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? t('auth.signing_in') : t('auth.sign_in')}
