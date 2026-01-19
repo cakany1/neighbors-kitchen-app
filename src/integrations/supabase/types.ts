@@ -233,6 +233,7 @@ export type Database = {
           unit_type: string | null
           updated_at: string
           visibility_mode: string | null
+          visibility_radius: number | null
           women_only: boolean | null
         }
         Insert: {
@@ -270,6 +271,7 @@ export type Database = {
           unit_type?: string | null
           updated_at?: string
           visibility_mode?: string | null
+          visibility_radius?: number | null
           women_only?: boolean | null
         }
         Update: {
@@ -307,6 +309,7 @@ export type Database = {
           unit_type?: string | null
           updated_at?: string
           visibility_mode?: string | null
+          visibility_radius?: number | null
           women_only?: boolean | null
         }
         Relationships: [
@@ -584,6 +587,7 @@ export type Database = {
           unit_type: string | null
           updated_at: string | null
           visibility_mode: string | null
+          visibility_radius: number | null
           women_only: boolean | null
         }
         Insert: {
@@ -620,6 +624,7 @@ export type Database = {
           unit_type?: string | null
           updated_at?: string | null
           visibility_mode?: string | null
+          visibility_radius?: number | null
           women_only?: boolean | null
         }
         Update: {
@@ -656,6 +661,7 @@ export type Database = {
           unit_type?: string | null
           updated_at?: string | null
           visibility_mode?: string | null
+          visibility_radius?: number | null
           women_only?: boolean | null
         }
         Relationships: [

@@ -645,6 +645,12 @@
     "exchange_title": "Dein Wunsch an den Gast",
     "exchange_desc": "Was akzeptierst du als Gegenleistung?",
     "who_can_pickup": "Wer darf abholen?",
+    "visibility_radius_label": "Sichtbarkeits-Radius",
+    "visibility_radius_hint": "Begrenze wer dein Gericht sieht – ideal für heisses Essen, das nicht kalt werden soll!",
+    "radius_all": "Alle (keine Distanz-Beschränkung)",
+    "radius_100m": "100m – Nur mein Haus",
+    "radius_500m": "500m – Meine Strasse",
+    "radius_1km": "1km – Mein Quartier",
     "submit_meal": "Gericht veröffentlichen",
     "submitting": "Wird veröffentlicht...",
     "meal_created": "Gericht ist live! Deine Nachbarn werden es bald sehen."

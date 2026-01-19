@@ -669,6 +669,12 @@
     "exchange_title": "Your request to the guest",
     "exchange_desc": "What do you accept in return?",
     "who_can_pickup": "Who may pick up?",
+    "visibility_radius_label": "Visibility Radius",
+    "visibility_radius_hint": "Limit who sees your meal – ideal for hot food that shouldn't get cold!",
+    "radius_all": "Everyone (no distance limit)",
+    "radius_100m": "100m – My building only",
+    "radius_500m": "500m – My street",
+    "radius_1km": "1km – My neighborhood",
     "submit_meal": "Publish Meal",
     "submitting": "Publishing...",
     "meal_created": "Meal is live! Your neighbors will see it soon."
