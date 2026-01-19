@@ -80,7 +80,7 @@ serve(async (req) => {
           <h2 style="color: #333;">Hallo ${firstName}! 👋</h2>
           
           <p style="color: #555; line-height: 1.6;">
-            Herzlich willkommen in unserer Community! Wir freuen uns, dich bei Neighbors Kitchen begrüssen zu dürfen.
+            Herzlich willkommen in unserer Community! Du kannst jetzt sofort loslegen und Gerichte in deiner Nachbarschaft entdecken.
           </p>
           
           <div style="background: #FFF5EB; border-left: 4px solid #F77B1C; padding: 15px; margin: 20px 0; border-radius: 4px;">
@@ -89,18 +89,17 @@ serve(async (req) => {
           
           <h3 style="color: #333; margin-top: 25px;">So funktioniert's:</h3>
           <ul style="color: #555; line-height: 1.8;">
-            <li>📸 <strong>Lade dein Profilfoto hoch</strong> – erst dann kannst du Essen bestellen oder anbieten</li>
-            <li>✏️ <strong>Vervollständige dein Profil</strong> mit Adresse und Telefonnummer</li>
-            <li>🍲 <strong>Entdecke Gerichte</strong> von deinen Nachbarn im Feed</li>
+            <li>🍲 <strong>Stöbere sofort los</strong> – entdecke Gerichte im Feed</li>
+            <li>📸 <strong>Beim ersten Buchen</strong> wirst du nach Profilfoto, Adresse und Telefon gefragt</li>
             <li>👨‍🍳 <strong>Teile deine Kochkünste</strong> und biete überschüssiges Essen an</li>
             <li>⭐ <strong>Sammle Karma</strong> durch Teilen und Zuverlässigkeit</li>
-            <li>🔒 <strong>Verifiziere dein Profil</strong> für den blauen Haken</li>
+            <li>🔒 <strong>Optional:</strong> Verifiziere dein Profil für den blauen Haken</li>
           </ul>
           
           <div style="text-align: center; margin: 30px 0;">
             <a href="https://share-kitchen-basel.lovable.app/feed" 
                style="background: #F77B1C; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">
-              Jetzt starten →
+              Jetzt stöbern →
             </a>
           </div>
           
@@ -119,7 +118,7 @@ serve(async (req) => {
           <h2 style="color: #333;">Hello ${firstName}! 👋</h2>
           
           <p style="color: #555; line-height: 1.6;">
-            Welcome to our community! We're excited to have you join Neighbors Kitchen.
+            Welcome to our community! You can start browsing meals in your neighborhood right away.
           </p>
           
           <div style="background: #FFF5EB; border-left: 4px solid #F77B1C; padding: 15px; margin: 20px 0; border-radius: 4px;">
@@ -128,18 +127,17 @@ serve(async (req) => {
           
           <h3 style="color: #333; margin-top: 25px;">How it works:</h3>
           <ul style="color: #555; line-height: 1.8;">
-            <li>📸 <strong>Upload your profile photo</strong> – required to order or offer food</li>
-            <li>✏️ <strong>Complete your profile</strong> with address and phone number</li>
-            <li>🍲 <strong>Discover meals</strong> from your neighbors in the feed</li>
+            <li>🍲 <strong>Browse right away</strong> – discover meals in the feed</li>
+            <li>📸 <strong>When you book</strong>, you'll be asked for your photo, address, and phone</li>
             <li>👨‍🍳 <strong>Share your cooking</strong> and offer excess food</li>
             <li>⭐ <strong>Earn Karma</strong> through sharing and reliability</li>
-            <li>🔒 <strong>Verify your profile</strong> for the blue badge</li>
+            <li>🔒 <strong>Optional:</strong> Verify your profile for the blue badge</li>
           </ul>
           
           <div style="text-align: center; margin: 30px 0;">
             <a href="https://share-kitchen-basel.lovable.app/feed" 
                style="background: #F77B1C; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">
-              Get Started →
+              Start Browsing →
             </a>
           </div>
           
