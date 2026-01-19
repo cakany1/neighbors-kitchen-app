@@ -411,50 +411,7 @@ const Profile = () => {
           </Alert>
         )}
         
-        {/* Trust & Security Card */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-primary" />
-              {t('profile.trust_security')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {profile?.verification_status === 'approved' || profile?.id_verified ? (
-              <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
-                <div className="text-2xl">✅</div>
-                <div>
-                  <p className="font-semibold text-green-600 dark:text-green-400">{t('profile.verified_profile')}</p>
-                  <p className="text-xs text-muted-foreground">{t('profile.blue_tick_received')}</p>
-                </div>
-              </div>
-            ) : profile?.verification_status === 'pending' ? (
-              <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                <div className="text-2xl">⏳</div>
-                <div>
-                  <p className="font-semibold text-yellow-600 dark:text-yellow-400">{t('profile.verification_pending')}</p>
-                  <p className="text-xs text-muted-foreground">{t('profile.checking_verification')}</p>
-                </div>
-              </div>
-            ) : (
-              <>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {t('profile.upload_id_desc')}
-                </p>
-                <VerificationDialog
-                  userId={currentUser.id}
-                  verificationStatus={profile?.verification_status || 'pending'}
-                  onSuccess={() => queryClient.invalidateQueries({ queryKey: ['currentUser'] })}
-                />
-              </>
-            )}
-          </CardContent>
-        </Card>
-        
-        {/* 2FA Settings */}
-        <TwoFactorSettings userId={currentUser.id} />
-        
-        {/* Admin Dashboard Access */}
+        {/* Admin Dashboard Access - moved up for admins */}
         {isAdmin && (
           <Card 
             className="mb-6 border-blue-600 bg-blue-950/20 hover:bg-blue-950/30 cursor-pointer transition-colors"
@@ -1349,6 +1306,64 @@ const Profile = () => {
                 {t('guidelines.disclaimer')}
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Optional: Trust & Verification (moved to end as optional feature) */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-primary" />
+              {t('profile.trust_security')} ({t('profile.optional_badge')})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              {t('profile.verification_optional_desc')}
+            </p>
+            {profile?.verification_status === 'approved' || profile?.id_verified ? (
+              <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <div className="text-2xl">✅</div>
+                <div>
+                  <p className="font-semibold text-green-600 dark:text-green-400">{t('profile.verified_profile')}</p>
+                  <p className="text-xs text-muted-foreground">{t('profile.blue_tick_received')}</p>
+                </div>
+              </div>
+            ) : profile?.verification_status === 'pending' ? (
+              <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                <div className="text-2xl">⏳</div>
+                <div>
+                  <p className="font-semibold text-yellow-600 dark:text-yellow-400">{t('profile.verification_pending')}</p>
+                  <p className="text-xs text-muted-foreground">{t('profile.checking_verification')}</p>
+                </div>
+              </div>
+            ) : (
+              <VerificationDialog
+                userId={currentUser.id}
+                verificationStatus={profile?.verification_status || 'pending'}
+                onSuccess={() => queryClient.invalidateQueries({ queryKey: ['currentUser'] })}
+              />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Optional: 2FA Settings */}
+        <TwoFactorSettings userId={currentUser.id} />
+
+        {/* Logout Button */}
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                toast.success(t('auth.logout') + '!');
+                navigate('/');
+              }}
+            >
+              {t('auth.logout')}
+            </Button>
           </CardContent>
         </Card>
 

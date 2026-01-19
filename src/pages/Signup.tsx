@@ -289,12 +289,15 @@ const Signup = () => {
                     passwordStrength.level >= 65 ? 'text-green-600' : 
                     passwordStrength.level >= 40 ? 'text-yellow-600' : 'text-red-600'
                   }`}>
-                    {passwordStrength.label}
+              {passwordStrength.label}
                   </p>
                 </div>
               )}
               <p className="text-xs text-muted-foreground mt-1">
                 {t('signup.password_hint')}
+              </p>
+              <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                ⚠️ {t('signup.leaked_password_hint')}
               </p>
             </div>
 

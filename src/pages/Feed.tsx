@@ -283,9 +283,8 @@ const Feed = () => {
                     minimum: meal.pricing_minimum || 0,
                     suggested: meal.pricing_suggested || undefined,
                   },
-                  // Exchange mode stored in DB but not in Meal interface
-                  ...(meal as any).exchange_mode && { _exchangeMode: (meal as any).exchange_mode },
-                  ...(meal as any).handover_mode && { _handoverMode: (meal as any).handover_mode },
+                  exchange_mode: (meal as any).exchange_mode || 'money',
+                  handover_mode: (meal as any).handover_mode || 'pickup',
 
                   isCookingExperience: meal.is_cooking_experience,
                   availablePortions: meal.available_portions,
