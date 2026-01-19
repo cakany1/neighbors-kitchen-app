@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Mail, Send, ArrowLeft } from 'lucide-react';
 
 export default function Contact() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -24,8 +26,8 @@ export default function Contact() {
     
     if (!formData.name || !formData.email || !formData.message) {
       toast({
-        title: "Fehler",
-        description: "Bitte alle Felder ausfüllen.",
+        title: t('contact.error_title'),
+        description: t('contact.error_fill_all'),
         variant: "destructive",
       });
       return;
@@ -47,8 +49,8 @@ export default function Contact() {
       if (error) throw error;
 
       toast({
-        title: "Nachricht gesendet!",
-        description: "Wir melden uns bald.",
+        title: t('contact.success_title'),
+        description: t('contact.success_desc'),
       });
 
       // Reset form
@@ -56,8 +58,8 @@ export default function Contact() {
     } catch (error) {
       console.error('Error submitting contact form:', error);
       toast({
-        title: "Fehler",
-        description: "Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
+        title: t('contact.error_title'),
+        description: t('contact.error_send_failed'),
         variant: "destructive",
       });
     } finally {
@@ -75,49 +77,49 @@ export default function Contact() {
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Zurück zur Startseite
+          {t('contact.back_to_home')}
         </Button>
         <div className="space-y-6">
           <div className="text-center space-y-2">
             <Mail className="w-12 h-12 mx-auto text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">Kontakt</h1>
+            <h1 className="text-3xl font-bold text-foreground">{t('contact.title')}</h1>
             <p className="text-muted-foreground">
-              Haben Sie Fragen oder Anregungen? Wir freuen uns auf Ihre Nachricht!
+              {t('contact.subtitle')}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 bg-card border border-border rounded-lg p-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t('contact.name')}</Label>
               <Input
                 id="name"
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Ihr Name"
+                placeholder={t('contact.name_placeholder')}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">E-Mail</Label>
+              <Label htmlFor="email">{t('contact.email')}</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="ihre.email@beispiel.ch"
+                placeholder={t('contact.email_placeholder')}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="message">Nachricht</Label>
+              <Label htmlFor="message">{t('contact.message')}</Label>
               <Textarea
                 id="message"
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                placeholder="Ihre Nachricht an uns..."
+                placeholder={t('contact.message_placeholder')}
                 rows={6}
                 required
               />
@@ -129,11 +131,11 @@ export default function Contact() {
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                "Wird gesendet..."
+                t('contact.submitting')
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-2" />
-                  Nachricht senden
+                  {t('contact.submit')}
                 </>
               )}
             </Button>
