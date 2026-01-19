@@ -253,7 +253,7 @@
     "address": "Street Address (Optional)",
     "city": "City",
     "postalCode": "Postal Code",
-    "addressHint": "🔒 Your address is private and encrypted. It will ONLY be revealed to guests after you confirm their booking.",
+    "addressHint": "🔒 Your address is private. You decide which details (street, entrance, door code) to share after confirming a booking.",
     "visibilityMode": "Who can see my meals?",
     "visibilityAll": "Everyone",
     "visibilityWomenFli": "Women + FLI",

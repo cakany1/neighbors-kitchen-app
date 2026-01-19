@@ -560,7 +560,7 @@
     "address_hint": "Wichtig für die Umkreissuche.",
     "city": "Stadt",
     "postalCode": "Postleitzahl",
-    "addressHint": "🔒 Ihre Adresse ist privat und verschlüsselt. Sie wird NUR nach Ihrer Buchungsbestätigung an Gäste weitergegeben.",
+    "addressHint": "🔒 Deine Adresse ist privat. Du entscheidest selbst, welche Details (Strasse, Eingang, Türcode) du nach Buchungsbestätigung teilst.",
     "photo_required_warning": "⚠️ Du kannst ohne Foto keine Gerichte bestellen oder anbieten.",
     "max_file_size": "Max 5MB, JPG/PNG",
     "verification_note": "Hinweis: Dein Profilbild muss manuell verifiziert werden. Dies kann etwas Zeit in Anspruch nehmen, bevor du Mahlzeiten anbieten kannst.",
