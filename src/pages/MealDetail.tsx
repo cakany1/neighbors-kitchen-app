@@ -709,6 +709,11 @@ const MealDetail = () => {
           <Button
             variant="outline"
             onClick={() => {
+              // Block chat for demo meals
+              if (meal.id.startsWith('demo-')) {
+                toast.info(t("meal_detail.demo_chat_blocked"));
+                return;
+              }
               if (!currentUser) {
                 setAuthModalOpen(true);
               } else {

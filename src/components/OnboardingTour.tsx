@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { X, ChefHat, MapPin, Heart, Shield, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Progress } from '@/components/ui/progress';
@@ -67,6 +69,7 @@ export const OnboardingTour = ({ onComplete }: OnboardingTourProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [isCentered, setIsCentered] = useState(false);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   useEffect(() => {
     const updatePosition = () => {
@@ -124,7 +127,10 @@ export const OnboardingTour = ({ onComplete }: OnboardingTourProps) => {
     if (currentStep < tourSteps.length - 1) {
       setCurrentStep((prev) => prev + 1);
     } else {
-      localStorage.setItem('tour_completed', 'true');
+      // Only mark as completed if user chose "don't show again"
+      if (dontShowAgain) {
+        localStorage.setItem('tour_completed', 'true');
+      }
       onComplete();
     }
   };
@@ -136,7 +142,13 @@ export const OnboardingTour = ({ onComplete }: OnboardingTourProps) => {
   };
 
   const handleSkip = () => {
+    // Skip always marks as "don't show again" since user explicitly skipped
     localStorage.setItem('tour_completed', 'true');
+    onComplete();
+  };
+
+  const handleExploreSelf = () => {
+    // User wants to explore themselves - don't mark as completed, show next time
     onComplete();
   };
 
@@ -195,6 +207,20 @@ export const OnboardingTour = ({ onComplete }: OnboardingTourProps) => {
             </Button>
           </div>
 
+          {/* Last step: show options for future behavior */}
+          {currentStep === tourSteps.length - 1 && (
+            <div className="flex items-center space-x-2 mb-3 p-2 bg-muted/50 rounded-lg">
+              <Checkbox 
+                id="dont-show-again" 
+                checked={dontShowAgain}
+                onCheckedChange={(checked) => setDontShowAgain(checked === true)}
+              />
+              <Label htmlFor="dont-show-again" className="text-xs cursor-pointer">
+                {t('onboarding.dont_show_again')}
+              </Label>
+            </div>
+          )}
+
           <div className="flex items-center justify-between">
             <div className="text-xs text-muted-foreground">
               {t('onboarding.step_counter', { current: currentStep + 1, total: tourSteps.length })}
@@ -206,8 +232,8 @@ export const OnboardingTour = ({ onComplete }: OnboardingTourProps) => {
                 </Button>
               )}
               {currentStep === 0 && (
-                <Button variant="outline" size="sm" onClick={handleSkip}>
-                  {t('onboarding.skip')}
+                <Button variant="outline" size="sm" onClick={handleExploreSelf}>
+                  {t('onboarding.explore_self')}
                 </Button>
               )}
               <Button size="sm" onClick={handleNext}>

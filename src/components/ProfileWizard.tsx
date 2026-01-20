@@ -247,7 +247,6 @@ export function ProfileWizard({
                   id="photo-upload"
                   type="file"
                   accept="image/*"
-                  capture="user"
                   className="hidden"
                   onChange={(e) => handlePhotoChange(e, false)}
                 />
@@ -283,7 +282,6 @@ export function ProfileWizard({
                   id="partner-photo-upload"
                   type="file"
                   accept="image/*"
-                  capture="user"
                   className="hidden"
                   onChange={(e) => handlePhotoChange(e, true)}
                 />
