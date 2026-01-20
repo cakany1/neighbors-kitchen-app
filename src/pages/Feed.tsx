@@ -44,13 +44,39 @@ const Feed = () => {
     },
   });
 
+  // Check if user is admin (skip onboarding for admins unless explicitly requested)
+  const { data: isAdmin } = useQuery({
+    queryKey: ["isAdmin", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return false;
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", currentUser.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      return !!data;
+    },
+    enabled: !!currentUser?.id,
+  });
+
   // Check if user just registered or logged in (show onboarding tour)
   useEffect(() => {
     const hasSeenTour = localStorage.getItem("tour_completed");
     const justRegistered = localStorage.getItem("just_registered");
+    const forceShowTour = localStorage.getItem("force_show_tour");
 
     if (currentUser && !isGuestMode) {
-      if (justRegistered === "true") {
+      // Skip tour for admins unless they explicitly requested it via "Restart Tutorial"
+      if (isAdmin && !forceShowTour) {
+        localStorage.setItem("tour_completed", "true");
+        return;
+      }
+
+      if (forceShowTour === "true") {
+        localStorage.removeItem("force_show_tour");
+        setTimeout(() => setShowOnboarding(true), 500);
+      } else if (justRegistered === "true") {
         localStorage.removeItem("just_registered");
         localStorage.removeItem("tour_completed");
         setTimeout(() => setShowOnboarding(true), 500);
@@ -58,7 +84,7 @@ const Feed = () => {
         setTimeout(() => setShowOnboarding(true), 500);
       }
     }
-  }, [currentUser, isGuestMode]);
+  }, [currentUser, isGuestMode, isAdmin]);
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);

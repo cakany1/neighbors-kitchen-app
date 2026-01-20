@@ -1358,6 +1358,7 @@ const Profile = () => {
               className="w-full gap-2"
               onClick={() => {
                 localStorage.removeItem('tour_completed');
+                localStorage.setItem('force_show_tour', 'true');
                 toast.success(t('profile.tour_restarting'));
                 navigate('/feed');
               }}
