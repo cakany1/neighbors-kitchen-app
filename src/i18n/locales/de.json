@@ -612,6 +612,7 @@
     "profile_incomplete": "Bitte vervollständige dein Profil (Adresse & Telefon), um Mahlzeiten zu buchen",
     "confirm_cancel": "Möchtest du diese Buchung wirklich stornieren?",
     "chat_with_chef": "Frage an den Chef",
+    "demo_chat_blocked": "Dies ist ein Demo-Gericht. Der Chat ist nicht verfügbar.",
     "book_now": "Jetzt reservieren",
     "cancel_booking": "Buchung stornieren",
     "booking_confirmed": "Buchung bestätigt",
@@ -816,6 +817,8 @@
     "skip": "Überspringen",
     "back": "Zurück",
     "next": "Weiter",
-    "done": "Los geht's!"
+    "done": "Los geht's!",
+    "explore_self": "Selbst erkunden",
+    "dont_show_again": "Nicht mehr anzeigen"
   }
 }

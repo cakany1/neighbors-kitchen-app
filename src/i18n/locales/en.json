@@ -636,6 +636,7 @@
     "profile_incomplete": "Please complete your profile (Address & Phone) to book meals",
     "confirm_cancel": "Do you really want to cancel this booking?",
     "chat_with_chef": "Ask the Chef",
+    "demo_chat_blocked": "This is a demo meal. Chat is not available.",
     "book_now": "Book Now",
     "cancel_booking": "Cancel Booking",
     "booking_confirmed": "Booking Confirmed",
@@ -805,6 +806,8 @@
     "skip": "Skip",
     "back": "Back",
     "next": "Next",
-    "done": "Let's go!"
+    "done": "Let's go!",
+    "explore_self": "Explore myself",
+    "dont_show_again": "Don't show again"
   }
 }
