@@ -9,12 +9,13 @@ import InteractiveMap from '@/components/maps/InteractiveMap';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { Meal } from '@/types/meal';
+import { DEMO_MEALS } from '@/data/demoMeals';
 
 const MapView = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  // Fetch meals from Supabase
+  // Fetch meals from Supabase + add demo meals
   const { data: meals = [] } = useQuery({
     queryKey: ['mapMeals'],
     queryFn: async () => {
@@ -42,8 +43,8 @@ const MapView = () => {
 
       if (error) throw error;
 
-      // Transform to Meal type with location structure
-      return (data || []).map((meal: any) => ({
+      // Transform DB meals to Meal type with location structure
+      const dbMeals = (data || []).map((meal: any) => ({
         id: meal.id,
         title: meal.title,
         description: meal.description,
@@ -69,6 +70,38 @@ const MapView = () => {
         tags: meal.tags || [],
         scheduledDate: meal.scheduled_date,
       })) as Meal[];
+
+      // Transform demo meals to same format
+      const safeDemoMeals = DEMO_MEALS && Array.isArray(DEMO_MEALS) ? DEMO_MEALS : [];
+      const demoMealsForMap = safeDemoMeals.map((meal) => ({
+        id: meal.id,
+        title: meal.title,
+        description: meal.description,
+        imageUrl: meal.image_url || '/placeholder-meal-1.jpg',
+        chef: {
+          firstName: meal.chef.first_name,
+          lastName: meal.chef.last_name,
+          karma: meal.chef.karma,
+        },
+        location: {
+          fuzzyLat: meal.fuzzy_lat,
+          fuzzyLng: meal.fuzzy_lng,
+          neighborhood: meal.neighborhood,
+        },
+        distance: 0,
+        pricing: {
+          minimum: meal.pricing_minimum || 0,
+          suggested: meal.pricing_suggested,
+        },
+        isCookingExperience: meal.is_cooking_experience,
+        availablePortions: meal.available_portions,
+        allergens: meal.allergens || [],
+        tags: meal.tags || [],
+        scheduledDate: meal.scheduled_date,
+      })) as Meal[];
+
+      // Combine: demo meals first, then DB meals
+      return [...demoMealsForMap, ...dbMeals];
     },
   });
 
