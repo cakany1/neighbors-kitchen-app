@@ -348,9 +348,14 @@ const Signup = () => {
               <p className="text-xs text-muted-foreground mt-1">
                 {t('signup.password_hint')}
               </p>
-              <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                ⚠️ {t('signup.leaked_password_hint')}
-              </p>
+              <div className="mt-2 p-3 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-lg">
+                <p className="text-xs font-medium text-orange-700 dark:text-orange-400">
+                  ⚠️ {t('signup.leaked_password_title')}
+                </p>
+                <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                  {t('signup.leaked_password_hint')}
+                </p>
+              </div>
             </div>
 
             {/* Submit Button */}
