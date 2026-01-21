@@ -95,7 +95,7 @@ export const DEMO_MEALS = [
     tags: ["Dessert", "Vegetarisch", "Süss"],
     allergens: ["Milch/Laktose", "Gluten (Getreide)", "Eier"],
     available_portions: 2, // KORRIGIERT: 2 Portionen
-    pricing_minimum: 0,
+    pricing_minimum: 9,
     pricing_suggested: 9,
     is_cooking_experience: false,
     scheduled_date: new Date(Date.now() + 86400000 * 3).toISOString(),
@@ -105,7 +105,7 @@ export const DEMO_MEALS = [
     collection_window_start: "15:00",
     collection_window_end: "18:00",
     unit_type: "slices",
-    exchange_mode: "pay_what_you_want",
+    exchange_mode: "money",
     estimated_restaurant_value: 16,
     ingredients: ["Frischkäse", "Eier", "Zucker", "Erdbeeren", "Butterkekse"],
     is_stock_photo: false,

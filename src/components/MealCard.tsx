@@ -1,7 +1,7 @@
 import { Meal } from "@/types/meal";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, ChefHat, Gift, Heart, Package, Home, Ghost, UtensilsCrossed } from "lucide-react";
+import { MapPin, ChefHat, Package, Home, Ghost, UtensilsCrossed } from "lucide-react";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -120,11 +120,6 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
               <span className="text-sm font-semibold text-secondary">
                 {t("landing.badge_surprise_me")}
               </span>
-            </div>
-          ) : exchangeMode === "pay_what_you_want" ? (
-            <div className="flex items-center justify-center w-full gap-2 py-2 px-3 bg-primary/10 rounded-lg text-center">
-              <Heart className="w-4 h-4 text-primary fill-current" />
-              <span className="text-sm font-semibold text-primary">{t("common.payWhatYouWant")}</span>
             </div>
           ) : (
             <div className="flex items-center justify-center w-full gap-2 py-2 px-3 bg-muted rounded-lg text-center">
