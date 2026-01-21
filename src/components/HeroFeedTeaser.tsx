@@ -52,13 +52,10 @@ export const HeroFeedTeaser = () => {
                 <h3 className="font-semibold text-base text-foreground line-clamp-1">{meal.title}</h3>
                 
                 {/* Centered badge for surprise/pwyw modes */}
-                {(meal.exchangeMode === "barter" || meal.exchangeMode === "pay_what_you_want") && (
+                {meal.exchangeMode === "barter" && (
                   <div className="w-full flex justify-center mt-1.5">
                     <Badge variant="secondary" className="bg-primary/20 text-primary text-xs border-0">
-                      {meal.exchangeMode === "barter" 
-                        ? t("landing.badge_surprise_me")
-                        : t("landing.badge_pay_what_you_want", "💝 Wähle deinen Preis")
-                      }
+                      {t("landing.badge_surprise_me")}
                     </Badge>
                   </div>
                 )}

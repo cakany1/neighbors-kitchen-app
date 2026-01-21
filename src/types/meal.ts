@@ -26,7 +26,7 @@ export interface Meal {
     minimum: number; // Can be 0
     suggested?: number;
   };
-  exchange_mode?: 'money' | 'barter' | 'pay_what_you_want';
+  exchange_mode?: 'money' | 'barter';
   handover_mode?: 'pickup' | 'pickup_box' | 'neighbor' | 'neighbor_plate' | 'anonymous_drop' | 'dine_in';
   isCookingExperience: boolean;
   availablePortions: number;
