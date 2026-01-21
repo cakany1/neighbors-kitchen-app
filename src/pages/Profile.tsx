@@ -1299,6 +1299,35 @@ const Profile = () => {
           </CardContent>
         </Card>
 
+        {/* Support the App */}
+        <Card className="mb-6 border-green-500/30 bg-gradient-to-br from-green-500/5 to-emerald-500/10">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-3">
+              <div className="w-12 h-12 mx-auto rounded-full bg-green-500/20 flex items-center justify-center">
+                <Heart className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">{t('profile.support_app_title')}</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {t('profile.support_app_desc')}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full border-green-500/50 text-green-700 dark:text-green-400 hover:bg-green-500/10"
+                onClick={() => {
+                  toast.info(t('profile.support_coming_soon'), { duration: 3000 });
+                }}
+              >
+                💚 {t('profile.support_app_button')}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                {t('profile.support_app_hint')}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Optional: Trust & Verification */}
         <Card className="mb-6">
           <CardHeader>
