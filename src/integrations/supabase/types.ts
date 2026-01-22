@@ -388,6 +388,7 @@ export type Database = {
           latitude: number | null
           longitude: number | null
           nickname: string | null
+          no_shows: number
           notification_radius: number | null
           partner_gender: string | null
           partner_name: string | null
@@ -398,6 +399,7 @@ export type Database = {
           private_city: string | null
           private_postal_code: string | null
           role: string | null
+          successful_pickups: number
           updated_at: string
           vacation_mode: boolean | null
           verification_status: Database["public"]["Enums"]["verification_status"]
@@ -423,6 +425,7 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           nickname?: string | null
+          no_shows?: number
           notification_radius?: number | null
           partner_gender?: string | null
           partner_name?: string | null
@@ -433,6 +436,7 @@ export type Database = {
           private_city?: string | null
           private_postal_code?: string | null
           role?: string | null
+          successful_pickups?: number
           updated_at?: string
           vacation_mode?: boolean | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
@@ -458,6 +462,7 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           nickname?: string | null
+          no_shows?: number
           notification_radius?: number | null
           partner_gender?: string | null
           partner_name?: string | null
@@ -468,6 +473,7 @@ export type Database = {
           private_city?: string | null
           private_postal_code?: string | null
           role?: string | null
+          successful_pickups?: number
           updated_at?: string
           vacation_mode?: boolean | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
@@ -728,12 +734,14 @@ export type Database = {
           languages: string[] | null
           last_name: string | null
           nickname: string | null
+          no_shows: number | null
           notification_radius: number | null
           partner_gender: string | null
           partner_name: string | null
           partner_photo_url: string | null
           phone_verified: boolean | null
           role: string | null
+          successful_pickups: number | null
           updated_at: string | null
           vacation_mode: boolean | null
           verification_status:
@@ -757,12 +765,14 @@ export type Database = {
           languages?: string[] | null
           last_name?: string | null
           nickname?: string | null
+          no_shows?: number | null
           notification_radius?: number | null
           partner_gender?: string | null
           partner_name?: string | null
           partner_photo_url?: string | null
           phone_verified?: boolean | null
           role?: string | null
+          successful_pickups?: number | null
           updated_at?: string | null
           vacation_mode?: boolean | null
           verification_status?:
@@ -786,12 +796,14 @@ export type Database = {
           languages?: string[] | null
           last_name?: string | null
           nickname?: string | null
+          no_shows?: number | null
           notification_radius?: number | null
           partner_gender?: string | null
           partner_name?: string | null
           partner_photo_url?: string | null
           phone_verified?: boolean | null
           role?: string | null
+          successful_pickups?: number | null
           updated_at?: string | null
           vacation_mode?: boolean | null
           verification_status?:

@@ -28,6 +28,7 @@ import { FeedbackDialog } from '@/components/FeedbackDialog';
 import { VerificationBadge } from '@/components/VerificationBadge';
 import { VerificationDialog } from '@/components/VerificationDialog';
 import { TwoFactorSettings } from '@/components/TwoFactorSettings';
+import { ReliabilityDisplay } from '@/components/ReliabilityDisplay';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -663,6 +664,14 @@ const Profile = () => {
                 <p className="text-2xl font-bold text-trust-badge">0</p>
                 <p className="text-xs text-muted-foreground">{t('profile.fairPayments')}</p>
               </div>
+            </div>
+            
+            {/* Reliability Display */}
+            <div className="pt-4 border-t border-border">
+              <ReliabilityDisplay 
+                successfulPickups={profile?.successful_pickups || 0}
+                noShows={profile?.no_shows || 0}
+              />
             </div>
           </CardContent>
         </Card>
