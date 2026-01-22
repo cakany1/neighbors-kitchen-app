@@ -29,6 +29,7 @@ import { VerificationBadge } from '@/components/VerificationBadge';
 import { VerificationDialog } from '@/components/VerificationDialog';
 import { TwoFactorSettings } from '@/components/TwoFactorSettings';
 import { ReliabilityDisplay } from '@/components/ReliabilityDisplay';
+import { KarmaLevel } from '@/components/KarmaLevel';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -648,8 +649,11 @@ const Profile = () => {
                   <span className="text-lg font-semibold text-trust-gold">
                     {profile?.karma || 0} {t('profile.karma')}
                   </span>
-                 </div>
-               </div>
+                </div>
+                <div className="mt-2">
+                  <KarmaLevel karma={profile?.karma || 0} size="md" />
+                </div>
+            </div>
 
              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
               <div className="text-center">

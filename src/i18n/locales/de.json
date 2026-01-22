@@ -1,4 +1,11 @@
 {
+  "karma_levels": {
+    "intern": "Praktikant",
+    "apprentice": "Lehrling",
+    "sous_chef": "Sous Chef",
+    "head_chef": "Küchenchef",
+    "star_chef": "Sternekoch"
+  },
   "common": {
     "payWhatYouWant": "Wähle deinen Preis",
     "fixedPrice": "Festpreis",

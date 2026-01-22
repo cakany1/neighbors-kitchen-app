@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VerificationBadge } from '@/components/VerificationBadge';
 import { ReportDialog } from '@/components/ReportDialog';
+import { KarmaLevel } from '@/components/KarmaLevel';
 import { Star, ChefHat, Award, Camera, ArrowLeft, Flag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -120,14 +121,6 @@ const ChefProfile = () => {
     ? `${chef.first_name} ${chef.last_name}`
     : chef.nickname || chef.first_name;
 
-  const getKarmaLevel = (karma: number) => {
-    if (karma >= 500) return { label: 'Master Chef', color: 'text-yellow-600' };
-    if (karma >= 300) return { label: 'Food Hero', color: 'text-green-600' };
-    if (karma >= 150) return { label: 'Rising Star', color: 'text-blue-600' };
-    return { label: 'Community Member', color: 'text-muted-foreground' };
-  };
-
-  const karmaLevel = getKarmaLevel(chef.karma);
   const galleryCount = galleryPhotos?.length || 0;
 
   return (
@@ -175,11 +168,8 @@ const ChefProfile = () => {
                   </Button>
                 </div>
                 
-                <div className="flex items-center gap-2 mb-2">
-                  <Award className={`w-5 h-5 ${karmaLevel.color}`} />
-                  <span className={`text-sm font-medium ${karmaLevel.color}`}>
-                    {karmaLevel.label}
-                  </span>
+                <div className="mb-2">
+                  <KarmaLevel karma={chef.karma || 0} size="sm" />
                 </div>
 
                 <div className="flex items-center gap-3 text-sm">
