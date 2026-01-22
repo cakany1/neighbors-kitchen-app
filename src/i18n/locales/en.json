@@ -1,4 +1,11 @@
 {
+  "karma_levels": {
+    "intern": "Intern",
+    "apprentice": "Apprentice",
+    "sous_chef": "Sous Chef",
+    "head_chef": "Head Chef",
+    "star_chef": "Star Chef"
+  },
   "common": {
     "payWhatYouWant": "Choose your price",
     "fixedPrice": "Fixed Price",
