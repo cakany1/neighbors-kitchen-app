@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import ChefProfile from "./pages/ChefProfile";
 import MealDetail from "./pages/MealDetail";
 import Payment from "./pages/Payment";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
@@ -70,6 +71,7 @@ const AppRoutes = () => {
           <Route path="/profile/:chefId" element={<ChefProfile />} />
           <Route path="/meal/:id" element={<MealDetail />} />
           <Route path="/payment/:id" element={<Payment />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/chat/:bookingId" element={<Chat />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/login" element={<Login />} />
