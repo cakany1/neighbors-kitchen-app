@@ -82,6 +82,8 @@ const AppRoutes = () => {
           <Route path="/install" element={<Install />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/story" element={<Story />} />
+          {/* OAuth callback route - redirects to feed after login */}
+          <Route path="/~oauth/callback" element={<Navigate to="/feed" replace />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
