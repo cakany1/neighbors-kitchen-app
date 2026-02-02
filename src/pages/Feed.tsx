@@ -61,6 +61,7 @@ const Feed = () => {
   });
 
   // Check if user just registered or logged in (show onboarding tour)
+  // FIX: Only show on first registration or explicit restart, not on every login
   useEffect(() => {
     const hasSeenTour = localStorage.getItem("tour_completed");
     const justRegistered = localStorage.getItem("just_registered");
@@ -69,7 +70,6 @@ const Feed = () => {
     if (currentUser && !isGuestMode) {
       // Skip tour for admins unless they explicitly requested it via "Restart Tutorial"
       if (isAdmin && !forceShowTour) {
-        localStorage.setItem("tour_completed", "true");
         return;
       }
 
@@ -78,11 +78,10 @@ const Feed = () => {
         setTimeout(() => setShowOnboarding(true), 500);
       } else if (justRegistered === "true") {
         localStorage.removeItem("just_registered");
-        localStorage.removeItem("tour_completed");
-        setTimeout(() => setShowOnboarding(true), 500);
-      } else if (!hasSeenTour) {
+        // Only show tour on first registration
         setTimeout(() => setShowOnboarding(true), 500);
       }
+      // REMOVED: else if (!hasSeenTour) - this caused tour to show on every login
     }
   }, [currentUser, isGuestMode, isAdmin]);
 

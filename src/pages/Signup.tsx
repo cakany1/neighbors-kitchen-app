@@ -57,14 +57,14 @@ const Signup = () => {
     const pwd = formData.password;
     if (pwd.length === 0) return { level: 0, label: '', color: '' };
     
-    if (pwd.length < 6) {
+    if (pwd.length < 8) {
       return { level: 25, label: t('signup.password_too_short'), color: 'bg-red-500' };
     }
     
     const hasNumber = /\d/.test(pwd);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
     
-    if (pwd.length >= 10 && hasNumber && hasSpecialChar) {
+    if (pwd.length >= 12 && hasNumber && hasSpecialChar) {
       return { level: 100, label: t('signup.password_strong'), color: 'bg-green-500' };
     }
     
@@ -83,7 +83,7 @@ const Signup = () => {
       return;
     }
     
-    if (formData.password.length < 6) {
+    if (formData.password.length < 8) {
       toast.error(t('signup.password_too_short'));
       return;
     }
