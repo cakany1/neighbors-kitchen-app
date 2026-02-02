@@ -116,8 +116,9 @@ const Feed = () => {
 
       const allBlockedUsers = [...blockedUserIds, ...usersWhoBlockedMe];
 
+      // SECURITY: Use meals_public view to prevent exact_address exposure
       let query = supabase
-        .from("meals")
+        .from("meals_public")
         .select(
           `
           id,

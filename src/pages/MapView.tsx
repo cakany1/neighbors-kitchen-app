@@ -21,9 +21,9 @@ const MapView = () => {
     queryFn: async () => {
       const today = new Date().toISOString().split('T')[0];
       
-      // SECURITY: Explicitly select only necessary fields - never use '*' to avoid exposing exact_address
+      // SECURITY: Use meals_public view to prevent exact_address exposure
       const { data, error } = await supabase
-        .from('meals')
+        .from('meals_public')
         .select(`
           id,
           title,
