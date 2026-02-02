@@ -287,7 +287,16 @@
     "apple_signup": "Sign up with Apple",
     "or_email": "or with email",
     "logout": "Log out",
-    "logging_out": "Logging out..."
+    "logging_out": "Logging out...",
+    "set_new_password": "Set New Password",
+    "set_new_password_desc": "Enter your new password to complete the reset.",
+    "password_reset_info": "You've requested to reset your password. Please choose a new secure password now.",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "save_new_password": "Save New Password",
+    "passwords_dont_match": "Passwords do not match.",
+    "password_too_short": "Password must be at least 8 characters.",
+    "password_updated": "Password successfully changed! You are now logged in."
   },
   "signup": {
     "phoneNumber": "Phone Number",
