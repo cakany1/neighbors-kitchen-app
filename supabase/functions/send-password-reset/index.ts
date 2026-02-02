@@ -21,7 +21,13 @@ serve(async (req) => {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
+    console.log("Starting password reset process...");
+    console.log("RESEND_API_KEY configured:", !!RESEND_API_KEY);
+    console.log("SUPABASE_URL configured:", !!SUPABASE_URL);
+    console.log("SUPABASE_SERVICE_ROLE_KEY configured:", !!SUPABASE_SERVICE_ROLE_KEY);
+    
     if (!RESEND_API_KEY) {
+      console.error("RESEND_API_KEY is not configured");
       throw new Error("RESEND_API_KEY is not configured");
     }
 
