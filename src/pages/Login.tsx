@@ -51,16 +51,51 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/feed`,
-        },
-      });
+      // Detect if we're on a custom domain (not lovable.app preview)
+      const isCustomDomain =
+        !window.location.hostname.includes('lovable.app') &&
+        !window.location.hostname.includes('lovableproject.com') &&
+        !window.location.hostname.includes('localhost');
 
-      if (error) {
-        toast.error(error.message || t('auth.login_failed'));
-        setGoogleLoading(false);
+      if (isCustomDomain) {
+        // Bypass auth-bridge for custom domains by getting OAuth URL directly
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/feed`,
+            skipBrowserRedirect: true, // Critical: prevents redirect to preview domain
+          },
+        });
+
+        if (error) {
+          toast.error(error.message || t('auth.login_failed'));
+          setGoogleLoading(false);
+          return;
+        }
+
+        // Validate OAuth URL before redirect (security: prevent open redirect)
+        if (data?.url) {
+          const oauthUrl = new URL(data.url);
+          const allowedHosts = ['accounts.google.com', 'ziyocgrzijovpfhzutzs.supabase.co'];
+          if (allowedHosts.some((host) => oauthUrl.hostname.includes(host))) {
+            window.location.href = data.url;
+          } else {
+            throw new Error('Invalid OAuth redirect URL');
+          }
+        }
+      } else {
+        // For Lovable preview domains, use normal flow (auth-bridge handles it)
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/feed`,
+          },
+        });
+
+        if (error) {
+          toast.error(error.message || t('auth.login_failed'));
+          setGoogleLoading(false);
+        }
       }
     } catch (error: any) {
       console.error('Google login error:', error);
