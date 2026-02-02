@@ -1,3 +1,5 @@
-# SPA fallback - redirect all routes to index.html
-# This ensures OAuth callback routes work correctly
+# OAuth paths should NOT be handled by SPA - let Lovable infrastructure handle them
+/~oauth/*  /~oauth/:splat  200
+
+# SPA fallback - redirect all other routes to index.html
 /*    /index.html   200
