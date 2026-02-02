@@ -48,7 +48,7 @@ serve(async (req) => {
       type: 'recovery',
       email: email,
       options: {
-        redirectTo: 'https://share-kitchen-basel.lovable.app/login',
+        redirectTo: 'https://www.neighbors-kitchen.ch/login',
       }
     });
 
