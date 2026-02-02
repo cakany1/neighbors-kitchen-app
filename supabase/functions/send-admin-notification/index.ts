@@ -133,7 +133,7 @@ const handler = async (req: Request): Promise<Response> => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Neighbors Kitchen <noreply@send.neighbors-kitchen.ch>",
+        from: "Neighbors Kitchen <noreply@neighbors-kitchen.ch>",
         to: [adminEmail],
         subject: subject,
         html: htmlContent,
