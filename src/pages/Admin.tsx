@@ -44,7 +44,7 @@ const Admin = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, nickname, gender, phone_number, avatar_url, verification_status, partner_name, partner_photo_url, partner_gender, created_at, id_document_url')
+        .select('id, first_name, last_name, nickname, gender, phone_number, avatar_url, verification_status, partner_name, partner_photo_url, partner_gender, created_at, id_document_url, is_couple')
         .eq('verification_status', 'pending')
         .order('created_at', { ascending: false });
 
