@@ -283,6 +283,8 @@
     "2fa_invalid_code": "Invalid code. Please try again.",
     "google_login": "Sign in with Google",
     "google_signup": "Sign up with Google",
+    "apple_login": "Sign in with Apple",
+    "apple_signup": "Sign up with Apple",
     "or_email": "or with email",
     "logout": "Log out",
     "logging_out": "Logging out..."

@@ -82,6 +82,8 @@
     "2fa_invalid_code": "Ungültiger Code. Bitte erneut versuchen.",
     "google_login": "Mit Google anmelden",
     "google_signup": "Mit Google registrieren",
+    "apple_login": "Mit Apple anmelden",
+    "apple_signup": "Mit Apple registrieren",
     "or_email": "oder mit E-Mail",
     "logout": "Ausloggen",
     "logging_out": "Wird abgemeldet..."
