@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Progress } from '@/components/ui/progress';
 
 // Helper function to check for incomplete profile fields
 const getProfileWarnings = (user: {
@@ -156,6 +157,36 @@ const Admin = () => {
         .in('status', ['pending', 'answered'])
         .order('similar_count', { ascending: false })
         .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
+  // Fetch profile reminders status
+  const { data: profileReminders, isLoading: remindersLoading, refetch: refetchReminders } = useQuery({
+    queryKey: ['profileReminders'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profile_reminders')
+        .select('user_id, reminder_count, last_sent_at, created_at')
+        .order('last_sent_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
+  // Fetch incomplete profiles count
+  const { data: incompleteProfiles, isLoading: incompleteLoading } = useQuery({
+    queryKey: ['incompleteProfiles'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, avatar_url, phone_number, private_address')
+        .or('avatar_url.is.null,phone_number.is.null,private_address.is.null');
 
       if (error) throw error;
       return data;
@@ -357,6 +388,33 @@ const Admin = () => {
     },
   });
 
+  // Send profile reminders mutation
+  const [isSendingReminders, setIsSendingReminders] = useState(false);
+  
+  const sendProfileRemindersMutation = useMutation({
+    mutationFn: async () => {
+      setIsSendingReminders(true);
+      const { data, error } = await supabase.functions.invoke('send-profile-reminders');
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      setIsSendingReminders(false);
+      if (data.sent > 0) {
+        toast.success(`${data.sent} Erinnerungs-E-Mail(s) versendet!`);
+      } else {
+        toast.info('Keine E-Mails zu versenden. Alle User sind aktuell oder haben bereits 3 Erinnerungen erhalten.');
+      }
+      refetchReminders();
+      queryClient.invalidateQueries({ queryKey: ['profileReminders'] });
+    },
+    onError: (error: Error) => {
+      setIsSendingReminders(false);
+      toast.error('Fehler beim Versenden: ' + error.message);
+    },
+  });
+
   // Generate image mutation
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   
@@ -549,7 +607,7 @@ const Admin = () => {
         )}
 
         <Tabs defaultValue="verifications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="verifications">
               Verifications
               {pendingVerifications && pendingVerifications.length > 0 && (
@@ -560,6 +618,15 @@ const Admin = () => {
             </TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="reminders">
+              <Mail className="w-4 h-4 mr-1" />
+              Reminders
+              {incompleteProfiles && incompleteProfiles.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {incompleteProfiles.length}
+                </Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="feedback">
               Feedback
               {feedbackList?.filter(f => f.status === 'pending').length > 0 && (
@@ -895,6 +962,168 @@ const Admin = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Profile Reminders Tab */}
+          <TabsContent value="reminders" className="space-y-4">
+            {/* Summary Cards */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Unvollständige Profile</CardTitle>
+                  <AlertTriangle className="h-4 w-4 text-amber-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {incompleteLoading ? '...' : incompleteProfiles?.length || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Fehlt: Avatar, Telefon oder Adresse</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Erinnerungen gesendet</CardTitle>
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {remindersLoading ? '...' : profileReminders?.length || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground">User mit mind. 1 Erinnerung</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Max. erreicht (3/3)</CardTitle>
+                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {remindersLoading ? '...' : profileReminders?.filter(r => r.reminder_count >= 3).length || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Keine weiteren E-Mails</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Manual Trigger Card */}
+            <Card className="border-2 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="w-5 h-5 text-primary" />
+                  Erinnerungs-E-Mails manuell auslösen
+                </CardTitle>
+                <CardDescription>
+                  Sendet E-Mails an alle User mit unvollständigen Profilen, die noch keine 3 Erinnerungen erhalten haben und deren letzte Erinnerung mindestens 7 Tage zurückliegt.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-4">
+                  <Button 
+                    onClick={() => sendProfileRemindersMutation.mutate()}
+                    disabled={isSendingReminders || sendProfileRemindersMutation.isPending}
+                    className="gap-2"
+                  >
+                    <Mail className="w-4 h-4" />
+                    {isSendingReminders ? 'Sende E-Mails...' : 'Jetzt Erinnerungen senden'}
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    Automatischer Cron: Jeden Montag um 10:00 Uhr (UTC)
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Reminder History Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Erinnerungs-Verlauf</CardTitle>
+                <CardDescription>
+                  Übersicht welche User wie viele Erinnerungen erhalten haben
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {remindersLoading ? (
+                  <p className="text-muted-foreground text-center py-8">Lade Daten...</p>
+                ) : !profileReminders || profileReminders.length === 0 ? (
+                  <Alert>
+                    <Mail className="h-4 w-4" />
+                    <AlertDescription>
+                      Noch keine Erinnerungen versendet.
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left p-3 text-sm font-semibold">User</th>
+                          <th className="text-left p-3 text-sm font-semibold">Erinnerungen</th>
+                          <th className="text-left p-3 text-sm font-semibold">Letzte E-Mail</th>
+                          <th className="text-left p-3 text-sm font-semibold">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {profileReminders.map((reminder) => {
+                          // Find user details from allUsers
+                          const user = allUsers?.find(u => u.id === reminder.user_id);
+                          const progressPercent = (reminder.reminder_count / 3) * 100;
+                          
+                          return (
+                            <tr key={reminder.user_id} className="border-b border-border/50 hover:bg-muted/50">
+                              <td className="p-3">
+                                <div className="flex items-center gap-2">
+                                  <Avatar className="w-8 h-8">
+                                    <AvatarImage src={user?.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${reminder.user_id}`} />
+                                    <AvatarFallback>{user?.first_name?.charAt(0) || '?'}</AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <p className="text-sm font-medium">
+                                      {user ? `${user.first_name} ${user.last_name}` : 'Unbekannt'}
+                                    </p>
+                                    {user?.nickname && (
+                                      <p className="text-xs text-muted-foreground">@{user.nickname}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="p-3">
+                                <div className="flex items-center gap-2">
+                                  <Progress value={progressPercent} className="w-20 h-2" />
+                                  <span className="text-sm font-medium">{reminder.reminder_count}/3</span>
+                                </div>
+                              </td>
+                              <td className="p-3 text-sm">
+                                {new Date(reminder.last_sent_at).toLocaleDateString('de-CH', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </td>
+                              <td className="p-3">
+                                {reminder.reminder_count >= 3 ? (
+                                  <Badge variant="outline" className="bg-muted">
+                                    ✅ Abgeschlossen
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="secondary">
+                                    📧 {3 - reminder.reminder_count} verbleibend
+                                  </Badge>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Feedback Tab */}
