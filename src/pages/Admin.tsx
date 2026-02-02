@@ -82,7 +82,7 @@ const Admin = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, nickname, phone_number, created_at, verification_status')
+        .select('id, first_name, last_name, nickname, phone_number, created_at, verification_status, avatar_url, gender, is_couple, partner_name, partner_photo_url, partner_gender')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -428,23 +428,41 @@ const Admin = () => {
                   <CardContent className="pt-4">
                     <div className="flex items-start gap-4">
                       <Avatar className="w-16 h-16 cursor-pointer hover:ring-2 ring-primary" onClick={() => {
-                        window.open(`https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`, '_blank');
+                        const imageUrl = user.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`;
+                        window.open(imageUrl, '_blank');
                       }}>
-                        <AvatarImage src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`} />
+                        <AvatarImage src={user.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`} />
                         <AvatarFallback>{user.first_name?.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-base">
                           {user.first_name} {user.last_name}
                         </h3>
+                        {user.nickname && (
+                          <p className="text-xs text-muted-foreground">@{user.nickname}</p>
+                        )}
                         <div className="flex flex-wrap gap-2 mt-1">
                           <Badge variant="outline" className="text-xs">
                             {user.gender === 'female' ? '👩' : user.gender === 'male' ? '👨' : '🌈'} {user.gender}
                           </Badge>
                           {user.phone_number && (
-                            <Badge variant="secondary" className="text-xs">📱 Verified</Badge>
+                            <Badge variant="secondary" className="text-xs">📱 {user.phone_number}</Badge>
                           )}
                         </div>
+                        {user.partner_name && (
+                          <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
+                            <span className="font-medium">👫 Couple:</span> Partner {user.partner_name} ({user.partner_gender})
+                            {user.partner_photo_url && (
+                              <Avatar className="w-8 h-8 inline-block ml-2 cursor-pointer" onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(user.partner_photo_url!, '_blank');
+                              }}>
+                                <AvatarImage src={user.partner_photo_url} />
+                                <AvatarFallback>{user.partner_name?.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                            )}
+                          </div>
+                        )}
                       </div>
                       <div className="flex gap-2">
                         <Button
@@ -573,10 +591,22 @@ const Admin = () => {
                               
                               {user.partner_name && (
                                 <div className="mt-2 p-3 bg-muted/50 rounded-lg">
-                                  <p className="text-sm font-medium">👫 Couple Registration</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    Partner: {user.partner_name} ({user.partner_gender})
-                                  </p>
+                                  <div className="flex items-center gap-3">
+                                    {user.partner_photo_url && (
+                                      <Avatar className="w-12 h-12 cursor-pointer hover:ring-2 ring-primary" onClick={() => {
+                                        window.open(user.partner_photo_url!, '_blank');
+                                      }}>
+                                        <AvatarImage src={user.partner_photo_url} />
+                                        <AvatarFallback>{user.partner_name?.charAt(0)}</AvatarFallback>
+                                      </Avatar>
+                                    )}
+                                    <div>
+                                      <p className="text-sm font-medium">👫 Couple Registration</p>
+                                      <p className="text-sm text-muted-foreground">
+                                        Partner: {user.partner_name} ({user.partner_gender})
+                                      </p>
+                                    </div>
+                                  </div>
                                 </div>
                               )}
                               <p className="text-xs text-muted-foreground">
@@ -647,17 +677,39 @@ const Admin = () => {
                           <tr key={user.id} className="border-b border-border/50 hover:bg-muted/50">
                             <td className="p-3">
                               <div className="flex items-center gap-2">
-                                <Avatar className="w-8 h-8">
-                                  <AvatarImage src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`} />
+                                <Avatar className="w-10 h-10 cursor-pointer" onClick={() => {
+                                  const url = user.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`;
+                                  window.open(url, '_blank');
+                                }}>
+                                  <AvatarImage src={user.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`} />
                                   <AvatarFallback>{user.first_name?.charAt(0)}</AvatarFallback>
                                 </Avatar>
+                                {user.is_couple && user.partner_photo_url && (
+                                  <Avatar className="w-10 h-10 -ml-4 border-2 border-background cursor-pointer" onClick={() => {
+                                    window.open(user.partner_photo_url!, '_blank');
+                                  }}>
+                                    <AvatarImage src={user.partner_photo_url} />
+                                    <AvatarFallback>{user.partner_name?.charAt(0)}</AvatarFallback>
+                                  </Avatar>
+                                )}
                                 <div>
                                   <p className="text-sm font-medium">
                                     {user.first_name} {user.last_name}
+                                    {user.is_couple && user.partner_name && (
+                                      <span className="text-muted-foreground"> & {user.partner_name}</span>
+                                    )}
                                   </p>
-                                  {user.nickname && (
-                                    <p className="text-xs text-muted-foreground">@{user.nickname}</p>
-                                  )}
+                                  <div className="flex items-center gap-1">
+                                    {user.nickname && (
+                                      <span className="text-xs text-muted-foreground">@{user.nickname}</span>
+                                    )}
+                                    <Badge variant="outline" className="text-[10px] py-0 px-1">
+                                      {user.gender === 'female' ? '👩' : user.gender === 'male' ? '👨' : '🌈'}
+                                    </Badge>
+                                    {user.is_couple && (
+                                      <Badge variant="secondary" className="text-[10px] py-0 px-1">👫</Badge>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </td>
