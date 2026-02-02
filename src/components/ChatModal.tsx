@@ -30,6 +30,9 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [inputMessage, setInputMessage] = useState('');
   
+  // Check if this is a demo meal
+  const isDemo = mealId?.startsWith('demo-');
+  
   // Get current user
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
@@ -40,6 +43,7 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
   });
 
   // Create or get existing booking for this meal (for message threading)
+  // Skip for demo meals
   const { data: booking } = useQuery({
     queryKey: ['prebooking', mealId, currentUser?.id],
     queryFn: async () => {
@@ -75,7 +79,7 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
       
       return data;
     },
-    enabled: !!currentUser?.id && open,
+    enabled: !!currentUser?.id && open && !isDemo,
   });
 
   // Fetch messages for this booking
@@ -169,6 +173,32 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
 
   if (!currentUser) {
     return null;
+  }
+
+  // Demo meal chat prevention
+  if (isDemo) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              💬 {t('chat.demo_title')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('chat.demo_description')}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 text-center">
+            <p className="text-sm text-muted-foreground mb-4">
+              {t('chat.demo_hint')}
+            </p>
+            <Button onClick={() => onOpenChange(false)}>
+              {t('common.understood')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   return (

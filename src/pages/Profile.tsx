@@ -811,18 +811,34 @@ const Profile = () => {
                   <Label className="text-base font-semibold">{t('profile.partner_details')}</Label>
                 </div>
                 
+                {/* Partner Photo Display & Upload */}
                 <div>
-                  <Label htmlFor="partner-photo">{t('profile.partner_photo_title')} (URL)</Label>
-                  <Input
-                    id="partner-photo"
-                    type="text"
-                    placeholder="https://..."
-                    value={formData.partner_photo_url}
-                    onChange={(e) => setFormData({ ...formData, partner_photo_url: e.target.value })}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    💡 Du kannst das Foto auch oben im Profilbereich hochladen
-                  </p>
+                  <Label>{t('profile.partner_photo_title')}</Label>
+                  <div className="flex items-center gap-4 mt-2">
+                    {formData.partner_photo_url ? (
+                      <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-secondary">
+                        <img 
+                          src={formData.partner_photo_url} 
+                          alt={t('profile.partner_photo_title')} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center border-2 border-dashed border-border">
+                        <span className="text-2xl">👥</span>
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground">
+                        {formData.partner_photo_url 
+                          ? '✅ ' + t('profile.partner_photo_uploaded')
+                          : t('profile.partner_photo_missing')}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        💡 {t('profile.upload_via_avatar_section')}
+                      </p>
+                    </div>
+                  </div>
                 </div>
                 
                 <div>

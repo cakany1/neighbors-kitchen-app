@@ -33,7 +33,26 @@
     "by": "by",
     "loading": "Loading...",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "understood": "Got it"
+  },
+  "chat": {
+    "loading": "Loading...",
+    "hide_translations": "Hide",
+    "show_translations": "Show",
+    "report_user": "Report User",
+    "block_user": "Block User",
+    "user_blocked_redirect": "User blocked. Returning to feed...",
+    "auto_translation_active": "Auto-translation active:",
+    "auto_translation_desc": "You and your chat partner speak different languages. Messages are automatically translated to facilitate communication.",
+    "translated": "Translated:",
+    "type_message": "Type a message...",
+    "send_blocked": "Cannot send message. There is a block between you and this user.",
+    "send_failed": "Could not send message",
+    "message_sent": "Message sent",
+    "demo_title": "Demo Mode",
+    "demo_description": "This is a demo meal. Chat with the chef is not available.",
+    "demo_hint": "Sign up and book a real meal to chat with chefs!"
   },
   "feed": {
     "available_meals": "Available Meals",
@@ -237,7 +256,10 @@
     "2fa_disabled_success": "2FA disabled.",
     "2fa_verification_failed": "Verification failed. Please try again.",
     "2fa_enrollment_failed": "2FA setup failed.",
-    "2fa_disable_failed": "Could not disable 2FA."
+    "2fa_disable_failed": "Could not disable 2FA.",
+    "partner_photo_uploaded": "Partner photo uploaded",
+    "partner_photo_missing": "No partner photo uploaded",
+    "upload_via_avatar_section": "You can upload the photo in the avatar section above"
   },
   "auth": {
     "welcome_back": "Welcome back!",
@@ -620,10 +642,11 @@
     "photoSecurityNote": "For the security of the community, a real photo is necessary. This serves as initial verification.",
     "selfDeclaration": "I confirm that I identify with the selected group and respect the protected space.",
     "selfDeclarationRequired": "Please confirm the self-declaration to proceed.",
-    "password_too_short": "Too short",
+    "password_too_short": "Min. 8 characters",
     "password_weak": "Weak",
     "password_medium": "Medium",
     "password_strong": "Strong",
+    "password_hint": "At least 8 characters",
     "select_languages": "Select all languages you speak",
     "chat_translation_note": "🇬🇧 This enables automatic chat translation. It does not change the app interface language.",
     "account_type": "Account Type",

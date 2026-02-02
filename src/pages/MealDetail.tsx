@@ -258,9 +258,11 @@ const MealDetail = () => {
       return;
     }
 
-    // DEMO LOCK: Prevent booking demo meals
-    if (meal?.tags?.includes("Demo / Beispiel")) {
+    // DEMO LOCK: Prevent booking demo meals (check ID prefix)
+    const isDemo = meal?.id?.startsWith("demo-");
+    if (isDemo) {
       toast.info(t("meal_detail.demo_meal_notice"), {
+        description: t("meal_detail.demo_meal_hint"),
         duration: 5000,
       });
       return;

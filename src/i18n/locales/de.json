@@ -33,7 +33,8 @@
     "by": "von",
     "loading": "Laden...",
     "error": "Fehler",
-    "success": "Erfolg"
+    "success": "Erfolg",
+    "understood": "Verstanden"
   },
   "actions": {
     "view_details": "Details ansehen"
@@ -110,7 +111,10 @@
     "type_message": "Nachricht schreiben...",
     "send_blocked": "Nachricht kann nicht gesendet werden. Es gibt eine Blockierung zwischen dir und diesem Nutzer.",
     "send_failed": "Nachricht konnte nicht gesendet werden",
-    "message_sent": "Nachricht gesendet"
+    "message_sent": "Nachricht gesendet",
+    "demo_title": "Demo-Modus",
+    "demo_description": "Dies ist ein Demo-Gericht. Der Chat mit dem Koch ist nicht verfügbar.",
+    "demo_hint": "Registriere dich und buche ein echtes Gericht, um mit Köchen zu chatten!"
   },
   "feed": {
     "available_meals": "Verfügbare Gerichte",
@@ -384,7 +388,10 @@
     "2fa_disabled_success": "2FA deaktiviert.",
     "2fa_verification_failed": "Verifizierung fehlgeschlagen. Bitte erneut versuchen.",
     "2fa_enrollment_failed": "2FA-Einrichtung fehlgeschlagen.",
-    "2fa_disable_failed": "2FA konnte nicht deaktiviert werden."
+    "2fa_disable_failed": "2FA konnte nicht deaktiviert werden.",
+    "partner_photo_uploaded": "Partner-Foto hochgeladen",
+    "partner_photo_missing": "Kein Partner-Foto vorhanden",
+    "upload_via_avatar_section": "Du kannst das Foto oben im Profilbereich hochladen"
   },
   "guidelines": {
     "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (außer beim Vor-Ort-Essen)",
@@ -585,11 +592,11 @@
     "photoSecurityNote": "Für die Sicherheit der Community ist ein echtes Foto notwendig. Dies dient als erste Verifizierung.",
     "selfDeclaration": "Ich bestätige, dass ich mich der gewählten Gruppe zugehörig fühle und den geschützten Raum respektiere.",
     "selfDeclarationRequired": "Bitte bestätige die Selbsterklärung, um fortzufahren.",
-    "password_too_short": "Mindestens 6 Zeichen",
+    "password_too_short": "Mindestens 8 Zeichen",
     "password_weak": "Schwach",
     "password_medium": "Mittel",
     "password_strong": "Stark",
-    "password_hint": "Mindestens 6 Zeichen",
+    "password_hint": "Mindestens 8 Zeichen",
     "leaked_password_title": "Wichtig: Passwort-Sicherheit",
     "leaked_password_hint": "Passwörter, die in bekannten Datenlecks vorkommen (z.B. \"123456\", \"password\"), werden blockiert – auch wenn sie lang genug sind. Wähle ein einzigartiges Passwort mit Zahlen und Sonderzeichen.",
     "first_name_required": "Bitte gib deinen Vornamen ein",
