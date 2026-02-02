@@ -43,8 +43,9 @@ const ChefProfile = () => {
   const { data: meals, isLoading: mealsLoading } = useQuery({
     queryKey: ['chefMeals', chefId],
     queryFn: async () => {
+      // SECURITY: Use meals_public view to prevent exact_address exposure
       const { data, error } = await supabase
-        .from('meals')
+        .from('meals_public')
         .select(`
           id,
           title,
