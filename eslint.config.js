@@ -6,21 +6,40 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   { ignores: ["dist"] },
+
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended,
+    ],
+
     files: ["**/*.{ts,tsx}"],
+
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
     },
+
     rules: {
+      // React
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
+      ],
+
+      // TypeScript – pragmatisch
+      "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": "off",
+
+      // JS / TS Hygiene
+      "no-unused-vars": "off",
+      "no-undef": "off",
     },
-  },
+  }
 );
