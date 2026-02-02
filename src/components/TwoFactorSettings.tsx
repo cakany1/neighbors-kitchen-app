@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Shield, ShieldCheck, Loader2, QrCode, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 
 interface TwoFactorSettingsProps {
   userId: string;
@@ -204,7 +205,11 @@ export const TwoFactorSettings = ({ userId }: TwoFactorSettingsProps) => {
             {qrCodeSvg && (
               <div 
                 className="flex justify-center p-4 bg-white rounded-lg"
-                dangerouslySetInnerHTML={{ __html: qrCodeSvg }}
+                dangerouslySetInnerHTML={{ 
+                  __html: DOMPurify.sanitize(qrCodeSvg, { 
+                    USE_PROFILES: { svg: true, svgFilters: true } 
+                  }) 
+                }}
               />
             )}
             
