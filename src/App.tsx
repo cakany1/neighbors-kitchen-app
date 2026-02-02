@@ -23,6 +23,7 @@ import FAQ from "./pages/FAQ";
 import Install from "./pages/Install";
 import Contact from "./pages/Contact";
 import Story from "./pages/Story";
+import OAuthCallback from "./pages/OAuthCallback";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
 import { OnboardingTour } from "./components/OnboardingTour";
@@ -82,8 +83,9 @@ const AppRoutes = () => {
           <Route path="/install" element={<Install />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/story" element={<Story />} />
-          {/* OAuth callback route - redirects to feed after login */}
-          <Route path="/~oauth/callback" element={<Navigate to="/feed" replace />} />
+          {/* OAuth callback routes - handles both with and without tilde */}
+          <Route path="/~oauth/callback" element={<OAuthCallback />} />
+          <Route path="/%7Eoauth/callback" element={<OAuthCallback />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
