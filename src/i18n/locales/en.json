@@ -469,7 +469,17 @@
   },
   "payment": {
     "back_to_feed": "Back to Feed",
-    "meal_not_found": "Meal not found"
+    "meal_not_found": "Meal not found",
+    "method": "Payment Method",
+    "processing": "Processing...",
+    "pay_now": "Pay now",
+    "demo_button": "Test demo payment",
+    "demo_notice": "This is a demo. No real payment.",
+    "secure_notice": "🔒 Secure payment via Stripe",
+    "error": "Payment failed. Please try again.",
+    "success_title": "Payment successful!",
+    "success_message": "Thank you for your contribution. You're supporting your neighborhood!",
+    "receipt_info": "A confirmation has been sent to your email."
   },
   "error": {
     "something_went_wrong": "Something went wrong",

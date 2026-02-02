@@ -484,7 +484,17 @@
   },
   "payment": {
     "back_to_feed": "Zurück zum Feed",
-    "meal_not_found": "Gericht nicht gefunden"
+    "meal_not_found": "Gericht nicht gefunden",
+    "method": "Zahlungsmethode",
+    "processing": "Wird verarbeitet...",
+    "pay_now": "Jetzt bezahlen",
+    "demo_button": "Demo-Zahlung testen",
+    "demo_notice": "Dies ist eine Demo. Keine echte Zahlung.",
+    "secure_notice": "🔒 Sichere Zahlung via Stripe",
+    "error": "Zahlung fehlgeschlagen. Bitte versuche es erneut.",
+    "success_title": "Zahlung erfolgreich!",
+    "success_message": "Vielen Dank für deinen Beitrag. Du unterstützt damit deine Nachbarschaft!",
+    "receipt_info": "Eine Bestätigung wurde an deine E-Mail gesendet."
   },
   "error": {
     "something_went_wrong": "Etwas ist schiefgelaufen",

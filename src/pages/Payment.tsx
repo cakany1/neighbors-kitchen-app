@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { Star, Heart } from 'lucide-react';
+import { Star, Heart, Loader2, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const Payment = () => {
   const { t } = useTranslation();
@@ -19,6 +20,10 @@ const Payment = () => {
   const [paymentAmount, setPaymentAmount] = useState(
     Math.max(meal?.pricing.suggested || 7, meal?.pricing.minimum || 7, 7)
   );
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Check if this is a demo meal
+  const isDemoMeal = id?.startsWith('demo-');
 
   if (!meal) {
     return (
@@ -33,24 +38,55 @@ const Payment = () => {
     );
   }
 
-  const handlePayment = () => {
+  const serviceFee = 2.00;
+  const totalAmount = paymentAmount + serviceFee;
+  const minTotal = 7.00;
+  const minPayment = 5; // CHF 5 + CHF 2 fee = CHF 7 minimum
+  const maxPayment = Math.max((meal.pricing.suggested || 20) * 2, 50);
+
+  const handlePayment = async () => {
     // Validate minimum total amount
     if (totalAmount < minTotal) {
       toast.error(`Minimumbetrag ist CHF ${minTotal.toFixed(2)} (inkl. Gebühr).`);
       return;
     }
-    
-    toast.success(`Payment of CHF ${paymentAmount} processed! Thank you for supporting ${meal.chef.firstName}.`);
-    setTimeout(() => {
-      navigate('/app');
-    }, 1500);
-  };
 
-  const maxPayment = Math.max((meal.pricing.suggested || 20) * 2, 50);
-  const serviceFee = 2.00;
-  const totalAmount = paymentAmount + serviceFee;
-  const minTotal = 7.00;
-  const minPayment = 7;
+    // Demo mode - just show success message
+    if (isDemoMeal) {
+      toast.success(t('meal.demo_meal_notice'));
+      return;
+    }
+    
+    setIsProcessing(true);
+    
+    try {
+      // Call edge function to create Stripe Checkout session
+      const { data, error } = await supabase.functions.invoke('create-payment-intent', {
+        body: {
+          amount: Math.round(paymentAmount * 100), // Convert to cents
+          mealId: id,
+          mealTitle: meal.title,
+          chefName: `${meal.chef.firstName} ${meal.chef.lastName.charAt(0)}.`,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data?.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error(t('payment.error', 'Zahlung fehlgeschlagen. Bitte versuche es erneut.'));
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -170,42 +206,47 @@ const Payment = () => {
             </CardContent>
           </Card>
 
-          {/* Payment Method - Online Only */}
+          {/* Payment Action */}
           <Card>
             <CardHeader>
-              <CardTitle>Payment Method</CardTitle>
+              <CardTitle>{t('payment.method', 'Zahlungsmethode')}</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <Button 
-                variant="outline" 
-                className="w-full h-16 text-lg border-primary/50 hover:bg-primary/10"
-                onClick={handlePayment}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
-                    💳
-                  </div>
-                  <span>Online Payment (Card / Stripe)</span>
+            <CardContent className="space-y-4">
+              {isDemoMeal && (
+                <div className="bg-muted/50 p-3 rounded-lg text-center text-sm text-muted-foreground">
+                  ℹ️ {t('meal.demo_meal_hint')}
                 </div>
+              )}
+              
+              <Button 
+                onClick={handlePayment}
+                disabled={totalAmount < minTotal || isProcessing}
+                size="lg"
+                className="w-full h-14 text-lg"
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    {t('payment.processing', 'Wird verarbeitet...')}
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="w-5 h-5 mr-2" />
+                    {isDemoMeal 
+                      ? t('payment.demo_button', 'Demo-Zahlung testen')
+                      : `${t('payment.pay_now', 'Jetzt bezahlen')} - CHF ${totalAmount.toFixed(2)}`
+                    }
+                  </>
+                )}
               </Button>
-              <p className="text-xs text-muted-foreground text-center">
-                ℹ️ Only online payments accepted to ensure platform fees and security
+
+              <p className="text-center text-xs text-muted-foreground">
+                {isDemoMeal 
+                  ? t('payment.demo_notice', 'Dies ist eine Demo. Keine echte Zahlung.')
+                  : t('payment.secure_notice', '🔒 Sichere Zahlung via Stripe')}
               </p>
             </CardContent>
           </Card>
-
-          <Button 
-            onClick={handlePayment}
-            size="lg"
-            className="w-full h-14 text-lg"
-            disabled={totalAmount < minTotal}
-          >
-            Complete Payment - CHF {totalAmount.toFixed(2)}
-          </Button>
-
-          <p className="text-center text-xs text-muted-foreground">
-            This is a demo payment. No actual transaction will be processed.
-          </p>
         </div>
       </main>
 
