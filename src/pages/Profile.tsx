@@ -1534,8 +1534,11 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Save Button */}
-        <div className="mt-6">
+      </main>
+
+      {/* Sticky Save Button - Always visible */}
+      <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-4 md:hidden z-40">
+        <div className="max-w-lg mx-auto">
           <Button 
             onClick={() => updateProfileMutation.mutate(undefined)}
             disabled={updateProfileMutation.isPending}
@@ -1548,7 +1551,22 @@ const Profile = () => {
             {updateProfileMutation.isPending ? t('profile.saving') : t('profile.save_changes')}
           </Button>
         </div>
-      </main>
+      </div>
+
+      {/* Desktop Save Button (non-sticky) */}
+      <div className="hidden md:block max-w-lg mx-auto px-4 pb-6">
+        <Button 
+          onClick={() => updateProfileMutation.mutate(undefined)}
+          disabled={updateProfileMutation.isPending}
+          className="w-full"
+          size="lg"
+        >
+          {updateProfileMutation.isPending && (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          )}
+          {updateProfileMutation.isPending ? t('profile.saving') : t('profile.save_changes')}
+        </Button>
+      </div>
 
       <BottomNav />
     </div>
