@@ -86,7 +86,16 @@
     "apple_signup": "Mit Apple registrieren",
     "or_email": "oder mit E-Mail",
     "logout": "Ausloggen",
-    "logging_out": "Wird abgemeldet..."
+    "logging_out": "Wird abgemeldet...",
+    "set_new_password": "Neues Passwort setzen",
+    "set_new_password_desc": "Gib dein neues Passwort ein, um den Vorgang abzuschliessen.",
+    "password_reset_info": "Du hast angefordert, dein Passwort zurückzusetzen. Bitte wähle jetzt ein neues sicheres Passwort.",
+    "new_password": "Neues Passwort",
+    "confirm_password": "Passwort bestätigen",
+    "save_new_password": "Neues Passwort speichern",
+    "passwords_dont_match": "Die Passwörter stimmen nicht überein.",
+    "password_too_short": "Das Passwort muss mindestens 8 Zeichen haben.",
+    "password_updated": "Passwort erfolgreich geändert! Du bist jetzt eingeloggt."
   },
   "chat": {
     "loading": "Lädt...",

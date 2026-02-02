@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
@@ -9,13 +9,15 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-import { ChefHat, Loader2 } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ChefHat, Loader2, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { TwoFactorVerify } from '@/components/TwoFactorVerify';
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
@@ -25,10 +27,27 @@ const Login = () => {
     password: '',
   });
   
+  // Password reset mode detection
+  const [isPasswordResetMode, setIsPasswordResetMode] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+  
   // 2FA state
   const [show2FA, setShow2FA] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
+
+  // Detect password reset token in URL (Supabase uses hash fragments)
+  useEffect(() => {
+    const hashParams = new URLSearchParams(location.hash.substring(1));
+    const type = hashParams.get('type');
+    const accessToken = hashParams.get('access_token');
+    
+    if (type === 'recovery' && accessToken) {
+      setIsPasswordResetMode(true);
+    }
+  }, [location]);
 
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
@@ -204,6 +223,41 @@ const Login = () => {
     }
   };
 
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (newPassword !== confirmPassword) {
+      toast.error(t('auth.passwords_dont_match'));
+      return;
+    }
+    
+    if (newPassword.length < 8) {
+      toast.error(t('auth.password_too_short'));
+      return;
+    }
+    
+    setUpdatingPassword(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success(t('auth.password_updated'));
+        setIsPasswordResetMode(false);
+        // Clear URL hash
+        window.history.replaceState(null, '', window.location.pathname);
+        navigate('/feed');
+      }
+    } catch (error: any) {
+      toast.error(error.message || t('auth.reset_failed'));
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
+
   // Show 2FA verification screen
   if (show2FA) {
     return (
@@ -212,6 +266,65 @@ const Login = () => {
           onSuccess={handle2FASuccess}
           onCancel={handle2FACancel}
         />
+      </div>
+    );
+  }
+
+  // Show password reset form when user clicked the email link
+  if (isPasswordResetMode) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <KeyRound className="w-8 h-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl">{t('auth.set_new_password')}</CardTitle>
+            <CardDescription>{t('auth.set_new_password_desc')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Alert className="mb-4 border-primary/20 bg-primary/5">
+              <KeyRound className="h-4 w-4" />
+              <AlertDescription>
+                {t('auth.password_reset_info')}
+              </AlertDescription>
+            </Alert>
+            
+            <form onSubmit={handlePasswordUpdate} className="space-y-4">
+              <div>
+                <Label htmlFor="new-password">{t('auth.new_password')}</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  minLength={8}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="confirm-password">{t('auth.confirm_password')}</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={8}
+                />
+              </div>
+              
+              <Button type="submit" className="w-full" disabled={updatingPassword}>
+                {updatingPassword ? t('common.loading') : t('auth.save_new_password')}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     );
   }
