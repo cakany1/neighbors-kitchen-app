@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
-import { lovable } from '@/integrations/lovable';
+// Using direct Supabase OAuth for BYOK (custom Google credentials)
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -52,12 +52,15 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: window.location.origin,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+        },
       });
 
-      if (result.error) {
-        toast.error(result.error.message || t('auth.login_failed'));
+      if (error) {
+        toast.error(error.message || t('auth.login_failed'));
         setGoogleLoading(false);
       }
     } catch (error: any) {
@@ -70,12 +73,15 @@ const Login = () => {
   const handleAppleLogin = async () => {
     setAppleLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth('apple', {
-        redirect_uri: window.location.origin,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: window.location.origin,
+        },
       });
 
-      if (result.error) {
-        toast.error(result.error.message || t('auth.login_failed'));
+      if (error) {
+        toast.error(error.message || t('auth.login_failed'));
         setAppleLoading(false);
       }
     } catch (error: any) {
