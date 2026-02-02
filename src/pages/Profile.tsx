@@ -30,6 +30,7 @@ import { VerificationDialog } from '@/components/VerificationDialog';
 import { TwoFactorSettings } from '@/components/TwoFactorSettings';
 import { ReliabilityDisplay } from '@/components/ReliabilityDisplay';
 import { KarmaLevel } from '@/components/KarmaLevel';
+import { ChefBookings } from '@/components/ChefBookings';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -651,7 +652,7 @@ const Profile = () => {
                   </span>
                 </div>
                 <div className="mt-2">
-                  <KarmaLevel karma={profile?.karma || 0} size="md" />
+                  <KarmaLevel karma={profile?.karma || 0} size="md" showProgress />
                 </div>
             </div>
 
@@ -1181,6 +1182,19 @@ const Profile = () => {
             </p>
             <GalleryUpload userId={currentUser.id} />
             <GalleryGrid userId={currentUser.id} isOwnProfile={true} />
+          </CardContent>
+        </Card>
+
+        {/* Chef Bookings Management */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ChefHat className="w-5 h-5 text-primary" />
+              {t('profile.chef_bookings_title')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChefBookings userId={currentUser.id} />
           </CardContent>
         </Card>
 

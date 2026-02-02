@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, ChefHat, Package, Home, Ghost, UtensilsCrossed } from "lucide-react";
 import { VerificationBadge } from "@/components/VerificationBadge";
+import { KarmaLevel } from "@/components/KarmaLevel";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -30,6 +31,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   const chef = meal.chef || {};
   const chefNickname = getProp(chef, "nickname", "nickname") || getProp(chef, "firstName", "first_name") || "Chef";
   const chefIsVerified = getProp(chef, "isVerified", "id_verified") || false;
+  const chefKarma = getProp(chef, "karma", "karma") || 0;
 
   const imageUrl = getProp(meal, "imageUrl", "image_url");
   const availablePortions = getProp(meal, "availablePortions", "available_portions");
@@ -93,6 +95,10 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
               <MapPin className="w-3 h-3" />
               {neighborhood}
             </span>
+          </div>
+          {/* Chef Karma Level */}
+          <div className="mt-1">
+            <KarmaLevel karma={chefKarma} size="sm" showLabel={false} />
           </div>
         </div>
 

@@ -4,7 +4,24 @@
     "apprentice": "Lehrling",
     "sous_chef": "Sous Chef",
     "head_chef": "Küchenchef",
-    "star_chef": "Sternekoch"
+    "star_chef": "Sternekoch",
+    "points_to_next": "{{points}} Punkte bis {{level}}",
+    "max_level_reached": "🎉 Maximales Level erreicht!"
+  },
+  "booking": {
+    "no_show": "No-Show markieren",
+    "no_show_confirm": "Bist du sicher, dass der Gast nicht erschienen ist?",
+    "no_show_marked": "No-Show wurde markiert",
+    "chef_cancelled": "Koch hat abgesagt",
+    "cancel_by_chef": "Absagen",
+    "cancel_chef_confirm": "Möchtest du diese Buchung wirklich absagen?",
+    "cancelled_by_chef": "Erfolgreich abgesagt",
+    "status_pending": "Ausstehend",
+    "status_confirmed": "Bestätigt",
+    "status_completed": "Abgeschlossen",
+    "status_cancelled": "Storniert",
+    "booked_on": "Gebucht am",
+    "no_bookings_yet": "Noch keine Buchungen für deine Gerichte"
   },
   "common": {
     "payWhatYouWant": "Wähle deinen Preis",
@@ -171,6 +188,7 @@
     "translated_successfully": "Erfolgreich übersetzt"
   },
   "profile": {
+    "chef_bookings_title": "Buchungen für deine Gerichte",
     "karma": "Karma",
     "mealsShared": "Mahlzeiten geteilt",
     "mealsReceived": "Mahlzeiten erhalten",
