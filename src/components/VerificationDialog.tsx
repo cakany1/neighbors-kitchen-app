@@ -74,12 +74,8 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
   };
 
   const handleSubmit = async () => {
-    if (!filePath) {
-      toast.error('Bitte lade ein Foto deines Ausweises hoch');
-      return;
-    }
-
-    if (!confirmed) {
+    // ID document is optional - only require confirmation if a document was uploaded
+    if (filePath && !confirmed) {
       toast.error('Bitte bestätige, dass dies dein eigener Ausweis ist');
       return;
     }
@@ -127,7 +123,7 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
             ID-Verifizierung
           </DialogTitle>
           <DialogDescription>
-            Lade ein Foto deines Ausweises hoch, um dein Profil zu verifizieren und das ✓ Badge zu erhalten.
+            Beantrage dein ✓ Verifiziert-Badge. Ein Ausweisfoto ist <strong>optional</strong>, beschleunigt aber die Prüfung.
           </DialogDescription>
         </DialogHeader>
 
@@ -157,13 +153,13 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
             </AlertDescription>
           </Alert>
 
-          {/* Upload Section */}
+          {/* Upload Section - Optional */}
           <div className="space-y-2">
             <Label htmlFor="verification-photo" className="font-medium">
-              Ausweis-Foto hochladen
+              Ausweis-Foto hochladen <span className="text-muted-foreground font-normal">(optional)</span>
             </Label>
             <p className="text-xs text-muted-foreground mb-2">
-              Pass, ID-Karte oder Führerschein (Foto muss lesbar sein)
+              Pass, ID-Karte oder Führerschein – beschleunigt die Prüfung, ist aber nicht zwingend erforderlich
             </p>
             <Input
               id="verification-photo"
@@ -187,19 +183,20 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
             )}
           </div>
 
-          {/* Confirmation Checkbox */}
-          <div className="flex items-start space-x-3 p-3 bg-muted/50 rounded-lg">
-            <Checkbox
-              id="confirm-ownership"
-              checked={confirmed}
-              onCheckedChange={(checked) => setConfirmed(checked === true)}
-              disabled={submitting}
-            />
-            <Label htmlFor="confirm-ownership" className="text-xs leading-relaxed cursor-pointer">
-              Ich bestätige, dass dies mein eigener Ausweis ist und dass meine Angaben korrekt sind.
-            </Label>
-          </div>
-
+          {/* Confirmation Checkbox - Only show if document was uploaded */}
+          {filePath && (
+            <div className="flex items-start space-x-3 p-3 bg-muted/50 rounded-lg">
+              <Checkbox
+                id="confirm-ownership"
+                checked={confirmed}
+                onCheckedChange={(checked) => setConfirmed(checked === true)}
+                disabled={submitting}
+              />
+              <Label htmlFor="confirm-ownership" className="text-xs leading-relaxed cursor-pointer">
+                Ich bestätige, dass dies mein eigener Ausweis ist und dass meine Angaben korrekt sind.
+              </Label>
+            </div>
+          )}
           {/* Rejection Notice */}
           {verificationStatus === 'rejected' && (
             <Alert variant="destructive">
@@ -209,11 +206,13 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
             </Alert>
           )}
 
-          {/* Delete Notice */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Trash2 className="w-3 h-3" />
-            Dokument wird nach erfolgreicher Prüfung automatisch gelöscht
-          </div>
+          {/* Delete Notice - Only show if document uploaded */}
+          {filePath && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Trash2 className="w-3 h-3" />
+              Dokument wird nach erfolgreicher Prüfung automatisch gelöscht
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2">
@@ -223,7 +222,7 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
           <Button 
             onClick={handleSubmit} 
             className="flex-1" 
-            disabled={!filePath || !confirmed || submitting}
+            disabled={(filePath && !confirmed) || submitting}
           >
             {submitting ? (
               <>
@@ -231,7 +230,7 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
                 Sende...
               </>
             ) : (
-              '📤 Absenden'
+              '📤 Verifizierung beantragen'
             )}
           </Button>
         </div>
