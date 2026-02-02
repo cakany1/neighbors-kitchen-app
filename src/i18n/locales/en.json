@@ -4,7 +4,24 @@
     "apprentice": "Apprentice",
     "sous_chef": "Sous Chef",
     "head_chef": "Head Chef",
-    "star_chef": "Star Chef"
+    "star_chef": "Star Chef",
+    "points_to_next": "{{points}} points to {{level}}",
+    "max_level_reached": "🎉 Maximum level reached!"
+  },
+  "booking": {
+    "no_show": "Mark as No-Show",
+    "no_show_confirm": "Are you sure the guest didn't show up?",
+    "no_show_marked": "No-show has been marked",
+    "chef_cancelled": "Chef cancelled",
+    "cancel_by_chef": "Cancel Booking",
+    "cancel_chef_confirm": "Do you really want to cancel this booking?",
+    "cancelled_by_chef": "Successfully cancelled",
+    "status_pending": "Pending",
+    "status_confirmed": "Confirmed",
+    "status_completed": "Completed",
+    "status_cancelled": "Cancelled",
+    "booked_on": "Booked on",
+    "no_bookings_yet": "No bookings for your meals yet"
   },
   "common": {
     "payWhatYouWant": "Choose your price",
@@ -35,6 +52,7 @@
     "view_details": "View Details"
   },
   "profile": {
+    "chef_bookings_title": "Bookings for Your Meals",
     "karma": "Karma",
     "mealsShared": "Meals Shared",
     "mealsReceived": "Meals Received",
