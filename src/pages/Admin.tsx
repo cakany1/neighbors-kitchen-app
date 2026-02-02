@@ -8,7 +8,36 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+// Helper function to check for incomplete profile fields
+const getProfileWarnings = (user: {
+  first_name?: string | null;
+  last_name?: string | null;
+  avatar_url?: string | null;
+  phone_number?: string | null;
+  gender?: string | null;
+  is_couple?: boolean | null;
+  partner_name?: string | null;
+  partner_photo_url?: string | null;
+}) => {
+  const warnings: string[] = [];
+  
+  if (!user.first_name?.trim()) warnings.push('Vorname fehlt');
+  if (!user.last_name?.trim()) warnings.push('Nachname fehlt');
+  if (!user.avatar_url) warnings.push('Profilfoto fehlt');
+  if (!user.phone_number) warnings.push('Telefonnummer fehlt');
+  if (!user.gender) warnings.push('Geschlecht fehlt');
+  
+  // Couple-specific checks
+  if (user.is_couple) {
+    if (!user.partner_name?.trim()) warnings.push('Partnername fehlt');
+    if (!user.partner_photo_url) warnings.push('Partnerfoto fehlt');
+  }
+  
+  return warnings;
+};
 import { IdDocumentViewer } from '@/components/IdDocumentViewer';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -443,11 +472,36 @@ const Admin = () => {
                         )}
                         <div className="flex flex-wrap gap-2 mt-1">
                           <Badge variant="outline" className="text-xs">
-                            {user.gender === 'female' ? '👩' : user.gender === 'male' ? '👨' : '🌈'} {user.gender}
+                            {user.gender === 'female' ? '👩' : user.gender === 'male' ? '👨' : '🌈'} {user.gender || 'Unbekannt'}
                           </Badge>
                           {user.phone_number && (
                             <Badge variant="secondary" className="text-xs">📱 {user.phone_number}</Badge>
                           )}
+                          {/* Profile Warnings Badge */}
+                          {(() => {
+                            const warnings = getProfileWarnings(user);
+                            if (warnings.length > 0) {
+                              return (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Badge variant="destructive" className="text-xs gap-1">
+                                        <AlertTriangle className="w-3 h-3" />
+                                        {warnings.length} unvollständig
+                                      </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom" className="max-w-xs">
+                                      <p className="font-medium mb-1">Fehlende Angaben:</p>
+                                      <ul className="text-xs list-disc ml-3">
+                                        {warnings.map((w, i) => <li key={i}>{w}</li>)}
+                                      </ul>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              );
+                            }
+                            return null;
+                          })()}
                         </div>
                         {user.partner_name && (
                           <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
@@ -569,11 +623,36 @@ const Admin = () => {
                               </div>
                               <div className="flex flex-wrap gap-2">
                                 <Badge variant="outline">
-                                  {user.gender === 'female' ? '👩' : user.gender === 'male' ? '👨' : '🌈'} {user.gender}
+                                  {user.gender === 'female' ? '👩' : user.gender === 'male' ? '👨' : '🌈'} {user.gender || 'Unbekannt'}
                                 </Badge>
                                 {user.phone_number && (
                                   <Badge variant="secondary">📱 {user.phone_number}</Badge>
                                 )}
+                                {/* Profile Warnings Badge */}
+                                {(() => {
+                                  const warnings = getProfileWarnings(user);
+                                  if (warnings.length > 0) {
+                                    return (
+                                      <TooltipProvider>
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <Badge variant="destructive" className="gap-1">
+                                              <AlertTriangle className="w-3 h-3" />
+                                              {warnings.length} unvollständig
+                                            </Badge>
+                                          </TooltipTrigger>
+                                          <TooltipContent side="bottom" className="max-w-xs">
+                                            <p className="font-medium mb-1">Fehlende Angaben:</p>
+                                            <ul className="text-xs list-disc ml-3">
+                                              {warnings.map((w, i) => <li key={i}>{w}</li>)}
+                                            </ul>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      </TooltipProvider>
+                                    );
+                                  }
+                                  return null;
+                                })()}
                               </div>
                               
                               {/* ID Document Preview for Admin */}
@@ -709,6 +788,30 @@ const Admin = () => {
                                     {user.is_couple && (
                                       <Badge variant="secondary" className="text-[10px] py-0 px-1">👫</Badge>
                                     )}
+                                    {/* Inline warning icon for incomplete profiles */}
+                                    {(() => {
+                                      const warnings = getProfileWarnings(user);
+                                      if (warnings.length > 0) {
+                                        return (
+                                          <TooltipProvider>
+                                            <Tooltip>
+                                              <TooltipTrigger asChild>
+                                                <span className="text-destructive cursor-help">
+                                                  <AlertTriangle className="w-3 h-3" />
+                                                </span>
+                                              </TooltipTrigger>
+                                              <TooltipContent side="right" className="max-w-xs">
+                                                <p className="font-medium mb-1">⚠️ Unvollständiges Profil:</p>
+                                                <ul className="text-xs list-disc ml-3">
+                                                  {warnings.map((w, i) => <li key={i}>{w}</li>)}
+                                                </ul>
+                                              </TooltipContent>
+                                            </Tooltip>
+                                          </TooltipProvider>
+                                        );
+                                      }
+                                      return null;
+                                    })()}
                                   </div>
                                 </div>
                               </div>
