@@ -74,7 +74,7 @@ const Admin = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, nickname, gender, phone_number, avatar_url, verification_status, partner_name, partner_photo_url, partner_gender, created_at, id_document_url, is_couple')
+        .select('id, first_name, last_name, nickname, gender, phone_number, avatar_url, verification_status, partner_name, partner_photo_url, partner_gender, created_at, id_document_url, is_couple, private_address, private_city, private_postal_code')
         .eq('verification_status', 'pending')
         .order('created_at', { ascending: false });
 
@@ -559,22 +559,28 @@ const Admin = () => {
                               );
                             }
                             return null;
-                          })()}
-                        </div>
-                        {user.partner_name && (
-                          <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
-                            <span className="font-medium">👫 Couple:</span> Partner {user.partner_name} ({user.partner_gender})
-                            {user.partner_photo_url && (
-                              <Avatar className="w-8 h-8 inline-block ml-2 cursor-pointer" onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(user.partner_photo_url!, '_blank');
-                              }}>
-                                <AvatarImage src={user.partner_photo_url} />
-                                <AvatarFallback>{user.partner_name?.charAt(0)}</AvatarFallback>
-                              </Avatar>
-                            )}
-                          </div>
-                        )}
+                                        })()}
+                                        </div>
+                                        {/* Address info in widget */}
+                                        {(user.private_address || user.private_city) && (
+                                          <p className="text-xs text-muted-foreground mt-1">
+                                            📍 {user.private_address && `${user.private_address}, `}{user.private_postal_code} {user.private_city}
+                                          </p>
+                                        )}
+                                        {user.partner_name && (
+                                          <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
+                                            <span className="font-medium">👫 Couple:</span> Partner {user.partner_name} ({user.partner_gender})
+                                            {user.partner_photo_url && (
+                                              <Avatar className="w-8 h-8 inline-block ml-2 cursor-pointer" onClick={(e) => {
+                                                e.stopPropagation();
+                                                window.open(user.partner_photo_url!, '_blank');
+                                              }}>
+                                                <AvatarImage src={user.partner_photo_url} />
+                                                <AvatarFallback>{user.partner_name?.charAt(0)}</AvatarFallback>
+                                              </Avatar>
+                                            )}
+                                          </div>
+                                        )}
                       </div>
                       <div className="flex gap-2">
                         <Button
@@ -721,6 +727,21 @@ const Admin = () => {
                                   return null;
                                 })()}
                               </div>
+                              
+                              {/* Address Info for Admin - to detect duplicates */}
+                              {(user.private_address || user.private_city || user.private_postal_code) && (
+                                <div className="mt-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                  <p className="text-sm font-medium flex items-center gap-2 mb-1">
+                                    🏠 Registrierte Adresse
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {user.private_address && <span>{user.private_address}<br /></span>}
+                                    {(user.private_postal_code || user.private_city) && (
+                                      <span>{user.private_postal_code} {user.private_city}</span>
+                                    )}
+                                  </p>
+                                </div>
+                              )}
                               
                               {/* ID Document Preview for Admin */}
                               {user.id_document_url && (
