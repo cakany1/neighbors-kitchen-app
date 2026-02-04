@@ -84,6 +84,50 @@ const Admin = () => {
     enabled: isAdmin,
   });
 
+  // Fetch all profiles for duplicate detection
+  const { data: allProfilesForDuplicates } = useQuery({
+    queryKey: ['allProfilesForDuplicates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, private_address, private_city, private_postal_code, verification_status');
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
+  // Helper function to find potential duplicates for a user
+  const findPotentialDuplicates = (userId: string, firstName: string | null, lastName: string | null, address: string | null, city: string | null) => {
+    if (!allProfilesForDuplicates || !firstName || !lastName) return [];
+    
+    const normalizedName = `${firstName.toLowerCase().trim()} ${lastName.toLowerCase().trim()}`;
+    const normalizedAddress = address?.toLowerCase().trim() || '';
+    const normalizedCity = city?.toLowerCase().trim() || '';
+    
+    return allProfilesForDuplicates.filter(profile => {
+      if (profile.id === userId) return false; // Skip self
+      
+      const profileName = `${(profile.first_name || '').toLowerCase().trim()} ${(profile.last_name || '').toLowerCase().trim()}`;
+      const profileAddress = (profile.private_address || '').toLowerCase().trim();
+      const profileCity = (profile.private_city || '').toLowerCase().trim();
+      
+      // Check for same name
+      const sameNameMatch = profileName === normalizedName;
+      
+      // Check for same address (if both have addresses)
+      const sameAddressMatch = normalizedAddress && profileAddress && 
+        (profileAddress.includes(normalizedAddress) || normalizedAddress.includes(profileAddress));
+      
+      // Check for same city
+      const sameCityMatch = normalizedCity && profileCity && profileCity === normalizedCity;
+      
+      // Flag if: same name + same address, OR same name + same city
+      return sameNameMatch && (sameAddressMatch || (sameCityMatch && normalizedAddress && profileAddress));
+    });
+  };
+
   // Fetch analytics data
   const { data: analytics, isLoading: analyticsLoading } = useQuery({
     queryKey: ['analytics'],
@@ -727,6 +771,45 @@ const Admin = () => {
                                   return null;
                                 })()}
                               </div>
+                              
+                              {/* Duplicate Detection Warning */}
+                              {(() => {
+                                const duplicates = findPotentialDuplicates(
+                                  user.id, 
+                                  user.first_name, 
+                                  user.last_name, 
+                                  user.private_address, 
+                                  user.private_city
+                                );
+                                if (duplicates.length > 0) {
+                                  return (
+                                    <div className="mt-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+                                      <p className="text-sm font-medium flex items-center gap-2 text-destructive mb-1">
+                                        ⚠️ Mögliche Duplikate gefunden!
+                                      </p>
+                                      <p className="text-xs text-muted-foreground mb-2">
+                                        {duplicates.length} Nutzer mit gleichem Namen und ähnlicher Adresse:
+                                      </p>
+                                      <ul className="text-xs space-y-1">
+                                        {duplicates.map((dup) => (
+                                          <li key={dup.id} className="flex items-center gap-2">
+                                            <Badge variant={dup.verification_status === 'approved' ? 'default' : 'secondary'} className="text-xs">
+                                              {dup.verification_status}
+                                            </Badge>
+                                            <span>{dup.first_name} {dup.last_name}</span>
+                                            {dup.private_address && (
+                                              <span className="text-muted-foreground">
+                                                — {dup.private_address}, {dup.private_city}
+                                              </span>
+                                            )}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })()}
                               
                               {/* Address Info for Admin - to detect duplicates */}
                               {(user.private_address || user.private_city || user.private_postal_code) && (
