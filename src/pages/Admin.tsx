@@ -68,13 +68,22 @@ const Admin = () => {
     },
   });
 
-  // Fetch pending verifications (sorted by newest first)
+  // Fetch pending verifications (sorted by newest first) - ALL profile fields
   const { data: pendingVerifications, isLoading: verificationsLoading } = useQuery({
     queryKey: ['pendingVerifications'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, nickname, gender, phone_number, avatar_url, verification_status, partner_name, partner_photo_url, partner_gender, created_at, id_document_url, is_couple, private_address, private_city, private_postal_code')
+        .select(`
+          id, first_name, last_name, nickname, gender, phone_number, phone_verified,
+          avatar_url, verification_status, id_verified, id_document_url,
+          partner_name, partner_photo_url, partner_gender, is_couple,
+          private_address, private_city, private_postal_code,
+          age, allergens, dislikes, languages, role, visibility_mode,
+          karma, successful_pickups, no_shows, vacation_mode, notification_radius,
+          latitude, longitude, iban, display_real_name,
+          created_at, updated_at
+        `)
         .eq('verification_status', 'pending')
         .order('created_at', { ascending: false });
 
@@ -150,13 +159,22 @@ const Admin = () => {
     enabled: isAdmin,
   });
 
-  // Fetch all users for user management
+  // Fetch all users for user management - ALL profile fields
   const { data: allUsers, isLoading: usersLoading } = useQuery({
     queryKey: ['allUsers'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, nickname, phone_number, created_at, verification_status, avatar_url, gender, is_couple, partner_name, partner_photo_url, partner_gender')
+        .select(`
+          id, first_name, last_name, nickname, gender, phone_number, phone_verified,
+          avatar_url, verification_status, id_verified, id_document_url,
+          partner_name, partner_photo_url, partner_gender, is_couple,
+          private_address, private_city, private_postal_code,
+          age, allergens, dislikes, languages, role, visibility_mode,
+          karma, successful_pickups, no_shows, vacation_mode, notification_radius,
+          latitude, longitude, iban, display_real_name,
+          created_at, updated_at
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
