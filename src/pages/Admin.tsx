@@ -40,6 +40,7 @@ const getProfileWarnings = (user: {
   return warnings;
 };
 import { IdDocumentViewer } from '@/components/IdDocumentViewer';
+import { AdminUserProfileDialog } from '@/components/AdminUserProfileDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -49,6 +50,10 @@ const Admin = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  
+  // State for user profile dialog
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   // Check if current user is admin
   const { data: isAdmin, isLoading: adminCheckLoading } = useQuery({
@@ -584,7 +589,13 @@ const Admin = () => {
                         <AvatarFallback>{user.first_name?.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-base">
+                        <h3 
+                          className="font-semibold text-base cursor-pointer hover:text-primary hover:underline"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setProfileDialogOpen(true);
+                          }}
+                        >
                           {user.first_name} {user.last_name}
                         </h3>
                         {user.nickname && (
@@ -749,7 +760,13 @@ const Admin = () => {
                             </Avatar>
                             <div className="flex-1 space-y-2">
                               <div>
-                                <h3 className="font-semibold text-lg">
+                                <h3 
+                                  className="font-semibold text-lg cursor-pointer hover:text-primary hover:underline"
+                                  onClick={() => {
+                                    setSelectedUser(user);
+                                    setProfileDialogOpen(true);
+                                  }}
+                                >
                                   {user.first_name} {user.last_name}
                                 </h3>
                                 {user.nickname && (
@@ -961,7 +978,13 @@ const Admin = () => {
                                   </Avatar>
                                 )}
                                 <div>
-                                  <p className="text-sm font-medium">
+                                  <p 
+                                    className="text-sm font-medium cursor-pointer hover:text-primary hover:underline"
+                                    onClick={() => {
+                                      setSelectedUser(user);
+                                      setProfileDialogOpen(true);
+                                    }}
+                                  >
                                     {user.first_name} {user.last_name}
                                     {user.is_couple && user.partner_name && (
                                       <span className="text-muted-foreground"> & {user.partner_name}</span>
@@ -1498,6 +1521,13 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* User Profile Dialog */}
+      <AdminUserProfileDialog 
+        user={selectedUser} 
+        open={profileDialogOpen} 
+        onOpenChange={setProfileDialogOpen} 
+      />
 
       <BottomNav />
     </div>
