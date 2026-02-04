@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Upload, Shield, Plus, Minus, Calendar as CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { exchangeOptions } from '@/utils/ingredientDatabase';
+import { hashToConsistentOffset } from '@/utils/fuzzyLocation';
 import { TagSelector } from '@/components/meals/TagSelector';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -224,9 +225,12 @@ const AddMeal = () => {
         return;
       }
 
-      // 2. Add random offset for fuzzy location (±200m ≈ ±0.002 degrees)
-      const fuzzyLat = geoData.latitude + (Math.random() * 0.004 - 0.002);
-      const fuzzyLng = geoData.longitude + (Math.random() * 0.004 - 0.002);
+      // 2. Add CONSISTENT hash-based offset for fuzzy location (±300m ≈ ±0.003 degrees)
+      // Using hash of user address ensures same offset for all meals from same location
+      // This prevents triangulation attacks where averaging multiple fuzzy coords reveals true location
+      const addressHash = hashToConsistentOffset(`${profile.private_address}-${profile.private_city}-${user.id}`);
+      const fuzzyLat = geoData.latitude + addressHash.latOffset;
+      const fuzzyLng = geoData.longitude + addressHash.lngOffset;
 
       // 3. Combine scheduled date and collection start time
       const scheduledDateTime = `${formData.scheduledDate}T${formData.collectionWindowStart || '18:00'}:00`;
