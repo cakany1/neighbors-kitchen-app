@@ -67,6 +67,8 @@ const Profile = () => {
   
   // Form state for editing
   const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
     nickname: '',
     age: null as number | null,
     gender: null as string | null,
@@ -180,6 +182,8 @@ const Profile = () => {
   useEffect(() => {
     if (currentUser?.profile) {
       setFormData({
+        first_name: currentUser.profile.first_name || '',
+        last_name: currentUser.profile.last_name || '',
         nickname: currentUser.profile.nickname || '',
         age: currentUser.profile.age || null,
         gender: currentUser.profile.gender || null,
@@ -261,6 +265,8 @@ const Profile = () => {
       }
       
       const updateData: any = {
+        first_name: formData.first_name || null,
+        last_name: formData.last_name || null,
         nickname: formData.nickname || null,
         age: formData.age || null,
         gender: formData.gender || null,
@@ -695,6 +701,30 @@ const Profile = () => {
             <CardTitle>{t('profile.personal_details')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Real Name Fields */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="first_name">{t('profile.first_name')}</Label>
+                <Input
+                  id="first_name"
+                  type="text"
+                  placeholder={t('profile.first_name_placeholder')}
+                  value={formData.first_name}
+                  onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="last_name">{t('profile.last_name')}</Label>
+                <Input
+                  id="last_name"
+                  type="text"
+                  placeholder={t('profile.last_name_placeholder')}
+                  value={formData.last_name}
+                  onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                />
+              </div>
+            </div>
+
             <div>
               <Label htmlFor="nickname">{t('profile.nickname')}</Label>
               <Input
@@ -1586,8 +1616,8 @@ const Profile = () => {
 
       </main>
 
-      {/* Sticky Save Button - Always visible */}
-      <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-4 md:hidden z-40">
+      {/* Sticky Save Button - Always visible on all devices */}
+      <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-4 z-40">
         <div className="max-w-lg mx-auto">
           <Button 
             onClick={() => updateProfileMutation.mutate(undefined)}
@@ -1601,21 +1631,6 @@ const Profile = () => {
             {updateProfileMutation.isPending ? t('profile.saving') : t('profile.save_changes')}
           </Button>
         </div>
-      </div>
-
-      {/* Desktop Save Button (non-sticky) */}
-      <div className="hidden md:block max-w-lg mx-auto px-4 pb-6">
-        <Button 
-          onClick={() => updateProfileMutation.mutate(undefined)}
-          disabled={updateProfileMutation.isPending}
-          className="w-full"
-          size="lg"
-        >
-          {updateProfileMutation.isPending && (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          )}
-          {updateProfileMutation.isPending ? t('profile.saving') : t('profile.save_changes')}
-        </Button>
       </div>
 
       <BottomNav />
