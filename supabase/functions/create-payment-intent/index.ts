@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -14,6 +14,32 @@ serve(async (req) => {
   }
 
   try {
+    // SECURITY: Require authentication
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create Supabase client with user's auth context
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    // Verify the user's JWT token
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { amount, mealId, mealTitle, chefName } = await req.json();
 
     // Validate minimum amount (CHF 7.00 = 700 cents)
@@ -22,24 +48,6 @@ serve(async (req) => {
         JSON.stringify({ error: "Minimum amount is CHF 7.00" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
       );
-    }
-
-    // Create Supabase client for user auth
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    );
-
-    // Get authenticated user
-    const authHeader = req.headers.get("Authorization");
-    let userEmail = null;
-    let userId = null;
-    
-    if (authHeader) {
-      const token = authHeader.replace("Bearer ", "");
-      const { data } = await supabaseClient.auth.getUser(token);
-      userEmail = data.user?.email;
-      userId = data.user?.id;
     }
 
     // Initialize Stripe
@@ -55,7 +63,7 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-      customer_email: userEmail || undefined,
+      customer_email: user.email || undefined,
       line_items: [
         {
           price_data: {
@@ -82,7 +90,8 @@ serve(async (req) => {
       ],
       metadata: {
         meal_id: mealId || "",
-        user_id: userId || "",
+        user_id: user.id,
+        user_email: user.email || "",
         chef_contribution: amount.toString(),
         service_fee: serviceFee.toString(),
       },
@@ -90,7 +99,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/payment/${mealId}`,
     });
 
-    console.log("Payment session created:", session.id);
+    console.log("Payment session created:", session.id, "for user:", user.id);
 
     return new Response(
       JSON.stringify({ url: session.url, sessionId: session.id }),
