@@ -719,7 +719,14 @@ const Profile = () => {
               </div>
             </div>
             <p className="text-xs text-muted-foreground -mt-2">
-              {t('profile.name_readonly_hint')}
+              {t('profile.name_readonly_hint')}{' '}
+              <button 
+                type="button"
+                onClick={() => navigate('/contact')}
+                className="text-primary hover:underline"
+              >
+                {t('profile.request_name_change')}
+              </button>
             </p>
 
             <div>
