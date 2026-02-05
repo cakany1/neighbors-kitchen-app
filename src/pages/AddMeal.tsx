@@ -14,7 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, Shield, Plus, Minus, Calendar as CalendarIcon } from 'lucide-react';
+import { Upload, Shield, Plus, Minus, Calendar as CalendarIcon, Keyboard } from 'lucide-react';
 import { toast } from 'sonner';
 import { exchangeOptions } from '@/utils/ingredientDatabase';
 import { hashToConsistentOffset } from '@/utils/fuzzyLocation';
@@ -57,7 +57,7 @@ const AddMeal = () => {
     { value: '45', label: ':45' },
   ];
 
-  // Fetch current user's gender for Ladies Only feature AND check auth status
+  // Fetch current user's gender AND avatar for profile completion check
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
@@ -66,11 +66,11 @@ const AddMeal = () => {
       
       const { data: profile } = await supabase
         .from('profiles')
-        .select('gender')
+        .select('gender, avatar_url')
         .eq('id', user.id)
         .single();
       
-      return { id: user.id, gender: profile?.gender };
+      return { id: user.id, gender: profile?.gender, avatarUrl: profile?.avatar_url };
     },
   });
 
@@ -152,6 +152,13 @@ const AddMeal = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       navigate('/signup');
+      return;
+    }
+    
+    // PROFILE PHOTO GATEKEEPER: Require avatar before allowing meal creation
+    if (!currentUser?.avatarUrl) {
+      toast.error('Bitte lade zuerst ein Profilbild hoch. Das schafft Vertrauen!');
+      navigate('/profile');
       return;
     }
     
@@ -886,6 +893,23 @@ const AddMeal = () => {
               </Card>
             </AccordionItem>
           </Accordion>
+
+          {/* Keyboard Dismiss Button - Fixed on mobile when input is focused */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="fixed bottom-24 right-4 z-50 md:hidden shadow-lg bg-background border-2"
+            onClick={() => {
+              // Blur active element to dismiss keyboard
+              if (document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+              }
+            }}
+          >
+            <Keyboard className="h-4 w-4 mr-1" />
+            Fertig
+          </Button>
 
           {/* Submit Button */}
           <Button 
