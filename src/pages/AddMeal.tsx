@@ -57,21 +57,28 @@ const AddMeal = () => {
     { value: '45', label: ':45' },
   ];
 
-  // Fetch current user's gender AND avatar for profile completion check
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser'],
+  // Fetch current user's profile - IMPORTANT: Use fresh query to avoid stale cache
+  const { data: currentUser, refetch: refetchUser } = useQuery({
+    queryKey: ['addMealUser'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
       
       const { data: profile } = await supabase
         .from('profiles')
-        .select('gender, avatar_url')
+        .select('gender, avatar_url, private_address, private_city')
         .eq('id', user.id)
         .single();
       
-      return { id: user.id, gender: profile?.gender, avatarUrl: profile?.avatar_url };
+      return { 
+        id: user.id, 
+        gender: profile?.gender, 
+        avatarUrl: profile?.avatar_url,
+        hasAddress: !!(profile?.private_address && profile?.private_city)
+      };
     },
+    staleTime: 0, // Always fetch fresh data
+    refetchOnMount: 'always',
   });
 
   const toggleExchangeOption = (option: string) => {
@@ -156,7 +163,9 @@ const AddMeal = () => {
     }
     
     // PROFILE PHOTO GATEKEEPER: Require avatar before allowing meal creation
-    if (!currentUser?.avatarUrl) {
+    // Refetch to ensure we have the latest data
+    const { data: freshUser } = await refetchUser();
+    if (!freshUser?.avatarUrl) {
       toast.error('Bitte lade zuerst ein Profilbild hoch. Das schafft Vertrauen!');
       navigate('/profile');
       return;
