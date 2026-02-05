@@ -14,7 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Star, Award, ChefHat, Heart, Globe, Shield, Loader2, Upload, AlertCircle } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Star, Award, ChefHat, Heart, Globe, Shield, Loader2, Upload, AlertCircle, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { allergenOptions, dislikeCategories } from '@/utils/ingredientDatabase';
 import { supabase } from '@/integrations/supabase/client';
@@ -998,208 +999,233 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Safety Shield - Dietary Preferences */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-destructive" />
-              {t('profile.settings_safety_title')}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {t('profile.settings_safety_desc')}
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label className="text-base font-semibold mb-3 block">{t('profile.settings_allergens')}</Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {allergenOptions.map((option) => (
-                  <div key={option.value} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`allergen-${option.value}`}
-                      checked={formData.allergens.includes(option.value)}
-                      onCheckedChange={() => toggleAllergen(option.value)}
-                    />
-                    <Label
-                      htmlFor={`allergen-${option.value}`}
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      {option.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="pt-4 border-t border-border">
-              <Label className="text-base font-semibold mb-3 block">{t('profile.settings_dislikes')}</Label>
-              <Accordion type="multiple" className="w-full">
-                {Object.entries(dislikeCategories).map(([category, items]) => (
-                  <AccordionItem key={category} value={category}>
-                    <AccordionTrigger className="text-sm capitalize">
-                      {category} ({items.filter(item => formData.dislikes.includes(item.value)).length}/{items.length})
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-2 pt-2">
-                        {items.map((dislike) => (
-                          <div key={dislike.value} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={`dislike-${dislike.value}`}
-                              checked={formData.dislikes.includes(dislike.value)}
-                              onCheckedChange={() => toggleDislike(dislike.value)}
-                            />
-                            <Label
-                              htmlFor={`dislike-${dislike.value}`}
-                              className="text-sm font-normal cursor-pointer"
-                            >
-                              {dislike.label}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Language Selection */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="w-5 h-5 text-primary" />
-              {t('profile.languagePreference')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <Label className="text-base font-semibold">{t('profile.languagePreference')}</Label>
-              <div className="grid grid-cols-2 gap-3">
-                {languages.map((lang) => (
-                  <div key={lang.code} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`language-${lang.code}`}
-                      checked={formData.languages.includes(lang.code)}
-                      onCheckedChange={() => toggleLanguage(lang.code)}
-                    />
-                    <Label
-                      htmlFor={`language-${lang.code}`}
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      {lang.name}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="pt-3 border-t border-border">
-                <Label className="text-sm font-medium mb-2 block">{t('profile.settings_language_missing')}</Label>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder={t('profile.settings_language_request_placeholder')}
-                    value={customLanguageInput}
-                    onChange={(e) => setCustomLanguageInput(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleCustomLanguageRequest();
-                      }
-                    }}
-                  />
-                  <Button 
-                    type="button" 
-                    onClick={handleCustomLanguageRequest} 
-                    variant="outline"
-                    disabled={!customLanguageInput.trim()}
-                  >
-                    {t('profile.settings_language_request')}
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {t('profile.settings_language_popular')}
+        {/* Safety Shield - Dietary Preferences (Collapsible) */}
+        <Collapsible className="mb-6">
+          <Card>
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-destructive" />
+                  {t('profile.settings_safety_title')}
+                </CardTitle>
+                <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-4 pt-0">
+                <p className="text-sm text-muted-foreground">
+                  {t('profile.settings_safety_desc')}
                 </p>
-              </div>
-              
-              <p className="text-xs text-muted-foreground mt-2">
-                {t('profile.settings_language_translation')}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+                <div>
+                  <Label className="text-base font-semibold mb-3 block">{t('profile.settings_allergens')}</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {allergenOptions.map((option) => (
+                      <div key={option.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`allergen-${option.value}`}
+                          checked={formData.allergens.includes(option.value)}
+                          onCheckedChange={() => toggleAllergen(option.value)}
+                        />
+                        <Label
+                          htmlFor={`allergen-${option.value}`}
+                          className="text-sm font-normal cursor-pointer"
+                        >
+                          {option.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="pt-4 border-t border-border">
+                  <Label className="text-base font-semibold mb-3 block">{t('profile.settings_dislikes')}</Label>
+                  <Accordion type="multiple" className="w-full">
+                    {Object.entries(dislikeCategories).map(([category, items]) => (
+                      <AccordionItem key={category} value={category}>
+                        <AccordionTrigger className="text-sm capitalize">
+                          {category} ({items.filter(item => formData.dislikes.includes(item.value)).length}/{items.length})
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-2 pt-2">
+                            {items.map((dislike) => (
+                              <div key={dislike.value} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`dislike-${dislike.value}`}
+                                  checked={formData.dislikes.includes(dislike.value)}
+                                  onCheckedChange={() => toggleDislike(dislike.value)}
+                                />
+                                <Label
+                                  htmlFor={`dislike-${dislike.value}`}
+                                  className="text-sm font-normal cursor-pointer"
+                                >
+                                  {dislike.label}
+                                </Label>
+                              </div>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
-        {/* Achievements - Motivational when empty */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Award className="w-5 h-5 text-trust-gold" />
-              {t('profile.achievements_title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-6 bg-muted/30 rounded-lg">
-              <Award className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
-              <p className="font-medium text-foreground mb-2">{t('profile.achievements_empty_title')}</p>
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                {t('profile.achievements_empty_desc')}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Language Selection (Collapsible) */}
+        <Collapsible className="mb-6">
+          <Card>
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="w-5 h-5 text-primary" />
+                  {t('profile.languagePreference')}
+                </CardTitle>
+                <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">{t('profile.languagePreference')}</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {languages.map((lang) => (
+                      <div key={lang.code} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`language-${lang.code}`}
+                          checked={formData.languages.includes(lang.code)}
+                          onCheckedChange={() => toggleLanguage(lang.code)}
+                        />
+                        <Label
+                          htmlFor={`language-${lang.code}`}
+                          className="text-sm font-normal cursor-pointer"
+                        >
+                          {lang.name}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="pt-3 border-t border-border">
+                    <Label className="text-sm font-medium mb-2 block">{t('profile.settings_language_missing')}</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder={t('profile.settings_language_request_placeholder')}
+                        value={customLanguageInput}
+                        onChange={(e) => setCustomLanguageInput(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleCustomLanguageRequest();
+                          }
+                        }}
+                      />
+                      <Button 
+                        type="button" 
+                        onClick={handleCustomLanguageRequest} 
+                        variant="outline"
+                        disabled={!customLanguageInput.trim()}
+                      >
+                        {t('profile.settings_language_request')}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {t('profile.settings_language_popular')}
+                    </p>
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {t('profile.settings_language_translation')}
+                  </p>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
-        {/* Trust System Info */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>{t('profile.karma_title')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                <ChefHat className="w-4 h-4 text-secondary" />
-              </div>
-              <div>
-                <p className="font-medium text-sm text-foreground">{t('profile.karma_share')}</p>
-                <p className="text-xs text-muted-foreground">{t('profile.karma_share_desc')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Heart className="w-4 h-4 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium text-sm text-foreground">{t('profile.karma_pay')}</p>
-                <p className="text-xs text-muted-foreground">{t('profile.karma_pay_desc')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-trust-badge/10 flex items-center justify-center flex-shrink-0">
-                <Star className="w-4 h-4 text-trust-gold" />
-              </div>
-              <div>
-                <p className="font-medium text-sm text-foreground">{t('profile.karma_respect')}</p>
-                <p className="text-xs text-muted-foreground">{t('profile.karma_respect_desc')}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Achievements & Karma Info (Collapsible) */}
+        <Collapsible className="mb-6">
+          <Card>
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="w-5 h-5 text-trust-gold" />
+                  {t('profile.achievements_title')} & Karma
+                </CardTitle>
+                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-6 pt-0">
+                {/* Achievements */}
+                <div className="text-center py-6 bg-muted/30 rounded-lg">
+                  <Award className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
+                  <p className="font-medium text-foreground mb-2">{t('profile.achievements_empty_title')}</p>
+                  <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                    {t('profile.achievements_empty_desc')}
+                  </p>
+                </div>
 
-        {/* Chef Portfolio Gallery */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ChefHat className="w-5 h-5 text-primary" />
-              {t('profile.gallery_title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {t('profile.gallery_desc')}
-            </p>
-            <GalleryUpload userId={currentUser.id} />
-            <GalleryGrid userId={currentUser.id} isOwnProfile={true} />
-          </CardContent>
-        </Card>
+                {/* Karma Info */}
+                <div className="border-t border-border pt-4 space-y-3">
+                  <Label className="text-base font-semibold">{t('profile.karma_title')}</Label>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                      <ChefHat className="w-4 h-4 text-secondary" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{t('profile.karma_share')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.karma_share_desc')}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Heart className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{t('profile.karma_pay')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.karma_pay_desc')}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-trust-badge/10 flex items-center justify-center flex-shrink-0">
+                      <Star className="w-4 h-4 text-trust-gold" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{t('profile.karma_respect')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.karma_respect_desc')}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
+
+        {/* Chef Portfolio Gallery (Collapsible) */}
+        <Collapsible className="mb-6">
+          <Card>
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <ChefHat className="w-5 h-5 text-primary" />
+                  {t('profile.gallery_title')}
+                </CardTitle>
+                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-4 pt-0">
+                <p className="text-sm text-muted-foreground">
+                  {t('profile.gallery_desc')}
+                </p>
+                <GalleryUpload userId={currentUser.id} />
+                <GalleryGrid userId={currentUser.id} isOwnProfile={true} />
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
         {/* Chef Bookings Management */}
         <Card className="mb-6">
@@ -1269,78 +1295,90 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Chef Wallet Section */}
-        <Card className="mb-6 border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              💰 {t('profile.your_wallet')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {walletLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              </div>
-            ) : (
-              <>
-                <div className="text-center py-6 bg-background/50 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-2">{t('profile.available_balance')}</p>
-                  <p className="text-4xl font-bold text-primary">
-                    CHF {walletData?.balance.toFixed(2) || '0.00'}
-                  </p>
-                  {walletData && walletData.requestedAmount > 0 && (
-                    <p className="text-xs text-muted-foreground mt-2">
-                      🕐 CHF {walletData.requestedAmount.toFixed(2)} {t('profile.in_processing')}
-                    </p>
+        {/* Chef Wallet Section (Collapsible) */}
+        <Collapsible className="mb-6">
+          <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  💰 {t('profile.your_wallet')}
+                  {walletData && walletData.balance > 0 && (
+                    <Badge variant="secondary" className="ml-2">
+                      CHF {walletData.balance.toFixed(0)}
+                    </Badge>
                   )}
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <Label htmlFor="iban">{t('profile.iban_for_payout')}</Label>
-                    <Input
-                      id="iban"
-                      type="text"
-                      placeholder="CH00 0000 0000 0000 0000 0"
-                      defaultValue={profile?.iban || ''}
-                      onBlur={(e) => {
-                        if (e.target.value !== profile?.iban) {
-                          updateProfileMutation.mutate(e.target.value);
-                        }
-                      }}
-                    />
+                </CardTitle>
+                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-4 pt-0">
+                {walletLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
                   </div>
+                ) : (
+                  <>
+                    <div className="text-center py-6 bg-background/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-2">{t('profile.available_balance')}</p>
+                      <p className="text-4xl font-bold text-primary">
+                        CHF {walletData?.balance.toFixed(2) || '0.00'}
+                      </p>
+                      {walletData && walletData.requestedAmount > 0 && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                          🕐 CHF {walletData.requestedAmount.toFixed(2)} {t('profile.in_processing')}
+                        </p>
+                      )}
+                    </div>
 
-                  <Button
-                    onClick={() => requestPayoutMutation.mutate()}
-                    disabled={
-                      !walletData || 
-                      walletData.balance < 10 || 
-                      !profile?.iban || 
-                      requestPayoutMutation.isPending
-                    }
-                    className="w-full"
-                  >
-                    {requestPayoutMutation.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        {t('profile.requesting_payout')}
-                      </>
-                    ) : (
-                      t('profile.request_payout')
-                    )}
-                  </Button>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="iban">{t('profile.iban_for_payout')}</Label>
+                        <Input
+                          id="iban"
+                          type="text"
+                          placeholder="CH00 0000 0000 0000 0000 0"
+                          defaultValue={profile?.iban || ''}
+                          onBlur={(e) => {
+                            if (e.target.value !== profile?.iban) {
+                              updateProfileMutation.mutate(e.target.value);
+                            }
+                          }}
+                        />
+                      </div>
 
-                  <Alert>
-                    <AlertDescription className="text-xs">
-                      💡 <strong>Info:</strong> {t('profile.payout_min_info')}
-                    </AlertDescription>
-                  </Alert>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+                      <Button
+                        onClick={() => requestPayoutMutation.mutate()}
+                        disabled={
+                          !walletData || 
+                          walletData.balance < 10 || 
+                          !profile?.iban || 
+                          requestPayoutMutation.isPending
+                        }
+                        className="w-full"
+                      >
+                        {requestPayoutMutation.isPending ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            {t('profile.requesting_payout')}
+                          </>
+                        ) : (
+                          t('profile.request_payout')
+                        )}
+                      </Button>
+
+                      <Alert>
+                        <AlertDescription className="text-xs">
+                          💡 <strong>Info:</strong> {t('profile.payout_min_info')}
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
         {/* Support the App */}
         <Card className="mb-6 border-green-500/30 bg-gradient-to-br from-green-500/5 to-emerald-500/10">
