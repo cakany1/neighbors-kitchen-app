@@ -40,6 +40,7 @@ const getProfileWarnings = (user: {
   return warnings;
 };
 import { IdDocumentViewer } from '@/components/IdDocumentViewer';
+import { AdminAnalyticsDashboard } from '@/components/AdminAnalyticsDashboard';
 import { AdminUserProfileDialog } from '@/components/AdminUserProfileDialog';
 import { AdminMessageDialog } from '@/components/AdminMessageDialog';
 import { supabase } from '@/integrations/supabase/client';
@@ -1084,6 +1085,7 @@ const Admin = () => {
 
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-4">
+            {/* Basic Stats */}
             <div className="grid gap-4 md:grid-cols-3">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -1124,6 +1126,9 @@ const Admin = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Live Analytics Dashboard */}
+            <AdminAnalyticsDashboard />
           </TabsContent>
 
           {/* Profile Reminders Tab */}

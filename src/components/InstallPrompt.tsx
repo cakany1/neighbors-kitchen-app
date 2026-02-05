@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { X, Download, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -62,6 +63,21 @@ export const InstallPrompt = () => {
       const { outcome } = await deferredPrompt.userChoice;
       
       if (outcome === 'accepted') {
+        // Track PWA installation
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          await supabase.from('analytics_events').insert({
+            user_id: user?.id || null,
+            event_type: 'pwa_install',
+            event_data: { 
+              device_type: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop'
+            },
+            page_path: window.location.pathname
+          });
+        } catch (error) {
+          console.error('Error tracking PWA install:', error);
+        }
+        
         setDeferredPrompt(null);
         setShowPrompt(false);
       }

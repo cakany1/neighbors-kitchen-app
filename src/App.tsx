@@ -28,6 +28,7 @@ import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { useAnalyticsTracking } from "./hooks/useAnalyticsTracking";
 import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,9 @@ const queryClient = new QueryClient();
 const AppRoutes = () => {
   const [showTour, setShowTour] = useState(false); // Disabled by default
   const location = useLocation();
+  
+  // Initialize analytics tracking
+  useAnalyticsTracking();
 
   // TOUR LOGIC DISABLED FOR STABILITY
   // useEffect(() => {
