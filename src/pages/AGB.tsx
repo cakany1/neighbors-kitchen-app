@@ -43,7 +43,7 @@ const AGB = () => {
             </p>
             <p className="text-muted-foreground leading-relaxed mt-3">
               Neighbors Kitchen ist kein gewerblicher Lebensmittelanbieter. 
-              Verträge über das Teilen von Speisen kommen ausschließlich zwischen dem anbietenden Nutzer 
+              Verträge über das Teilen von Speisen kommen ausschliesslich zwischen dem anbietenden Nutzer 
               („Koch") und dem abnehmenden Nutzer („Gast") zustande.
             </p>
           </section>
@@ -100,7 +100,7 @@ const AGB = () => {
           <section>
             <h2 className="text-xl font-semibold mb-3">6. Haftung</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Neighbors Kitchen haftet ausschließlich für Schäden, die auf vorsätzlichem oder 
+              Neighbors Kitchen haftet ausschliesslich für Schäden, die auf vorsätzlichem oder 
               grob fahrlässigem Verhalten beruhen.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-3">
@@ -111,7 +111,7 @@ const AGB = () => {
           <section>
             <h2 className="text-xl font-semibold mb-3">7. Datenschutz</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Die Verarbeitung personenbezogener Daten erfolgt gemäß unserer{' '}
+              Die Verarbeitung personenbezogener Daten erfolgt gemäss unserer{' '}
               <Link to="/privacy" className="text-primary hover:underline">
                 Datenschutzerklärung
               </Link>.

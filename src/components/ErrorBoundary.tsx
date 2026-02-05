@@ -27,7 +27,7 @@ const getErrorTranslations = () => {
   
   return {
     title: 'Etwas ist schiefgelaufen',
-    description: 'Die Anwendung ist auf einen unerwarteten Fehler gestoßen. Bitte lade die Seite neu oder kehre zur Startseite zurück.',
+    description: 'Die Anwendung ist auf einen unerwarteten Fehler gestossen. Bitte lade die Seite neu oder kehre zur Startseite zurück.',
     technicalDetails: 'Technische Details',
     reloadPage: 'Seite neu laden',
     backToHome: 'Zur Startseite'
