@@ -24,8 +24,12 @@ const GalleryGrid = ({ userId, isOwnProfile }: GalleryGridProps) => {
 
       if (error) throw error;
 
-      // Get public URLs for each image
-      const imageUrls = data.map((file) => {
+      // Filter out avatar images - only show food photos
+      // Avatar files start with "avatar-" and should not appear in the food gallery
+      const foodPhotos = data.filter((file) => !file.name.startsWith('avatar-'));
+
+      // Get public URLs for each food image
+      const imageUrls = foodPhotos.map((file) => {
         const { data: { publicUrl } } = supabase.storage
           .from('gallery')
           .getPublicUrl(`${userId}/${file.name}`);

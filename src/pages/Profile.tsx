@@ -537,16 +537,17 @@ const Profile = () => {
                     try {
                       const fileExt = file.name.split('.').pop();
                       // Use folder structure: userId/filename for RLS policy compliance
+                      // IMPORTANT: Avatars go to 'avatars' bucket, NOT 'gallery' bucket
                       const fileName = `${currentUser.id}/avatar-${Date.now()}.${fileExt}`;
 
                       const { error: uploadError } = await supabase.storage
-                        .from('gallery')
-                        .upload(fileName, file);
+                        .from('avatars')
+                        .upload(fileName, file, { upsert: true });
 
                       if (uploadError) throw uploadError;
 
                       const { data } = supabase.storage
-                        .from('gallery')
+                        .from('avatars')
                         .getPublicUrl(fileName);
 
                       await supabase
