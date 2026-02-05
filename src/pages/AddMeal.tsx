@@ -18,6 +18,7 @@ import { Upload, Shield, Plus, Minus, Calendar as CalendarIcon, Keyboard } from 
 import { toast } from 'sonner';
 import { exchangeOptions } from '@/utils/ingredientDatabase';
 import { hashToConsistentOffset } from '@/utils/fuzzyLocation';
+import { validateMealContent } from '@/utils/contentFilter';
 import { TagSelector } from '@/components/meals/TagSelector';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -33,6 +34,7 @@ const AddMeal = () => {
   const [selectedExchangeOptions, setSelectedExchangeOptions] = useState<string[]>([]);
   const [useStockPhoto, setUseStockPhoto] = useState(false);
   const [barterText, setBarterText] = useState('');
+  const [containerPolicy, setContainerPolicy] = useState<'bring_container' | 'plate_ok' | 'either_ok'>('either_ok');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -165,15 +167,10 @@ const AddMeal = () => {
     // MVP: Profile photo is OPTIONAL for standard meals
     // Only require avatar for verified-only meals (future feature)
     
-    // CONTENT FILTER: Block profanity/hate speech
-    const contentBlacklist = [
-      'fuck', 'shit', 'sex', 'porno', 'arsch', 'fotze', 'bitch', 'nazi', 'idiot',
-      'hurensohn', 'wichser', 'schlampe', 'nigger', 'schwuchtel', 'spast'
-    ];
-    const textToCheck = `${formData.title} ${formData.description}`.toLowerCase();
-    const foundBadWord = contentBlacklist.find(word => textToCheck.includes(word));
-    if (foundBadWord) {
-      toast.error('Bitte respektvolle Sprache verwenden.');
+    // CONTENT FILTER: Use centralized filter with normalization
+    const contentCheck = validateMealContent(formData.title, formData.description);
+    if (!contentCheck.isValid) {
+      toast.error(contentCheck.error || 'Bitte respektvolle Sprache verwenden.');
       return;
     }
     
@@ -333,6 +330,7 @@ const AddMeal = () => {
         handover_mode: 'pickup_box',
         unit_type: 'portions',
         is_cooking_experience: false,
+        container_policy: containerPolicy,
       };
 
       // 5. Insert meal into database
@@ -742,6 +740,31 @@ const AddMeal = () => {
                   );
                 })}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Container Policy for Pickup */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">🥡 Behälter für Abholung</CardTitle>
+              <CardDescription>
+                Was sollen Gäste zur Abholung mitbringen?
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Select
+                value={containerPolicy}
+                onValueChange={(val) => setContainerPolicy(val as 'bring_container' | 'plate_ok' | 'either_ok')}
+              >
+                <SelectTrigger className="h-11">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bring_container">📦 Bitte Tupperware mitbringen</SelectItem>
+                  <SelectItem value="plate_ok">🍽️ Teller genügt</SelectItem>
+                  <SelectItem value="either_ok">🤷 Egal / Alles OK</SelectItem>
+                </SelectContent>
+              </Select>
             </CardContent>
           </Card>
 

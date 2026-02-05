@@ -261,6 +261,7 @@ export type Database = {
           chef_id: string
           collection_window_end: string | null
           collection_window_start: string | null
+          container_policy: string | null
           created_at: string
           description: string
           description_en: string | null
@@ -299,6 +300,7 @@ export type Database = {
           chef_id: string
           collection_window_end?: string | null
           collection_window_start?: string | null
+          container_policy?: string | null
           created_at?: string
           description: string
           description_en?: string | null
@@ -337,6 +339,7 @@ export type Database = {
           chef_id?: string
           collection_window_end?: string | null
           collection_window_start?: string | null
+          container_policy?: string | null
           created_at?: string
           description?: string
           description_en?: string | null
@@ -460,6 +463,7 @@ export type Database = {
           id_document_url: string | null
           id_verified: boolean | null
           is_couple: boolean | null
+          is_disabled: boolean
           karma: number
           languages: string[] | null
           last_name: string
@@ -497,6 +501,7 @@ export type Database = {
           id_document_url?: string | null
           id_verified?: boolean | null
           is_couple?: boolean | null
+          is_disabled?: boolean
           karma?: number
           languages?: string[] | null
           last_name: string
@@ -534,6 +539,7 @@ export type Database = {
           id_document_url?: string | null
           id_verified?: boolean | null
           is_couple?: boolean | null
+          is_disabled?: boolean
           karma?: number
           languages?: string[] | null
           last_name?: string
@@ -959,6 +965,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      container_policy_type: "bring_container" | "plate_ok" | "either_ok"
       verification_status: "pending" | "approved" | "rejected"
       visibility_mode: "women_only" | "women_fli" | "all"
     }
@@ -1089,6 +1096,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      container_policy_type: ["bring_container", "plate_ok", "either_ok"],
       verification_status: ["pending", "approved", "rejected"],
       visibility_mode: ["women_only", "women_fli", "all"],
     },
