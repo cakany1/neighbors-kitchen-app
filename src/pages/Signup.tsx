@@ -224,6 +224,21 @@ const Signup = () => {
         console.error('Welcome email failed (non-blocking):', emailError);
       }
 
+      // Step 4: Send admin notification for new registration (non-blocking)
+      try {
+        await supabase.functions.invoke('send-registration-notification', {
+          body: {
+            type: 'registration',
+            userId: data.user.id,
+            userName: formData.firstName,
+            userEmail: formData.email,
+            isCouple: formData.isCouple,
+          },
+        });
+      } catch (notifyError) {
+        console.error('Admin notification failed (non-blocking):', notifyError);
+      }
+
       toast.success(t('auth.account_created'));
       // Redirect directly to feed - user can browse immediately
       navigate('/feed');

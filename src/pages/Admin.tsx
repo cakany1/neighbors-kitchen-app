@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 
@@ -43,6 +43,7 @@ import { IdDocumentViewer } from '@/components/IdDocumentViewer';
 import { AdminAnalyticsDashboard } from '@/components/AdminAnalyticsDashboard';
 import { AdminUserProfileDialog } from '@/components/AdminUserProfileDialog';
 import { AdminMessageDialog } from '@/components/AdminMessageDialog';
+import { AdminNotificationSettings } from '@/components/AdminNotificationSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -741,7 +742,10 @@ const Admin = () => {
               )}
             </TabsTrigger>
             <TabsTrigger value="payouts">Payouts</TabsTrigger>
-            <TabsTrigger value="utilities">Utilities</TabsTrigger>
+            <TabsTrigger value="settings">
+              <Settings className="w-4 h-4 mr-1" />
+              Settings
+            </TabsTrigger>
           </TabsList>
 
           {/* Verification Queue Tab */}
@@ -1504,8 +1508,10 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
-          {/* Utilities Tab */}
-          <TabsContent value="utilities" className="space-y-4">
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-4">
+            <AdminNotificationSettings />
+            
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
