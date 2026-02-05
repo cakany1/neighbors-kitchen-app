@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 
@@ -41,6 +41,7 @@ const getProfileWarnings = (user: {
 };
 import { IdDocumentViewer } from '@/components/IdDocumentViewer';
 import { AdminUserProfileDialog } from '@/components/AdminUserProfileDialog';
+import { AdminMessageDialog } from '@/components/AdminMessageDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -54,6 +55,10 @@ const Admin = () => {
   // State for user profile dialog
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  
+  // State for admin message dialog
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [messagePreselectedUser, setMessagePreselectedUser] = useState<any>(null);
 
   // Check if current user is admin
   const { data: isAdmin, isLoading: adminCheckLoading } = useQuery({
@@ -549,12 +554,24 @@ const Admin = () => {
       <Header />
 
       <main className="max-w-5xl mx-auto px-4 py-6">
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Shield className="w-6 h-6 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="w-6 h-6 text-primary" />
+              <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+            </div>
+            <p className="text-muted-foreground">Manage verifications, analytics, and feedback</p>
           </div>
-          <p className="text-muted-foreground">Manage verifications, analytics, and feedback</p>
+          <Button 
+            onClick={() => {
+              setMessagePreselectedUser(null);
+              setMessageDialogOpen(true);
+            }}
+            className="gap-2"
+          >
+            <MessageSquare className="w-4 h-4" />
+            Nachricht senden
+          </Button>
         </div>
 
         {/* Pending Approvals Widget - Always Visible at Top */}
@@ -1526,7 +1543,31 @@ const Admin = () => {
       <AdminUserProfileDialog 
         user={selectedUser} 
         open={profileDialogOpen} 
-        onOpenChange={setProfileDialogOpen} 
+        onOpenChange={setProfileDialogOpen}
+        onSendMessage={(user) => {
+          setMessagePreselectedUser({
+            id: user.id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            nickname: user.nickname,
+            avatar_url: user.avatar_url
+          });
+          setMessageDialogOpen(true);
+        }}
+      />
+
+      {/* Admin Message Dialog */}
+      <AdminMessageDialog
+        open={messageDialogOpen}
+        onOpenChange={setMessageDialogOpen}
+        users={(allUsers || []).map(u => ({
+          id: u.id,
+          first_name: u.first_name,
+          last_name: u.last_name,
+          nickname: u.nickname,
+          avatar_url: u.avatar_url
+        }))}
+        preselectedUser={messagePreselectedUser}
       />
 
       <BottomNav />

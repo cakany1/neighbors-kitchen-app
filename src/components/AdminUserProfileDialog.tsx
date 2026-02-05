@@ -1,11 +1,12 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   CheckCircle, XCircle, User, Phone, MapPin, Globe, Heart, 
-  Shield, Star, Calendar, AlertTriangle, CreditCard
+  Shield, Star, Calendar, AlertTriangle, CreditCard, MessageSquare
 } from 'lucide-react';
 
 interface UserProfile {
@@ -50,6 +51,7 @@ interface AdminUserProfileDialogProps {
   user: UserProfile | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSendMessage?: (user: UserProfile) => void;
 }
 
 const FieldRow = ({ 
@@ -92,7 +94,7 @@ const StatusBadge = ({ filled, label }: { filled: boolean; label: string }) => (
   </Badge>
 );
 
-export function AdminUserProfileDialog({ user, open, onOpenChange }: AdminUserProfileDialogProps) {
+export function AdminUserProfileDialog({ user, open, onOpenChange, onSendMessage }: AdminUserProfileDialogProps) {
   if (!user) return null;
 
   const formatDate = (dateStr: string | null) => {
@@ -131,16 +133,32 @@ export function AdminUserProfileDialog({ user, open, onOpenChange }: AdminUserPr
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
-            <Avatar className="w-12 h-12 cursor-pointer" onClick={() => user.avatar_url && window.open(user.avatar_url, '_blank')}>
-              <AvatarImage src={user.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`} />
-              <AvatarFallback>{user.first_name?.charAt(0) || '?'}</AvatarFallback>
-            </Avatar>
-            <div>
-              <span>{user.first_name} {user.last_name}</span>
-              {user.nickname && <span className="text-muted-foreground ml-2">@{user.nickname}</span>}
-            </div>
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="flex items-center gap-3">
+              <Avatar className="w-12 h-12 cursor-pointer" onClick={() => user.avatar_url && window.open(user.avatar_url, '_blank')}>
+                <AvatarImage src={user.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`} />
+                <AvatarFallback>{user.first_name?.charAt(0) || '?'}</AvatarFallback>
+              </Avatar>
+              <div>
+                <span>{user.first_name} {user.last_name}</span>
+                {user.nickname && <span className="text-muted-foreground ml-2">@{user.nickname}</span>}
+              </div>
+            </DialogTitle>
+            {onSendMessage && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => {
+                  onOpenChange(false);
+                  onSendMessage(user);
+                }}
+                className="gap-2"
+              >
+                <MessageSquare className="w-4 h-4" />
+                Nachricht
+              </Button>
+            )}
+          </div>
         </DialogHeader>
 
         <ScrollArea className="max-h-[70vh] pr-4">
@@ -252,7 +270,12 @@ export function AdminUserProfileDialog({ user, open, onOpenChange }: AdminUserPr
             />
             <FieldRow 
               label="Koordinaten" 
-              value={user.latitude && user.longitude ? `${user.latitude.toFixed(4)}, ${user.longitude.toFixed(4)}` : null} 
+              value={user.latitude && user.longitude 
+                ? `${user.latitude.toFixed(4)}, ${user.longitude.toFixed(4)}` 
+                : user.private_address 
+                  ? '⏳ Wird beim Speichern berechnet'
+                  : '—'
+              } 
               status="neutral" 
             />
             <FieldRow 
