@@ -26,6 +26,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://neighbors-kitchen.ch/trust</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://neighbors-kitchen.ch/privacy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
