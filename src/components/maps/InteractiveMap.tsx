@@ -18,8 +18,15 @@ const InteractiveMap = ({ meals, userLat = 47.5596, userLng = 7.5886 }: Interact
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    // Initialize map centered on Basel
-    const map = L.map(mapRef.current).setView([userLat, userLng], 13);
+    // Initialize map centered on Basel with ZOOM ENABLED
+    const map = L.map(mapRef.current, {
+      scrollWheelZoom: true,
+      zoomControl: true,
+      touchZoom: true,
+      doubleClickZoom: true,
+      dragging: true,
+    }).setView([userLat, userLng], 13);
+    
     mapInstanceRef.current = map;
 
     // Add OpenStreetMap tiles
@@ -66,7 +73,7 @@ const InteractiveMap = ({ meals, userLat = 47.5596, userLng = 7.5886 }: Interact
     <div 
       ref={mapRef} 
       className="w-full h-full min-h-[400px] rounded-lg overflow-hidden border border-border"
-      style={{ zIndex: 0 }}
+      style={{ zIndex: 1, touchAction: 'auto' }}
     />
   );
 };

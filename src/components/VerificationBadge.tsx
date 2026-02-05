@@ -1,3 +1,5 @@
+import { BadgeCheck } from 'lucide-react';
+
 interface VerificationBadgeProps {
   isVerified: boolean;
   size?: 'sm' | 'md' | 'lg';
@@ -7,17 +9,15 @@ export const VerificationBadge = ({ isVerified, size = 'md' }: VerificationBadge
   if (!isVerified) return null;
 
   const sizeClasses = {
-    sm: 'w-3 h-3 text-xs',
-    md: 'w-4 h-4 text-sm',
-    lg: 'w-5 h-5 text-base',
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5',
+    lg: 'w-6 h-6',
   };
 
   return (
-    <span
-      className={`inline-flex items-center justify-center ${sizeClasses[size]} text-blue-500 font-bold`}
-      title="Verified User (Phone or ID verified)"
-    >
-      ✓
-    </span>
+    <BadgeCheck 
+      className={`${sizeClasses[size]} text-blue-500 fill-blue-500/20`}
+      aria-label="Verified User"
+    />
   );
 };

@@ -185,6 +185,25 @@ const AddMeal = () => {
       return;
     }
 
+    // TIME VALIDATION: Block past pickup slots for today
+    const now = new Date();
+    const scheduledDate = new Date(formData.scheduledDate);
+    const isToday = scheduledDate.toDateString() === now.toDateString();
+    
+    if (isToday && formData.collectionWindowStart) {
+      const [hour, minute] = formData.collectionWindowStart.split(':').map(Number);
+      const pickupTime = new Date(scheduledDate);
+      pickupTime.setHours(hour, minute, 0, 0);
+      
+      // Add 15 min grace period
+      const graceTime = new Date(now.getTime() + 15 * 60 * 1000);
+      
+      if (pickupTime < graceTime) {
+        toast.error('Dieser Zeitslot liegt in der Vergangenheit. Bitte wähle einen späteren Zeitpunkt.');
+        return;
+      }
+    }
+
     if (selectedExchangeOptions.length === 0) {
       toast.error(t('toast.select_exchange_option'));
       return;

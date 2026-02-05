@@ -1155,6 +1155,7 @@ export type Database = {
         Args: { meal_id: string; user_id: string }
         Returns: boolean
       }
+      withdraw_meal: { Args: { p_meal_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
