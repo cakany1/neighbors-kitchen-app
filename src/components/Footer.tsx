@@ -42,6 +42,12 @@ export const Footer = () => {
           </Link>
           <span className="text-muted-foreground/30">|</span>
 
+          {/* Trust & Safety */}
+          <Link to="/trust" className="text-muted-foreground hover:text-foreground transition-colors">
+            Trust & Safety
+          </Link>
+          <span className="text-muted-foreground/30">|</span>
+
           {/* NEU: FAQ */}
           <Link to="/faq" className="text-muted-foreground hover:text-foreground transition-colors">
             FAQ
