@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 // Using direct Supabase OAuth for BYOK (custom Google credentials on custom domain)
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ import { toast } from 'sonner';
 import { TwoFactorVerify } from '@/components/TwoFactorVerify';
 
 const Login = () => {
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -154,6 +156,9 @@ const Login = () => {
 
   const completeLogin = async (user: any) => {
     try {
+      // CRITICAL: Clear all cached queries to prevent data leakage between users
+      queryClient.clear();
+      
       // PROFILE CHECK: Verify profile exists (self-healing for orphaned users)
       const { data: existingProfile } = await supabase
         .from('profiles')
