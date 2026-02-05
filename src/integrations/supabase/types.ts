@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          page_path: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          page_path?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          page_path?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       app_feedback: {
         Row: {
           created_at: string
@@ -606,6 +636,45 @@ export type Database = {
           created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          device_type: string | null
+          duration_seconds: number | null
+          ended_at: string | null
+          exit_page: string | null
+          id: string
+          is_pwa: boolean | null
+          last_heartbeat: string
+          last_page: string | null
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          device_type?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          exit_page?: string | null
+          id?: string
+          is_pwa?: boolean | null
+          last_heartbeat?: string
+          last_page?: string | null
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          device_type?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          exit_page?: string | null
+          id?: string
+          is_pwa?: boolean | null
+          last_heartbeat?: string
+          last_page?: string | null
+          started_at?: string
           user_id?: string
         }
         Relationships: []
