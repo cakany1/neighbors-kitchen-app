@@ -18,6 +18,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 import Impressum from "./pages/Impressum";
+import Privacy from "./pages/Privacy";
 import AGB from "./pages/AGB";
 import FAQ from "./pages/FAQ";
 import Install from "./pages/Install";
@@ -82,6 +83,7 @@ const AppRoutes = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/impressum" element={<Impressum />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="/agb" element={<AGB />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/install" element={<Install />} />
