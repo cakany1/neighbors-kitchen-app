@@ -25,6 +25,7 @@ import Install from "./pages/Install";
 import Contact from "./pages/Contact";
 import Story from "./pages/Story";
 import Trust from "./pages/Trust";
+import AdminHealth from "./pages/AdminHealth";
 import OAuthCallback from "./pages/OAuthCallback";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
@@ -81,6 +82,7 @@ const AppRoutes = () => {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/chat/:bookingId" element={<Chat />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/health" element={<AdminHealth />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/impressum" element={<Impressum />} />
