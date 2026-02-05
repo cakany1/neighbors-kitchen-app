@@ -705,48 +705,50 @@ const Admin = () => {
         )}
 
         <Tabs defaultValue="verifications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8">
-            <TabsTrigger value="verifications">
-              Verifications
-              {pendingVerifications && pendingVerifications.length > 0 && (
-                <Badge variant="destructive" className="ml-2">
-                  {pendingVerifications.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="reminders">
-              <Mail className="w-4 h-4 mr-1" />
-              Reminders
-              {incompleteProfiles && incompleteProfiles.length > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {incompleteProfiles.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="feedback">
-              Feedback
-              {feedbackList?.filter(f => f.status === 'pending').length > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {feedbackList?.filter(f => f.status === 'pending').length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="faq">
-              FAQ
-              {faqRequests && faqRequests.length > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {faqRequests.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="payouts">Payouts</TabsTrigger>
-            <TabsTrigger value="settings">
-              <Settings className="w-4 h-4 mr-1" />
-              Settings
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 pb-2">
+            <TabsList className="inline-flex w-auto min-w-full md:grid md:w-full md:grid-cols-8 gap-1">
+              <TabsTrigger value="verifications" className="whitespace-nowrap">
+                Verifications
+                {pendingVerifications && pendingVerifications.length > 0 && (
+                  <Badge variant="destructive" className="ml-2">
+                    {pendingVerifications.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="users" className="whitespace-nowrap">Users</TabsTrigger>
+              <TabsTrigger value="analytics" className="whitespace-nowrap">Analytics</TabsTrigger>
+              <TabsTrigger value="reminders" className="whitespace-nowrap">
+                <Mail className="w-4 h-4 mr-1" />
+                Reminders
+                {incompleteProfiles && incompleteProfiles.length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {incompleteProfiles.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="feedback" className="whitespace-nowrap">
+                Feedback
+                {feedbackList?.filter(f => f.status === 'pending').length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {feedbackList?.filter(f => f.status === 'pending').length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="faq" className="whitespace-nowrap">
+                FAQ
+                {faqRequests && faqRequests.length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {faqRequests.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="payouts" className="whitespace-nowrap">Payouts</TabsTrigger>
+              <TabsTrigger value="settings" className="whitespace-nowrap">
+                <Settings className="w-4 h-4 mr-1" />
+                Settings
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Verification Queue Tab */}
           <TabsContent value="verifications" className="space-y-4">
