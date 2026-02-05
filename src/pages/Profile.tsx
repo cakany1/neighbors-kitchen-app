@@ -1450,6 +1450,8 @@ const Profile = () => {
               variant="outline"
               className="w-full"
               onClick={async () => {
+                // CRITICAL: Clear all cached queries to prevent data leakage between users
+                queryClient.clear();
                 await supabase.auth.signOut();
                 toast.success(t('auth.logout') + '!');
                 navigate('/');
@@ -1515,6 +1517,9 @@ const Profile = () => {
                       .eq('id', currentUser.id);
                     
                     if (profileError) throw profileError;
+                    
+                    // CRITICAL: Clear all cached queries before signout
+                    queryClient.clear();
                     
                     // Sign out and redirect
                     await supabase.auth.signOut();
