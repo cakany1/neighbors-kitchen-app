@@ -171,26 +171,14 @@ const Admin = () => {
     enabled: isAdmin,
   });
 
-  // Fetch all users for user management - ALL profile fields
+  // Fetch all users for user management - Use Edge Function for admin-only data including email
   const { data: allUsers, isLoading: usersLoading } = useQuery({
-    queryKey: ['allUsers'],
+    queryKey: ['allUsersAdmin'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select(`
-          id, first_name, last_name, nickname, gender, phone_number, phone_verified,
-          avatar_url, verification_status, id_verified, id_document_url,
-          partner_name, partner_photo_url, partner_gender, is_couple,
-          private_address, private_city, private_postal_code,
-          age, allergens, dislikes, languages, role, visibility_mode,
-          karma, successful_pickups, no_shows, vacation_mode, notification_radius,
-          latitude, longitude, iban, display_real_name,
-          created_at, updated_at
-        `)
-        .order('created_at', { ascending: false });
-
+      const { data, error } = await supabase.functions.invoke('admin-list-users');
+      
       if (error) throw error;
-      return data;
+      return data?.users || [];
     },
     enabled: isAdmin,
   });
@@ -459,6 +447,26 @@ const Admin = () => {
     },
     onError: (error: Error) => {
       toast.error('Fehler beim Löschen: ' + error.message);
+    },
+  });
+
+  // Toggle user disabled status mutation
+  const toggleUserDisabledMutation = useMutation({
+    mutationFn: async ({ userId, isDisabled }: { userId: string; isDisabled: boolean }) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_disabled: isDisabled })
+        .eq('id', userId);
+
+      if (error) throw error;
+      return { userId, isDisabled };
+    },
+    onSuccess: ({ isDisabled }) => {
+      toast.success(isDisabled ? 'Benutzer deaktiviert' : 'Benutzer reaktiviert');
+      queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
+    },
+    onError: (error: Error) => {
+      toast.error('Fehler: ' + error.message);
     },
   });
 
@@ -976,6 +984,7 @@ const Admin = () => {
                           <th className="text-left p-3 text-sm font-semibold">Name</th>
                           <th className="text-left p-3 text-sm font-semibold">E-Mail</th>
                           <th className="text-left p-3 text-sm font-semibold">Telefon</th>
+                          <th className="text-left p-3 text-sm font-semibold">Blocks</th>
                           <th className="text-left p-3 text-sm font-semibold">Registriert</th>
                           <th className="text-left p-3 text-sm font-semibold">Status</th>
                           <th className="text-right p-3 text-sm font-semibold">Aktionen</th>
@@ -1052,32 +1061,62 @@ const Admin = () => {
                                 </div>
                               </div>
                             </td>
-                            <td className="p-3 text-sm">-</td>
+                            <td className="p-3 text-sm">{user.email || '-'}</td>
                             <td className="p-3 text-sm">{user.phone_number || '-'}</td>
+                            <td className="p-3">
+                              <div className="flex items-center gap-1">
+                                <span className="text-xs">↗{user.blocks_made_count || 0}</span>
+                                <span className="text-muted-foreground">/</span>
+                                <span className="text-xs">↙{user.blocks_received_count || 0}</span>
+                                {user.needs_review && (
+                                  <Badge variant="destructive" className="text-[10px] ml-1">⚠️</Badge>
+                                )}
+                              </div>
+                            </td>
                             <td className="p-3 text-sm">
                               {new Date(user.created_at).toLocaleDateString('de-CH')}
                             </td>
                             <td className="p-3">
-                              <Badge 
-                                variant={user.verification_status === 'approved' ? 'default' : 
-                                        user.verification_status === 'pending' ? 'secondary' : 'outline'}
-                              >
-                                {user.verification_status}
-                              </Badge>
+                              <div className="flex items-center gap-1">
+                                <Badge 
+                                  variant={user.verification_status === 'approved' ? 'default' : 
+                                          user.verification_status === 'pending' ? 'secondary' : 'outline'}
+                                >
+                                  {user.verification_status}
+                                </Badge>
+                                {user.is_disabled && (
+                                  <Badge variant="destructive">Deaktiviert</Badge>
+                                )}
+                              </div>
                             </td>
                             <td className="p-3 text-right">
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => {
-                                  if (window.confirm(`Benutzer ${user.first_name} ${user.last_name} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
-                                    deleteUserMutation.mutate(user.id);
-                                  }
-                                }}
-                                disabled={deleteUserMutation.isPending}
-                              >
-                                Löschen
-                              </Button>
+                              <div className="flex gap-1 justify-end">
+                                <Button
+                                  variant={user.is_disabled ? 'outline' : 'secondary'}
+                                  size="sm"
+                                  onClick={() => {
+                                    toggleUserDisabledMutation.mutate({ 
+                                      userId: user.id, 
+                                      isDisabled: !user.is_disabled 
+                                    });
+                                  }}
+                                  disabled={toggleUserDisabledMutation.isPending}
+                                >
+                                  {user.is_disabled ? 'Aktivieren' : 'Deaktivieren'}
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => {
+                                    if (window.confirm(`Benutzer ${user.first_name} ${user.last_name} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
+                                      deleteUserMutation.mutate(user.id);
+                                    }
+                                  }}
+                                  disabled={deleteUserMutation.isPending}
+                                >
+                                  Löschen
+                                </Button>
+                              </div>
                             </td>
                           </tr>
                         ))}
