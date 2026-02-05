@@ -24,6 +24,12 @@ export const Footer = () => {
           </Link>
           <span className="text-muted-foreground/30">|</span>
 
+          {/* Privacy Policy */}
+          <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+            Privacy Policy
+          </Link>
+          <span className="text-muted-foreground/30">|</span>
+
           {/* Kontakt */}
           <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
             {t("footer.contact")}
