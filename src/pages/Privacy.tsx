@@ -228,13 +228,13 @@ const Privacy = () => {
               10. Kontakt & Verantwortliche Stelle
             </h2>
             <div className="p-4 bg-muted/50 border border-border rounded-lg">
-              <p className="text-foreground mb-2"><strong>Neighbors Kitchen</strong></p>
+              <p className="text-foreground mb-2"><strong>Verantwortliche Stelle:</strong></p>
               <p className="text-muted-foreground">
-                Yagiz Cakan<br />
+                Neighbors Kitchen<br />
+                c/o Yagiz Cakan<br />
                 Basel, Schweiz
               </p>
               <p className="text-muted-foreground mt-3">
-                E-Mail:{' '}
                 <a href="mailto:hello@neighbors-kitchen.ch" className="text-primary hover:underline">
                   hello@neighbors-kitchen.ch
                 </a>
