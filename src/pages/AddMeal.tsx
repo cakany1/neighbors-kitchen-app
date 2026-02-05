@@ -700,19 +700,26 @@ const AddMeal = () => {
                       )}
 
                       {isOnline && isSelected && (
-                        <div className="pl-8 w-full space-y-2">
+                        <div className="pl-8 w-full space-y-3">
                           <Label htmlFor="price" className="text-sm font-medium">
                             {t('add_meal.price_label')} <span className="text-destructive">*</span>
                           </Label>
-                          <Input
-                            id="price"
-                            type="number"
-                            step="0.50"
-                            value={formData.restaurantReferencePrice}
-                            onChange={(e) => setFormData({ ...formData, restaurantReferencePrice: e.target.value })}
-                            placeholder="z.B. 12.00"
-                            className="h-10 text-sm"
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                              <span className="text-muted-foreground font-medium">CHF</span>
+                            </div>
+                            <Input
+                              id="price"
+                              type="number"
+                              step="0.50"
+                              min="7.00"
+                              max="50.00"
+                              value={formData.restaurantReferencePrice}
+                              onChange={(e) => setFormData({ ...formData, restaurantReferencePrice: e.target.value })}
+                              placeholder="12.00"
+                              className="pl-14 h-12 text-lg font-semibold text-right pr-4"
+                            />
+                          </div>
                           <p className="text-xs text-muted-foreground">
                             {t('add_meal.price_hint')}
                           </p>
