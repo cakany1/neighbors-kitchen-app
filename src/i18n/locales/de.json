@@ -185,7 +185,7 @@
     "photo_deleted": "Foto gelöscht",
     "upload_failed": "Fehler beim Hochladen",
     "delete_failed": "Fehler beim Löschen",
-    "file_too_large": "Datei zu groß (max 5MB)",
+    "file_too_large": "Datei zu gross (max 5MB)",
     "images_only": "Nur Bilder sind erlaubt",
     "meal_title_required": "Bitte zuerst einen Gerichttitel eingeben",
     "price_range_found": "Preisspanne gefunden!",
@@ -243,7 +243,7 @@
     "unblock_action": "Entblocken",
     "unblocking": "Wird entblockt...",
     "settings_mobile": "Handynummer",
-    "settings_address": "Straße & Hausnummer",
+    "settings_address": "Strasse & Hausnummer",
     "settings_zip": "Postleitzahl",
     "settings_city": "Stadt",
     "settings_address_hint": "💡 Diese Adresse definiert dein Zentrum für den Essens-Radar.",
@@ -351,7 +351,7 @@
     "profile_updated": "Profilbild aktualisiert!",
     "partner_photo_updated": "Partner Foto aktualisiert!",
     "upload_error": "Fehler beim Hochladen",
-    "file_too_large": "Datei zu groß (max 5MB)",
+    "file_too_large": "Datei zu gross (max 5MB)",
     "images_only": "Nur Bilder sind erlaubt",
     "help_us_improve": "Hilf uns zu verbessern",
     "account_management": "Kontoverwaltung",
@@ -382,7 +382,7 @@
     "2fa_enabled_desc": "Dein Konto ist durch Zwei-Faktor-Authentifizierung geschützt.",
     "2fa_scan_qr": "Scanne diesen QR-Code mit deiner Authenticator-App.",
     "2fa_manual_entry": "Oder gib diesen Code manuell ein:",
-    "2fa_enter_code": "Gib den 6-stelligen Code ein, um die Einrichtung abzuschließen:",
+    "2fa_enter_code": "Gib den 6-stelligen Code ein, um die Einrichtung abzuschliessen:",
     "2fa_verify": "Verifizieren",
     "2fa_enabled_success": "2FA erfolgreich aktiviert!",
     "2fa_disabled_success": "2FA deaktiviert.",
@@ -394,7 +394,7 @@
     "upload_via_avatar_section": "Du kannst das Foto oben im Profilbereich hochladen"
   },
   "guidelines": {
-    "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (außer beim Vor-Ort-Essen)",
+    "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (ausser beim Vor-Ort-Essen)",
     "bePunctual": "Pünktlich sein und die Zeit des Kochs respektieren",
     "payFairly": "Fair bezahlen basierend auf Qualität und Aufwand",
     "respectPrivacy": "Privatsphäre respektieren - genaue Orte erst nach Bestätigung teilen",
@@ -450,7 +450,7 @@
     "menOnly": "Nur Männer",
     "diverseGroup": "Diverse Gruppe",
     "preferNotSay": "Keine Angabe",
-    "safetyNote": "Wir verwenden diese Informationen ausschließlich zu organisatorischen Zwecken, um ein respektvolles, komfortables und sicheres Erlebnis für alle Gäste zu gewährleisten."
+    "safetyNote": "Wir verwenden diese Informationen ausschliesslich zu organisatorischen Zwecken, um ein respektvolles, komfortables und sicheres Erlebnis für alle Gäste zu gewährleisten."
   },
   "reporting": {
     "title": "Melden",
@@ -498,7 +498,7 @@
   },
   "error": {
     "something_went_wrong": "Etwas ist schiefgelaufen",
-    "unexpected_error": "Die Anwendung ist auf einen unerwarteten Fehler gestoßen. Bitte lade die Seite neu oder kehre zur Startseite zurück.",
+    "unexpected_error": "Die Anwendung ist auf einen unerwarteten Fehler gestossen. Bitte lade die Seite neu oder kehre zur Startseite zurück.",
     "technical_details": "Technische Details",
     "reload_page": "Seite neu laden",
     "back_to_home": "Zur Startseite"
@@ -647,7 +647,7 @@
     "verification_note": "Hinweis: Dein Profilbild muss manuell verifiziert werden. Dies kann etwas Zeit in Anspruch nehmen, bevor du Mahlzeiten anbieten kannst.",
     "upload_success": "Partner-Foto hochgeladen",
     "upload_failed": "Foto-Upload fehlgeschlagen",
-    "file_too_large": "Datei zu groß! Max 5MB.",
+    "file_too_large": "Datei zu gross! Max 5MB.",
     "images_only": "Nur Bilder erlaubt!",
     "photo_after_registration": "Dein Profilfoto und Partner-Foto kannst du nach der Registrierung auf deiner Profilseite hochladen.",
     "partner_photo_after_registration": "Das Partner-Foto kannst du nach der Registrierung hochladen."
@@ -700,7 +700,7 @@
     "your_contribution": "Dein Beitrag",
     "total": "Gesamt",
     "chef_receives": "Koch erhält",
-    "karma_bonus": "+5 Karma für deine Großzügigkeit!",
+    "karma_bonus": "+5 Karma für deine Grosszügigkeit!",
     "confirm_payment": "Jetzt bezahlen",
     "skip_for_now": "Später vielleicht",
     "secure_payment": "Sichere Zahlung via Stripe",
@@ -757,7 +757,7 @@
     "meal_created": "Gericht ist live! Deine Nachbarn werden es bald sehen."
   },
   "feed_page": {
-    "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schließen.",
+    "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schliessen.",
     "within_radius": "innerhalb",
     "no_meals_found": "Keine Mahlzeiten innerhalb deines Radius verfügbar. Versuche, deinen Benachrichtigungsradius in den Profileinstellungen zu erhöhen.",
     "guest_modal_title": "Registriere dich, um dieses Essen zu retten!",

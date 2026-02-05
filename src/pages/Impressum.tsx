@@ -62,7 +62,7 @@ const Impressum = () => {
           <section>
             <h2 className="text-xl font-semibold mb-3">Haftungsausschluss</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. 
+              Die Inhalte dieser Website wurden mit grösstmöglicher Sorgfalt erstellt. 
               Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte übernehmen wir jedoch keine Gewähr.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-3">

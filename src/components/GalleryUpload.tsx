@@ -44,7 +44,7 @@ const GalleryUpload = ({ userId }: GalleryUploadProps) => {
 
     // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Datei zu groß (max 5MB)');
+      toast.error('Datei zu gross (max 5MB)');
       return;
     }
 

@@ -48,7 +48,7 @@ const Trust = () => {
             Neighbors Kitchen wurde entwickelt, um Nachbarschaft sicher, respektvoll und transparent zu ermöglichen.
           </p>
           <p className="text-muted-foreground leading-relaxed mt-2">
-            Unsere Plattform basiert auf Vertrauen – unterstützt durch klare Regeln und technische Schutzmaßnahmen.
+            Unsere Plattform basiert auf Vertrauen – unterstützt durch klare Regeln und technische Schutzmassnahmen.
           </p>
         </div>
 
@@ -130,7 +130,7 @@ const Trust = () => {
               </li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4 italic">
-              Neighbors Kitchen vermittelt ausschließlich.
+              Neighbors Kitchen vermittelt ausschliesslich.
             </p>
           </section>
 
@@ -163,7 +163,7 @@ const Trust = () => {
             </ul>
             <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
               <p className="text-foreground font-medium">
-                Verstöße führen zur Sperrung des Accounts.
+                Verstösse führen zur Sperrung des Accounts.
               </p>
             </div>
           </section>

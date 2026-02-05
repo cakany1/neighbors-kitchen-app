@@ -97,7 +97,7 @@ export const PostPickupRating = ({
       // Bonus karma notification
       if (amount > (pricingMinimum || 7)) {
         setTimeout(() => {
-          toast("💚 +5 Karma für deine Großzügigkeit!", { duration: 3000 });
+          toast("💚 +5 Karma für deine Grosszügigkeit!", { duration: 3000 });
         }, 1500);
       }
 
