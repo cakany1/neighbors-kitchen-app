@@ -251,10 +251,19 @@ const MealDetail = () => {
     };
   };
 
+  // Check if user is the chef (for self-booking prevention)
+  const isOwnMeal = currentUser?.id === meal?.chef_id;
+
   const handleRequestBooking = () => {
     // AUTH GATEKEEPER: Show trust modal first if not logged in
     if (!currentUser) {
       setAuthModalOpen(true);
+      return;
+    }
+
+    // SELF-BOOKING BLOCK
+    if (isOwnMeal) {
+      toast.error("Du kannst dein eigenes Angebot nicht buchen.");
       return;
     }
 
@@ -268,10 +277,19 @@ const MealDetail = () => {
       return;
     }
 
-    // PROFILE WIZARD: Check if profile is complete
-    const missing = getMissingProfileData();
-    if (missing.missingPhoto || missing.missingAddress || missing.missingPhone || missing.partnerPhotoMissing) {
-      setProfileWizardOpen(true);
+    // PORTIONS OVERFLOW CHECK
+    if (bookingQuantity > (meal?.available_portions || 0)) {
+      toast.error("Nicht genügend Portionen verfügbar.");
+      return;
+    }
+
+    // PROFILE GATE: Only check address and phone (NOT photo, NOT partner photo)
+    const profile = currentUser.profile;
+    const isProfileComplete = profile?.phone_number && profile?.private_address && profile?.private_city;
+
+    if (!isProfileComplete) {
+      toast.error("Bitte vervollständige dein Profil (Telefon & Adresse) bevor du buchst.");
+      navigate("/profile");
       return;
     }
 
@@ -628,8 +646,8 @@ const MealDetail = () => {
             <span className="text-lg font-semibold text-foreground">{meal.available_portions}</span>
           </div>
 
-          {/* Couple Booking Selector */}
-          {currentUser?.profile?.is_couple && bookingStatus === "none" && (
+          {/* Couple Booking Selector - Only show if portions available */}
+          {currentUser?.profile?.is_couple && bookingStatus === "none" && !isOwnMeal && (meal?.available_portions || 0) > 0 && (
             <Card className="border-primary/20 bg-primary/5">
               <CardContent className="pt-6 space-y-3">
                 <div className="flex items-center gap-2 mb-2">
@@ -644,12 +662,15 @@ const MealDetail = () => {
                   onValueChange={(val) => setBookingQuantity(parseInt(val))}
                   className="space-y-2"
                 >
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
-                    <RadioGroupItem value="2" id="couple-both" />
-                    <Label htmlFor="couple-both" className="cursor-pointer flex-1">
-                      👫 {t("meal_detail.for_both")}
-                    </Label>
-                  </div>
+                  {/* Only show "For both" option if 2+ portions available */}
+                  {(meal?.available_portions || 0) >= 2 && (
+                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
+                      <RadioGroupItem value="2" id="couple-both" />
+                      <Label htmlFor="couple-both" className="cursor-pointer flex-1">
+                        👫 {t("meal_detail.for_both")}
+                      </Label>
+                    </div>
+                  )}
                   <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer">
                     <RadioGroupItem value="1" id="couple-single" />
                     <Label htmlFor="couple-single" className="cursor-pointer flex-1">
@@ -657,16 +678,6 @@ const MealDetail = () => {
                     </Label>
                   </div>
                 </RadioGroup>
-                {meal.pricing_suggested && bookingQuantity > 1 && (
-                  <Alert className="bg-secondary/10 border-secondary/20">
-                    <AlertDescription className="text-xs">
-                      💡 {t("meal_detail.estimated_restaurant_value", { 
-                        amount: (meal.pricing_suggested * bookingQuantity).toFixed(2),
-                        portions: bookingQuantity 
-                      })}
-                    </AlertDescription>
-                  </Alert>
-                )}
               </CardContent>
             </Card>
           )}
@@ -676,36 +687,74 @@ const MealDetail = () => {
       {/* Aktionsbuttons - Sticky on Mobile */}
       <div className="fixed md:sticky bottom-16 md:bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t border-border z-40">
         <div className="max-w-lg mx-auto flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => {
-              // Block chat for demo meals
-              if (meal.id.startsWith('demo-')) {
-                toast.info(t("meal_detail.demo_chat_blocked"));
-                return;
-              }
-              if (!currentUser) {
-                setAuthModalOpen(true);
-              } else {
-                setChatOpen(true);
-              }
-            }}
-            className="flex-1"
-            aria-label={t("meal_detail.chat_with_chef")}
-          >
-            <MessageCircle className="w-4 h-4 mr-2" />
-            {t("meal_detail.chat_with_chef")}
-          </Button>
-
-          {bookingStatus === "none" && (
-            <Button
-              onClick={handleRequestBooking}
-              disabled={meal.available_portions === 0 || bookingMutation.isPending}
-              className="flex-1"
-              aria-label={t("meal_detail.book_now")}
-            >
-              {meal.available_portions === 0 ? t("meal_detail.sold_out") : t("meal_detail.book_now")}
+          {/* Self-chat/booking block for own meal */}
+          {isOwnMeal ? (
+            <Button disabled variant="outline" className="flex-1">
+              Dein eigenes Angebot
             </Button>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (meal.id.startsWith('demo-')) {
+                    toast.info(t("meal_detail.demo_chat_blocked"));
+                    return;
+                  }
+                  if (!currentUser) {
+                    setAuthModalOpen(true);
+                  } else {
+                    setChatOpen(true);
+                  }
+                }}
+                className="flex-1"
+                aria-label={t("meal_detail.chat_with_chef")}
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                {t("meal_detail.chat_with_chef")}
+              </Button>
+
+              {bookingStatus === "none" && (
+                <Button
+                  onClick={handleRequestBooking}
+                  disabled={meal.available_portions === 0 || bookingMutation.isPending}
+                  className="flex-1"
+                  aria-label={t("meal_detail.book_now")}
+                >
+                  {meal.available_portions === 0 ? t("meal_detail.sold_out") : t("meal_detail.book_now")}
+                </Button>
+              )}
+
+              {bookingStatus === "pending" && (
+                <>
+                  {isWithinCancellationPeriod ? (
+                    <Button
+                      variant="destructive"
+                      onClick={handleCancelBooking}
+                      disabled={cancelBookingMutation.isPending}
+                      className="flex-1"
+                    >
+                      {cancelBookingMutation.isPending ? t("common.loading") : t("meal_detail.cancel_booking")}
+                    </Button>
+                  ) : (
+                    <Button disabled className="flex-1">
+                      <Clock className="w-4 h-4 mr-2" />
+                      {t("common.loading")}
+                    </Button>
+                  )}
+                </>
+              )}
+
+              {bookingStatus === "confirmed" && (
+                <div className="flex-1 space-y-2">
+                  <Button disabled className="w-full bg-secondary">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    {t("meal_detail.booking_confirmed")}
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground">{t("meal_detail.contact_chef_to_cancel")}</p>
+                </div>
+              )}
+            </>
           )}
 
           {bookingStatus === "pending" && (

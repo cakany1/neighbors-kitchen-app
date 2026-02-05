@@ -1622,9 +1622,22 @@ const Profile = () => {
 
       {/* Sticky Save Button - Always visible on all devices */}
       <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-4 z-40">
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-lg mx-auto space-y-2">
+          {/* Gender validation error */}
+          {!formData.gender && (
+            <p className="text-sm text-destructive text-center">
+              ⚠️ Bitte wähle dein Geschlecht aus, um das Profil zu speichern.
+            </p>
+          )}
           <Button 
-            onClick={() => updateProfileMutation.mutate(undefined)}
+            onClick={() => {
+              // Gender validation
+              if (!formData.gender) {
+                toast.error('Bitte wähle dein Geschlecht aus (Pflichtfeld).');
+                return;
+              }
+              updateProfileMutation.mutate(undefined);
+            }}
             disabled={updateProfileMutation.isPending}
             className="w-full"
             size="lg"
