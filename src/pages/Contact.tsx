@@ -18,6 +18,7 @@ export default function Contact() {
     name: '',
     email: '',
     message: '',
+    website: '', // Honeypot field
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -36,30 +37,23 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
-        .from('contact_requests')
-        .insert([
-          {
-            name: formData.name,
-            email: formData.email,
-            message: formData.message,
-          },
-        ]);
+      const { data, error } = await supabase.functions.invoke('submit-contact', {
+        body: {
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          website: formData.website, // Honeypot
+        },
+      });
 
       if (error) throw error;
 
-      // Send admin notification (non-blocking)
-      try {
-        await supabase.functions.invoke('send-admin-notification', {
-          body: {
-            type: 'contact',
-            content: formData.message,
-            senderName: formData.name,
-            senderEmail: formData.email,
-          },
-        });
-      } catch (notifError) {
-        console.error('Admin notification failed (non-blocking):', notifError);
+      if (data?.error) {
+        // Handle rate limiting
+        if (data.error_de) {
+          throw new Error(data.error_de);
+        }
+        throw new Error(data.error);
       }
 
       toast({
@@ -68,12 +62,12 @@ export default function Contact() {
       });
 
       // Reset form
-      setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
+      setFormData({ name: '', email: '', message: '', website: '' });
+    } catch (error: any) {
       console.error('Error submitting contact form:', error);
       toast({
         title: t('contact.error_title'),
-        description: t('contact.error_send_failed'),
+        description: error.message || t('contact.error_send_failed'),
         variant: "destructive",
       });
     } finally {
@@ -111,6 +105,7 @@ export default function Contact() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder={t('contact.name_placeholder')}
+                maxLength={100}
                 required
               />
             </div>
@@ -123,6 +118,7 @@ export default function Contact() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder={t('contact.email_placeholder')}
+                maxLength={255}
                 required
               />
             </div>
@@ -135,7 +131,21 @@ export default function Contact() {
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder={t('contact.message_placeholder')}
                 rows={6}
+                maxLength={5000}
                 required
+              />
+            </div>
+
+            {/* Honeypot field - hidden from users, bots will fill it */}
+            <div className="absolute -left-[9999px]" aria-hidden="true">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                type="text"
+                value={formData.website}
+                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                tabIndex={-1}
+                autoComplete="off"
               />
             </div>
 
