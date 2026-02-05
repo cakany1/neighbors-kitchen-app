@@ -1,15 +1,23 @@
-import { ChefHat, User, HelpCircle, Shield } from 'lucide-react';
+import { ChefHat, User, HelpCircle, Shield, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 export const Header = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
   // Check if user is authenticated
   const { data: currentUser } = useQuery({
@@ -53,12 +61,15 @@ export const Header = () => {
     enabled: isAdmin === true,
   });
 
-  // Navigate to profile if logged in, otherwise to login
-  const handleUserIconClick = () => {
-    if (currentUser) {
-      navigate('/profile');
-    } else {
-      navigate('/login');
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      queryClient.clear();
+      toast.success(t('common.logged_out', 'Erfolgreich abgemeldet'));
+      navigate('/');
+    } catch (error) {
+      toast.error(t('common.logout_error', 'Fehler beim Abmelden'));
     }
   };
 
@@ -116,14 +127,38 @@ export const Header = () => {
               )}
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleUserIconClick}
-            aria-label={currentUser ? "Profil öffnen" : "Login"}
-          >
-            <User className="w-5 h-5" />
-          </Button>
+          {currentUser ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Benutzermenü"
+                >
+                  <User className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => navigate('/profile')}>
+                  <User className="w-4 h-4 mr-2" />
+                  {t('nav.profile', 'Mein Profil')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  {t('nav.logout', 'Abmelden')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/login')}
+              aria-label="Login"
+            >
+              <User className="w-5 h-5" />
+            </Button>
+          )}
         </div>
       </div>
     </header>
