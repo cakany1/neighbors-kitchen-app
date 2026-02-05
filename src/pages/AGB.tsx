@@ -2,7 +2,7 @@ import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const AGB = () => {
@@ -15,14 +15,14 @@ const AGB = () => {
       <main className="max-w-2xl mx-auto px-4 py-8 pb-24">
         <Button
           variant="ghost"
-          onClick={() => navigate('/')}
+          onClick={() => navigate(-1)}
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           {t('legal.back_home')}
         </Button>
         <h1 className="text-3xl font-bold text-foreground mb-6">
-          {t('legal.agb_title')}
+          Allgemeine Geschäftsbedingungen (AGB)
         </h1>
         
         {/* English Disclaimer (only shown when language is EN) */}
@@ -38,35 +38,90 @@ const AGB = () => {
           <section>
             <h2 className="text-xl font-semibold mb-3">1. Geltungsbereich</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Neighbors Kitchen ist eine Vermittlungsplattform für das Teilen von Lebensmitteln innerhalb einer Gemeinschaft. Neighbors Kitchen vermittelt keine Kaufverträge über Speisen im gewerblichen Sinne. Es handelt sich um eine Gemeinschaft zur Vermeidung von Lebensmittelverschwendung. Die Verträge über das Teilen von Lebensmitteln kommen ausschliesslich zwischen dem anbietenden Nutzer (Koch) und dem abnehmenden Nutzer (Gast) zustande.
+              Neighbors Kitchen ist eine Vermittlungsplattform für das Teilen von selbstgekochtem Essen 
+              innerhalb einer Nachbarschaft.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-3">
+              Neighbors Kitchen ist kein gewerblicher Lebensmittelanbieter. 
+              Verträge über das Teilen von Speisen kommen ausschließlich zwischen dem anbietenden Nutzer 
+              („Koch") und dem abnehmenden Nutzer („Gast") zustande.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">2. Unkostenbeiträge & Zahlung</h2>
+            <h2 className="text-xl font-semibold mb-3">2. Nutzung der Plattform</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Die Nutzung der Plattform ist grundsätzlich kostenlos. Zahlungen gelten als freiwillige Unkostenbeiträge (für Zutaten/Energie) oder Schenkungen an den Koch. Bei Transaktionen über die Plattform wird eine Servicegebühr von CHF 2.00 erhoben. Diese Gebühr dient dem Betrieb der Plattform und wird bei der Buchung direkt einbehalten.
+              Die Nutzung der Plattform ist grundsätzlich kostenlos.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-3">
+              Sofern Köche einen freiwilligen Unkostenbeitrag verlangen (z. B. für Zutaten oder Energie), 
+              handelt es sich nicht um einen Verkauf im gewerblichen Sinn, sondern um eine private 
+              Kostenbeteiligung oder Schenkung.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">3. Haftung & Hygiene</h2>
+            <h2 className="text-xl font-semibold mb-3">3. Zahlungen</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Die Köche sind allein verantwortlich für die Qualität, Hygiene und Deklaration der Inhaltsstoffe (Allergene) ihrer Speisen. Neighbors Kitchen übernimmt keine Haftung für gesundheitliche Schäden, die aus dem Konsum der vermittelten Speisen entstehen.
+              Bei kostenpflichtigen Buchungen wird eine technische Servicegebühr von CHF 2.00 erhoben. 
+              Diese dient der Deckung von Zahlungsabwicklung und Plattformbetrieb.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-3">
+              Die Zahlung erfolgt über Stripe. Es gelten zusätzlich die Bedingungen des jeweiligen Zahlungsanbieters.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">4. Stornierung</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Buchungen sind verbindlich. Stornierungen sind nur bis zu dem vom Koch festgelegten Zeitpunkt möglich. Bei Nichterscheinen (No-Show) besteht kein Anspruch auf Rückerstattung der Servicegebühr.
+            <h2 className="text-xl font-semibold mb-3">4. Verantwortung & Hygiene</h2>
+            <p className="text-muted-foreground leading-relaxed mb-3">
+              Köche sind selbst verantwortlich für:
+            </p>
+            <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
+              <li>Zubereitung</li>
+              <li>Hygiene</li>
+              <li>Deklaration von Allergenen</li>
+            </ul>
+            <p className="text-muted-foreground leading-relaxed mt-3">
+              Neighbors Kitchen übernimmt keine Haftung für Qualität oder Verträglichkeit der vermittelten Speisen.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">5. Datenschutz</h2>
+            <h2 className="text-xl font-semibold mb-3">5. Buchungen & Stornierungen</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Wir behandeln Ihre Daten vertraulich und geben sie nicht an Dritte weiter, ausser dies ist für die Abwicklung der Buchung notwendig (z.B. Weitergabe der Adresse an den Gast nach Buchung). Wir nutzen Stripe für Zahlungen; es gelten deren Datenschutzbestimmungen.
+              Buchungen sind verbindlich.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-3">
+              Stornierungen sind nur bis zum vom Koch festgelegten Zeitpunkt möglich. 
+              Bei Nichterscheinen besteht kein Anspruch auf Rückerstattung der Servicegebühr.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">6. Haftung</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Neighbors Kitchen haftet ausschließlich für Schäden, die auf vorsätzlichem oder 
+              grob fahrlässigem Verhalten beruhen.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-3">
+              Für Inhalte, Angebote oder Handlungen der Nutzer übernimmt Neighbors Kitchen keine Verantwortung.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">7. Datenschutz</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Die Verarbeitung personenbezogener Daten erfolgt gemäß unserer{' '}
+              <Link to="/privacy" className="text-primary hover:underline">
+                Datenschutzerklärung
+              </Link>.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">8. Änderungen</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Neighbors Kitchen behält sich vor, diese AGB jederzeit anzupassen.
             </p>
           </section>
         </div>
