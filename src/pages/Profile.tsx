@@ -200,17 +200,24 @@ const Profile = () => {
     }
   }, [currentUser]);
 
-  // Geocoding helper function
-  const getCoordinates = async (address: string): Promise<{ lat: number; lon: number } | null> => {
+  // Geocoding helper function - uses Edge Function with auth
+  const getCoordinates = async (street: string, city: string, postalCode: string): Promise<{ lat: number; lon: number } | null> => {
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`,
-        { headers: { "User-Agent": "NeighborsKitchen/1.0" } }
-      );
-      const data = await response.json();
-      if (data && data.length > 0) {
-        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+      const { data, error } = await supabase.functions.invoke('geocode-address', {
+        body: { street, city, postalCode }
+      });
+      
+      if (error) {
+        console.error("Geocoding edge function error:", error);
+        return null;
       }
+      
+      if (data?.latitude && data?.longitude) {
+        return { lat: data.latitude, lon: data.longitude };
+      }
+      
+      console.warn("Geocoding returned no coordinates:", data);
+      return null;
     } catch (error) {
       console.error("Geocoding failed:", error);
     }
@@ -233,10 +240,9 @@ const Profile = () => {
 
       // Geocode address if it has changed and is complete
       if (addressChanged && formData.private_address && formData.private_city) {
-        const fullAddress = `${formData.private_address}, ${formData.private_postal_code || ''} ${formData.private_city}, Switzerland`.trim();
-        console.log('Geocoding address:', fullAddress);
+        console.log('Geocoding address:', formData.private_address, formData.private_city);
         
-        const coords = await getCoordinates(fullAddress);
+        const coords = await getCoordinates(formData.private_address, formData.private_city, formData.private_postal_code || '');
         
         if (coords) {
           latitude = coords.lat;
@@ -247,7 +253,7 @@ const Profile = () => {
           toast.error(t('toast.address_geocode_failed'), {
             duration: 5000,
           });
-          console.warn('Geocoding returned no results for:', fullAddress);
+          console.warn('Geocoding returned no results for address');
           // Keep existing coordinates if any, or set to null
           latitude = null;
           longitude = null;
