@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Mail, Shield, Database, Lock, Trash2, Brain, FileCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Privacy = () => {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     document.title = 'Privacy Policy – Neighbors Kitchen';
@@ -30,7 +32,17 @@ const Privacy = () => {
         </Button>
 
         <h1 className="text-3xl font-bold text-foreground mb-2">Datenschutzerklärung</h1>
-        <p className="text-muted-foreground mb-8">Zuletzt aktualisiert: Februar 2025</p>
+        <p className="text-muted-foreground mb-6">Zuletzt aktualisiert: Februar 2025</p>
+
+        {/* English Disclaimer (only shown when language is EN) */}
+        {i18n.language === 'en' && (
+          <div className="mb-6 p-4 bg-muted/50 border border-border rounded-lg">
+            <p className="text-sm text-muted-foreground italic">
+              Note: For legal reasons, this privacy policy is currently available in German only. 
+              In case of doubt, the German version applies.
+            </p>
+          </div>
+        )}
 
         <div className="space-y-8 text-foreground">
           
