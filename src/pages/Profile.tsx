@@ -65,10 +65,8 @@ const Profile = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
-  // Form state for editing
+  // Form state for editing (excludes first_name/last_name - read-only)
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
     nickname: '',
     age: null as number | null,
     gender: null as string | null,
@@ -178,12 +176,10 @@ const Profile = () => {
     }
   }, []);
 
-  // Initialize form data when profile loads
+  // Initialize form data when profile loads (excludes first_name/last_name - read-only)
   useEffect(() => {
     if (currentUser?.profile) {
       setFormData({
-        first_name: currentUser.profile.first_name || '',
-        last_name: currentUser.profile.last_name || '',
         nickname: currentUser.profile.nickname || '',
         age: currentUser.profile.age || null,
         gender: currentUser.profile.gender || null,
@@ -265,8 +261,6 @@ const Profile = () => {
       }
       
       const updateData: any = {
-        first_name: formData.first_name || null,
-        last_name: formData.last_name || null,
         nickname: formData.nickname || null,
         age: formData.age || null,
         gender: formData.gender || null,
@@ -701,16 +695,16 @@ const Profile = () => {
             <CardTitle>{t('profile.personal_details')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Real Name Fields */}
+            {/* Real Name Fields - Read Only (requires re-verification to change) */}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="first_name">{t('profile.first_name')}</Label>
                 <Input
                   id="first_name"
                   type="text"
-                  placeholder={t('profile.first_name_placeholder')}
-                  value={formData.first_name}
-                  onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                  value={profile?.first_name || ''}
+                  disabled
+                  className="bg-muted/50 cursor-not-allowed"
                 />
               </div>
               <div>
@@ -718,12 +712,15 @@ const Profile = () => {
                 <Input
                   id="last_name"
                   type="text"
-                  placeholder={t('profile.last_name_placeholder')}
-                  value={formData.last_name}
-                  onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                  value={profile?.last_name || ''}
+                  disabled
+                  className="bg-muted/50 cursor-not-allowed"
                 />
               </div>
             </div>
+            <p className="text-xs text-muted-foreground -mt-2">
+              {t('profile.name_readonly_hint')}
+            </p>
 
             <div>
               <Label htmlFor="nickname">{t('profile.nickname')}</Label>
