@@ -162,12 +162,18 @@ const AddMeal = () => {
       return;
     }
     
-    // PROFILE PHOTO GATEKEEPER: Require avatar before allowing meal creation
-    // Refetch to ensure we have the latest data
-    const { data: freshUser } = await refetchUser();
-    if (!freshUser?.avatarUrl) {
-      toast.error('Bitte lade zuerst ein Profilbild hoch. Das schafft Vertrauen!');
-      navigate('/profile');
+    // MVP: Profile photo is OPTIONAL for standard meals
+    // Only require avatar for verified-only meals (future feature)
+    
+    // CONTENT FILTER: Block profanity/hate speech
+    const contentBlacklist = [
+      'fuck', 'shit', 'sex', 'porno', 'arsch', 'fotze', 'bitch', 'nazi', 'idiot',
+      'hurensohn', 'wichser', 'schlampe', 'nigger', 'schwuchtel', 'spast'
+    ];
+    const textToCheck = `${formData.title} ${formData.description}`.toLowerCase();
+    const foundBadWord = contentBlacklist.find(word => textToCheck.includes(word));
+    if (foundBadWord) {
+      toast.error('Bitte respektvolle Sprache verwenden.');
       return;
     }
     
@@ -216,7 +222,8 @@ const AddMeal = () => {
         return;
       }
 
-      toast.loading('Gericht wird erstellt und übersetzt...');
+      // Show loading state - will be dismissed on success or error
+      const loadingToastId = toast.loading('Gericht wird erstellt und übersetzt...');
 
       // 1. Geocode chef's exact address
       const { data: geoData, error: geoError } = await supabase.functions.invoke('geocode-address', {
@@ -230,6 +237,7 @@ const AddMeal = () => {
       // Handle geocoding response with robust null checks
       if (geoError) {
         console.error('Geocoding error:', geoError);
+        toast.dismiss(loadingToastId);
         toast.error('Adresse konnte nicht gefunden werden. Bitte prüfe deine Profiladresse.');
         return;
       }
@@ -237,6 +245,7 @@ const AddMeal = () => {
       // Check for valid coordinates (response uses 'latitude' and 'longitude', not 'lat' and 'lng')
       if (!geoData || typeof geoData.latitude !== 'number' || typeof geoData.longitude !== 'number') {
         console.error('Invalid geocoding response:', geoData);
+        toast.dismiss(loadingToastId);
         toast.error('Adresse konnte nicht in Koordinaten umgewandelt werden. Bitte prüfe deine Profiladresse.');
         return;
       }
@@ -313,7 +322,8 @@ const AddMeal = () => {
         women_only: womenOnly,
         visibility_mode: profile.visibility_mode || 'all', // Use chef's visibility preference
         visibility_radius: visibilityRadius, // Chef-set distance limit in meters
-        exchange_mode: selectedExchangeOptions.join(','),
+        // Map UI options to DB valid values: 'online' -> 'money', everything else -> 'barter'
+        exchange_mode: selectedExchangeOptions.includes('online') ? 'money' : 'barter',
         pricing_minimum: selectedExchangeOptions.includes('online') ? priceCents : 0,
         pricing_suggested: selectedExchangeOptions.includes('online') ? priceCents : null,
         restaurant_reference_price: selectedExchangeOptions.includes('online') ? priceCents : null,
@@ -334,10 +344,12 @@ const AddMeal = () => {
 
       if (insertError) {
         console.error('Insert error:', insertError);
-        toast.error('Fehler beim Erstellen des Gerichts. Bitte versuche es erneut.');
+        toast.dismiss(loadingToastId);
+        toast.error(`Fehler beim Erstellen: ${insertError.message || 'Bitte versuche es erneut.'}`);
         return;
       }
 
+      toast.dismiss(loadingToastId);
       toast.success('✅ Gericht ist live! Dein Essen ist jetzt sichtbar.');
       
       // Navigate to the new meal detail page
@@ -347,6 +359,7 @@ const AddMeal = () => {
 
     } catch (error) {
       console.error('Error creating meal:', error);
+      toast.dismiss();
       toast.error('Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
     }
   };
