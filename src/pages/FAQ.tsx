@@ -3,6 +3,7 @@ import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Building2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -269,6 +270,67 @@ const FAQ = () => {
               <Send className="w-4 h-4 mr-2" />
               {isSubmitting ? t('faq.ask_question_submitting') : t('faq.ask_question_submit')}
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Section for Municipalities & Organizations */}
+        <Card className="border-primary/20 bg-gradient-to-br from-muted/30 to-muted/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5 text-primary" />
+              Für Gemeinden & Organisationen
+            </CardTitle>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Neighbors Kitchen eignet sich neben der privaten Nutzung auch als digitale Quartier-Infrastruktur – 
+              z. B. zur Förderung von Begegnung, zur Reduktion von Lebensmittelverschwendung oder als 
+              niedrigschwellige Präventionsmassnahme gegen soziale Isolation.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="org-1">
+                <AccordionTrigger className="text-left text-sm">
+                  Ist Neighbors Kitchen ein kommerzieller Anbieter?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  Nein. Neighbors Kitchen ist eine Vermittlungsplattform. Mahlzeiten werden privat geteilt. 
+                  Freiwillige Kostenbeiträge dienen lediglich der Deckung von Zutaten oder Energie.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="org-2">
+                <AccordionTrigger className="text-left text-sm">
+                  Welche Rolle hat eine Gemeinde oder Organisation?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  Gemeinden können Neighbors Kitchen ideell oder organisatorisch unterstützen (z. B. Einführung 
+                  auf Quartiersebene). Die Community bleibt dabei selbstorganisiert – Institutionen wirken 
+                  ermöglichend, nicht steuernd.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="org-3">
+                <AccordionTrigger className="text-left text-sm">
+                  Welche Daten erhalten Gemeinden?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  Auf Wunsch stellen wir anonymisierte Wirkungsdaten zur Verfügung (z. B. Anzahl geteilter 
+                  Mahlzeiten oder aktive Haushalte). Es werden keine personenbezogenen Daten weitergegeben.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            <div className="mt-4 pt-4 border-t border-border">
+              <p className="text-sm text-muted-foreground mb-2">
+                Kontakt für Partnerschaften:
+              </p>
+              <a 
+                href="mailto:hello@neighbors-kitchen.ch" 
+                className="text-primary hover:underline font-medium"
+              >
+                hello@neighbors-kitchen.ch
+              </a>
+            </div>
           </CardContent>
         </Card>
 
