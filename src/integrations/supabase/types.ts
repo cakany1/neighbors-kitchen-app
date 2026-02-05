@@ -118,33 +118,45 @@ export type Database = {
       }
       bookings: {
         Row: {
+          cancellation_reason: string | null
+          cancelled_at: string | null
           created_at: string
           guest_composition: string | null
           guest_id: string
           id: string
           meal_id: string
+          no_show_marked_at: string | null
+          no_show_marked_by: string | null
           payment_amount: number | null
           payout_status: string | null
           status: string
           updated_at: string
         }
         Insert: {
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           created_at?: string
           guest_composition?: string | null
           guest_id: string
           id?: string
           meal_id: string
+          no_show_marked_at?: string | null
+          no_show_marked_by?: string | null
           payment_amount?: number | null
           payout_status?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           created_at?: string
           guest_composition?: string | null
           guest_id?: string
           id?: string
           meal_id?: string
+          no_show_marked_at?: string | null
+          no_show_marked_by?: string | null
           payment_amount?: number | null
           payout_status?: string | null
           status?: string
@@ -163,6 +175,20 @@ export type Database = {
             columns: ["meal_id"]
             isOneToOne: false
             referencedRelation: "meals_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_no_show_marked_by_fkey"
+            columns: ["no_show_marked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_no_show_marked_by_fkey"
+            columns: ["no_show_marked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -595,6 +621,126 @@ export type Database = {
         }
         Relationships: []
       }
+      qa_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          run_type: string
+          started_at: string
+          status: string
+          summary: Json | null
+          test_results: Json
+          triggered_by: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          run_type?: string
+          started_at?: string
+          status?: string
+          summary?: Json | null
+          test_results?: Json
+          triggered_by?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          run_type?: string
+          started_at?: string
+          status?: string
+          summary?: Json | null
+          test_results?: Json
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qa_runs_triggered_by_fkey"
+            columns: ["triggered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qa_runs_triggered_by_fkey"
+            columns: ["triggered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ratings: {
+        Row: {
+          booking_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          rated_user_id: string
+          rater_id: string
+          stars: number
+          tags: string[] | null
+        }
+        Insert: {
+          booking_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rated_user_id: string
+          rater_id: string
+          stars: number
+          tags?: string[] | null
+        }
+        Update: {
+          booking_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rated_user_id?: string
+          rater_id?: string
+          stars?: number
+          tags?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_rated_user_id_fkey"
+            columns: ["rated_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_rated_user_id_fkey"
+            columns: ["rated_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_rater_id_fkey"
+            columns: ["rater_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_rater_id_fkey"
+            columns: ["rater_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reports: {
         Row: {
           created_at: string | null
@@ -936,6 +1082,31 @@ export type Database = {
         }
         Relationships: []
       }
+      user_rating_summary: {
+        Row: {
+          avg_rating: number | null
+          negative_ratings: number | null
+          positive_ratings: number | null
+          total_ratings: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_rated_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_rated_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       admin_delete_user: { Args: { target_user_id: string }; Returns: Json }
@@ -951,12 +1122,34 @@ export type Database = {
         Args: { p_booking_id: string; p_guest_id: string }
         Returns: Json
       }
+      cancel_booking_with_reason: {
+        Args: { p_booking_id: string; p_guest_id: string; p_reason?: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      host_cancel_booking: {
+        Args: { p_booking_id: string; p_reason?: string }
+        Returns: Json
+      }
+      mark_no_show: {
+        Args: { p_booking_id: string; p_is_guest_noshow?: boolean }
+        Returns: Json
+      }
+      submit_rating: {
+        Args: {
+          p_booking_id: string
+          p_comment?: string
+          p_rated_user_id: string
+          p_stars: number
+          p_tags?: string[]
+        }
+        Returns: Json
       }
       user_can_view_meal_address: {
         Args: { meal_id: string; user_id: string }
