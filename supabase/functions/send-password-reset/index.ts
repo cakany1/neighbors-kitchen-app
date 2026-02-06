@@ -1,47 +1,58 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
+/**
+ * Send Password Reset Edge Function
+ * 
+ * Features:
+ * - Uses shared utils for CORS and logging
+ * - Origin validation for production security
+ * - No auth required (public endpoint for password reset)
+ * - Uses Supabase Admin API for secure reset link generation
+ */
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { 
+  getCorsHeaders, 
+  handleCors,
+  generateRequestId,
+  safeLog,
+  checkOrigin,
+  jsonError,
+  getAdminClient
+} from '../_shared/utils.ts'
 
 interface PasswordResetRequest {
   email: string;
   language?: string;
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  const requestId = generateRequestId();
+  const origin = req.headers.get('Origin');
+  
+  // Handle CORS preflight
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
+
+  // PRODUCTION SECURITY: Validate origin
+  const originError = checkOrigin(req, requestId);
+  if (originError) return originError;
 
   try {
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
-    console.log("Starting password reset process...");
-    console.log("RESEND_API_KEY configured:", !!RESEND_API_KEY);
-    console.log("SUPABASE_URL configured:", !!SUPABASE_URL);
-    console.log("SUPABASE_SERVICE_ROLE_KEY configured:", !!SUPABASE_SERVICE_ROLE_KEY);
+    safeLog(requestId, 'info', 'Starting password reset process');
     
     if (!RESEND_API_KEY) {
-      console.error("RESEND_API_KEY is not configured");
+      safeLog(requestId, 'error', 'RESEND_API_KEY is not configured');
       throw new Error("RESEND_API_KEY is not configured");
     }
 
     const { email, language = 'de' }: PasswordResetRequest = await req.json();
 
     if (!email || !email.includes('@')) {
-      return new Response(
-        JSON.stringify({ error: 'Valid email is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return jsonError('Valid email is required', 400, requestId, undefined, origin);
     }
 
-    // Create Supabase admin client to generate password reset link
-    const supabaseAdmin = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+    // Use admin client for password reset
+    const supabaseAdmin = getAdminClient();
 
     // Generate password reset link using Supabase Admin API
     const { data, error: resetError } = await supabaseAdmin.auth.admin.generateLink({
@@ -53,21 +64,21 @@ serve(async (req) => {
     });
 
     if (resetError) {
-      console.error("Reset link generation error:", resetError);
+      safeLog(requestId, 'warn', 'Reset link generation error (not revealing to user)');
       // Don't reveal if email exists or not for security
       return new Response(
-        JSON.stringify({ success: true, message: 'If this email exists, a reset link has been sent.' }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: true, message: 'If this email exists, a reset link has been sent.', requestId }),
+        { status: 200, headers: { ...getCorsHeaders(origin), 'Content-Type': 'application/json' } }
       );
     }
 
     const resetLink = data?.properties?.action_link;
 
     if (!resetLink) {
-      console.error("No reset link generated");
+      safeLog(requestId, 'warn', 'No reset link generated');
       return new Response(
-        JSON.stringify({ success: true, message: 'If this email exists, a reset link has been sent.' }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: true, message: 'If this email exists, a reset link has been sent.', requestId }),
+        { status: 200, headers: { ...getCorsHeaders(origin), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -154,22 +165,23 @@ serve(async (req) => {
     const emailData = await response.json();
 
     if (!response.ok) {
-      console.error("Resend API error:", emailData);
+      safeLog(requestId, 'error', 'Resend API error', { error: emailData });
       throw new Error(emailData.message || "Failed to send email");
     }
 
-    console.log("Password reset email sent successfully:", emailData);
+    safeLog(requestId, 'info', 'Password reset email sent successfully');
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Password reset email sent successfully' }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ success: true, message: 'Password reset email sent successfully', requestId }),
+      { status: 200, headers: { ...getCorsHeaders(origin), 'Content-Type': 'application/json' } }
     );
-  } catch (error: any) {
-    console.error("Error in send-password-reset function:", error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    safeLog(requestId, 'error', 'Error in send-password-reset', { error: message });
     // Always return success to prevent email enumeration attacks
     return new Response(
-      JSON.stringify({ success: true, message: 'If this email exists, a reset link has been sent.' }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ success: true, message: 'If this email exists, a reset link has been sent.', requestId }),
+      { status: 200, headers: { ...getCorsHeaders(origin), 'Content-Type': 'application/json' } }
     );
   }
 });

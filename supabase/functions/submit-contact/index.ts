@@ -16,7 +16,8 @@ import {
   handleCors,
   generateRequestId,
   checkRateLimit,
-  safeLog
+  safeLog,
+  checkOrigin
 } from '../_shared/utils.ts'
 
 // Rate limit configuration (configurable via ENV)
@@ -30,6 +31,10 @@ Deno.serve(async (req) => {
   // Handle CORS preflight
   const corsResponse = handleCors(req)
   if (corsResponse) return corsResponse
+
+  // PRODUCTION SECURITY: Validate origin
+  const originError = checkOrigin(req, requestId)
+  if (originError) return originError
 
   try {
     // Get client IP for rate limiting

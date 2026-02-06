@@ -251,32 +251,53 @@ export function checkOrigin(req: Request, requestId: string): Response | null {
 
 // ============= Auth Helpers =============
 
+interface AuthResult {
+  success: boolean
+  user?: { id: string; email?: string }
+  client?: SupabaseClient
+  response?: Response
+}
+
 /**
  * Verify user authentication and return user object
- * Returns null if not authenticated
+ * Returns structured result with user/client on success, response on failure
  */
-export async function verifyAuth(req: Request): Promise<{ 
-  user: { id: string; email?: string } | null; 
-  error: string | null;
-  client: SupabaseClient | null;
-}> {
+export async function verifyAuth(req: Request, requestId: string): Promise<AuthResult> {
+  const origin = req.headers.get('Origin')
   const authHeader = req.headers.get('Authorization')
   
   if (!authHeader?.startsWith('Bearer ')) {
-    return { user: null, error: 'Missing or invalid Authorization header', client: null }
+    return { 
+      success: false, 
+      response: jsonError('Missing authorization', 401, requestId, undefined, origin)
+    }
   }
   
   try {
     const client = getAnonClient(authHeader)
-    const { data: { user }, error } = await client.auth.getUser()
+    const token = authHeader.replace('Bearer ', '')
     
-    if (error || !user) {
-      return { user: null, error: 'Invalid or expired token', client: null }
+    // Use getClaims for faster validation
+    const { data: claimsData, error: claimsError } = await client.auth.getClaims(token)
+    
+    if (claimsError || !claimsData?.claims) {
+      return { 
+        success: false, 
+        response: jsonError('Unauthorized', 401, requestId, undefined, origin)
+      }
     }
     
-    return { user, error: null, client }
+    const user = {
+      id: claimsData.claims.sub as string,
+      email: claimsData.claims.email as string | undefined
+    }
+    
+    return { success: true, user, client }
   } catch (err) {
-    return { user: null, error: 'Authentication failed', client: null }
+    return { 
+      success: false, 
+      response: jsonError('Authentication failed', 401, requestId, undefined, origin)
+    }
   }
 }
 
@@ -296,36 +317,27 @@ export async function isAdmin(client: SupabaseClient, userId: string): Promise<b
 
 /**
  * Verify admin authorization (combines auth + role check)
- * Returns error Response if not authorized, null if authorized
+ * Returns structured result with user/client on success, response on failure
  */
-export async function verifyAdmin(req: Request, requestId: string): Promise<{
-  user: { id: string; email?: string } | null;
-  client: SupabaseClient | null;
-  error: Response | null;
-}> {
+export async function verifyAdmin(req: Request, requestId: string): Promise<AuthResult> {
   const origin = req.headers.get('Origin')
   
-  const { user, error: authError, client } = await verifyAuth(req)
+  const auth = await verifyAuth(req, requestId)
   
-  if (authError || !user || !client) {
-    return { 
-      user: null, 
-      client: null, 
-      error: jsonError('Unauthorized', 401, requestId, undefined, origin)
-    }
+  if (!auth.success || !auth.user || !auth.client) {
+    return auth
   }
   
-  const hasAdminRole = await isAdmin(client, user.id)
+  const hasAdminRole = await isAdmin(auth.client, auth.user.id)
   
   if (!hasAdminRole) {
     return { 
-      user: null, 
-      client: null, 
-      error: jsonError('Forbidden: Admin access required', 403, requestId, undefined, origin)
+      success: false, 
+      response: jsonError('Forbidden: Admin access required', 403, requestId, undefined, origin)
     }
   }
   
-  return { user, client, error: null }
+  return { success: true, user: auth.user, client: auth.client }
 }
 
 // ============= Logging Helpers =============

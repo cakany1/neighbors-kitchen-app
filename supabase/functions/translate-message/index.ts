@@ -1,39 +1,39 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
+/**
+ * Translate Message Edge Function
+ * 
+ * Features:
+ * - Uses shared utils for CORS, auth, and logging
+ * - Origin validation for production security
+ * - Uses Lovable AI for translation
+ */
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  getCorsHeaders, 
+  handleCors,
+  generateRequestId,
+  safeLog,
+  verifyAuth,
+  checkOrigin,
+  jsonError
+} from '../_shared/utils.ts'
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  const requestId = generateRequestId();
+  const origin = req.headers.get('Origin');
+  
+  // Handle CORS preflight
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
+
+  // PRODUCTION SECURITY: Validate origin
+  const originError = checkOrigin(req, requestId);
+  if (originError) return originError;
 
   try {
     // Authentication check
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(
-        JSON.stringify({ error: 'Missing authorization' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const auth = await verifyAuth(req, requestId);
+    if (!auth.success) {
+      return auth.response!;
     }
 
     const { text, targetLanguage, sourceLanguage } = await req.json();
@@ -43,7 +43,11 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log(`Translating from ${sourceLanguage} to ${targetLanguage}:`, text);
+    safeLog(requestId, 'info', 'Translating message', { 
+      from: sourceLanguage, 
+      to: targetLanguage, 
+      userId: auth.user?.id 
+    });
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -68,24 +72,22 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Translation API error:", response.status, errorText);
+      safeLog(requestId, 'error', 'Translation API error', { status: response.status, error: errorText });
       throw new Error(`Translation failed: ${response.status}`);
     }
 
     const data = await response.json();
     const translatedText = data.choices[0].message.content;
 
-    console.log("Translation successful:", translatedText);
+    safeLog(requestId, 'info', 'Translation successful');
 
     return new Response(
-      JSON.stringify({ translatedText, originalText: text }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ translatedText, originalText: text, requestId }),
+      { headers: { ...getCorsHeaders(origin), "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Translation error:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Translation failed" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    const message = error instanceof Error ? error.message : "Translation failed";
+    safeLog(requestId, 'error', 'Translation error', { error: message });
+    return jsonError(message, 500, requestId, undefined, origin);
   }
 });

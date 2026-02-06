@@ -1,53 +1,48 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+/**
+ * Create Payment Intent Edge Function
+ * 
+ * Features:
+ * - Uses shared utils for CORS, auth, and logging
+ * - Origin validation for production security
+ * - Stripe Checkout integration
+ */
+
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { 
+  getCorsHeaders, 
+  handleCors,
+  generateRequestId,
+  safeLog,
+  verifyAuth,
+  checkOrigin,
+  jsonError
+} from '../_shared/utils.ts'
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
-
-serve(async (req) => {
+Deno.serve(async (req) => {
+  const requestId = generateRequestId();
+  const origin = req.headers.get('Origin');
+  
   // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
+
+  // PRODUCTION SECURITY: Validate origin
+  const originError = checkOrigin(req, requestId);
+  if (originError) return originError;
 
   try {
     // SECURITY: Require authentication
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const auth = await verifyAuth(req, requestId);
+    if (!auth.success) {
+      return auth.response!;
     }
-
-    // Create Supabase client with user's auth context
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    // Verify the user's JWT token
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-    if (authError || !user) {
-      console.error('Auth error:', authError);
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    const user = auth.user!;
 
     const { amount, mealId, mealTitle, chefName } = await req.json();
 
     // Validate minimum amount (CHF 7.00 = 700 cents)
     if (!amount || amount < 700) {
-      return new Response(
-        JSON.stringify({ error: "Minimum amount is CHF 7.00" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
-      );
+      return jsonError("Minimum amount is CHF 7.00", 400, requestId, undefined, origin);
     }
 
     // Initialize Stripe
@@ -58,6 +53,12 @@ serve(async (req) => {
     // Calculate fees
     const serviceFee = 200; // CHF 2.00 = 200 cents
     const totalAmount = amount + serviceFee;
+
+    safeLog(requestId, 'info', 'Creating payment session', { 
+      userId: user.id, 
+      mealId, 
+      amount 
+    });
 
     // Create Checkout Session with dynamic pricing
     const session = await stripe.checkout.sessions.create({
@@ -99,18 +100,15 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/payment/${mealId}`,
     });
 
-    console.log("Payment session created:", session.id, "for user:", user.id);
+    safeLog(requestId, 'info', 'Payment session created', { sessionId: session.id });
 
     return new Response(
-      JSON.stringify({ url: session.url, sessionId: session.id }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      JSON.stringify({ url: session.url, sessionId: session.id, requestId }),
+      { headers: { ...getCorsHeaders(origin), "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error: unknown) {
-    console.error("Payment error:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
-    return new Response(
-      JSON.stringify({ error: message }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-    );
+    safeLog(requestId, 'error', 'Payment error', { error: message });
+    return jsonError(message, 500, requestId, undefined, origin);
   }
 });

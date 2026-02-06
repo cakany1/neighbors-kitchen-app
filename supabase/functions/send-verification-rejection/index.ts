@@ -1,12 +1,22 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { Resend } from "npm:resend@2.0.0";
+/**
+ * Send Verification Rejection Edge Function
+ * 
+ * Features:
+ * - Uses shared utils for CORS, auth, and logging
+ * - Origin validation for production security
+ * - Admin-only access
+ */
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { Resend } from "npm:resend@2.0.0";
+import { 
+  getCorsHeaders, 
+  handleCors,
+  generateRequestId,
+  safeLog,
+  verifyAdmin,
+  checkOrigin,
+  jsonError
+} from '../_shared/utils.ts'
 
 interface RejectionRequest {
   userId: string;
@@ -25,89 +35,42 @@ const REASON_LABELS: Record<string, { de: string; en: string }> = {
   other: { de: 'Anderer Grund', en: 'Other reason' },
 };
 
-serve(async (req: Request): Promise<Response> => {
-  const requestId = crypto.randomUUID().slice(0, 8);
-  console.log(`[${requestId}] Verification rejection function called`);
-
+Deno.serve(async (req) => {
+  const requestId = generateRequestId();
+  const origin = req.headers.get('Origin');
+  
   // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
+
+  // PRODUCTION SECURITY: Validate origin
+  const originError = checkOrigin(req, requestId);
+  if (originError) return originError;
 
   try {
-    // Verify admin authorization
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      console.log(`[${requestId}] No authorization header`);
-      return new Response(
-        JSON.stringify({ error: "Unauthorized - no token provided", requestId }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // Admin-only access
+    const adminAuth = await verifyAdmin(req, requestId);
+    if (!adminAuth.success) {
+      return adminAuth.response!;
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    
-    // Verify the user's token with anon client
-    const anonClient = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: { persistSession: false },
-      global: { headers: { Authorization: authHeader } }
-    });
-
-    const { data: { user }, error: userError } = await anonClient.auth.getUser();
-    if (userError || !user) {
-      console.log(`[${requestId}] Invalid token:`, userError?.message);
-      return new Response(
-        JSON.stringify({ error: "Unauthorized - invalid token", requestId }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Use service role client for admin operations
-    const serviceClient = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { persistSession: false }
-    });
-
-    // Check if user is admin
-    const { data: adminRole, error: roleError } = await serviceClient
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-
-    if (roleError || !adminRole) {
-      console.log(`[${requestId}] User ${user.id} is not an admin`);
-      return new Response(
-        JSON.stringify({ error: "Forbidden - admin access required", requestId }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    console.log(`[${requestId}] Admin ${user.id} authorized`);
+    safeLog(requestId, 'info', 'Admin processing verification rejection', { adminId: adminAuth.user?.id });
 
     // Parse request body
     const body: RejectionRequest = await req.json();
     const { userId, userEmail, userName, reason, details } = body;
 
     if (!userId || !userEmail || !userName || !reason) {
-      return new Response(
-        JSON.stringify({ error: "Missing required fields: userId, userEmail, userName, reason", requestId }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return jsonError("Missing required fields: userId, userEmail, userName, reason", 400, requestId, undefined, origin);
     }
 
-    console.log(`[${requestId}] Processing rejection for user ${userId} (${userEmail})`);
+    safeLog(requestId, 'info', 'Processing rejection', { targetUserId: userId });
 
     // Get Resend API key
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) {
-      console.error(`[${requestId}] RESEND_API_KEY not configured`);
-      return new Response(
-        JSON.stringify({ error: "Email service not configured", requestId }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      safeLog(requestId, 'error', 'RESEND_API_KEY not configured');
+      return jsonError("Email service not configured", 500, requestId, undefined, origin);
     }
 
     const resend = new Resend(resendApiKey);
@@ -184,23 +147,21 @@ serve(async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log(`[${requestId}] Email sent to ${userEmail}:`, emailResult);
+    safeLog(requestId, 'info', 'Rejection email sent', { emailId: emailResult.data?.id });
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         requestId,
         emailId: emailResult.data?.id,
-        message: `Rejection email sent to ${userEmail}`
+        message: `Rejection email sent to user`
       }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 200, headers: { ...getCorsHeaders(origin), "Content-Type": "application/json" } }
     );
 
-  } catch (error: any) {
-    console.error(`[${requestId}] Error:`, error);
-    return new Response(
-      JSON.stringify({ error: error.message || "Internal server error", requestId }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Internal server error";
+    safeLog(requestId, 'error', 'Error in send-verification-rejection', { error: message });
+    return jsonError(message, 500, requestId, undefined, origin);
   }
 });
