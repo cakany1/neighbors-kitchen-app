@@ -710,6 +710,7 @@
     "for_both": "Für uns beide (2 Portionen)",
     "for_me": "Nur für mich (1 Portion)",
     "estimated_restaurant_value": "Im Restaurant wären das ca. CHF {{amount}}.- ({{portions}} Portionen)",
+    "estimated_value": "Geschätzter Wert",
     "show_original": "Original anzeigen",
     "show_english": "Englisch anzeigen",
     "translate_to_german": "Ins Deutsche übersetzen",
@@ -786,7 +787,11 @@
     "change_address": "Adresse ändern",
     "address_required": "Bitte gib eine Abholadresse ein",
     "address_not_resolved": "Adresse konnte nicht gefunden werden. Bitte prüfe Strasse und Stadt.",
-    "geocoding_rate_limit": "Zu viele Anfragen. Bitte warte einen Moment und versuche es erneut."
+    "geocoding_rate_limit": "Zu viele Anfragen. Bitte warte einen Moment und versuche es erneut.",
+    "estimated_value_title": "Geschätzter Wert",
+    "estimated_value_desc": "Optional: Was würde dieses Gericht im Restaurant kosten? (Gesamtwert für alle Portionen)",
+    "estimated_value_placeholder": "z.B. 35",
+    "estimated_value_hint": "Hilft Gästen den Wert einzuschätzen. Wir zeigen 'Geschätzter Wert' an."
   },
   "feed_page": {
     "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schliessen.",

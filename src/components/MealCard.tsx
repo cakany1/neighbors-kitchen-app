@@ -46,6 +46,10 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   const pricingMinCents = Number(pricingMinRaw) > 100 ? Number(pricingMinRaw) : Number(pricingMinRaw) * 100;
   const minPrice = (pricingMinCents / 100).toFixed(2);
 
+  // Estimated restaurant value - stored in cents in DB, CHF in mock data
+  const estimatedValueRaw = (meal as any).estimated_restaurant_value || (meal as any).estimatedRestaurantValue || 0;
+  const estimatedValueCHF = Number(estimatedValueRaw) > 100 ? Number(estimatedValueRaw) / 100 : Number(estimatedValueRaw);
+
   const location = meal.location || {};
   const neighborhood =
     getProp(location, "neighborhood", "neighborhood") || getProp(meal, "neighborhood", "neighborhood") || "Basel";
@@ -148,13 +152,18 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
               <HandoverIcon className="w-4 h-4" />
               <span className="capitalize">{handoverMode.replace("_", " ")}</span>
             </div>
-            <div className="font-semibold text-primary text-right">
-              {exchangeMode === "money" && Number(minPrice) > 0 && (
+            <div className="font-semibold text-right">
+              {exchangeMode === "money" && Number(minPrice) > 0 ? (
                 <span className="flex flex-col items-end leading-tight">
                   <span className="text-xs text-muted-foreground font-normal">Online Payment</span>
-                  <span>CHF {minPrice}</span>
+                  <span className="text-primary">CHF {minPrice}</span>
                 </span>
-              )}
+              ) : estimatedValueCHF > 0 ? (
+                <span className="flex flex-col items-end leading-tight">
+                  <span className="text-xs text-muted-foreground font-normal">{t("meal_detail.estimated_value", "Geschätzter Wert")}</span>
+                  <span className="text-secondary">~CHF {estimatedValueCHF.toFixed(0)}.-</span>
+                </span>
+              ) : null}
             </div>
           </div>
         </div>
