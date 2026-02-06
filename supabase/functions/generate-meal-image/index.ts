@@ -1,69 +1,69 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
+/**
+ * Generate Meal Image Edge Function
+ * 
+ * Features:
+ * - Uses shared utils for CORS, auth, and logging
+ * - Origin validation for production security
+ * - Uses Lovable AI for image generation
+ * - Uploads to Supabase storage
+ */
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  getCorsHeaders, 
+  handleCors,
+  generateRequestId,
+  safeLog,
+  verifyAuth,
+  checkOrigin,
+  jsonError,
+  getAdminClient,
+  getAnonClient
+} from '../_shared/utils.ts'
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  const requestId = generateRequestId();
+  const origin = req.headers.get('Origin');
+  
+  // Handle CORS preflight
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
+
+  // PRODUCTION SECURITY: Validate origin
+  const originError = checkOrigin(req, requestId);
+  if (originError) return originError;
 
   try {
     // Authentication check
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(
-        JSON.stringify({ error: 'Missing authorization', success: false }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const auth = await verifyAuth(req, requestId);
+    if (!auth.success) {
+      return auth.response!;
     }
-
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized', success: false }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const userId = claimsData.claims.sub;
+    const userId = auth.user!.id;
 
     const { prompt, mealId } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Get anon client for user-scoped operations
+    const anonClient = getAnonClient(req.headers.get('Authorization')!);
+
     // Verify that the user owns the meal they're trying to update
     if (mealId) {
-      const { data: mealData, error: mealError } = await supabaseClient
+      const { data: mealData, error: mealError } = await anonClient
         .from('meals')
         .select('chef_id')
         .eq('id', mealId)
         .single();
 
       if (mealError || !mealData || mealData.chef_id !== userId) {
-        return new Response(
-          JSON.stringify({ error: 'You can only generate images for your own meals', success: false }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return jsonError('You can only generate images for your own meals', 403, requestId, undefined, origin);
       }
     }
 
-    console.log("Generating image with prompt:", prompt);
+    safeLog(requestId, 'info', 'Generating image', { userId, mealId });
 
     // Generate image using Lovable AI
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -86,7 +86,7 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      safeLog(requestId, 'error', 'AI gateway error', { status: response.status, error: errorText });
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
@@ -97,17 +97,17 @@ serve(async (req) => {
       throw new Error("No image generated");
     }
 
-    console.log("Image generated successfully");
+    safeLog(requestId, 'info', 'Image generated successfully');
 
     // Convert base64 to blob
     const base64Data = imageUrl.split(',')[1];
     const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
-    // Upload to Supabase storage using service role for storage operations
-    const supabaseAdmin = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+    // Upload to Supabase storage using admin client
+    const adminClient = getAdminClient();
     const fileName = `meal-${mealId}-${Date.now()}.png`;
     
-    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+    const { data: uploadData, error: uploadError } = await adminClient.storage
       .from('gallery')
       .upload(fileName, binaryData, {
         contentType: 'image/png',
@@ -115,54 +115,47 @@ serve(async (req) => {
       });
 
     if (uploadError) {
-      console.error("Upload error:", uploadError);
+      safeLog(requestId, 'error', 'Upload error', { error: uploadError.message });
       throw uploadError;
     }
 
     // Get public URL
-    const { data: { publicUrl } } = supabaseAdmin.storage
+    const { data: { publicUrl } } = adminClient.storage
       .from('gallery')
       .getPublicUrl(fileName);
 
-    console.log("Image uploaded to:", publicUrl);
+    safeLog(requestId, 'info', 'Image uploaded', { publicUrl });
 
-    // Update meal with new image URL (using service role since user already verified)
+    // Update meal with new image URL
     if (mealId) {
-      const { error: updateError } = await supabaseAdmin
+      const { error: updateError } = await adminClient
         .from('meals')
         .update({ image_url: publicUrl })
         .eq('id', mealId);
 
       if (updateError) {
-        console.error("Update error:", updateError);
+        safeLog(requestId, 'error', 'Update error', { error: updateError.message });
         throw updateError;
       }
 
-      console.log("Meal updated with new image URL");
+      safeLog(requestId, 'info', 'Meal updated with new image URL');
     }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         imageUrl: publicUrl,
-        message: "Image generated and uploaded successfully"
+        message: "Image generated and uploaded successfully",
+        requestId
       }),
       { 
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...getCorsHeaders(origin), "Content-Type": "application/json" },
         status: 200
       }
     );
   } catch (error) {
-    console.error("Error in generate-meal-image function:", error);
-    return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : "Unknown error",
-        success: false
-      }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      }
-    );
+    const message = error instanceof Error ? error.message : "Unknown error";
+    safeLog(requestId, 'error', 'Error in generate-meal-image', { error: message });
+    return jsonError(message, 500, requestId, undefined, origin);
   }
 });

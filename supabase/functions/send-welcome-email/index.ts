@@ -1,10 +1,21 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
+/**
+ * Send Welcome Email Edge Function
+ * 
+ * Features:
+ * - Uses shared utils for CORS, auth, and logging
+ * - Origin validation for production security
+ * - Bilingual email support (DE/EN)
+ */
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { 
+  getCorsHeaders, 
+  handleCors,
+  generateRequestId,
+  safeLog,
+  verifyAuth,
+  checkOrigin,
+  jsonError
+} from '../_shared/utils.ts'
 
 interface WelcomeEmailRequest {
   email: string;
@@ -12,39 +23,25 @@ interface WelcomeEmailRequest {
   language?: string;
 }
 
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  const requestId = generateRequestId();
+  const origin = req.headers.get('Origin');
+  
+  // Handle CORS preflight
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
+
+  // PRODUCTION SECURITY: Validate origin
+  const originError = checkOrigin(req, requestId);
+  if (originError) return originError;
 
   try {
-    // Authentication check - only authenticated users can trigger welcome emails
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(
-        JSON.stringify({ error: 'Missing authorization' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Authentication check
+    const auth = await verifyAuth(req, requestId);
+    if (!auth.success) {
+      return auth.response!;
     }
-
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Get the authenticated user's email from claims
-    const authenticatedEmail = claimsData.claims.email;
+    const authenticatedEmail = auth.user?.email;
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     
@@ -56,11 +53,10 @@ serve(async (req) => {
 
     // Security: Only allow sending welcome email to the authenticated user's own email
     if (email !== authenticatedEmail) {
-      return new Response(
-        JSON.stringify({ error: 'You can only send welcome emails to your own email address' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return jsonError('You can only send welcome emails to your own email address', 403, requestId, undefined, origin);
     }
+
+    safeLog(requestId, 'info', 'Sending welcome email', { userId: auth.user?.id });
 
     // German and English versions
     const isGerman = language === 'de';
@@ -165,24 +161,19 @@ serve(async (req) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Resend API error:", data);
+      safeLog(requestId, 'error', 'Resend API error', { error: data });
       throw new Error(data.message || "Failed to send email");
     }
 
-    console.log("Welcome email sent successfully:", data);
+    safeLog(requestId, 'info', 'Welcome email sent successfully');
 
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify({ ...data, requestId }), {
       status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { "Content-Type": "application/json", ...getCorsHeaders(origin) },
     });
-  } catch (error: any) {
-    console.error("Error in send-welcome-email function:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    safeLog(requestId, 'error', 'Error in send-welcome-email', { error: message });
+    return jsonError(message, 500, requestId, undefined, origin);
   }
 });

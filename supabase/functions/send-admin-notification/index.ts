@@ -1,10 +1,22 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+/**
+ * Send Admin Notification Edge Function
+ * 
+ * Features:
+ * - Uses shared utils for CORS, auth, and logging
+ * - Origin validation for production security
+ * - HTML escaping to prevent injection attacks
+ */
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { 
+  getCorsHeaders, 
+  handleCors,
+  generateRequestId,
+  safeLog,
+  verifyAuth,
+  checkOrigin,
+  jsonError,
+  jsonSuccess
+} from '../_shared/utils.ts'
 
 interface NotificationRequest {
   type: 'faq' | 'contact';
@@ -23,36 +35,26 @@ function escapeHtml(unsafe: string): string {
     .replace(/'/g, "&#039;");
 }
 
-const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  const requestId = generateRequestId();
+  const origin = req.headers.get('Origin');
+  
+  // Handle CORS preflight
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
+
+  // PRODUCTION SECURITY: Validate origin
+  const originError = checkOrigin(req, requestId);
+  if (originError) return originError;
 
   try {
     // SECURITY: Require authentication
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const auth = await verifyAuth(req, requestId);
+    if (!auth.success) {
+      return auth.response!;
     }
 
-    // Verify the user's JWT token
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-    if (authError || !user) {
-      console.error('Auth error:', authError);
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    safeLog(requestId, 'info', 'Admin notification request', { userId: auth.user?.id });
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     
@@ -143,23 +145,16 @@ const handler = async (req: Request): Promise<Response> => {
     const emailData = await response.json();
 
     if (!response.ok) {
-      console.error("Resend API error:", emailData);
+      safeLog(requestId, 'error', 'Resend API error', { error: emailData });
       throw new Error(emailData.message || "Failed to send notification email");
     }
 
-    console.log("Admin notification sent successfully:", emailData);
+    safeLog(requestId, 'info', 'Admin notification sent successfully');
 
-    return new Response(
-      JSON.stringify({ success: true }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-  } catch (error: any) {
-    console.error("Error in send-admin-notification:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return jsonSuccess({ success: true, requestId }, 200, origin);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    safeLog(requestId, 'error', 'Error in send-admin-notification', { error: message });
+    return jsonError(message, 500, requestId, undefined, origin);
   }
-};
-
-serve(handler);
+});
