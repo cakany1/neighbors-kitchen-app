@@ -68,7 +68,9 @@
     "guest_login_required": "Sign up to save this meal!",
     "guest_login_desc": "Create a free account to book meals and share with your neighborhood.",
     "my_address_only": "My address only",
-    "all_meals": "All meals"
+    "all_meals": "All meals",
+    "no_results_address": "No results at your address. Turn off filter to see more.",
+    "no_results_radius": "No results in selected radius. Increase radius or turn off filter."
   },
   "actions": {
     "view_details": "View Details"
