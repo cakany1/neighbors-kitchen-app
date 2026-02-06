@@ -11,6 +11,16 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock, Zap, UserCog } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Helper function to check for incomplete profile fields
@@ -67,6 +77,10 @@ const Admin = () => {
   // State for rejection dialog
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [userToReject, setUserToReject] = useState<any>(null);
+  
+  // State for role change confirmation dialog
+  const [roleChangeDialogOpen, setRoleChangeDialogOpen] = useState(false);
+  const [pendingRoleChange, setPendingRoleChange] = useState<{ userId: string; userName: string; makeAdmin: boolean } | null>(null);
 
   // Check if current user is admin
   const { data: isAdmin, isLoading: adminCheckLoading } = useQuery({
@@ -543,9 +557,13 @@ const Admin = () => {
     },
   });
 
-  // Toggle user role mutation
+  // Toggle user role mutation with audit logging
   const toggleRoleMutation = useMutation({
     mutationFn: async ({ userId, makeAdmin }: { userId: string; makeAdmin: boolean }) => {
+      // Get current user for audit
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) throw new Error('Not authenticated');
+      
       if (makeAdmin) {
         // Add admin role
         const { error } = await supabase
@@ -561,14 +579,34 @@ const Admin = () => {
           .eq('role', 'admin');
         if (error) throw error;
       }
+      
+      // Log the action to admin_actions audit table
+      const { error: auditError } = await supabase
+        .from('admin_actions')
+        .insert({
+          actor_id: currentUser.id,
+          target_id: userId,
+          action: makeAdmin ? 'grant_admin' : 'revoke_admin',
+          metadata: { previous_role: makeAdmin ? 'user' : 'admin', new_role: makeAdmin ? 'admin' : 'user' }
+        });
+      
+      if (auditError) {
+        console.error('Failed to log admin action:', auditError);
+        // Don't throw - the role change succeeded, audit is secondary
+      }
+      
       return { userId, makeAdmin };
     },
     onSuccess: ({ makeAdmin }) => {
       toast.success(makeAdmin ? 'Admin-Rolle hinzugefügt' : 'Admin-Rolle entfernt');
       queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
+      setRoleChangeDialogOpen(false);
+      setPendingRoleChange(null);
     },
     onError: (error: Error) => {
       toast.error('Fehler: ' + error.message);
+      setRoleChangeDialogOpen(false);
+      setPendingRoleChange(null);
     },
   });
 
@@ -1351,10 +1389,17 @@ const Admin = () => {
                               <Select
                                 value={user.roles?.includes('admin') ? 'admin' : 'user'}
                                 onValueChange={(value) => {
-                                  toggleRoleMutation.mutate({ 
-                                    userId: user.id, 
-                                    makeAdmin: value === 'admin' 
-                                  });
+                                  const makeAdmin = value === 'admin';
+                                  const currentIsAdmin = user.roles?.includes('admin');
+                                  // Only trigger if there's an actual change
+                                  if ((makeAdmin && !currentIsAdmin) || (!makeAdmin && currentIsAdmin)) {
+                                    setPendingRoleChange({ 
+                                      userId: user.id, 
+                                      userName: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email || 'User',
+                                      makeAdmin 
+                                    });
+                                    setRoleChangeDialogOpen(true);
+                                  }
                                 }}
                                 disabled={toggleRoleMutation.isPending}
                               >
@@ -1986,6 +2031,41 @@ const Admin = () => {
           });
         }}
       />
+
+      {/* Role Change Confirmation Dialog */}
+      <AlertDialog open={roleChangeDialogOpen} onOpenChange={setRoleChangeDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingRoleChange?.makeAdmin ? 'Admin-Rechte vergeben' : 'Admin-Rechte entziehen'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingRoleChange?.makeAdmin 
+                ? `Möchtest du "${pendingRoleChange?.userName}" wirklich Admin-Rechte geben? Diese Person erhält vollen Zugriff auf das Admin-Dashboard.`
+                : `Möchtest du "${pendingRoleChange?.userName}" wirklich die Admin-Rechte entziehen? Diese Person verliert den Zugriff auf das Admin-Dashboard.`
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPendingRoleChange(null)}>
+              Abbrechen
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingRoleChange) {
+                  toggleRoleMutation.mutate({ 
+                    userId: pendingRoleChange.userId, 
+                    makeAdmin: pendingRoleChange.makeAdmin 
+                  });
+                }
+              }}
+              className={pendingRoleChange?.makeAdmin ? '' : 'bg-destructive hover:bg-destructive/90'}
+            >
+              {toggleRoleMutation.isPending ? 'Wird gespeichert...' : 'Bestätigen'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <BottomNav />
     </div>
