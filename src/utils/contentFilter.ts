@@ -12,7 +12,7 @@ const BLACKLIST = [
   'fotze', 'wichser', 'hurensohn', 'schlampe', 'schwuchtel', 'spast',
   'arschloch', 'missgeburt', 'behindert',
   // Hate speech
-  'nazi', 'heil hitler', 'sieg heil',
+  'nazi', 'hitler', 'heil hitler', 'sieg heil',
   // Sexual content
   'porno', 'porn', 'sex video', 'nackt',
 ];
