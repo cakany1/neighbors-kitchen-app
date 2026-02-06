@@ -93,10 +93,12 @@ export function ProfileWizard({
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
+      toast.error(`Upload fehlgeschlagen: ${uploadError.message}`);
       return null;
     }
 
     const { data } = supabase.storage.from("avatars").getPublicUrl(fileName);
+    console.log("[ProfileWizard] Photo uploaded successfully:", data.publicUrl);
     return data.publicUrl;
   };
 

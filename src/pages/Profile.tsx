@@ -550,22 +550,31 @@ const Profile = () => {
                         .from('avatars')
                         .upload(fileName, file, { upsert: true });
 
-                      if (uploadError) throw uploadError;
+                      if (uploadError) {
+                        console.error('Avatar upload error:', uploadError);
+                        toast.error(`Upload fehlgeschlagen: ${uploadError.message}`);
+                        return;
+                      }
 
                       const { data } = supabase.storage
                         .from('avatars')
                         .getPublicUrl(fileName);
 
-                      await supabase
+                      const { error: updateError } = await supabase
                         .from('profiles')
                         .update({ avatar_url: data.publicUrl })
                         .eq('id', currentUser.id);
 
+                      if (updateError) {
+                        toast.error(`Speicherfehler: ${updateError.message}`);
+                        return;
+                      }
+
                       toast.success(t('profile.profile_updated'));
                       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
-                    } catch (error) {
+                    } catch (error: any) {
                       console.error('Upload error:', error);
-                      toast.error(t('profile.upload_error'));
+                      toast.error(t('profile.upload_error') + ': ' + error.message);
                     }
                   }}
                 />
@@ -610,28 +619,38 @@ const Profile = () => {
                       try {
                         const fileExt = file.name.split('.').pop();
                         // Use folder structure: userId/filename for RLS policy compliance
+                        // Partner photos go to 'avatars' bucket like main avatar
                         const fileName = `${currentUser.id}/partner-${Date.now()}.${fileExt}`;
 
                         const { error: uploadError } = await supabase.storage
-                          .from('gallery')
-                          .upload(fileName, file);
+                          .from('avatars')
+                          .upload(fileName, file, { upsert: true });
 
-                        if (uploadError) throw uploadError;
+                        if (uploadError) {
+                          console.error('Partner photo upload error:', uploadError);
+                          toast.error(`Upload fehlgeschlagen: ${uploadError.message}`);
+                          return;
+                        }
 
                         const { data } = supabase.storage
-                          .from('gallery')
+                          .from('avatars')
                           .getPublicUrl(fileName);
 
-                        await supabase
+                        const { error: updateError } = await supabase
                           .from('profiles')
                           .update({ partner_photo_url: data.publicUrl })
                           .eq('id', currentUser.id);
 
+                        if (updateError) {
+                          toast.error(`Speicherfehler: ${updateError.message}`);
+                          return;
+                        }
+
                         toast.success(t('profile.partner_photo_updated'));
                         queryClient.invalidateQueries({ queryKey: ['currentUser'] });
-                      } catch (error) {
+                      } catch (error: any) {
                         console.error('Upload error:', error);
-                        toast.error(t('profile.upload_error'));
+                        toast.error(t('profile.upload_error') + ': ' + error.message);
                       }
                     }}
                   />
