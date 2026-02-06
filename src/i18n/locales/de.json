@@ -581,7 +581,12 @@
     "success_desc": "Wir melden uns bald.",
     "error_title": "Fehler",
     "error_fill_all": "Bitte alle Felder ausfüllen.",
-    "error_send_failed": "Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut."
+    "error_send_failed": "Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
+    "captcha_label": "Sicherheitsüberprüfung",
+    "captcha_required": "Bitte löse die Sicherheitsüberprüfung.",
+    "captcha_error": "Überprüfung fehlgeschlagen. Bitte versuche es erneut.",
+    "captcha_hint": "Bitte löse das CAPTCHA, um fortzufahren.",
+    "captcha_not_configured": "Sicherheitsüberprüfung nicht konfiguriert."
   },
   "modal": {
     "almost_done": "Fast geschafft!",
