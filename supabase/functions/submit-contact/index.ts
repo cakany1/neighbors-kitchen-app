@@ -1,147 +1,147 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+/**
+ * Submit Contact Form Edge Function
+ * 
+ * Features:
+ * - DB-based rate limiting (persistent across function restarts)
+ * - Honeypot spam protection
+ * - Input validation and sanitization
+ * - Admin notification (non-blocking)
+ */
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { 
+  getCorsHeaders, 
+  getAdminClient, 
+  jsonError, 
+  jsonSuccess, 
+  handleCors,
+  generateRequestId,
+  checkRateLimit,
+  safeLog
+} from '../_shared/utils.ts'
 
-// Simple in-memory rate limiting (per IP, 3 requests per hour)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT = 3;
-const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+// Rate limit configuration (configurable via ENV)
+const RATE_LIMIT = parseInt(Deno.env.get('CONTACT_RATE_LIMIT') || '3')
+const RATE_WINDOW_MS = parseInt(Deno.env.get('CONTACT_RATE_WINDOW_MS') || '3600000') // 1 hour
 
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const record = rateLimitStore.get(ip);
-
-  if (!record || now > record.resetTime) {
-    rateLimitStore.set(ip, { count: 1, resetTime: now + RATE_WINDOW_MS });
-    return false;
-  }
-
-  if (record.count >= RATE_LIMIT) {
-    return true;
-  }
-
-  record.count++;
-  return false;
-}
-
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  const requestId = generateRequestId()
+  const origin = req.headers.get('Origin')
+  
+  // Handle CORS preflight
+  const corsResponse = handleCors(req)
+  if (corsResponse) return corsResponse
 
   try {
-    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
-                     req.headers.get("cf-connecting-ip") || 
-                     "unknown";
+    // Get client IP for rate limiting
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                     req.headers.get('cf-connecting-ip') || 
+                     'unknown'
 
-    // Rate limiting check
-    if (isRateLimited(clientIP)) {
+    safeLog(requestId, 'info', 'Contact form submission', { ip: clientIP })
+
+    // DB-based rate limiting
+    const rateLimit = await checkRateLimit(clientIP, 'submit-contact', RATE_LIMIT, RATE_WINDOW_MS)
+    
+    if (!rateLimit.allowed) {
+      safeLog(requestId, 'warn', 'Rate limit exceeded', { ip: clientIP })
       return new Response(
         JSON.stringify({ 
-          error: "Too many requests. Please try again later.",
-          error_de: "Zu viele Anfragen. Bitte versuche es später erneut."
+          error: 'Too many requests. Please try again later.',
+          error_de: 'Zu viele Anfragen. Bitte versuche es später erneut.',
+          retryAfter: Math.ceil((rateLimit.resetAt.getTime() - Date.now()) / 1000),
+          requestId
         }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+        { 
+          status: 429, 
+          headers: { 
+            ...getCorsHeaders(origin), 
+            'Content-Type': 'application/json',
+            'Retry-After': Math.ceil((rateLimit.resetAt.getTime() - Date.now()) / 1000).toString()
+          } 
+        }
+      )
     }
 
-    const { name, email, message, website } = await req.json();
+    const { name, email, message, website } = await req.json()
 
     // Honeypot check - if 'website' field is filled, it's a bot
-    if (website && website.trim() !== "") {
-      console.log("Honeypot triggered - bot detected");
+    if (website && website.trim() !== '') {
+      safeLog(requestId, 'info', 'Honeypot triggered - bot detected')
       // Return success to not alert the bot, but don't save
-      return new Response(
-        JSON.stringify({ success: true }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return jsonSuccess({ success: true, requestId }, 200, origin)
     }
 
     // Input validation
     if (!name || !email || !message) {
-      return new Response(
-        JSON.stringify({ error: "All fields are required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return jsonError('All fields are required', 400, requestId, undefined, origin)
     }
 
     // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid email address" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return jsonError('Invalid email address', 400, requestId, undefined, origin)
     }
 
     // Length limits
     if (name.length > 100 || email.length > 255 || message.length > 5000) {
-      return new Response(
-        JSON.stringify({ error: "Input too long" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return jsonError('Input too long', 400, requestId, undefined, origin)
     }
 
     // Sanitize inputs (basic HTML escape)
     const sanitize = (str: string) => 
       str.replace(/[<>&"']/g, (c) => 
         ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#x27;' }[c] || c)
-      );
+      )
 
-    const sanitizedName = sanitize(name.trim());
-    const sanitizedEmail = email.trim().toLowerCase();
-    const sanitizedMessage = sanitize(message.trim());
+    const sanitizedName = sanitize(name.trim())
+    const sanitizedEmail = email.trim().toLowerCase()
+    const sanitizedMessage = sanitize(message.trim())
 
-    // Save to database
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // Save to database using admin client
+    const adminClient = getAdminClient()
 
-    const { error: insertError } = await supabase
-      .from("contact_requests")
+    const { error: insertError } = await adminClient
+      .from('contact_requests')
       .insert({
         name: sanitizedName,
         email: sanitizedEmail,
         message: sanitizedMessage,
-      });
+      })
 
     if (insertError) {
-      console.error("Database insert error:", insertError);
-      throw new Error("Failed to save contact request");
+      safeLog(requestId, 'error', 'Database insert error', { error: insertError.message })
+      throw new Error('Failed to save contact request')
     }
+
+    safeLog(requestId, 'info', 'Contact request saved successfully')
 
     // Send admin notification (non-blocking)
     try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      
       await fetch(`${supabaseUrl}/functions/v1/send-admin-notification`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseServiceKey}`,
         },
         body: JSON.stringify({
-          type: "contact",
+          type: 'contact',
           content: sanitizedMessage,
           senderName: sanitizedName,
           senderEmail: sanitizedEmail,
         }),
-      });
+      })
     } catch (notifError) {
-      console.error("Admin notification failed (non-blocking):", notifError);
+      safeLog(requestId, 'warn', 'Admin notification failed (non-blocking)')
     }
 
-    return new Response(
-      JSON.stringify({ success: true }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-  } catch (error) {
-    console.error("Error in submit-contact:", error);
-    return new Response(
-      JSON.stringify({ error: "An error occurred. Please try again." }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return jsonSuccess({ success: true, requestId }, 200, origin)
+    
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'An error occurred'
+    safeLog(requestId, 'error', 'Contact form error', { error: message })
+    return jsonError('An error occurred. Please try again.', 500, requestId, undefined, origin)
   }
-});
+})
