@@ -600,9 +600,9 @@ const Profile = () => {
                       // Invalidate and refetch to ensure UI syncs with DB
                       await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
                       
-                      // Clean up object URL after successful upload
+                      // Clear preview AFTER query has refetched - the DB value will now show
+                      setAvatarPreview(null);
                       URL.revokeObjectURL(previewUrl);
-                      // Keep preview until query refetch completes, then it will use DB value
                     } catch (error: any) {
                       console.error('Upload error:', error);
                       toast.error(t('profile.upload_error') + ': ' + error.message);
