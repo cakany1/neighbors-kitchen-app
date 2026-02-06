@@ -852,8 +852,7 @@
     "guest_modal_title": "Sign up to save this meal!",
     "guest_modal_desc": "You're currently browsing as a guest. To book meals and chat with chefs, you need to register.",
     "register_now": "Register now",
-    "already_have_account": "I already have an account",
-    "no_hits_nearby": "No matches nearby – here are offers from all of Basel."
+    "already_have_account": "I already have an account"
   },
   "toast": {
     "booking_sent": "Booking request sent to {name}!",
