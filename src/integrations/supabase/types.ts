@@ -229,6 +229,13 @@ export type Database = {
             foreignKeyName: "bookings_no_show_marked_by_fkey"
             columns: ["no_show_marked_by"]
             isOneToOne: false
+            referencedRelation: "profile_ratings"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "bookings_no_show_marked_by_fkey"
+            columns: ["no_show_marked_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -444,6 +451,13 @@ export type Database = {
           women_only?: boolean | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_meals_profiles"
+            columns: ["chef_id"]
+            isOneToOne: false
+            referencedRelation: "profile_ratings"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "fk_meals_profiles"
             columns: ["chef_id"]
@@ -720,6 +734,13 @@ export type Database = {
             foreignKeyName: "qa_runs_triggered_by_fkey"
             columns: ["triggered_by"]
             isOneToOne: false
+            referencedRelation: "profile_ratings"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "qa_runs_triggered_by_fkey"
+            columns: ["triggered_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -775,6 +796,13 @@ export type Database = {
             foreignKeyName: "ratings_rated_user_id_fkey"
             columns: ["rated_user_id"]
             isOneToOne: false
+            referencedRelation: "profile_ratings"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ratings_rated_user_id_fkey"
+            columns: ["rated_user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -784,6 +812,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles_public"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_rater_id_fkey"
+            columns: ["rater_id"]
+            isOneToOne: false
+            referencedRelation: "profile_ratings"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "ratings_rater_id_fkey"
@@ -950,6 +985,54 @@ export type Database = {
       }
     }
     Views: {
+      chef_rating_summary: {
+        Row: {
+          avg_rating: number | null
+          stars_1: number | null
+          stars_2: number | null
+          stars_3: number | null
+          stars_4: number | null
+          stars_5: number | null
+          total_ratings: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_meals_profiles"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profile_ratings"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_meals_profiles"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_meals_profiles"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guest_rating_summary: {
+        Row: {
+          avg_rating: number | null
+          stars_1: number | null
+          stars_2: number | null
+          stars_3: number | null
+          stars_4: number | null
+          stars_5: number | null
+          total_ratings: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       meals_public: {
         Row: {
           allergens: string[] | null
@@ -1067,6 +1150,13 @@ export type Database = {
             foreignKeyName: "fk_meals_profiles"
             columns: ["chef_id"]
             isOneToOne: false
+            referencedRelation: "profile_ratings"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_meals_profiles"
+            columns: ["chef_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1078,6 +1168,26 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profile_ratings: {
+        Row: {
+          chef_avg: number | null
+          chef_stars_1: number | null
+          chef_stars_2: number | null
+          chef_stars_3: number | null
+          chef_stars_4: number | null
+          chef_stars_5: number | null
+          chef_total: number | null
+          guest_avg: number | null
+          guest_stars_1: number | null
+          guest_stars_2: number | null
+          guest_stars_3: number | null
+          guest_stars_4: number | null
+          guest_stars_5: number | null
+          guest_total: number | null
+          user_id: string | null
+        }
+        Relationships: []
       }
       profiles_public: {
         Row: {
@@ -1184,6 +1294,13 @@ export type Database = {
           user_id: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "ratings_rated_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profile_ratings"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "ratings_rated_user_id_fkey"
             columns: ["user_id"]

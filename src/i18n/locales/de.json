@@ -928,5 +928,13 @@
   "validation": {
     "invalid_number": "Bitte gib eine gültige Zahl ein.",
     "content_rejected": "Bitte respektvolle Sprache verwenden. Beleidigende Inhalte sind nicht erlaubt."
+  },
+  "ratings": {
+    "title": "Bewertungen",
+    "as_chef": "Als Koch",
+    "as_guest": "Als Gast",
+    "no_ratings_yet": "Noch keine Bewertungen",
+    "review": "Bewertung",
+    "reviews": "Bewertungen"
   }
 }

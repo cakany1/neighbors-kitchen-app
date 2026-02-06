@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VerificationBadge } from '@/components/VerificationBadge';
 import { ReportDialog } from '@/components/ReportDialog';
 import { KarmaLevel } from '@/components/KarmaLevel';
+import { ProfileRatings } from '@/components/ProfileRatings';
 import { Star, ChefHat, Award, Camera, ArrowLeft, Flag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -183,6 +184,11 @@ const ChefProfile = () => {
                     <span className="font-bold text-primary">{galleryCount}</span>
                     <span className="text-muted-foreground">Photos</span>
                   </div>
+                </div>
+
+                {/* Ratings summary */}
+                <div className="mt-2">
+                  <ProfileRatings userId={chefId!} compact />
                 </div>
 
                 {/* Languages */}
