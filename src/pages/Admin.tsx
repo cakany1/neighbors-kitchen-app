@@ -476,24 +476,81 @@ const Admin = () => {
   const sendProfileRemindersMutation = useMutation({
     mutationFn: async () => {
       setIsSendingReminders(true);
-      const { data, error } = await supabase.functions.invoke('send-profile-reminders');
       
-      if (error) throw error;
+      // Get current session for auth header
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated - please log in again');
+      }
+      
+      const { data, error } = await supabase.functions.invoke('send-profile-reminders', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+      
+      if (error) {
+        // Extract detailed error info
+        const errorDetails = {
+          functionName: 'send-profile-reminders',
+          statusCode: error.status || 'unknown',
+          message: error.message || 'Unknown error',
+          context: error.context || null,
+          requestId: data?.requestId || null
+        };
+        console.error('[Admin] Reminder function error:', errorDetails, error);
+        throw new Error(JSON.stringify(errorDetails));
+      }
+      
       return data;
     },
     onSuccess: (data) => {
       setIsSendingReminders(false);
+      console.log('[Admin] Reminder success:', data);
+      
       if (data.sent > 0) {
-        toast.success(`${data.sent} Erinnerungs-E-Mail(s) versendet!`);
+        toast.success(`${data.sent} Erinnerungs-E-Mail(s) versendet!`, {
+          description: data.sentTo?.join(', ') || undefined
+        });
       } else {
         toast.info('Keine E-Mails zu versenden. Alle User sind aktuell oder haben bereits 3 Erinnerungen erhalten.');
       }
+      
+      if (data.errors && data.errors.length > 0) {
+        toast.warning(`${data.errors.length} Fehler aufgetreten`, {
+          description: data.errors.slice(0, 3).join('\n')
+        });
+      }
+      
       refetchReminders();
       queryClient.invalidateQueries({ queryKey: ['profileReminders'] });
     },
     onError: (error: Error) => {
       setIsSendingReminders(false);
-      toast.error('Fehler beim Versenden: ' + error.message);
+      console.error('[Admin] Reminder mutation error:', error);
+      
+      // Parse error details if JSON
+      let errorInfo: any = { message: error.message };
+      try {
+        errorInfo = JSON.parse(error.message);
+      } catch {
+        // Not JSON, use raw message
+      }
+      
+      // Show detailed toast with retry option
+      toast.error('Erinnerungen senden fehlgeschlagen', {
+        description: `
+          Funktion: ${errorInfo.functionName || 'send-profile-reminders'}
+          Status: ${errorInfo.statusCode || 'unbekannt'}
+          Fehler: ${errorInfo.message || error.message}
+          ${errorInfo.requestId ? `Request-ID: ${errorInfo.requestId}` : ''}
+        `.trim(),
+        duration: 10000,
+        action: {
+          label: 'Erneut versuchen',
+          onClick: () => sendProfileRemindersMutation.mutate()
+        }
+      });
     },
   });
 

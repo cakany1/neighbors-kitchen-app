@@ -1,10 +1,9 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1'
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+}
 
 interface IncompleteProfile {
   id: string;
@@ -15,108 +14,211 @@ interface IncompleteProfile {
   languages: string[] | null;
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+Deno.serve(async (req) => {
+  // Generate request ID for debugging
+  const requestId = crypto.randomUUID();
+  
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-    if (!RESEND_API_KEY) {
-      throw new Error("RESEND_API_KEY is not configured");
+    // 1. Verify authentication
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.error(`[${requestId}] Missing or invalid Authorization header`)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Unauthorized', 
+          message: 'Authorization header is missing or invalid',
+          requestId 
+        }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
-    // Use service role to access all data
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+
+    // Create client with user's token to verify identity
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    })
+
+    // Verify the user's token
+    const { data: { user }, error: authError } = await userClient.auth.getUser()
+    if (authError || !user) {
+      console.error(`[${requestId}] Auth verification failed:`, authError)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Unauthorized', 
+          message: 'Invalid or expired authentication token',
+          requestId 
+        }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // 2. Check if user is admin
+    const { data: adminCheck, error: roleError } = await userClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle()
+
+    if (roleError) {
+      console.error(`[${requestId}] Role check error:`, roleError)
+    }
+
+    if (!adminCheck) {
+      console.error(`[${requestId}] User ${user.id} is not an admin`)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Forbidden', 
+          message: 'Admin access required to send reminders',
+          requestId 
+        }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    console.log(`[${requestId}] Admin ${user.id} authorized, starting reminder process`)
+
+    // 3. Now use service role to access all data
+    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
+    if (!RESEND_API_KEY) {
+      console.error(`[${requestId}] RESEND_API_KEY is not configured`)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Configuration Error', 
+          message: 'Email service is not configured',
+          requestId 
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Find users with incomplete profiles
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
     // Get all profiles with incomplete critical fields
     const { data: incompleteProfiles, error: profilesError } = await supabase
       .from('profiles')
       .select('id, first_name, avatar_url, phone_number, private_address, languages')
-      .or('avatar_url.is.null,phone_number.is.null,private_address.is.null');
+      .or('avatar_url.is.null,phone_number.is.null,private_address.is.null')
 
     if (profilesError) {
-      console.error('Error fetching profiles:', profilesError);
-      throw profilesError;
+      console.error(`[${requestId}] Error fetching profiles:`, profilesError)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Database Error', 
+          message: 'Failed to fetch incomplete profiles',
+          details: profilesError.message,
+          requestId 
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
     if (!incompleteProfiles || incompleteProfiles.length === 0) {
+      console.log(`[${requestId}] No incomplete profiles found`)
       return new Response(
-        JSON.stringify({ success: true, message: 'No incomplete profiles found', sent: 0 }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+        JSON.stringify({ 
+          success: true, 
+          message: 'No incomplete profiles found', 
+          sent: 0,
+          requestId 
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
     // Get email addresses from auth.users
-    const userIds = incompleteProfiles.map(p => p.id);
-    const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+    const userIds = incompleteProfiles.map(p => p.id)
+    const { data: authData, error: authUsersError } = await supabase.auth.admin.listUsers()
     
-    if (authError) {
-      console.error('Error fetching auth users:', authError);
-      throw authError;
+    if (authUsersError) {
+      console.error(`[${requestId}] Error fetching auth users:`, authUsersError)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Database Error', 
+          message: 'Failed to fetch user emails',
+          details: authUsersError.message,
+          requestId 
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
     // Create a map of user IDs to emails
-    const emailMap = new Map(authData.users.map(u => [u.id, u.email]));
+    const emailMap = new Map(authData.users.map(u => [u.id, u.email]))
 
     // Get existing reminders
     const { data: existingReminders, error: remindersError } = await supabase
       .from('profile_reminders')
       .select('user_id, reminder_count, last_sent_at')
-      .in('user_id', userIds);
+      .in('user_id', userIds)
 
     if (remindersError) {
-      console.error('Error fetching reminders:', remindersError);
-      throw remindersError;
+      console.error(`[${requestId}] Error fetching reminders:`, remindersError)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Database Error', 
+          message: 'Failed to fetch reminder history',
+          details: remindersError.message,
+          requestId 
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
-    const reminderMap = new Map(existingReminders?.map(r => [r.user_id, r]) || []);
+    const reminderMap = new Map(existingReminders?.map(r => [r.user_id, r]) || [])
 
-    let sentCount = 0;
-    const errors: string[] = [];
+    let sentCount = 0
+    const errors: string[] = []
+    const sentTo: string[] = []
 
     for (const profile of incompleteProfiles) {
-      const email = emailMap.get(profile.id);
-      if (!email) continue;
+      const email = emailMap.get(profile.id)
+      if (!email) continue
 
-      const existingReminder = reminderMap.get(profile.id);
+      const existingReminder = reminderMap.get(profile.id)
       
       // Skip if already sent 3 reminders
       if (existingReminder && existingReminder.reminder_count >= 3) {
-        continue;
+        continue
       }
 
       // Skip if last reminder was less than 7 days ago
       if (existingReminder) {
-        const lastSent = new Date(existingReminder.last_sent_at);
+        const lastSent = new Date(existingReminder.last_sent_at)
         if (lastSent > sevenDaysAgo) {
-          continue;
+          continue
         }
       }
 
       // Determine which fields are missing
-      const missingFields: string[] = [];
-      if (!profile.avatar_url) missingFields.push('Profilfoto');
-      if (!profile.phone_number) missingFields.push('Telefonnummer');
-      if (!profile.private_address) missingFields.push('Adresse');
+      const missingFields: string[] = []
+      if (!profile.avatar_url) missingFields.push('Profilfoto')
+      if (!profile.phone_number) missingFields.push('Telefonnummer')
+      if (!profile.private_address) missingFields.push('Adresse')
 
-      const missingFieldsList = missingFields.join(', ');
-      const reminderNumber = (existingReminder?.reminder_count || 0) + 1;
+      const missingFieldsList = missingFields.join(', ')
+      const reminderNumber = (existingReminder?.reminder_count || 0) + 1
 
       // Determine language (default German)
-      const userLanguage = profile.languages?.[0] || 'de';
-      const isEnglish = userLanguage === 'en';
+      const userLanguage = profile.languages?.[0] || 'de'
+      const isEnglish = userLanguage === 'en'
 
       const subject = isEnglish
         ? `🏡 Complete your Neighbors Kitchen profile`
-        : `🏡 Vervollständige dein Neighbors Kitchen Profil`;
+        : `🏡 Vervollständige dein Neighbors Kitchen Profil`
 
       const htmlContent = isEnglish
         ? `
@@ -135,7 +237,7 @@ serve(async (req) => {
             </div>
 
             <div style="text-align: center; margin: 30px 0;">
-              <a href="https://share-kitchen-basel.lovable.app/profile" 
+              <a href="https://neighbors-kitchen.ch/profile" 
                  style="background: #F77B1C; color: white; padding: 14px 28px; text-decoration: none; border-radius: 25px; display: inline-block; font-weight: 600;">
                 Complete my profile →
               </a>
@@ -168,7 +270,7 @@ serve(async (req) => {
             </div>
 
             <div style="text-align: center; margin: 30px 0;">
-              <a href="https://share-kitchen-basel.lovable.app/profile" 
+              <a href="https://neighbors-kitchen.ch/profile" 
                  style="background: #F77B1C; color: white; padding: 14px 28px; text-decoration: none; border-radius: 25px; display: inline-block; font-weight: 600;">
                 Mein Profil vervollständigen →
               </a>
@@ -184,30 +286,30 @@ serve(async (req) => {
               Neighbors Kitchen Basel - Gemeinschaft durch geteilte Mahlzeiten 🍽️
             </p>
           </div>
-        `;
+        `
 
       try {
         // Send email via Resend API
-        const emailResponse = await fetch("https://api.resend.com/emails", {
-          method: "POST",
+        const emailResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
           headers: {
-            "Authorization": `Bearer ${RESEND_API_KEY}`,
-            "Content-Type": "application/json",
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: "Neighbors Kitchen <noreply@neighbors-kitchen.ch>",
+            from: 'Neighbors Kitchen <noreply@neighbors-kitchen.ch>',
             to: [email],
             subject: subject,
             html: htmlContent,
           }),
-        });
+        })
 
-        const emailData = await emailResponse.json();
+        const emailData = await emailResponse.json()
 
         if (!emailResponse.ok) {
-          console.error(`Failed to send to ${email}:`, emailData);
-          errors.push(`${email}: ${emailData.message || 'Unknown error'}`);
-          continue;
+          console.error(`[${requestId}] Failed to send to ${email}:`, emailData)
+          errors.push(`${email}: ${emailData.message || 'Unknown error'}`)
+          continue
         }
 
         // Update or insert reminder record
@@ -218,7 +320,7 @@ serve(async (req) => {
               reminder_count: reminderNumber,
               last_sent_at: new Date().toISOString()
             })
-            .eq('user_id', profile.id);
+            .eq('user_id', profile.id)
         } else {
           await supabase
             .from('profile_reminders')
@@ -226,30 +328,39 @@ serve(async (req) => {
               user_id: profile.id,
               reminder_count: 1,
               last_sent_at: new Date().toISOString()
-            });
+            })
         }
 
-        sentCount++;
-        console.log(`Reminder ${reminderNumber} sent to ${email}`);
+        sentCount++
+        sentTo.push(email)
+        console.log(`[${requestId}] Reminder ${reminderNumber} sent to ${email}`)
       } catch (emailError: any) {
-        console.error(`Failed to send to ${email}:`, emailError);
-        errors.push(`${email}: ${emailError.message}`);
+        console.error(`[${requestId}] Failed to send to ${email}:`, emailError)
+        errors.push(`${email}: ${emailError.message}`)
       }
     }
+
+    console.log(`[${requestId}] Completed: sent=${sentCount}, errors=${errors.length}`)
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         sent: sentCount,
-        errors: errors.length > 0 ? errors : undefined 
+        sentTo: sentTo,
+        errors: errors.length > 0 ? errors : undefined,
+        requestId
       }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   } catch (error: any) {
-    console.error("Error in send-profile-reminders:", error);
+    console.error(`[${requestId}] Unexpected error:`, error)
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+      JSON.stringify({ 
+        error: 'Internal Server Error', 
+        message: error.message,
+        requestId 
+      }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   }
-});
+})
