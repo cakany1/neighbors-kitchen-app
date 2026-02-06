@@ -31,6 +31,7 @@ import { VerificationDialog } from '@/components/VerificationDialog';
 import { TwoFactorSettings } from '@/components/TwoFactorSettings';
 import { ReliabilityDisplay } from '@/components/ReliabilityDisplay';
 import { KarmaLevel } from '@/components/KarmaLevel';
+import { RatingSummary } from '@/components/RatingSummary';
 import { ChefBookings } from '@/components/ChefBookings';
 import { ProfileRatings } from '@/components/ProfileRatings';
 
@@ -767,6 +768,13 @@ const Profile = () => {
               <div className="text-center">
                 <p className="text-2xl font-bold text-primary">0</p>
                 <p className="text-xs text-muted-foreground">{t('profile.mealsShared')}</p>
+                {currentUser?.id && (
+                  <div className="flex items-center gap-4 mt-2 text-xs">
+                    <RatingSummary userId={currentUser.id} role="chef" size="sm" showLabel={false} />
+                    <span className="text-muted-foreground">•</span>
+                    <RatingSummary userId={currentUser.id} role="guest" size="sm" showLabel={false} />
+                  </div>
+                )}
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-secondary">0</p>

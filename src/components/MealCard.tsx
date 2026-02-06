@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, ChefHat, Package, Home, Ghost, UtensilsCrossed } from "lucide-react";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { KarmaLevel } from "@/components/KarmaLevel";
+import { RatingSummary } from "@/components/RatingSummary";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -88,21 +89,23 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           <div className="flex justify-between items-start">
             <h3 className="font-semibold text-lg leading-tight mb-1 text-foreground">{displayTitle}</h3>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span className="font-medium text-foreground flex items-center gap-1">
-              {chefNickname}
-              {chefIsVerified && <VerificationBadge isVerified={true} size="sm" />}
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <MapPin className="w-3 h-3" />
-              {neighborhood}
-            </span>
-          </div>
-          {/* Chef Karma Level */}
-          <div className="mt-1">
-            <KarmaLevel karma={chefKarma} size="sm" showLabel={false} />
-          </div>
+          <div className="flex flex-col gap-1.5 text-sm text-muted-foreground">
+             <div className="flex items-center gap-2">
+               <span className="font-medium text-foreground flex items-center gap-1">
+                 {chefNickname}
+                 {chefIsVerified && <VerificationBadge isVerified={true} size="sm" />}
+               </span>
+               <span>•</span>
+               <span className="flex items-center gap-1">
+                 <MapPin className="w-3 h-3" />
+                 {neighborhood}
+               </span>
+             </div>
+             <div className="flex items-center gap-3">
+               <KarmaLevel karma={chefKarma} size="sm" showLabel={false} />
+               <RatingSummary userId={getProp(chef, "id", "id")} role="chef" size="sm" showLabel={false} />
+             </div>
+           </div>
         </div>
 
         {/* Tags */}
