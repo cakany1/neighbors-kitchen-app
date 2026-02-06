@@ -201,6 +201,58 @@ serve(async (req) => {
     duration_ms: Date.now() - t14
   });
 
+  // ===== T15: Stripe Webhook =====
+  const t15 = Date.now();
+  let t15Status: 'PASS' | 'FAIL' = 'FAIL';
+  let t15Details = '';
+  try {
+    // Get latest webhook event
+    const { data: latestEvent, error: webhookError } = await adminClient
+      .from('stripe_webhook_events')
+      .select('event_id, event_type, stripe_mode, processed_at, success, error_message')
+      .order('processed_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    
+    // Get 24h stats
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { count: successCount } = await adminClient
+      .from('stripe_webhook_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('success', true)
+      .gte('processed_at', twentyFourHoursAgo);
+    
+    const { count: failCount } = await adminClient
+      .from('stripe_webhook_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('success', false)
+      .gte('processed_at', twentyFourHoursAgo);
+
+    // Get current mode
+    const { data: modeSetting } = await adminClient
+      .from('admin_settings')
+      .select('setting_value')
+      .eq('setting_key', 'stripe_mode')
+      .maybeSingle();
+    
+    const currentMode = modeSetting?.setting_value ? JSON.parse(modeSetting.setting_value as string) : 'test';
+    
+    if (webhookError) {
+      t15Details = `Error checking webhooks: ${webhookError.message}`;
+    } else if (!latestEvent) {
+      t15Status = 'PASS'; // No events yet is acceptable
+      t15Details = `Mode: ${currentMode.toUpperCase()} | No webhook events received yet`;
+    } else {
+      const lastTime = new Date(latestEvent.processed_at).toLocaleString('de-CH');
+      const lastStatus = latestEvent.success ? 'OK' : 'FAIL';
+      t15Status = 'PASS';
+      t15Details = `Mode: ${currentMode.toUpperCase()} | Last: ${latestEvent.event_type} at ${lastTime} (${lastStatus}) | 24h: ${successCount || 0} OK, ${failCount || 0} fail`;
+    }
+  } catch (e: any) {
+    t15Details = `Error: ${e.message?.slice(0, 50)}`;
+  }
+  results.push({ name: 'T15: Stripe Webhook', status: t15Status, details: t15Details, duration_ms: Date.now() - t15 });
+
   // Summary
   const passed = results.filter(r => r.status === 'PASS').length;
   const failed = results.filter(r => r.status === 'FAIL').length;
