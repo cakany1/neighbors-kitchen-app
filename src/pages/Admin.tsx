@@ -335,6 +335,37 @@ const Admin = () => {
     enabled: isAdmin,
   });
 
+  // Payout history query - for audit trail
+  const { data: payoutHistory, isLoading: historyLoading } = useQuery({
+    queryKey: ['payoutHistory'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('admin_actions')
+        .select('*')
+        .eq('action', 'payout_marked_paid')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      // Get user names for display
+      const { data: usersData } = await supabase.functions.invoke('admin-list-users');
+      const userMap = new Map(
+        usersData?.users?.map((u: any) => [u.id, { 
+          name: `${u.first_name} ${u.last_name}`,
+          email: u.email 
+        }]) || []
+      );
+
+      return data?.map((action: any) => ({
+        ...action,
+        chef: userMap.get(action.target_id) || { name: 'Unknown', email: '' },
+        admin: userMap.get(action.actor_id) || { name: 'Unknown', email: '' },
+      }));
+    },
+    enabled: isAdmin,
+  });
+
   // Approve verification mutation
   const approveMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -2027,6 +2058,77 @@ const Admin = () => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+            {/* Payout History Card */}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="w-5 h-5" />
+                  Auszahlungs-Historie
+                </CardTitle>
+                <CardDescription>
+                  Audit-Trail aller bestätigten Auszahlungen
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {historyLoading ? (
+                  <p className="text-muted-foreground text-center py-8">Loading history...</p>
+                ) : !payoutHistory || payoutHistory.length === 0 ? (
+                  <Alert>
+                    <Clock className="h-4 w-4" />
+                    <AlertDescription>
+                      Noch keine Auszahlungen bestätigt.
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <div className="space-y-3">
+                    {payoutHistory.map((entry: any) => (
+                      <div key={entry.id} className="border rounded-lg p-4 bg-muted/30">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="font-medium">
+                              {entry.chef?.name || 'Unknown Chef'}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {entry.chef?.email}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-primary">
+                              CHF {(entry.metadata?.amount || 0).toFixed(2)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {entry.metadata?.booking_ids?.length || 0} Buchung(en)
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-2 pt-2 border-t border-border/50 text-xs text-muted-foreground">
+                          <div className="flex items-center justify-between">
+                            <span>
+                              Bestätigt von: {entry.admin?.name || 'Unknown'}
+                            </span>
+                            <span>
+                              {new Date(entry.created_at).toLocaleString('de-CH', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                          {entry.metadata?.note && (
+                            <p className="mt-1 italic bg-muted p-2 rounded">
+                              "{entry.metadata.note}"
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* FAQ Requests Tab */}
