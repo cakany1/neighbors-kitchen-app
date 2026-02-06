@@ -1,8 +1,17 @@
 /**
  * Shared utilities for Edge Functions
+ * Version: 2.0.0
  * 
  * USAGE:
- * import { getAdminClient, getAnonClient, getCorsHeaders, jsonError, jsonSuccess, generateRequestId } from '../_shared/utils.ts'
+ * import { 
+ *   getAdminClient, getAnonClient, getCorsHeaders, jsonError, jsonSuccess, 
+ *   generateRequestId, handleCors, validateOrigin, verifyAuth, isAdmin,
+ *   safeLog, checkRateLimit 
+ * } from '../_shared/utils.ts'
+ * 
+ * PRODUCTION SECURITY:
+ * - Set ALLOWED_ORIGINS in Supabase secrets (comma-separated)
+ * - Example: https://neighbors-kitchen.ch,https://share-kitchen-basel.lovable.app
  */
 
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1'
@@ -10,11 +19,43 @@ import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-
 // ============= CORS Configuration =============
 
 /**
+ * Get allowed origins from environment
+ * Returns array of allowed origins or null if not configured (dev mode)
+ */
+function getAllowedOrigins(): string[] | null {
+  const allowedOrigins = Deno.env.get('ALLOWED_ORIGINS')
+  if (!allowedOrigins) return null
+  return allowedOrigins.split(',').map(o => o.trim()).filter(Boolean)
+}
+
+/**
+ * Validate if a request origin is allowed
+ * Returns { valid: boolean, origin: string | null }
+ */
+export function validateOrigin(requestOrigin: string | null): { valid: boolean; origin: string | null } {
+  const allowedOrigins = getAllowedOrigins()
+  
+  // If ALLOWED_ORIGINS not set, allow all (development mode)
+  if (!allowedOrigins) {
+    return { valid: true, origin: requestOrigin }
+  }
+  
+  // If no origin header, reject in production
+  if (!requestOrigin) {
+    return { valid: false, origin: null }
+  }
+  
+  // Check if origin is in allowed list
+  const isAllowed = allowedOrigins.includes(requestOrigin)
+  return { valid: isAllowed, origin: isAllowed ? requestOrigin : null }
+}
+
+/**
  * Get CORS headers based on environment
  * In production, use ALLOWED_ORIGINS env var; in dev, allow all
  */
 export function getCorsHeaders(requestOrigin?: string | null): Record<string, string> {
-  const allowedOrigins = Deno.env.get('ALLOWED_ORIGINS')
+  const allowedOrigins = getAllowedOrigins()
   
   // Default allowed headers (comprehensive list)
   const allowedHeaders = [
@@ -25,29 +66,30 @@ export function getCorsHeaders(requestOrigin?: string | null): Record<string, st
     'x-supabase-client-platform',
     'x-supabase-client-platform-version',
     'x-supabase-client-runtime',
-    'x-supabase-client-runtime-version'
+    'x-supabase-client-runtime-version',
+    'stripe-signature'
   ].join(', ')
 
   // If ALLOWED_ORIGINS is set, validate the request origin
-  if (allowedOrigins) {
-    const origins = allowedOrigins.split(',').map(o => o.trim())
-    
+  if (allowedOrigins && allowedOrigins.length > 0) {
     // Check if request origin is in the allowed list
-    if (requestOrigin && origins.includes(requestOrigin)) {
+    if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
       return {
         'Access-Control-Allow-Origin': requestOrigin,
         'Access-Control-Allow-Headers': allowedHeaders,
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Max-Age': '86400',
+        'Vary': 'Origin',
       }
     }
     
-    // If origin not allowed, use first allowed origin (or reject)
+    // Origin not in allowed list - return restrictive headers
     return {
-      'Access-Control-Allow-Origin': origins[0],
+      'Access-Control-Allow-Origin': allowedOrigins[0],
       'Access-Control-Allow-Headers': allowedHeaders,
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
       'Access-Control-Max-Age': '86400',
+      'Vary': 'Origin',
     }
   }
   
@@ -154,13 +196,56 @@ export function jsonSuccess(
 }
 
 /**
+ * Return a 403 Forbidden response for disallowed origins
+ */
+export function forbiddenOrigin(requestId: string, origin?: string | null): Response {
+  return new Response(
+    JSON.stringify({ 
+      error: 'Forbidden: Origin not allowed',
+      requestId 
+    }),
+    { 
+      status: 403, 
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': origin || 'null',
+      } 
+    }
+  )
+}
+
+/**
  * Handle CORS preflight request
+ * Returns Response for OPTIONS, null otherwise
  */
 export function handleCors(req: Request): Response | null {
   if (req.method === 'OPTIONS') {
     const origin = req.headers.get('Origin')
     return new Response(null, { headers: getCorsHeaders(origin) })
   }
+  return null
+}
+
+/**
+ * Full origin check: validates origin and returns 403 if not allowed
+ * Call this AFTER handleCors() for non-OPTIONS requests
+ * Returns null if origin is valid, or Response if rejected
+ */
+export function checkOrigin(req: Request, requestId: string): Response | null {
+  const origin = req.headers.get('Origin')
+  const allowedOrigins = getAllowedOrigins()
+  
+  // If ALLOWED_ORIGINS not configured, skip check (dev mode)
+  if (!allowedOrigins) {
+    return null
+  }
+  
+  // Validate origin
+  if (!origin || !allowedOrigins.includes(origin)) {
+    safeLog(requestId, 'warn', 'Rejected request from disallowed origin', { origin })
+    return forbiddenOrigin(requestId, origin)
+  }
+  
   return null
 }
 
@@ -209,6 +294,40 @@ export async function isAdmin(client: SupabaseClient, userId: string): Promise<b
   return !!data
 }
 
+/**
+ * Verify admin authorization (combines auth + role check)
+ * Returns error Response if not authorized, null if authorized
+ */
+export async function verifyAdmin(req: Request, requestId: string): Promise<{
+  user: { id: string; email?: string } | null;
+  client: SupabaseClient | null;
+  error: Response | null;
+}> {
+  const origin = req.headers.get('Origin')
+  
+  const { user, error: authError, client } = await verifyAuth(req)
+  
+  if (authError || !user || !client) {
+    return { 
+      user: null, 
+      client: null, 
+      error: jsonError('Unauthorized', 401, requestId, undefined, origin)
+    }
+  }
+  
+  const hasAdminRole = await isAdmin(client, user.id)
+  
+  if (!hasAdminRole) {
+    return { 
+      user: null, 
+      client: null, 
+      error: jsonError('Forbidden: Admin access required', 403, requestId, undefined, origin)
+    }
+  }
+  
+  return { user, client, error: null }
+}
+
 // ============= Logging Helpers =============
 
 /**
@@ -240,7 +359,7 @@ export function safeLog(
  * Mask sensitive fields in data objects
  */
 function maskSensitiveData(data: Record<string, unknown>): Record<string, unknown> {
-  const sensitiveKeys = ['password', 'token', 'secret', 'key', 'iban', 'email', 'phone']
+  const sensitiveKeys = ['password', 'token', 'secret', 'key', 'iban', 'email', 'phone', 'authorization']
   const masked: Record<string, unknown> = {}
   
   for (const [key, value] of Object.entries(data)) {
@@ -248,7 +367,7 @@ function maskSensitiveData(data: Record<string, unknown>): Record<string, unknow
     const isSensitive = sensitiveKeys.some(sk => lowerKey.includes(sk))
     
     if (isSensitive && typeof value === 'string') {
-      masked[key] = value.slice(0, 3) + '***'
+      masked[key] = value.length > 6 ? value.slice(0, 3) + '***' + value.slice(-3) : '***'
     } else if (typeof value === 'object' && value !== null) {
       masked[key] = maskSensitiveData(value as Record<string, unknown>)
     } else {
