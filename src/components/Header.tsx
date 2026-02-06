@@ -21,6 +21,7 @@ export const Header = () => {
   const queryClient = useQueryClient();
 
   // Check if user is authenticated and get profile
+  // Uses same query key as Profile page to share cache
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
@@ -29,12 +30,13 @@ export const Header = () => {
       
       const { data: profile } = await supabase
         .from('profiles')
-        .select('avatar_url, first_name')
+        .select('*')
         .eq('id', user.id)
         .single();
       
       return { ...user, profile };
     },
+    staleTime: 0, // Always get fresh data to sync avatar across views
   });
 
   // Check if current user is admin

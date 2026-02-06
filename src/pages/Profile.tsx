@@ -94,8 +94,8 @@ const Profile = () => {
 
   const [customLanguageInput, setCustomLanguageInput] = useState('');
 
-  // Fetch current user and profile
-  const { data: currentUser, isLoading: userLoading } = useQuery({
+  // Fetch current user and profile - staleTime: 0 ensures fresh data after navigation
+  const { data: currentUser, isLoading: userLoading, refetch: refetchUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -110,8 +110,10 @@ const Profile = () => {
         .eq('id', user.id)
         .single();
       
+      console.log('[Profile] Fetched avatar_url:', profile?.avatar_url);
       return { ...user, profile };
     },
+    staleTime: 0, // Always refetch on mount to get latest avatar
   });
 
   // Check if user is admin
@@ -597,12 +599,13 @@ const Profile = () => {
 
                       toast.success(t('profile.profile_updated'));
                       
-                      // Invalidate and refetch to ensure UI syncs with DB
-                      await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                      // Force refetch to ensure UI syncs with DB
+                      await refetchUser();
                       
-                      // Clear preview AFTER query has refetched - the DB value will now show
+                      // Clear preview AFTER refetch completes - the DB value will now show
                       setAvatarPreview(null);
                       URL.revokeObjectURL(previewUrl);
+                      console.log('[Profile] Avatar uploaded and refetched:', data.publicUrl);
                     } catch (error: any) {
                       console.error('Upload error:', error);
                       toast.error(t('profile.upload_error') + ': ' + error.message);
