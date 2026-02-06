@@ -509,8 +509,10 @@ const Admin = () => {
       console.log('[Admin] Reminder success:', data);
       
       if (data.sent > 0) {
+        const emailList = data.sentTo?.join('\n• ') || '';
         toast.success(`${data.sent} Erinnerungs-E-Mail(s) versendet!`, {
-          description: data.sentTo?.join(', ') || undefined
+          description: emailList ? `An:\n• ${emailList}` : undefined,
+          duration: 8000
         });
       } else {
         toast.info('Keine E-Mails zu versenden. Alle User sind aktuell oder haben bereits 3 Erinnerungen erhalten.');
