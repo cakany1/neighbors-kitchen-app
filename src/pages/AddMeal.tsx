@@ -1093,6 +1093,8 @@ const AddMeal = () => {
                       selectedTags={tags}
                       onTagsChange={setTags}
                       ingredientText={formData.ingredients}
+                      titleText={formData.title}
+                      descriptionText={formData.description}
                     />
 
                     {/* Restaurant Reference Price */}
