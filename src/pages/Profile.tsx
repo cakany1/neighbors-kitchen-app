@@ -639,6 +639,7 @@ const Profile = () => {
                     >
                       <Upload className="w-6 h-6 text-white" />
                     </label>
+                  </div>
                   <input
                     id="partner-avatar-upload"
                     type="file"
@@ -711,7 +712,6 @@ const Profile = () => {
                       }
                     }}
                   />
-                  </div>
                   <p className="text-[10px] text-muted-foreground text-center max-w-[80px]">
                     {t('profile.couple_photo_hint')}
                   </p>
