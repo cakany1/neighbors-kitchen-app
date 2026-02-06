@@ -8,7 +8,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Lock } from "lucide-react";
+import { AlertCircle, Lock, Home } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { getDistance } from "@/utils/distance";
@@ -26,6 +26,7 @@ const Feed = () => {
   });
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showGuestModal, setShowGuestModal] = useState(false);
+  const [filterSameAddress, setFilterSameAddress] = useState(false);
 
   // Fetch current user for allergens
   const { data: currentUser } = useQuery({
@@ -92,7 +93,7 @@ const Feed = () => {
 
   // Fetch meals from database
   const { data: meals, isLoading } = useQuery({
-    queryKey: ["meals", currentUser?.id],
+    queryKey: ["meals", currentUser?.id, filterSameAddress],
     queryFn: async () => {
       let blockedUserIds: string[] = [];
       let usersWhoBlockedMe: string[] = [];
@@ -143,6 +144,7 @@ const Feed = () => {
           exchange_mode,
           visibility_mode,
           visibility_radius,
+          address_id,
           chef:profiles_public!chef_id (
             first_name,
             last_name,
@@ -155,6 +157,11 @@ const Feed = () => {
         `,
         )
         .order("created_at", { ascending: false });
+
+      // Filter by same address if enabled and user has an address_id
+      if (filterSameAddress && currentUser?.profile?.address_id) {
+        query = query.eq("address_id", currentUser.profile.address_id);
+      }
 
       if (allBlockedUsers.length > 0) {
         query = query.not("chef_id", "in", `(${allBlockedUsers.join(",")})`);
@@ -257,6 +264,25 @@ const Feed = () => {
             {userLat && userLon && ` (within ${userRadius / 1000}km)`}
           </p>
         </div>
+
+        {/* Same-Address Filter Toggle */}
+        {currentUser?.profile?.address_id && (
+          <div className="mb-4">
+            <button
+              onClick={() => setFilterSameAddress(!filterSameAddress)}
+              className={`w-full p-3 rounded-lg border-2 transition-all flex items-center gap-2 ${
+                filterSameAddress
+                  ? 'border-secondary bg-secondary/10'
+                  : 'border-border hover:border-secondary/50'
+              }`}
+            >
+              <Home className="w-4 h-4" />
+              <span className="font-medium text-sm">
+                {filterSameAddress ? t("feed.my_address_only", "Nur meine Adresse") : t("feed.all_meals", "Alle Gerichte")}
+              </span>
+            </button>
+          </div>
+        )}
 
         {!userLat || !userLon ? (
           <Alert className="mb-6 border-warning bg-warning/10">

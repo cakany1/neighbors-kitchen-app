@@ -334,6 +334,7 @@ export type Database = {
       }
       meals: {
         Row: {
+          address_id: string | null
           allergens: string[] | null
           arrival_time: string | null
           available_portions: number
@@ -373,6 +374,7 @@ export type Database = {
           women_only: boolean | null
         }
         Insert: {
+          address_id?: string | null
           allergens?: string[] | null
           arrival_time?: string | null
           available_portions?: number
@@ -412,6 +414,7 @@ export type Database = {
           women_only?: boolean | null
         }
         Update: {
+          address_id?: string | null
           allergens?: string[] | null
           arrival_time?: string | null
           available_portions?: number
@@ -538,6 +541,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address_id: string | null
           age: number | null
           allergens: string[] | null
           avatar_url: string | null
@@ -581,6 +585,7 @@ export type Database = {
           visibility_mode: string | null
         }
         Insert: {
+          address_id?: string | null
           age?: number | null
           allergens?: string[] | null
           avatar_url?: string | null
@@ -624,6 +629,7 @@ export type Database = {
           visibility_mode?: string | null
         }
         Update: {
+          address_id?: string | null
           age?: number | null
           allergens?: string[] | null
           avatar_url?: string | null
@@ -1038,6 +1044,7 @@ export type Database = {
       }
       meals_public: {
         Row: {
+          address_id: string | null
           allergens: string[] | null
           arrival_time: string | null
           available_portions: number | null
@@ -1075,6 +1082,7 @@ export type Database = {
           women_only: boolean | null
         }
         Insert: {
+          address_id?: string | null
           allergens?: string[] | null
           arrival_time?: string | null
           available_portions?: number | null
@@ -1112,6 +1120,7 @@ export type Database = {
           women_only?: boolean | null
         }
         Update: {
+          address_id?: string | null
           allergens?: string[] | null
           arrival_time?: string | null
           available_portions?: number | null

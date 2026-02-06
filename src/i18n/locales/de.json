@@ -128,7 +128,9 @@
     "set_location": "Standort festlegen",
     "set_location_desc": "Setze deinen Standort in den Profil-Einstellungen, um Gerichte nach Entfernung gefiltert zu sehen.",
     "guest_login_required": "Registriere dich, um dieses Essen zu retten!",
-    "guest_login_desc": "Erstelle ein kostenloses Konto, um Gerichte zu buchen und mit deiner Nachbarschaft zu teilen."
+    "guest_login_desc": "Erstelle ein kostenloses Konto, um Gerichte zu buchen und mit deiner Nachbarschaft zu teilen.",
+    "my_address_only": "Nur meine Adresse",
+    "all_meals": "Alle Gerichte"
   },
   "admin": {
     "title": "Admin Dashboard",
