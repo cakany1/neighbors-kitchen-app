@@ -292,12 +292,6 @@ const Feed = () => {
                 <span className="text-xs text-muted-foreground ml-auto">(keine Adresse)</span>
               )}
             </button>
-            {/* DEBUG: Show address_id values for verification */}
-            <div className="mt-2 p-2 bg-muted/50 rounded text-xs font-mono text-muted-foreground">
-              <div>my_address_id: {currentUser?.profile?.address_id || 'NULL'}</div>
-              <div>first_meal_address_id: {meals?.[0]?.address_id || 'NULL'}</div>
-              <div>filterSameAddress: {filterSameAddress ? 'true' : 'false'}</div>
-            </div>
           </div>
         )}
 
