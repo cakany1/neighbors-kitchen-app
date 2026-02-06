@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Mail, Send, ArrowLeft, ShieldCheck, Loader2 } from 'lucide-react';
+import { Mail, Send, ArrowLeft, ShieldCheck, Loader2, CheckCircle2, Home } from 'lucide-react';
 
 // Declare Turnstile types
 declare global {
@@ -39,6 +39,7 @@ export default function Contact() {
     website: '', // Honeypot field
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [captchaError, setCaptchaError] = useState(false);
   const [siteKey, setSiteKey] = useState<string | null>(null);
@@ -168,14 +169,16 @@ export default function Contact() {
         throw new Error(errorMessage);
       }
 
+      // Show success state (toast is optional but nice)
       toast({
         title: t('contact.success_title'),
         description: t('contact.success_desc'),
       });
 
-      // Reset form and CAPTCHA
+      // Reset form, CAPTCHA, and show success state
       setFormData({ name: '', email: '', message: '', website: '' });
       resetCaptcha();
+      setIsSubmitted(true);
     } catch (error: any) {
       console.error('Error submitting contact form:', error);
       toast({
@@ -192,6 +195,35 @@ export default function Contact() {
 
   const isCaptchaReady = !!captchaToken;
   const isFormValid = formData.name && formData.email && formData.message && isCaptchaReady;
+
+  // Success state view
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 container max-w-2xl mx-auto px-4 py-8">
+          <div className="flex flex-col items-center justify-center space-y-6 py-12">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+              <CheckCircle2 className="w-12 h-12 text-primary" />
+            </div>
+            <div className="text-center space-y-2">
+              <h1 className="text-3xl font-bold text-foreground">
+                {t('contact.success_page_title')}
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                {t('contact.success_page_desc')}
+              </p>
+            </div>
+            <Button onClick={() => navigate('/')} className="mt-4">
+              <Home className="w-4 h-4 mr-2" />
+              {t('contact.back_button')}
+            </Button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
