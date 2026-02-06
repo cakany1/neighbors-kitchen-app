@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-// Using direct Supabase OAuth for BYOK (custom Google credentials on custom domain)
+import { lovable } from '@/integrations/lovable';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -53,14 +53,14 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
-      // Detect if we're on a custom domain (not lovable.app preview)
+      // Detect if we're on a custom domain (not lovable.app/lovableproject.com preview)
       const isCustomDomain =
         !window.location.hostname.includes('lovable.app') &&
         !window.location.hostname.includes('lovableproject.com') &&
         !window.location.hostname.includes('localhost');
 
       if (isCustomDomain) {
-        // Bypass auth-bridge for custom domains by getting OAuth URL directly
+        // Bypass auth-bridge for custom domains by getting OAuth URL directly (BYOK)
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
@@ -86,12 +86,9 @@ const Login = () => {
           }
         }
       } else {
-        // For Lovable preview domains, use normal flow (auth-bridge handles it)
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: `${window.location.origin}/feed`,
-          },
+        // For Lovable preview domains, use Lovable Cloud managed OAuth
+        const { error } = await lovable.auth.signInWithOAuth('google', {
+          redirect_uri: window.location.origin,
         });
 
         if (error) {
