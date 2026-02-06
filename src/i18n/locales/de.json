@@ -615,6 +615,7 @@
     "leaked_password_title": "Wichtig: Passwort-Sicherheit",
     "leaked_password_hint": "Passwörter, die in bekannten Datenlecks vorkommen (z.B. \"123456\", \"password\"), werden blockiert – auch wenn sie lang genug sind. Wähle ein einzigartiges Passwort mit Zahlen und Sonderzeichen.",
     "first_name_required": "Bitte gib deinen Vornamen ein",
+    "last_name_required": "Bitte gib deinen Nachnamen ein",
     "profile_creation_failed": "Profil konnte nicht erstellt werden",
     "account_exists_wrong_password": "Dieses Konto existiert bereits, aber das Passwort ist falsch. Bitte melde dich an.",
     "complete_profile_later": "💡 Du kannst dein Profil jederzeit später vervollständigen. Foto und Adresse werden erst beim Buchen benötigt.",

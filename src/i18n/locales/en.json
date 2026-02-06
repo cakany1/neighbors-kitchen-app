@@ -357,6 +357,7 @@
     "leaked_password_title": "Important: Password Security",
     "leaked_password_hint": "Passwords found in known data breaches (e.g., \"123456\", \"password\") are blocked – even if they meet the length requirement. Choose a unique password with numbers and special characters.",
     "first_name_required": "Please enter your first name",
+    "last_name_required": "Please enter your last name",
     "profile_creation_failed": "Could not create profile",
     "account_exists_wrong_password": "This account already exists but the password is wrong. Please log in.",
     "complete_profile_later": "💡 You can complete your profile later. Photo and address are only needed when booking."
