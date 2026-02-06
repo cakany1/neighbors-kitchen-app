@@ -489,7 +489,17 @@
     "tag_dessert": "Dessert",
     "tag_vegetarian": "Vegetarisch",
     "tag_sweet": "Süss",
-    "tag_classic": "Klassiker"
+    "tag_classic": "Klassiker",
+    "vegan": "Vegan 🌱",
+    "vegetarisch": "Vegetarisch 🥗",
+    "halal": "Halal ☪️",
+    "koscher": "Koscher ✡️",
+    "scharf": "Scharf 🌶️",
+    "glutenfrei": "Glutenfrei 🌾",
+    "laktosefrei": "Laktosefrei 🥛",
+    "bio": "Bio 🌿",
+    "hausgemacht": "Hausgemacht 🏠",
+    "kindgerecht": "Kindgerecht 🧸"
   },
   "install": {
     "back_to_app": "Zurück zur App",

@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 import { allergenOptions, detectAllergens } from '@/utils/ingredientDatabase';
 import { toast } from 'sonner';
 
@@ -14,24 +15,57 @@ interface TagSelectorProps {
   onAllergensChange: (allergens: string[]) => void;
   selectedTags: string[];
   onTagsChange: (tags: string[]) => void;
-  ingredientText?: string; // Optional ingredient text to scan for allergens
+  ingredientText?: string;
+  titleText?: string;
+  descriptionText?: string;
 }
 
-// Common predefined tags
+// Predefined taste/dietary tags (max 10 as per requirements)
 const commonTags = [
-  { value: 'kindgerecht', label: 'Kindgerecht 🧸', icon: '🧸' },
   { value: 'vegan', label: 'Vegan 🌱', icon: '🌱' },
   { value: 'vegetarisch', label: 'Vegetarisch 🥗', icon: '🥗' },
-  { value: 'laktosefrei', label: 'Laktosefrei 🥛', icon: '🥛' },
-  { value: 'glutenfrei', label: 'Glutenfrei 🌾', icon: '🌾' },
   { value: 'halal', label: 'Halal ☪️', icon: '☪️' },
   { value: 'koscher', label: 'Koscher ✡️', icon: '✡️' },
-  { value: 'bio', label: 'Bio 🌿', icon: '🌿' },
   { value: 'scharf', label: 'Scharf 🌶️', icon: '🌶️' },
-  { value: 'italienisch', label: 'Italienisch 🇮🇹', icon: '🇮🇹' },
-  { value: 'asiatisch', label: 'Asiatisch 🥢', icon: '🥢' },
-  { value: 'mediterran', label: 'Mediterran 🫒', icon: '🫒' },
+  { value: 'glutenfrei', label: 'Glutenfrei 🌾', icon: '🌾' },
+  { value: 'laktosefrei', label: 'Laktosefrei 🥛', icon: '🥛' },
+  { value: 'bio', label: 'Bio 🌿', icon: '🌿' },
+  { value: 'hausgemacht', label: 'Hausgemacht 🏠', icon: '🏠' },
+  { value: 'kindgerecht', label: 'Kindgerecht 🧸', icon: '🧸' },
 ];
+
+// Keywords for auto-detection (DE + EN)
+const tagKeywords: Record<string, string[]> = {
+  vegan: ['vegan', 'pflanzlich', 'plant-based', 'plantbased', 'ohne tierische'],
+  vegetarisch: ['vegetarisch', 'vegetarian', 'veggie', 'fleischlos', 'meatless'],
+  halal: ['halal', 'حلال'],
+  koscher: ['koscher', 'kosher', 'כשר'],
+  scharf: ['scharf', 'spicy', 'hot', 'chili', 'jalapeño', 'habanero', 'sriracha', 'curry scharf', 'pikant'],
+  glutenfrei: ['glutenfrei', 'gluten-free', 'glutenfree', 'ohne gluten', 'zöliakie'],
+  laktosefrei: ['laktosefrei', 'lactose-free', 'lactosefree', 'ohne laktose', 'milchfrei', 'dairy-free'],
+  bio: ['bio', 'organic', 'ökologisch', 'demeter', 'bioland'],
+  hausgemacht: ['hausgemacht', 'homemade', 'selbstgemacht', 'handmade', 'home-made', 'eigene herstellung'],
+  kindgerecht: ['kindgerecht', 'kinderfreundlich', 'kid-friendly', 'für kinder', 'familienfreundlich', 'family-friendly'],
+};
+
+/**
+ * Auto-detect tags from text (title + description)
+ */
+function detectTagsFromText(text: string): string[] {
+  const lowerText = text.toLowerCase();
+  const detected: string[] = [];
+  
+  for (const [tag, keywords] of Object.entries(tagKeywords)) {
+    for (const keyword of keywords) {
+      if (lowerText.includes(keyword)) {
+        detected.push(tag);
+        break; // Found match for this tag, move to next
+      }
+    }
+  }
+  
+  return detected;
+}
 
 export function TagSelector({
   selectedAllergens,
@@ -39,24 +73,59 @@ export function TagSelector({
   selectedTags,
   onTagsChange,
   ingredientText = '',
+  titleText = '',
+  descriptionText = '',
 }: TagSelectorProps) {
+  const { t } = useTranslation();
   const [customTagInput, setCustomTagInput] = useState('');
+  const [autoDetectedTags, setAutoDetectedTags] = useState<string[]>([]);
+  const hasAutoDetectedRef = useRef(false);
+
+  // Auto-detect tags from title + description
+  useEffect(() => {
+    const combinedText = `${titleText} ${descriptionText}`.trim();
+    if (combinedText.length > 5) {
+      const detected = detectTagsFromText(combinedText);
+      setAutoDetectedTags(detected);
+      
+      // Auto-add detected tags only once per text change (to allow override)
+      if (detected.length > 0 && !hasAutoDetectedRef.current) {
+        const newTags = detected.filter(tag => !selectedTags.includes(tag));
+        if (newTags.length > 0) {
+          onTagsChange([...selectedTags, ...newTags]);
+          
+          const tagLabels = newTags.map(tag => {
+            const option = commonTags.find(t => t.value === tag);
+            return option?.label || tag;
+          }).join(', ');
+          
+          toast.success(`Tags erkannt: ${tagLabels}`, {
+            icon: <Sparkles className="w-4 h-4" />,
+            duration: 3000,
+          });
+          hasAutoDetectedRef.current = true;
+        }
+      }
+    }
+  }, [titleText, descriptionText]);
+
+  // Reset auto-detection flag when text changes significantly
+  useEffect(() => {
+    hasAutoDetectedRef.current = false;
+  }, [titleText.slice(0, 10), descriptionText.slice(0, 20)]);
 
   // Auto-detect allergens from ingredient text
   useEffect(() => {
     if (ingredientText.trim()) {
-      // Split text by common separators
       const ingredients = ingredientText.split(/[,\n;]+/).map(i => i.trim()).filter(Boolean);
       const detectedAllergens = detectAllergens(ingredients);
       
-      // Only add newly detected allergens
       const newAllergens = detectedAllergens.filter(a => !selectedAllergens.includes(a));
       
       if (newAllergens.length > 0) {
         const updatedAllergens = [...selectedAllergens, ...newAllergens];
         onAllergensChange(updatedAllergens);
         
-        // Show feedback toast
         const allergenLabels = newAllergens.map(a => {
           const option = allergenOptions.find(opt => opt.value === a);
           return option?.label || a;
