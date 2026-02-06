@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { MealCard } from "@/components/MealCard";
 import { SkeletonMealCard } from "@/components/SkeletonMealCard";
@@ -15,6 +15,9 @@ import { getDistance } from "@/utils/distance";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { toast } from "sonner";
 import { DEMO_MEALS } from "@/data/demoMeals";
+
+// Threshold for "small radius" in meters (300m)
+const SMALL_RADIUS_THRESHOLD = 300;
 
 const Feed = () => {
   const { t } = useTranslation();
@@ -181,8 +184,11 @@ const Feed = () => {
   const safeDemoMeals = Array.isArray(DEMO_MEALS) ? DEMO_MEALS : [];
   const finalMeals = meals && meals.length > 0 ? meals : safeDemoMeals;
 
-  const filteredAndSortedMeals = useMemo(() => {
-    if (!finalMeals || finalMeals.length === 0) return [];
+  // Track if we've shown the "no results" toast for current filter state to prevent duplicates
+  const lastToastKeyRef = useRef<string | null>(null);
+
+  const { filteredMeals: filteredAndSortedMeals, noResultsInfo } = useMemo(() => {
+    if (!finalMeals || finalMeals.length === 0) return { filteredMeals: [], noResultsInfo: null };
 
     const viewerGender = currentUser?.profile?.gender;
     const visibilityFilteredMeals = finalMeals.filter((meal) => {
@@ -192,16 +198,13 @@ const Feed = () => {
       return true;
     });
 
-    if (!userLat || !userLon) return visibilityFilteredMeals || [];
+    if (!userLat || !userLon) return { filteredMeals: visibilityFilteredMeals || [], noResultsInfo: null };
 
     const mealsWithDistance = visibilityFilteredMeals
       .map((meal) => {
-        // Use meal's fuzzy location for distance calculation
         const mealLat = meal.fuzzy_lat;
         const mealLon = meal.fuzzy_lng;
-
         if (!mealLat || !mealLon) return null;
-
         return {
           ...meal,
           calculatedDistance: getDistance(userLat, userLon, mealLat, mealLon),
@@ -212,31 +215,62 @@ const Feed = () => {
     // Apply chef-side visibility radius filter (if set)
     const radiusFilteredMeals = mealsWithDistance.filter((meal) => {
       const chefVisibilityRadius = (meal as any).visibility_radius;
-      // If chef set a visibility radius, only show to users within that distance
       if (chefVisibilityRadius && chefVisibilityRadius > 0) {
         return meal.calculatedDistance <= chefVisibilityRadius;
       }
-      return true; // No chef-side limit
+      return true;
     });
 
     // Apply user-side notification radius filter
     const withinRadius = radiusFilteredMeals.filter((meal) => meal.calculatedDistance <= userRadius);
+
+    // Same-address filter already applied at query level, but check if it resulted in 0
+    const isAddressFilterActive = filterSameAddress && currentUser?.profile?.address_id;
+    const isSmallRadiusActive = userRadius <= SMALL_RADIUS_THRESHOLD;
 
     if (withinRadius.length === 0 && radiusFilteredMeals.length > 0) {
       const fallbackMeals = radiusFilteredMeals
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
         .slice(0, 5);
 
-      if (fallbackMeals.length > 0) {
-        setTimeout(() => {
-          toast.info(t("feed_page.no_hits_nearby"), { duration: 5000 });
-        }, 500);
+      // Only provide noResultsInfo if a restrictive filter is active
+      let noResultsReason: 'address' | 'radius' | null = null;
+      if (isAddressFilterActive) {
+        noResultsReason = 'address';
+      } else if (isSmallRadiusActive) {
+        noResultsReason = 'radius';
       }
-      return fallbackMeals;
+
+      return {
+        filteredMeals: fallbackMeals,
+        noResultsInfo: noResultsReason ? { reason: noResultsReason, radiusKm: userRadius / 1000 } : null,
+      };
     }
 
-    return withinRadius.sort((a, b) => a.calculatedDistance - b.calculatedDistance);
-  }, [finalMeals, userLat, userLon, userRadius, currentUser]);
+    return {
+      filteredMeals: withinRadius.sort((a, b) => a.calculatedDistance - b.calculatedDistance),
+      noResultsInfo: null,
+    };
+  }, [finalMeals, userLat, userLon, userRadius, currentUser, filterSameAddress]);
+
+  // Show "no results" toast ONLY when restrictive filter is active, and prevent duplicates
+  useEffect(() => {
+    if (!noResultsInfo) {
+      lastToastKeyRef.current = null;
+      return;
+    }
+
+    const toastKey = `${noResultsInfo.reason}-${noResultsInfo.radiusKm}`;
+    if (lastToastKeyRef.current === toastKey) return; // Prevent duplicate
+
+    lastToastKeyRef.current = toastKey;
+
+    if (noResultsInfo.reason === 'address') {
+      toast.info(t("feed.no_results_address"), { duration: 5000 });
+    } else if (noResultsInfo.reason === 'radius') {
+      toast.info(t("feed.no_results_radius"), { duration: 5000 });
+    }
+  }, [noResultsInfo, t]);
 
   const handleDismissDisclaimer = () => {
     localStorage.setItem("disclaimerSeen", "true");
