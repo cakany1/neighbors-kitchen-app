@@ -622,9 +622,9 @@ const Profile = () => {
               {/* Partner Avatar (if couple) - use formData for immediate toggle response */}
               {formData.is_couple && (
                 <div className="space-y-1">
-                  <label 
-                    htmlFor="partner-avatar-upload" 
-                    className="relative w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-3xl overflow-hidden border-2 border-dashed border-border cursor-pointer block"
+                  <div 
+                    className="relative w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-3xl overflow-hidden border-2 border-dashed border-border cursor-pointer group"
+                    onClick={() => document.getElementById('partner-avatar-upload')?.click()}
                     title={t('profile.partner_photo_title')}
                   >
                     {(partnerPhotoPreview || profile?.partner_photo_url) ? (
@@ -634,12 +634,12 @@ const Profile = () => {
                         className="w-full h-full object-cover" 
                       />
                     ) : (
-                      <span>👥</span>
+                      <span className="opacity-60">👥</span>
                     )}
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-100 group-hover:opacity-80 transition-opacity">
                       <Upload className="w-6 h-6 text-white" />
                     </div>
-                  </label>
+                  </div>
                   <input
                     id="partner-avatar-upload"
                     type="file"
@@ -668,7 +668,9 @@ const Profile = () => {
 
                       try {
                         const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-                        const fileName = `${currentUser.id}/partner-${Date.now()}.${fileExt}`;
+                        const fileName = `${currentUser.id}/partner.${fileExt}`;
+
+                        console.log('[Profile] Uploading partner photo:', fileName);
 
                         const { error: uploadError } = await supabase.storage
                           .from('avatars')
@@ -685,16 +687,22 @@ const Profile = () => {
                           return;
                         }
 
+                        // Get public URL with cache buster
                         const { data } = supabase.storage
                           .from('avatars')
                           .getPublicUrl(fileName);
+                        
+                        const publicUrlWithCacheBuster = `${data.publicUrl}?t=${Date.now()}`;
+                        console.log('[Profile] Partner photo uploaded:', publicUrlWithCacheBuster);
 
+                        // CRITICAL: Store URL in database immediately
                         const { error: updateError } = await supabase
                           .from('profiles')
-                          .update({ partner_photo_url: data.publicUrl })
+                          .update({ partner_photo_url: publicUrlWithCacheBuster })
                           .eq('id', currentUser.id);
 
                         if (updateError) {
+                          console.error('Partner photo DB update error:', updateError);
                           toast.error(`Speicherfehler: ${updateError.message}`);
                           setPartnerPhotoPreview(null);
                           URL.revokeObjectURL(previewUrl);
@@ -702,8 +710,14 @@ const Profile = () => {
                         }
 
                         toast.success(t('profile.partner_photo_updated'));
-                        await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                        
+                        // Force refetch to sync UI with DB
+                        await refetchUser();
+                        
+                        // Clear preview AFTER refetch - DB value will show
+                        setPartnerPhotoPreview(null);
                         URL.revokeObjectURL(previewUrl);
+                        console.log('[Profile] Partner photo saved and refetched');
                       } catch (error: any) {
                         console.error('Upload error:', error);
                         toast.error(t('profile.upload_error') + ': ' + error.message);
