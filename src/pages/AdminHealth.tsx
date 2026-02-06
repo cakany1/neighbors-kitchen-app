@@ -51,20 +51,30 @@ const AdminHealth = () => {
   const [lastTestResult, setLastTestResult] = useState<SelfTestResponse | null>(null);
 
   // Check if current user is admin
-  const { data: isAdmin, isLoading: adminCheckLoading } = useQuery({
+  const { data: isAdmin, isLoading: adminCheckLoading, error: adminError } = useQuery({
     queryKey: ['isAdminHealth'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return false;
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      console.log('[AdminHealth] Auth user:', user?.id, userError);
+      
+      if (!user) {
+        console.log('[AdminHealth] No user logged in');
+        return false;
+      }
 
-      const { data: roles } = await supabase
+      // Check user_roles table for admin role
+      const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
+        .eq('user_id', user.id);
 
-      return !!roles;
+      console.log('[AdminHealth] Role query result:', roleData, roleError);
+
+      // Check if any of the roles is 'admin'
+      const hasAdminRole = roleData?.some(r => r.role === 'admin') || false;
+      console.log('[AdminHealth] Has admin role:', hasAdminRole);
+      
+      return hasAdminRole;
     },
   });
 
@@ -124,11 +134,17 @@ const AdminHealth = () => {
             <Lock className="h-4 w-4" />
             <AlertDescription>
               Zugang verweigert. Admin-Berechtigung erforderlich.
+              {adminError && <span className="block mt-2 text-xs">Fehler: {adminError.message}</span>}
             </AlertDescription>
           </Alert>
-          <Button onClick={() => navigate('/admin')} className="mt-4">
-            Zurück zum Admin Dashboard
-          </Button>
+          <div className="mt-4 space-y-2">
+            <Button onClick={() => navigate('/admin')}>
+              Zurück zum Admin Dashboard
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/login')}>
+              Zur Anmeldung
+            </Button>
+          </div>
         </main>
         <BottomNav />
       </div>
