@@ -215,6 +215,8 @@
     "visibility_women_only_hint": "🔒 Only women will see your meals",
     "visibility_women_fli_hint": "🌈 Women and Diverse/NB/Inter will see your meals",
     "visibility_all_hint": "🌍 All users will see your meals",
+    "couple_account": "Couple Account",
+    "couple_account_hint": "Enable if you share meals as a couple (2 portions default)",
     "partner_details": "Partner Details (Couples only)",
     "name_display_hint": "💡 Controls how your name appears on meal cards",
     "full_name_option": "Full Name (Max Smith)",
