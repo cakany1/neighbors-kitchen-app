@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock, Zap, UserCog, Download } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock, Zap, UserCog, Download, Activity } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -1083,7 +1083,7 @@ const Admin = () => {
 
         <Tabs defaultValue="verifications" className="space-y-6">
           <div className="overflow-x-auto -mx-4 px-4 pb-2">
-            <TabsList className="inline-flex w-auto min-w-full md:grid md:w-full md:grid-cols-8 gap-1">
+            <TabsList className="inline-flex w-auto min-w-full md:grid md:w-full md:grid-cols-9 gap-1">
               <TabsTrigger value="verifications" className="whitespace-nowrap">
                 Verifications
                 {pendingVerifications && pendingVerifications.length > 0 && (
@@ -1120,6 +1120,10 @@ const Admin = () => {
                 )}
               </TabsTrigger>
               <TabsTrigger value="payouts" className="whitespace-nowrap">Payouts</TabsTrigger>
+              <TabsTrigger value="health" className="whitespace-nowrap" onClick={() => navigate('/admin/health')}>
+                <Activity className="w-4 h-4 mr-1" />
+                Health
+              </TabsTrigger>
               <TabsTrigger value="settings" className="whitespace-nowrap">
                 <Settings className="w-4 h-4 mr-1" />
                 Settings
