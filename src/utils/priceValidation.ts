@@ -38,10 +38,15 @@ export function validatePrice(
     return { isValid: true };
   }
 
+  // Empty value - no error while typing, will be caught on submit
+  if (!value || value.trim() === '') {
+    return { isValid: true };
+  }
+
   const parsedValue = parseLocalizedNumber(value);
 
-  // Check for invalid number
-  if (isNaN(parsedValue)) {
+  // Check for invalid number (NaN or negative)
+  if (isNaN(parsedValue) || parsedValue < 0) {
     return {
       isValid: false,
       error: t('validation.invalid_number'),
@@ -49,8 +54,8 @@ export function validatePrice(
     };
   }
 
-  // Check minimum (CHF 7)
-  if (parsedValue < MIN_PRICE_CHF) {
+  // Check minimum (CHF 7) - show error immediately when value is entered
+  if (parsedValue > 0 && parsedValue < MIN_PRICE_CHF) {
     return {
       isValid: false,
       error: t('add_meal.price_min_error'),
@@ -58,7 +63,7 @@ export function validatePrice(
     };
   }
 
-  // Check maximum (CHF 50)
+  // Check maximum (CHF 50) - show error immediately
   if (parsedValue > MAX_PRICE_CHF) {
     return {
       isValid: false,
