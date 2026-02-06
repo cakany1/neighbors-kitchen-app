@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock, Zap, UserCog } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 
@@ -695,7 +695,7 @@ const Admin = () => {
       <Header />
 
       <main className="max-w-5xl mx-auto px-4 py-6">
-        <div className="mb-6 flex items-start justify-between">
+        <div className="mb-6 flex items-start justify-between flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Shield className="w-6 h-6 text-primary" />
@@ -703,16 +703,26 @@ const Admin = () => {
             </div>
             <p className="text-muted-foreground">Manage verifications, analytics, and feedback</p>
           </div>
-          <Button 
-            onClick={() => {
-              setMessagePreselectedUser(null);
-              setMessageDialogOpen(true);
-            }}
-            className="gap-2"
-          >
-            <MessageSquare className="w-4 h-4" />
-            Nachricht senden
-          </Button>
+          <div className="flex gap-2 flex-wrap">
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/admin/health')}
+              className="gap-2"
+            >
+              <Zap className="w-4 h-4" />
+              System Health
+            </Button>
+            <Button 
+              onClick={() => {
+                setMessagePreselectedUser(null);
+                setMessageDialogOpen(true);
+              }}
+              className="gap-2"
+            >
+              <MessageSquare className="w-4 h-4" />
+              Nachricht senden
+            </Button>
+          </div>
         </div>
 
         {/* Pending Approvals Widget - Always Visible at Top */}
@@ -1797,6 +1807,52 @@ const Admin = () => {
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-4">
             <AdminNotificationSettings />
+            
+            {/* Admin Role Management */}
+            <Card className="border-2 border-primary/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserCog className="w-5 h-5 text-primary" />
+                  Admin-Rollen verwalten
+                </CardTitle>
+                <CardDescription>
+                  Admins können andere Benutzer zu Admins befördern oder Admin-Rechte entziehen.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert>
+                  <Shield className="h-4 w-4" />
+                  <AlertDescription>
+                    ⚠️ Aktuelle Admins: Nur Benutzer mit Eintrag in der user_roles Tabelle mit role='admin' haben Admin-Zugriff.
+                  </AlertDescription>
+                </Alert>
+                
+                {/* List current admins */}
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Aktuelle Administratoren</h4>
+                  <div className="space-y-2">
+                    {allUsers?.filter((u: any) => {
+                      // Check in user_roles if this user has admin role
+                      return u.role === 'admin';
+                    }).map((admin: any) => (
+                      <div key={admin.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-10 h-10">
+                            <AvatarImage src={admin.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${admin.id}`} />
+                            <AvatarFallback>{admin.first_name?.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">{admin.first_name} {admin.last_name}</p>
+                            <p className="text-xs text-muted-foreground">{admin.email || '-'}</p>
+                          </div>
+                        </div>
+                        <Badge>Admin</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             
             <Card>
               <CardHeader>
