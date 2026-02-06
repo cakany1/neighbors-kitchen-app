@@ -265,7 +265,7 @@ const Feed = () => {
           </p>
         </div>
 
-        {/* Same-Address Filter Toggle - Always visible for logged-in users */}
+        {/* TASK 18: Same-Address Filter Toggle - Always visible for logged-in users */}
         {currentUser && (
           <div className="mb-4">
             <button
@@ -289,9 +289,20 @@ const Feed = () => {
                   : t("feed.all_meals", "Alle Gerichte")}
               </span>
               {!currentUser?.profile?.address_id && (
-                <span className="text-xs text-muted-foreground ml-auto">(keine Adresse)</span>
+                <span className="text-xs text-muted-foreground ml-auto">
+                  ({t("feed.no_address_hint", "keine Adresse")})
+                </span>
               )}
             </button>
+            
+            {/* DEBUG BLOCK - TASK 18.1 VERIFICATION */}
+            <div className="mt-2 p-3 bg-warning/20 border border-warning rounded text-xs font-mono">
+              <div className="font-bold text-warning-foreground mb-1">🔍 TASK 18 DEBUG:</div>
+              <div>my_profile_address_id: <strong>{currentUser?.profile?.address_id || 'NULL'}</strong></div>
+              <div>first_feed_meal_address_id: <strong>{meals?.[0]?.address_id || 'NULL'}</strong></div>
+              <div>filterSameAddress: <strong>{filterSameAddress ? 'ON' : 'OFF'}</strong></div>
+              <div>total_meals_shown: <strong>{filteredAndSortedMeals?.length || 0}</strong></div>
+            </div>
           </div>
         )}
 
