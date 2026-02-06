@@ -68,6 +68,27 @@ export type Database = {
         }
         Relationships: []
       }
+      api_rate_limits: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          identifier: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          identifier: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          identifier?: string
+        }
+        Relationships: []
+      }
       app_feedback: {
         Row: {
           created_at: string
@@ -1138,6 +1159,7 @@ export type Database = {
         Args: { p_booking_id: string; p_guest_id: string; p_reason?: string }
         Returns: Json
       }
+      cleanup_rate_limits: { Args: { max_age_hours?: number }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
