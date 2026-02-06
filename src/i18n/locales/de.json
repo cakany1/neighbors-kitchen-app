@@ -926,6 +926,7 @@
     "dont_show_again": "Nicht mehr anzeigen"
   },
   "validation": {
-    "invalid_number": "Bitte gib eine gültige Zahl ein."
+    "invalid_number": "Bitte gib eine gültige Zahl ein.",
+    "content_rejected": "Bitte respektvolle Sprache verwenden. Beleidigende Inhalte sind nicht erlaubt."
   }
 }

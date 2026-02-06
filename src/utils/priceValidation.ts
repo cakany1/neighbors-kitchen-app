@@ -103,6 +103,12 @@ export function mapDbPriceError(
   errorMessage: string,
   t: (key: string) => string
 ): string {
+  // Match content filter trigger error (server-side validation)
+  if (errorMessage.includes('respektvolle Sprache') || 
+      errorMessage.includes('respectful language')) {
+    return t('validation.content_rejected');
+  }
+
   // Match PostgreSQL check constraint violation for price
   if (errorMessage.includes('pricing_minimum') || errorMessage.includes('check constraint')) {
     if (errorMessage.includes('700')) {
