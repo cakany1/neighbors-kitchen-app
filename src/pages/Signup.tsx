@@ -22,6 +22,7 @@ const Signup = () => {
     email: '',
     password: '',
     firstName: '',
+    lastName: '',
     isCouple: false,
   });
 
@@ -117,6 +118,11 @@ const Signup = () => {
       toast.error(t('signup.first_name_required'));
       return;
     }
+
+    if (!formData.lastName.trim()) {
+      toast.error(t('signup.last_name_required'));
+      return;
+    }
     
     if (formData.password.length < 8) {
       toast.error(t('signup.password_too_short'));
@@ -134,6 +140,7 @@ const Signup = () => {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
             first_name: formData.firstName,
+            last_name: formData.lastName,
             languages: [i18n.language || 'de'],
           },
         },
@@ -197,7 +204,7 @@ const Signup = () => {
         .upsert({
           id: data.user.id,
           first_name: formData.firstName,
-          last_name: '', // Will be completed later
+          last_name: formData.lastName,
           languages: [i18n.language || 'de'],
           is_couple: formData.isCouple,
         }, { onConflict: 'id' });
@@ -316,6 +323,20 @@ const Signup = () => {
                 placeholder={t('auth.first_name_placeholder')}
                 value={formData.firstName}
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                required
+              />
+            </div>
+
+            {/* Last Name */}
+            <div>
+              <Label htmlFor="lastName">
+                {t('auth.last_name')} <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="lastName"
+                placeholder={t('auth.last_name_placeholder')}
+                value={formData.lastName}
+                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 required
               />
             </div>
