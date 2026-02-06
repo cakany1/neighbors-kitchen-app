@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 
@@ -44,6 +44,7 @@ import { AdminAnalyticsDashboard } from '@/components/AdminAnalyticsDashboard';
 import { AdminUserProfileDialog } from '@/components/AdminUserProfileDialog';
 import { AdminMessageDialog } from '@/components/AdminMessageDialog';
 import { AdminNotificationSettings } from '@/components/AdminNotificationSettings';
+import { VerificationRejectDialog, RejectionData } from '@/components/VerificationRejectDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -61,6 +62,10 @@ const Admin = () => {
   // State for admin message dialog
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [messagePreselectedUser, setMessagePreselectedUser] = useState<any>(null);
+  
+  // State for rejection dialog
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [userToReject, setUserToReject] = useState<any>(null);
 
   // Check if current user is admin
   const { data: isAdmin, isLoading: adminCheckLoading } = useQuery({
@@ -324,23 +329,90 @@ const Admin = () => {
     },
   });
 
-  // Reject verification mutation
+  // Reject verification mutation - now with full flow
   const rejectMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      const { error } = await supabase
+    mutationFn: async ({ userId, reason, details, userEmail, userName }: { 
+      userId: string; 
+      reason: string; 
+      details: string;
+      userEmail: string;
+      userName: string;
+    }) => {
+      // Get current user for rejected_by field
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+      
+      // Get session for edge function auth
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('No session');
+      
+      // Update profile with rejection data
+      const { error: updateError } = await supabase
         .from('profiles')
-        .update({ verification_status: 'rejected' })
+        .update({ 
+          verification_status: 'rejected',
+          rejection_reason: reason,
+          rejection_details: details || null,
+          rejected_at: new Date().toISOString(),
+          rejected_by: user.id,
+          // Clear any pending document
+          id_document_url: null
+        })
         .eq('id', userId);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
+      
+      // Send rejection email via edge function
+      const { data, error: emailError } = await supabase.functions.invoke('send-verification-rejection', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        body: { userId, userEmail, userName, reason, details }
+      });
+      
+      if (emailError) {
+        console.error('Email notification failed:', emailError);
+        // Don't throw - rejection was saved, email is secondary
+      }
+      
+      return { emailSent: !emailError, emailData: data };
     },
-    onSuccess: () => {
-      toast.success(t('admin.rejection_success'));
+    onSuccess: (result) => {
+      setRejectDialogOpen(false);
+      setUserToReject(null);
+      toast.success(t('admin.rejection_success'), {
+        description: result.emailSent 
+          ? 'E-Mail-Benachrichtigung wurde gesendet' 
+          : 'Achtung: E-Mail konnte nicht gesendet werden'
+      });
       queryClient.invalidateQueries({ queryKey: ['pendingVerifications'] });
+      queryClient.invalidateQueries({ queryKey: ['rejectedVerifications'] });
     },
-    onError: () => {
-      toast.error(t('admin.rejection_failed'));
+    onError: (error: Error) => {
+      toast.error(t('admin.rejection_failed'), {
+        description: error.message
+      });
     },
+  });
+  
+  // Fetch rejected verifications for history
+  const { data: rejectedVerifications, isLoading: rejectedLoading } = useQuery({
+    queryKey: ['rejectedVerifications'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id, first_name, last_name, nickname, avatar_url,
+          verification_status, rejection_reason, rejection_details, 
+          rejected_at, rejected_by, created_at
+        `)
+        .eq('verification_status', 'rejected')
+        .not('rejected_at', 'is', null)
+        .order('rejected_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
   });
 
   // Update feedback status mutation
@@ -752,7 +824,10 @@ const Admin = () => {
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => rejectMutation.mutate(user.id)}
+                          onClick={() => {
+                            setUserToReject(user);
+                            setRejectDialogOpen(true);
+                          }}
                           disabled={rejectMutation.isPending}
                         >
                           <XCircle className="w-4 h-4" />
@@ -1011,7 +1086,10 @@ const Admin = () => {
                             </Button>
                             <Button
                               variant="destructive"
-                              onClick={() => rejectMutation.mutate(user.id)}
+                              onClick={() => {
+                                setUserToReject(user);
+                                setRejectDialogOpen(true);
+                              }}
                               disabled={rejectMutation.isPending}
                               className="flex-1"
                             >
@@ -1023,6 +1101,103 @@ const Admin = () => {
                       </Card>
                       );
                     })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
+            {/* Rejection History */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="w-5 h-5" />
+                  Ablehnungs-Historie
+                </CardTitle>
+                <CardDescription>
+                  Zuletzt abgelehnte Verifizierungen mit Gründen
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {rejectedLoading ? (
+                  <p className="text-muted-foreground text-center py-8">Lade Historie...</p>
+                ) : !rejectedVerifications || rejectedVerifications.length === 0 ? (
+                  <Alert>
+                    <CheckCircle className="h-4 w-4 text-primary" />
+                    <AlertDescription>
+                      Keine abgelehnten Verifizierungen vorhanden.
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left p-2 font-semibold">Nutzer</th>
+                          <th className="text-left p-2 font-semibold">Grund</th>
+                          <th className="text-left p-2 font-semibold">Details</th>
+                          <th className="text-left p-2 font-semibold">Datum</th>
+                          <th className="text-left p-2 font-semibold">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rejectedVerifications.map((user) => {
+                          const reasonLabels: Record<string, string> = {
+                            blurred_photo: '📷 Unscharfes Foto',
+                            missing_document: '📄 Dokument fehlt',
+                            incomplete_profile: '👤 Unvollständig',
+                            duplicate_account: '👥 Duplikat',
+                            document_mismatch: '❌ Keine Übereinstimmung',
+                            other: '📝 Anderer Grund',
+                          };
+                          
+                          return (
+                            <tr key={user.id} className="border-b border-border/50 hover:bg-muted/50">
+                              <td className="p-2">
+                                <div className="flex items-center gap-2">
+                                  <Avatar className="w-8 h-8">
+                                    <AvatarImage src={user.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.id}`} />
+                                    <AvatarFallback>{user.first_name?.charAt(0)}</AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <p className="font-medium">{user.first_name} {user.last_name}</p>
+                                    {user.nickname && (
+                                      <p className="text-xs text-muted-foreground">@{user.nickname}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="p-2">
+                                <Badge variant="destructive" className="text-xs">
+                                  {reasonLabels[user.rejection_reason || ''] || user.rejection_reason || '-'}
+                                </Badge>
+                              </td>
+                              <td className="p-2 max-w-[200px]">
+                                <p className="text-xs text-muted-foreground truncate" title={user.rejection_details || ''}>
+                                  {user.rejection_details || '-'}
+                                </p>
+                              </td>
+                              <td className="p-2">
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <Clock className="w-3 h-3" />
+                                  {user.rejected_at ? new Date(user.rejected_at).toLocaleDateString('de-CH', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  }) : '-'}
+                                </div>
+                              </td>
+                              <td className="p-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {user.verification_status}
+                                </Badge>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </CardContent>
@@ -1690,6 +1865,26 @@ const Admin = () => {
           avatar_url: u.avatar_url
         }))}
         preselectedUser={messagePreselectedUser}
+      />
+
+      {/* Verification Rejection Dialog */}
+      <VerificationRejectDialog
+        open={rejectDialogOpen}
+        onOpenChange={setRejectDialogOpen}
+        userName={userToReject ? `${userToReject.first_name} ${userToReject.last_name}` : ''}
+        userEmail={allUsers?.find((u: any) => u.id === userToReject?.id)?.email}
+        isPending={rejectMutation.isPending}
+        onConfirm={async (data: RejectionData) => {
+          if (!userToReject) return;
+          const userEmail = allUsers?.find((u: any) => u.id === userToReject.id)?.email || '';
+          await rejectMutation.mutateAsync({
+            userId: userToReject.id,
+            reason: data.reason,
+            details: data.details,
+            userEmail,
+            userName: `${userToReject.first_name} ${userToReject.last_name}`
+          });
+        }}
       />
 
       <BottomNav />
