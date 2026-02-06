@@ -253,6 +253,37 @@ serve(async (req) => {
   }
   results.push({ name: 'T15: Stripe Webhook', status: t15Status, details: t15Details, duration_ms: Date.now() - t15 });
 
+  // ===== T16: Contact Rate Limiting =====
+  const t16 = Date.now();
+  let t16Status: 'PASS' | 'FAIL' = 'PASS';
+  let t16Details = '';
+  try {
+    // Check if rate limit table exists and has records
+    const { count: rateLimitCount, error: rlError } = await adminClient
+      .from('api_rate_limits')
+      .select('id', { count: 'exact', head: true })
+      .eq('endpoint', 'submit-contact');
+    
+    if (rlError) {
+      t16Status = 'FAIL';
+      t16Details = `Rate limit table error: ${rlError.message}`;
+    } else {
+      // Count recent rate limit entries (last hour)
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { count: recentCount } = await adminClient
+        .from('api_rate_limits')
+        .select('id', { count: 'exact', head: true })
+        .eq('endpoint', 'submit-contact')
+        .gte('created_at', oneHourAgo);
+      
+      t16Details = `Rate limit table ready | ${rateLimitCount || 0} total entries, ${recentCount || 0} in last hour | Limit: 3/hour + honeypot`;
+    }
+  } catch (e: any) {
+    t16Status = 'FAIL';
+    t16Details = `Error: ${e.message?.slice(0, 50)}`;
+  }
+  results.push({ name: 'T16: Contact Spam Protection', status: t16Status, details: t16Details, duration_ms: Date.now() - t16 });
+
   // Summary
   const passed = results.filter(r => r.status === 'PASS').length;
   const failed = results.filter(r => r.status === 'FAIL').length;

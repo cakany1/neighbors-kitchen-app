@@ -12,7 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Mail, Send, ArrowLeft } from 'lucide-react';
 
 export default function Contact() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -48,12 +48,12 @@ export default function Contact() {
 
       if (error) throw error;
 
+      // Handle rate limiting (429 response)
       if (data?.error) {
-        // Handle rate limiting
-        if (data.error_de) {
-          throw new Error(data.error_de);
-        }
-        throw new Error(data.error);
+        const errorMessage = i18n.language === 'de' && data.error_de 
+          ? data.error_de 
+          : data.error;
+        throw new Error(errorMessage);
       }
 
       toast({
