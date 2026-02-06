@@ -66,7 +66,9 @@
     "set_location": "Set Location",
     "set_location_desc": "Set your location in profile settings to see meals filtered by distance.",
     "guest_login_required": "Sign up to save this meal!",
-    "guest_login_desc": "Create a free account to book meals and share with your neighborhood."
+    "guest_login_desc": "Create a free account to book meals and share with your neighborhood.",
+    "my_address_only": "My address only",
+    "all_meals": "All meals"
   },
   "actions": {
     "view_details": "View Details"

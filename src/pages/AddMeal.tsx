@@ -21,6 +21,7 @@ import { hashToConsistentOffset } from '@/utils/fuzzyLocation';
 import { validateMealContent } from '@/utils/contentFilter';
 import { validatePrice, parseLocalizedNumber, MIN_PRICE_CHF, MAX_PRICE_CHF, mapDbPriceError } from '@/utils/priceValidation';
 import { TagSelector } from '@/components/meals/TagSelector';
+import { generateAddressId } from '@/utils/addressHash';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
@@ -264,12 +265,15 @@ const AddMeal = () => {
       const loadingToastId = toast.loading('Gericht wird erstellt und übersetzt...');
 
       // Save address to profile if it's new or changed
+      const addressId = generateAddressId(addressData.street, addressData.city, addressData.postalCode);
+      
       const { error: profileUpdateError } = await supabase
         .from('profiles')
         .update({
           private_address: addressData.street.trim(),
           private_city: addressData.city.trim(),
           private_postal_code: addressData.postalCode.trim() || null,
+          address_id: addressId,
         })
         .eq('id', user.id);
 
@@ -414,6 +418,7 @@ const AddMeal = () => {
         pricing_suggested: selectedExchangeOptions.includes('online') ? priceCents : null,
         restaurant_reference_price: selectedExchangeOptions.includes('online') ? priceCents : null,
         estimated_restaurant_value: estimatedValueCents,
+        address_id: addressId,
         allergens: selectedAllergens.length > 0 ? selectedAllergens : null,
         tags: tags.length > 0 ? tags : null,
         is_stock_photo: useStockPhoto,
