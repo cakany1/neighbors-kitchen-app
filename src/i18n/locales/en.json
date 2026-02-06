@@ -34,7 +34,8 @@
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
-    "understood": "Got it"
+    "understood": "Got it",
+    "cancel": "Cancel"
   },
   "chat": {
     "loading": "Loading...",
@@ -173,6 +174,10 @@
     "last_name": "Last Name",
     "name_readonly_hint": "Name can only be changed through re-verification.",
     "request_name_change": "Request change →",
+    "street": "Street & House Number",
+    "street_placeholder": "e.g. Main Street 123",
+    "city": "City",
+    "postal_code": "Postal Code",
     "nickname": "Nickname",
     "nickname_placeholder": "What neighbors should call you",
     "display_name_privacy": "Display Name / Privacy",
@@ -802,7 +807,11 @@
     "submitting": "Publishing...",
     "meal_created": "Meal is live! Your neighbors will see it soon.",
     "price_min_error": "Minimum CHF 7.00 (incl. fee)",
-    "price_max_error": "Maximum CHF 50.00. For catering, please contact us directly."
+    "price_max_error": "Maximum CHF 50.00. For catering, please contact us directly.",
+    "pickup_address": "Pickup Address",
+    "pickup_address_hint": "Where can guests pick up the food?",
+    "change_address": "Change address",
+    "address_required": "Please enter a pickup address"
   },
   "feed_page": {
     "welcome_message": "Welcome to Neighbors Kitchen! This is a private food-sharing community. Please bring your own containers, respect the chefs' homes and pay fairly. Tap to close.",

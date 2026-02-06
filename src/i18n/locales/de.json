@@ -34,7 +34,8 @@
     "loading": "Laden...",
     "error": "Fehler",
     "success": "Erfolg",
-    "understood": "Verstanden"
+    "understood": "Verstanden",
+    "cancel": "Abbrechen"
   },
   "actions": {
     "view_details": "Details ansehen"
@@ -307,6 +308,10 @@
     "last_name": "Nachname",
     "name_readonly_hint": "Name kann nur durch erneute Verifizierung geändert werden.",
     "request_name_change": "Änderung beantragen →",
+    "street": "Strasse & Hausnummer",
+    "street_placeholder": "z.B. Güterstrasse 123",
+    "city": "Stadt",
+    "postal_code": "PLZ",
     "nickname": "Spitzname",
     "nickname_placeholder": "Wie Nachbarn dich nennen sollen",
     "display_name_privacy": "Anzeigename / Privatsphäre",
@@ -762,7 +767,11 @@
     "submitting": "Wird veröffentlicht...",
     "meal_created": "Gericht ist live! Deine Nachbarn werden es bald sehen.",
     "price_min_error": "Mindestpreis: CHF 7.00 (inkl. Gebühr)",
-    "price_max_error": "Maximal CHF 50.00. Für Catering kontaktiere uns bitte direkt."
+    "price_max_error": "Maximal CHF 50.00. Für Catering kontaktiere uns bitte direkt.",
+    "pickup_address": "Abholadresse",
+    "pickup_address_hint": "Wo können Gäste das Essen abholen?",
+    "change_address": "Adresse ändern",
+    "address_required": "Bitte gib eine Abholadresse ein"
   },
   "feed_page": {
     "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schliessen.",

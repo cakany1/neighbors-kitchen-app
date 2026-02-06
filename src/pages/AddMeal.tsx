@@ -59,6 +59,14 @@ const AddMeal = () => {
     { value: '45', label: ':45' },
   ];
 
+  // Address state for inline editing
+  const [addressData, setAddressData] = useState({
+    street: '',
+    city: '',
+    postalCode: '',
+  });
+  const [showAddressForm, setShowAddressForm] = useState(false);
+
   // Fetch current user's profile - IMPORTANT: Use fresh query to avoid stale cache
   const { data: currentUser, refetch: refetchUser } = useQuery({
     queryKey: ['addMealUser'],
@@ -68,7 +76,7 @@ const AddMeal = () => {
       
       const { data: profile } = await supabase
         .from('profiles')
-        .select('gender, avatar_url, private_address, private_city')
+        .select('gender, avatar_url, private_address, private_city, private_postal_code')
         .eq('id', user.id)
         .single();
       
@@ -76,12 +84,30 @@ const AddMeal = () => {
         id: user.id, 
         gender: profile?.gender, 
         avatarUrl: profile?.avatar_url,
-        hasAddress: !!(profile?.private_address && profile?.private_city)
+        hasAddress: !!(profile?.private_address && profile?.private_city),
+        privateAddress: profile?.private_address || '',
+        privateCity: profile?.private_city || '',
+        privatePostalCode: profile?.private_postal_code || '',
       };
     },
     staleTime: 0, // Always fetch fresh data
     refetchOnMount: 'always',
   });
+
+  // Initialize address data when profile loads
+  useEffect(() => {
+    if (currentUser) {
+      setAddressData({
+        street: currentUser.privateAddress,
+        city: currentUser.privateCity,
+        postalCode: currentUser.privatePostalCode,
+      });
+      // Show form if no address exists
+      if (!currentUser.hasAddress) {
+        setShowAddressForm(true);
+      }
+    }
+  }, [currentUser]);
 
   const toggleExchangeOption = (option: string) => {
     setSelectedExchangeOptions(prev =>
@@ -225,28 +251,46 @@ const AddMeal = () => {
     }
 
     try {
-      // Get current user profile with address and visibility_mode
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('private_address, private_city, private_postal_code, visibility_mode')
-        .eq('id', user.id)
-        .single();
-
-      if (!profile?.private_address || !profile?.private_city) {
-        toast.error('Bitte vervollständige deine Adresse im Profil.');
-        navigate('/profile');
+      // Validate address data
+      if (!addressData.street.trim() || !addressData.city.trim()) {
+        toast.error(t('add_meal.address_required'));
+        setShowAddressForm(true);
         return;
       }
 
-      // Show loading state - will be dismissed on success or error
+      // Show loading state
       const loadingToastId = toast.loading('Gericht wird erstellt und übersetzt...');
+
+      // Save address to profile if it's new or changed
+      const { error: profileUpdateError } = await supabase
+        .from('profiles')
+        .update({
+          private_address: addressData.street.trim(),
+          private_city: addressData.city.trim(),
+          private_postal_code: addressData.postalCode.trim() || null,
+        })
+        .eq('id', user.id);
+
+      if (profileUpdateError) {
+        console.error('Profile update error:', profileUpdateError);
+        toast.dismiss(loadingToastId);
+        toast.error('Adresse konnte nicht gespeichert werden.');
+        return;
+      }
+
+      // Get visibility_mode from profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('visibility_mode')
+        .eq('id', user.id)
+        .single();
 
       // 1. Geocode chef's exact address
       const { data: geoData, error: geoError } = await supabase.functions.invoke('geocode-address', {
         body: {
-          street: profile.private_address,
-          city: profile.private_city,
-          postalCode: profile.private_postal_code || ''
+          street: addressData.street.trim(),
+          city: addressData.city.trim(),
+          postalCode: addressData.postalCode.trim() || ''
         }
       });
 
@@ -269,7 +313,7 @@ const AddMeal = () => {
       // 2. Add CONSISTENT hash-based offset for fuzzy location (±300m ≈ ±0.003 degrees)
       // Using hash of user address ensures same offset for all meals from same location
       // This prevents triangulation attacks where averaging multiple fuzzy coords reveals true location
-      const addressHash = hashToConsistentOffset(`${profile.private_address}-${profile.private_city}-${user.id}`);
+      const addressHash = hashToConsistentOffset(`${addressData.street.trim()}-${addressData.city.trim()}-${user.id}`);
       const fuzzyLat = geoData.latitude + addressHash.latOffset;
       const fuzzyLng = geoData.longitude + addressHash.lngOffset;
 
@@ -329,8 +373,8 @@ const AddMeal = () => {
         description_en: descriptionEn,
         fuzzy_lat: fuzzyLat,
         fuzzy_lng: fuzzyLng,
-        exact_address: `${profile.private_address}, ${profile.private_city}`,
-        neighborhood: profile.private_city,
+        exact_address: `${addressData.street.trim()}, ${addressData.city.trim()}`,
+        neighborhood: addressData.city.trim(),
         scheduled_date: scheduledDateTime,
         collection_window_start: formData.collectionWindowStart,
         collection_window_end: formData.collectionWindowEnd || formData.collectionWindowStart,
@@ -677,6 +721,91 @@ const AddMeal = () => {
                   </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Pickup Address Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                📍 {t('add_meal.pickup_address')} *
+              </CardTitle>
+              <CardDescription>
+                {t('add_meal.pickup_address_hint')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Show current address or prompt to add */}
+              {currentUser?.hasAddress && !showAddressForm ? (
+                <div className="space-y-3">
+                  <div className="p-3 bg-muted/50 rounded-lg border">
+                    <p className="font-medium">{addressData.street}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {addressData.postalCode} {addressData.city}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAddressForm(true)}
+                  >
+                    {t('add_meal.change_address')}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="street">{t('profile.street')} *</Label>
+                    <Input
+                      id="street"
+                      placeholder={t('profile.street_placeholder')}
+                      value={addressData.street}
+                      onChange={(e) => setAddressData({ ...addressData, street: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <Label htmlFor="postalCode">{t('profile.postal_code')}</Label>
+                      <Input
+                        id="postalCode"
+                        placeholder="4051"
+                        value={addressData.postalCode}
+                        onChange={(e) => setAddressData({ ...addressData, postalCode: e.target.value })}
+                        maxLength={5}
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <Label htmlFor="city">{t('profile.city')} *</Label>
+                      <Input
+                        id="city"
+                        placeholder="Basel"
+                        value={addressData.city}
+                        onChange={(e) => setAddressData({ ...addressData, city: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+                  {currentUser?.hasAddress && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowAddressForm(false);
+                        setAddressData({
+                          street: currentUser.privateAddress,
+                          city: currentUser.privateCity,
+                          postalCode: currentUser.privatePostalCode,
+                        });
+                      }}
+                    >
+                      {t('common.cancel')}
+                    </Button>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 
