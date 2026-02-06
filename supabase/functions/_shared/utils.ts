@@ -275,12 +275,11 @@ export async function verifyAuth(req: Request, requestId: string): Promise<AuthR
   
   try {
     const client = getAnonClient(authHeader)
-    const token = authHeader.replace('Bearer ', '')
     
-    // Use getClaims for faster validation
-    const { data: claimsData, error: claimsError } = await client.auth.getClaims(token)
+    // Use getUser for reliable token validation
+    const { data: userData, error: userError } = await client.auth.getUser()
     
-    if (claimsError || !claimsData?.claims) {
+    if (userError || !userData?.user) {
       return { 
         success: false, 
         response: jsonError('Unauthorized', 401, requestId, undefined, origin)
@@ -288,8 +287,8 @@ export async function verifyAuth(req: Request, requestId: string): Promise<AuthR
     }
     
     const user = {
-      id: claimsData.claims.sub as string,
-      email: claimsData.claims.email as string | undefined
+      id: userData.user.id,
+      email: userData.user.email
     }
     
     return { success: true, user, client }

@@ -59,21 +59,42 @@ Deno.serve(async (req) => {
 
     if (profilesError) throw profilesError;
 
-    // Fetch emails from auth.users using service role
+    // Fetch emails and last_sign_in_at from auth.users using service role
     const { data: authUsers, error: authUsersError } = await adminClient.auth.admin.listUsers();
     if (authUsersError) throw authUsersError;
 
-    // Create a map of user_id -> email
-    const emailMap = new Map<string, string>();
+    // Create maps for user auth data
+    const authDataMap = new Map<string, { email: string; last_sign_in_at: string | null }>();
     authUsers.users.forEach(authUser => {
-      emailMap.set(authUser.id, authUser.email || '');
+      authDataMap.set(authUser.id, {
+        email: authUser.email || '',
+        last_sign_in_at: authUser.last_sign_in_at || null
+      });
     });
 
-    // Merge profiles with emails
-    const usersWithEmail = profiles?.map(profile => ({
-      ...profile,
-      email: emailMap.get(profile.id) || '-'
-    })) || [];
+    // Fetch user roles
+    const { data: userRoles } = await adminClient
+      .from('user_roles')
+      .select('user_id, role');
+
+    // Create map for roles
+    const rolesMap = new Map<string, string[]>();
+    userRoles?.forEach(ur => {
+      const existing = rolesMap.get(ur.user_id) || [];
+      existing.push(ur.role);
+      rolesMap.set(ur.user_id, existing);
+    });
+
+    // Merge profiles with auth data and roles
+    const usersWithEmail = profiles?.map(profile => {
+      const authData = authDataMap.get(profile.id);
+      return {
+        ...profile,
+        email: authData?.email || '-',
+        last_sign_in_at: authData?.last_sign_in_at || null,
+        roles: rolesMap.get(profile.id) || ['user']
+      };
+    }) || [];
 
     // Also fetch block stats
     const { data: blockStats } = await adminClient

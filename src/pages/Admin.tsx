@@ -1238,9 +1238,9 @@ const Admin = () => {
                         <tr className="border-b border-border">
                           <th className="text-left p-3 text-sm font-semibold">Name</th>
                           <th className="text-left p-3 text-sm font-semibold">E-Mail</th>
-                          <th className="text-left p-3 text-sm font-semibold">Telefon</th>
-                          <th className="text-left p-3 text-sm font-semibold">Blocks</th>
+                          <th className="text-left p-3 text-sm font-semibold">Role</th>
                           <th className="text-left p-3 text-sm font-semibold">Registriert</th>
+                          <th className="text-left p-3 text-sm font-semibold">Letzter Login</th>
                           <th className="text-left p-3 text-sm font-semibold">Status</th>
                           <th className="text-right p-3 text-sm font-semibold">Aktionen</th>
                         </tr>
@@ -1316,20 +1316,24 @@ const Admin = () => {
                                 </div>
                               </div>
                             </td>
-                            <td className="p-3 text-sm">{user.email || '-'}</td>
-                            <td className="p-3 text-sm">{user.phone_number || '-'}</td>
+                            <td className="p-3 text-sm font-mono text-xs">{user.email || '-'}</td>
                             <td className="p-3">
                               <div className="flex items-center gap-1">
-                                <span className="text-xs">↗{user.blocks_made_count || 0}</span>
-                                <span className="text-muted-foreground">/</span>
-                                <span className="text-xs">↙{user.blocks_received_count || 0}</span>
-                                {user.needs_review && (
-                                  <Badge variant="destructive" className="text-[10px] ml-1">⚠️</Badge>
+                                {user.roles?.includes('admin') && (
+                                  <Badge variant="default" className="text-[10px]">admin</Badge>
+                                )}
+                                {(!user.roles || user.roles.length === 0 || (user.roles.length === 1 && !user.roles.includes('admin'))) && (
+                                  <Badge variant="outline" className="text-[10px]">user</Badge>
                                 )}
                               </div>
                             </td>
                             <td className="p-3 text-sm">
                               {new Date(user.created_at).toLocaleDateString('de-CH')}
+                            </td>
+                            <td className="p-3 text-sm text-muted-foreground">
+                              {user.last_sign_in_at 
+                                ? new Date(user.last_sign_in_at).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+                                : '-'}
                             </td>
                             <td className="p-3">
                               <div className="flex items-center gap-1">
