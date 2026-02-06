@@ -19,7 +19,8 @@ import {
   Users,
   MessageSquare,
   CreditCard,
-  Lock
+  Lock,
+  Zap
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -92,6 +93,45 @@ const AdminHealth = () => {
       return data;
     },
     enabled: isAdmin === true,
+  });
+
+  // Fetch Stripe status
+  const { data: stripeStatus } = useQuery({
+    queryKey: ['stripeStatus'],
+    queryFn: async () => {
+      // Get current Stripe mode from admin_settings
+      const { data: modeData } = await supabase
+        .from('admin_settings')
+        .select('setting_value, updated_at')
+        .eq('setting_key', 'stripe_mode')
+        .single();
+
+      // Get last webhook event
+      const { data: webhookData } = await supabase
+        .from('stripe_webhook_events')
+        .select('*')
+        .order('processed_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      // Get webhook stats
+      const { data: statsData } = await supabase
+        .from('stripe_webhook_events')
+        .select('stripe_mode, success')
+        .gte('processed_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+      const testCount = statsData?.filter(e => e.stripe_mode === 'test').length || 0;
+      const liveCount = statsData?.filter(e => e.stripe_mode === 'live').length || 0;
+      const failedCount = statsData?.filter(e => !e.success).length || 0;
+
+      return {
+        currentMode: modeData?.setting_value ? JSON.parse(modeData.setting_value as string) : 'test',
+        lastWebhook: webhookData,
+        stats24h: { test: testCount, live: liveCount, failed: failedCount }
+      };
+    },
+    enabled: isAdmin === true,
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Run self-test mutation
@@ -262,6 +302,100 @@ const AdminHealth = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Stripe Status Card */}
+        <Card className="border-2 border-primary/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-primary" />
+              Stripe Zahlungssystem
+            </CardTitle>
+            <CardDescription>
+              Webhook-Status und Transaktionsübersicht
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Current Mode */}
+              <div className="p-4 rounded-lg bg-muted/50">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Aktueller Modus</span>
+                  <Badge 
+                    variant={stripeStatus?.currentMode === 'live' ? 'default' : 'secondary'}
+                    className={stripeStatus?.currentMode === 'live' ? 'bg-green-600' : 'bg-yellow-600'}
+                  >
+                    {stripeStatus?.currentMode === 'live' ? '🔴 LIVE' : '🟡 TEST'}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stripeStatus?.currentMode === 'live' 
+                    ? 'Echte Transaktionen aktiv' 
+                    : 'Sandbox-Modus für Tests'}
+                </p>
+              </div>
+
+              {/* Last Webhook */}
+              <div className="p-4 rounded-lg bg-muted/50">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Letzter Webhook</span>
+                  {stripeStatus?.lastWebhook?.success ? (
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                  ) : stripeStatus?.lastWebhook ? (
+                    <XCircle className="w-4 h-4 text-red-500" />
+                  ) : (
+                    <Clock className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </div>
+                {stripeStatus?.lastWebhook ? (
+                  <>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {stripeStatus.lastWebhook.event_type}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(stripeStatus.lastWebhook.processed_at).toLocaleString('de-DE')}
+                    </p>
+                    <Badge variant="outline" className="mt-1 text-xs">
+                      {stripeStatus.lastWebhook.stripe_mode}
+                    </Badge>
+                  </>
+                ) : (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Noch keine Webhooks empfangen
+                  </p>
+                )}
+              </div>
+
+              {/* 24h Stats */}
+              <div className="p-4 rounded-lg bg-muted/50">
+                <span className="text-sm font-medium">Letzte 24h</span>
+                <div className="flex gap-4 mt-2">
+                  <div className="text-center">
+                    <p className="text-lg font-bold">{stripeStatus?.stats24h?.test || 0}</p>
+                    <p className="text-xs text-muted-foreground">Test</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold">{stripeStatus?.stats24h?.live || 0}</p>
+                    <p className="text-xs text-muted-foreground">Live</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold text-destructive">{stripeStatus?.stats24h?.failed || 0}</p>
+                    <p className="text-xs text-muted-foreground">Fehler</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Warning if no webhooks configured */}
+            {!stripeStatus?.lastWebhook && (
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  Noch keine Stripe-Webhooks empfangen. Stellen Sie sicher, dass der Webhook in Stripe Dashboard konfiguriert ist.
+                </AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Run Self-Test Button */}
         <Card>
