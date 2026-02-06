@@ -42,6 +42,7 @@ const AddMeal = () => {
     description: '',
     ingredients: '',
     restaurantReferencePrice: '',
+    estimatedValue: '',
     portions: '1',
     scheduledDate: new Date().toISOString().split('T')[0],
     collectionWindowStart: '',
@@ -386,6 +387,11 @@ const AddMeal = () => {
         // Continue without translations if they fail
       }
 
+      // Parse estimated value (optional) - stored in cents
+      const estimatedValueCents = formData.estimatedValue 
+        ? Math.round(parseLocalizedNumber(formData.estimatedValue) * 100)
+        : null;
+
       const mealData = {
         chef_id: user.id,
         title: formData.title.trim(),
@@ -401,13 +407,13 @@ const AddMeal = () => {
         collection_window_end: formData.collectionWindowEnd || formData.collectionWindowStart,
         available_portions: parseInt(formData.portions) || 1,
         women_only: womenOnly,
-        visibility_mode: profile.visibility_mode || 'all', // Use chef's visibility preference
-        visibility_radius: visibilityRadius, // Chef-set distance limit in meters
-        // Map UI options to DB valid values: 'online' -> 'money', everything else -> 'barter'
+        visibility_mode: profile.visibility_mode || 'all',
+        visibility_radius: visibilityRadius,
         exchange_mode: selectedExchangeOptions.includes('online') ? 'money' : 'barter',
         pricing_minimum: selectedExchangeOptions.includes('online') ? priceCents : 0,
         pricing_suggested: selectedExchangeOptions.includes('online') ? priceCents : null,
         restaurant_reference_price: selectedExchangeOptions.includes('online') ? priceCents : null,
+        estimated_restaurant_value: estimatedValueCents,
         allergens: selectedAllergens.length > 0 ? selectedAllergens : null,
         tags: tags.length > 0 ? tags : null,
         is_stock_photo: useStockPhoto,
@@ -925,6 +931,34 @@ const AddMeal = () => {
                   );
                 })}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Estimated Restaurant Value - Optional */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">💰 {t('add_meal.estimated_value_title', 'Geschätzter Wert')}</CardTitle>
+              <CardDescription>
+                {t('add_meal.estimated_value_desc', 'Optional: Was würde dieses Gericht im Restaurant kosten? (Gesamtwert für alle Portionen)')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <span className="text-muted-foreground font-medium">CHF</span>
+                </div>
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  value={formData.estimatedValue}
+                  onChange={(e) => setFormData({ ...formData, estimatedValue: e.target.value })}
+                  placeholder={t('add_meal.estimated_value_placeholder', 'z.B. 35')}
+                  className="pl-14 h-11"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                {t('add_meal.estimated_value_hint', 'Hilft Gästen den Wert einzuschätzen. Wir zeigen "Geschätzter Wert" an.')}
+              </p>
             </CardContent>
           </Card>
 
