@@ -60,10 +60,17 @@ const visibilityModeOptions = [
   { value: 'all', label: '🌍 All Users (Alle Nutzer*innen)', allowedFor: ['woman', 'man', 'diverse', 'none'] },
 ];
 
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 const Profile = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  
+  // Local preview states for immediate feedback
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [partnerPhotoPreview, setPartnerPhotoPreview] = useState<string | null>(null);
   
   // Form state for editing (excludes first_name/last_name - read-only)
   const [formData, setFormData] = useState({
@@ -506,10 +513,14 @@ const Profile = () => {
               {/* Main User Avatar */}
               <div 
                 className="relative w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-3xl overflow-hidden group cursor-pointer"
-                onClick={() => !profile?.avatar_url && document.getElementById('avatar-upload')?.click()}
+                onClick={() => !profile?.avatar_url && !avatarPreview && document.getElementById('avatar-upload')?.click()}
               >
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt={t('profile.your_profile_photo')} className="w-full h-full object-cover" />
+                {(avatarPreview || profile?.avatar_url) ? (
+                  <img 
+                    src={avatarPreview || profile?.avatar_url} 
+                    alt={t('profile.your_profile_photo')} 
+                    className="w-full h-full object-cover" 
+                  />
                 ) : (
                   <span className="opacity-60 hover:opacity-100 transition-opacity">📷</span>
                 )}
@@ -523,43 +534,55 @@ const Profile = () => {
                 <input
                   id="avatar-upload"
                   type="file"
-                  accept="image/*"
+                  accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                   capture="user"
                   className="hidden"
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
 
-                    if (file.size > 5 * 1024 * 1024) {
+                    // Validate file size
+                    if (file.size > MAX_FILE_SIZE) {
                       toast.error(t('profile.file_too_large'));
                       return;
                     }
 
-                    if (!file.type.startsWith('image/')) {
+                    // Validate file type (jpg/png/webp only)
+                    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
                       toast.error(t('profile.images_only'));
                       return;
                     }
 
+                    // IMMEDIATE PREVIEW: Show preview before upload completes
+                    const previewUrl = URL.createObjectURL(file);
+                    setAvatarPreview(previewUrl);
+
                     try {
-                      const fileExt = file.name.split('.').pop();
+                      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
                       // Use folder structure: userId/filename for RLS policy compliance
-                      // IMPORTANT: Avatars go to 'avatars' bucket, NOT 'gallery' bucket
                       const fileName = `${currentUser.id}/avatar-${Date.now()}.${fileExt}`;
 
                       const { error: uploadError } = await supabase.storage
                         .from('avatars')
-                        .upload(fileName, file, { upsert: true });
+                        .upload(fileName, file, { 
+                          upsert: true,
+                          contentType: file.type,
+                        });
 
                       if (uploadError) {
                         console.error('Avatar upload error:', uploadError);
                         toast.error(`Upload fehlgeschlagen: ${uploadError.message}`);
+                        setAvatarPreview(null); // Clear preview on error
+                        URL.revokeObjectURL(previewUrl);
                         return;
                       }
 
+                      // Get public URL
                       const { data } = supabase.storage
                         .from('avatars')
                         .getPublicUrl(fileName);
 
+                      // CRITICAL: Store URL in database immediately
                       const { error: updateError } = await supabase
                         .from('profiles')
                         .update({ avatar_url: data.publicUrl })
@@ -567,14 +590,24 @@ const Profile = () => {
 
                       if (updateError) {
                         toast.error(`Speicherfehler: ${updateError.message}`);
+                        setAvatarPreview(null);
+                        URL.revokeObjectURL(previewUrl);
                         return;
                       }
 
                       toast.success(t('profile.profile_updated'));
-                      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                      
+                      // Invalidate and refetch to ensure UI syncs with DB
+                      await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                      
+                      // Clean up object URL after successful upload
+                      URL.revokeObjectURL(previewUrl);
+                      // Keep preview until query refetch completes, then it will use DB value
                     } catch (error: any) {
                       console.error('Upload error:', error);
                       toast.error(t('profile.upload_error') + ': ' + error.message);
+                      setAvatarPreview(null);
+                      URL.revokeObjectURL(previewUrl);
                     }
                   }}
                 />
@@ -584,8 +617,12 @@ const Profile = () => {
               {profile?.is_couple && (
                 <div className="space-y-1">
                   <div className="relative w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-3xl overflow-hidden group border-2 border-dashed border-border">
-                    {profile?.partner_photo_url ? (
-                      <img src={profile.partner_photo_url} alt={t('profile.partner_photo_title')} className="w-full h-full object-cover" />
+                    {(partnerPhotoPreview || profile?.partner_photo_url) ? (
+                      <img 
+                        src={partnerPhotoPreview || profile?.partner_photo_url} 
+                        alt={t('profile.partner_photo_title')} 
+                        className="w-full h-full object-cover" 
+                      />
                     ) : (
                       <span>👥</span>
                     )}
@@ -599,36 +636,45 @@ const Profile = () => {
                   <input
                     id="partner-avatar-upload"
                     type="file"
-                    accept="image/*"
+                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                     capture="user"
                     className="hidden"
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
 
-                      if (file.size > 5 * 1024 * 1024) {
+                      // Validate file size
+                      if (file.size > MAX_FILE_SIZE) {
                         toast.error(t('profile.file_too_large'));
                         return;
                       }
 
-                      if (!file.type.startsWith('image/')) {
+                      // Validate file type (jpg/png/webp only)
+                      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
                         toast.error(t('profile.images_only'));
                         return;
                       }
 
+                      // IMMEDIATE PREVIEW
+                      const previewUrl = URL.createObjectURL(file);
+                      setPartnerPhotoPreview(previewUrl);
+
                       try {
-                        const fileExt = file.name.split('.').pop();
-                        // Use folder structure: userId/filename for RLS policy compliance
-                        // Partner photos go to 'avatars' bucket like main avatar
+                        const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
                         const fileName = `${currentUser.id}/partner-${Date.now()}.${fileExt}`;
 
                         const { error: uploadError } = await supabase.storage
                           .from('avatars')
-                          .upload(fileName, file, { upsert: true });
+                          .upload(fileName, file, { 
+                            upsert: true,
+                            contentType: file.type,
+                          });
 
                         if (uploadError) {
                           console.error('Partner photo upload error:', uploadError);
                           toast.error(`Upload fehlgeschlagen: ${uploadError.message}`);
+                          setPartnerPhotoPreview(null);
+                          URL.revokeObjectURL(previewUrl);
                           return;
                         }
 
@@ -643,14 +689,19 @@ const Profile = () => {
 
                         if (updateError) {
                           toast.error(`Speicherfehler: ${updateError.message}`);
+                          setPartnerPhotoPreview(null);
+                          URL.revokeObjectURL(previewUrl);
                           return;
                         }
 
                         toast.success(t('profile.partner_photo_updated'));
-                        queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                        await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                        URL.revokeObjectURL(previewUrl);
                       } catch (error: any) {
                         console.error('Upload error:', error);
                         toast.error(t('profile.upload_error') + ': ' + error.message);
+                        setPartnerPhotoPreview(null);
+                        URL.revokeObjectURL(previewUrl);
                       }
                     }}
                   />
