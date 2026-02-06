@@ -799,7 +799,9 @@
     "radius_1km": "1km – My neighborhood",
     "submit_meal": "Publish Meal",
     "submitting": "Publishing...",
-    "meal_created": "Meal is live! Your neighbors will see it soon."
+    "meal_created": "Meal is live! Your neighbors will see it soon.",
+    "price_min_error": "Minimum CHF 7.00 (incl. fee)",
+    "price_max_error": "Maximum CHF 50.00. For catering, please contact us directly."
   },
   "feed_page": {
     "welcome_message": "Welcome to Neighbors Kitchen! This is a private food-sharing community. Please bring your own containers, respect the chefs' homes and pay fairly. Tap to close.",
