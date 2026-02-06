@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { BlockUserDialog } from '@/components/BlockUserDialog';
 import { ReportDialog } from '@/components/ReportDialog';
+import { VerificationBadge } from '@/components/VerificationBadge';
 
 interface Message {
   id: string;
@@ -248,8 +249,9 @@ const Chat = () => {
                 </div>
               </Avatar>
               <div>
-                <h2 className="font-semibold text-foreground">
+                <h2 className="font-semibold text-foreground flex items-center gap-1.5">
                   {otherPerson.first_name} {otherPerson.last_name}
+                  {otherPerson.id_verified && <VerificationBadge isVerified={true} size="sm" />}
                 </h2>
                 <p className="text-xs text-muted-foreground">{booking.meal.title}</p>
               </div>

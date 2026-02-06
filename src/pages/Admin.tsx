@@ -610,6 +610,44 @@ const Admin = () => {
     },
   });
 
+  // Toggle user verified status mutation (admin-only)
+  const toggleVerifiedMutation = useMutation({
+    mutationFn: async ({ userId, verified }: { userId: string; verified: boolean }) => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) throw new Error('Not authenticated');
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          id_verified: verified,
+          verification_status: verified ? 'approved' : 'pending'
+        })
+        .eq('id', userId);
+      
+      if (error) throw error;
+      
+      // Log the action
+      await supabase
+        .from('admin_actions')
+        .insert({
+          actor_id: currentUser.id,
+          target_id: userId,
+          action: verified ? 'verify_user' : 'unverify_user',
+          metadata: { id_verified: verified }
+        });
+      
+      return { userId, verified };
+    },
+    onSuccess: ({ verified }) => {
+      toast.success(verified ? 'Nutzer verifiziert ✓' : 'Verifizierung entfernt');
+      queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
+      queryClient.invalidateQueries({ queryKey: ['pendingVerifications'] });
+    },
+    onError: (error: Error) => {
+      toast.error('Fehler: ' + error.message);
+    },
+  });
+
   // Send profile reminders mutation
   const [isSendingReminders, setIsSendingReminders] = useState(false);
   
@@ -1307,8 +1345,8 @@ const Admin = () => {
                           <th className="text-left p-3 text-sm font-semibold">Name</th>
                           <th className="text-left p-3 text-sm font-semibold">E-Mail</th>
                           <th className="text-left p-3 text-sm font-semibold">Role</th>
+                          <th className="text-left p-3 text-sm font-semibold">Verifiziert</th>
                           <th className="text-left p-3 text-sm font-semibold">Registriert</th>
-                          <th className="text-left p-3 text-sm font-semibold">Letzter Login</th>
                           <th className="text-left p-3 text-sm font-semibold">Status</th>
                           <th className="text-right p-3 text-sm font-semibold">Aktionen</th>
                         </tr>
@@ -1412,13 +1450,26 @@ const Admin = () => {
                                 </SelectContent>
                               </Select>
                             </td>
+                            <td className="p-3">
+                              <Button
+                                variant={user.id_verified ? 'default' : 'outline'}
+                                size="sm"
+                                className="h-7 text-xs gap-1"
+                                onClick={() => toggleVerifiedMutation.mutate({ userId: user.id, verified: !user.id_verified })}
+                                disabled={toggleVerifiedMutation.isPending}
+                              >
+                                {user.id_verified ? (
+                                  <>
+                                    <CheckCircle className="w-3 h-3" />
+                                    Verifiziert
+                                  </>
+                                ) : (
+                                  'Verifizieren'
+                                )}
+                              </Button>
+                            </td>
                             <td className="p-3 text-sm">
                               {new Date(user.created_at).toLocaleDateString('de-CH')}
-                            </td>
-                            <td className="p-3 text-sm text-muted-foreground">
-                              {user.last_sign_in_at 
-                                ? new Date(user.last_sign_in_at).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
-                                : '-'}
                             </td>
                             <td className="p-3">
                               <div className="flex items-center gap-1">
