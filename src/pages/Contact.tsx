@@ -9,10 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Mail, Send, ArrowLeft, ShieldCheck } from 'lucide-react';
-
-// Turnstile site key from environment
-const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || '';
+import { Mail, Send, ArrowLeft, ShieldCheck, Loader2 } from 'lucide-react';
 
 // Declare Turnstile types
 declare global {
@@ -44,20 +41,41 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [captchaError, setCaptchaError] = useState(false);
+  const [siteKey, setSiteKey] = useState<string | null>(null);
+  const [isLoadingKey, setIsLoadingKey] = useState(true);
   const turnstileRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
 
-  // Initialize Turnstile widget
+  // Fetch Turnstile site key from edge function
   useEffect(() => {
-    if (!TURNSTILE_SITE_KEY) {
-      console.warn('Turnstile site key not configured');
+    const fetchSiteKey = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-turnstile-key');
+        if (error) throw error;
+        if (data?.siteKey) {
+          setSiteKey(data.siteKey);
+        } else {
+          console.warn('Turnstile site key not configured');
+        }
+      } catch (err) {
+        console.error('Failed to fetch Turnstile key:', err);
+      } finally {
+        setIsLoadingKey(false);
+      }
+    };
+    fetchSiteKey();
+  }, []);
+
+  // Initialize Turnstile widget when site key is available
+  useEffect(() => {
+    if (!siteKey) {
       return;
     }
 
     const initTurnstile = () => {
       if (turnstileRef.current && window.turnstile && !widgetIdRef.current) {
         widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
-          sitekey: TURNSTILE_SITE_KEY,
+          sitekey: siteKey,
           callback: (token: string) => {
             setCaptchaToken(token);
             setCaptchaError(false);
@@ -96,7 +114,7 @@ export default function Contact() {
         widgetIdRef.current = null;
       }
     };
-  }, [i18n.language]);
+  }, [siteKey, i18n.language]);
 
   const resetCaptcha = useCallback(() => {
     if (widgetIdRef.current && window.turnstile) {
@@ -255,15 +273,20 @@ export default function Contact() {
                 <ShieldCheck className="w-4 h-4 text-muted-foreground" />
                 {t('contact.captcha_label')}
               </Label>
-              <div 
-                ref={turnstileRef} 
-                className="flex justify-center"
-              />
+              {isLoadingKey ? (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : siteKey ? (
+                <div 
+                  ref={turnstileRef} 
+                  className="flex justify-center"
+                />
+              ) : (
+                <p className="text-sm text-muted-foreground">{t('contact.captcha_not_configured')}</p>
+              )}
               {captchaError && (
                 <p className="text-sm text-destructive">{t('contact.captcha_error')}</p>
-              )}
-              {!TURNSTILE_SITE_KEY && (
-                <p className="text-sm text-muted-foreground">{t('contact.captcha_not_configured')}</p>
               )}
             </div>
 
