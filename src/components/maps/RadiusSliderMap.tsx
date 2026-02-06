@@ -16,11 +16,14 @@ const RadiusSliderMap = ({ lat, lng, radius }: RadiusSliderMapProps) => {
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    // Initialize map
+    // Initialize map - enable all zoom/pan interactions
     const map = L.map(mapRef.current, {
-      scrollWheelZoom: false,
-      dragging: false,
-      zoomControl: false,
+      scrollWheelZoom: true,
+      touchZoom: true,
+      dragging: true,
+      zoomControl: true,
+      doubleClickZoom: true,
+      boxZoom: true,
     }).setView([lat, lng], 13);
     mapInstanceRef.current = map;
 

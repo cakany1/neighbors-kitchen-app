@@ -81,6 +81,7 @@ export function checkContentViolation(text: string): string | null {
 export function validateMealContent(title: string, description: string): { 
   isValid: boolean; 
   error?: string;
+  error_en?: string;
 } {
   const combinedText = `${title} ${description}`;
   const violation = checkContentViolation(combinedText);
@@ -88,7 +89,8 @@ export function validateMealContent(title: string, description: string): {
   if (violation) {
     return {
       isValid: false,
-      error: 'Bitte respektvolle Sprache verwenden.',
+      error: 'Bitte respektvolle Sprache verwenden. Beleidigende Inhalte sind nicht erlaubt.',
+      error_en: 'Please use respectful language. Offensive content is not allowed.',
     };
   }
   
