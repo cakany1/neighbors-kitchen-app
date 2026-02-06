@@ -2,6 +2,7 @@
  * Submit Contact Form Edge Function
  * 
  * Features:
+ * - Cloudflare Turnstile CAPTCHA verification (server-side)
  * - DB-based rate limiting (persistent across function restarts)
  * - Honeypot spam protection
  * - Input validation and sanitization
@@ -24,6 +25,50 @@ import {
 const RATE_LIMIT = parseInt(Deno.env.get('CONTACT_RATE_LIMIT') || '3')
 const RATE_WINDOW_MS = parseInt(Deno.env.get('CONTACT_RATE_WINDOW_MS') || '3600000') // 1 hour
 
+// Turnstile verification endpoint
+const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
+
+/**
+ * Verify Turnstile CAPTCHA token with Cloudflare
+ */
+async function verifyTurnstileToken(token: string, ip: string): Promise<{ success: boolean; error?: string }> {
+  const secretKey = Deno.env.get('TURNSTILE_SECRET_KEY')
+  
+  if (!secretKey) {
+    console.error('TURNSTILE_SECRET_KEY not configured')
+    return { success: false, error: 'CAPTCHA not configured' }
+  }
+
+  try {
+    const response = await fetch(TURNSTILE_VERIFY_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        secret: secretKey,
+        response: token,
+        remoteip: ip,
+      }),
+    })
+
+    const result = await response.json()
+    
+    if (result.success) {
+      return { success: true }
+    } else {
+      console.warn('Turnstile verification failed:', result['error-codes'])
+      return { 
+        success: false, 
+        error: result['error-codes']?.join(', ') || 'Verification failed' 
+      }
+    }
+  } catch (error) {
+    console.error('Turnstile verification error:', error)
+    return { success: false, error: 'Verification request failed' }
+  }
+}
+
 Deno.serve(async (req) => {
   const requestId = generateRequestId()
   const origin = req.headers.get('Origin')
@@ -37,7 +82,7 @@ Deno.serve(async (req) => {
   if (originError) return originError
 
   try {
-    // Get client IP for rate limiting
+    // Get client IP for rate limiting and CAPTCHA verification
     const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
                      req.headers.get('cf-connecting-ip') || 
                      'unknown'
@@ -67,7 +112,7 @@ Deno.serve(async (req) => {
       )
     }
 
-    const { name, email, message, website } = await req.json()
+    const { name, email, message, website, captchaToken } = await req.json()
 
     // Honeypot check - if 'website' field is filled, it's a bot
     if (website && website.trim() !== '') {
@@ -75,6 +120,41 @@ Deno.serve(async (req) => {
       // Return success to not alert the bot, but don't save
       return jsonSuccess({ success: true, requestId }, 200, origin)
     }
+
+    // CAPTCHA verification - REQUIRED
+    if (!captchaToken) {
+      safeLog(requestId, 'warn', 'Missing CAPTCHA token')
+      return new Response(
+        JSON.stringify({
+          error: 'Please complete the CAPTCHA verification.',
+          error_de: 'Bitte löse die CAPTCHA-Überprüfung.',
+          requestId
+        }),
+        {
+          status: 400,
+          headers: { ...getCorsHeaders(origin), 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    // Verify CAPTCHA token with Cloudflare
+    const captchaResult = await verifyTurnstileToken(captchaToken, clientIP)
+    if (!captchaResult.success) {
+      safeLog(requestId, 'warn', 'CAPTCHA verification failed', { error: captchaResult.error })
+      return new Response(
+        JSON.stringify({
+          error: 'CAPTCHA verification failed. Please try again.',
+          error_de: 'CAPTCHA-Überprüfung fehlgeschlagen. Bitte erneut versuchen.',
+          requestId
+        }),
+        {
+          status: 400,
+          headers: { ...getCorsHeaders(origin), 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    safeLog(requestId, 'info', 'CAPTCHA verified successfully')
 
     // Input validation
     if (!name || !email || !message) {

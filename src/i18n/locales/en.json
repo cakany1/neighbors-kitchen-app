@@ -641,7 +641,12 @@
     "error_title": "Error",
     "error_fill_all": "Please fill in all fields.",
     "error_send_failed": "Message could not be sent. Please try again later.",
-    "remove_email_text": " "
+    "remove_email_text": " ",
+    "captcha_label": "Security check",
+    "captcha_required": "Please complete the security check.",
+    "captcha_error": "Verification failed. Please try again.",
+    "captcha_hint": "Please solve the CAPTCHA to continue.",
+    "captcha_not_configured": "Security check not configured."
   },
   "modal": {
     "almost_done": "Almost done!",
