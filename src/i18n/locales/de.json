@@ -812,8 +812,7 @@
     "guest_modal_title": "Registriere dich, um dieses Essen zu retten!",
     "guest_modal_desc": "Du browsst gerade als Gast. Um Mahlzeiten zu buchen und mit Köchen zu chatten, musst du dich registrieren.",
     "register_now": "Jetzt registrieren",
-    "already_have_account": "Ich habe bereits einen Account",
-    "no_hits_nearby": "Keine Treffer in der Nähe – hier sind Angebote aus ganz Basel."
+    "already_have_account": "Ich habe bereits einen Account"
   },
   "toast": {
     "booking_sent": "Buchungsanfrage an {name} gesendet!",

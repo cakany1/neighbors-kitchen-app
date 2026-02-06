@@ -254,23 +254,32 @@ const Feed = () => {
   }, [finalMeals, userLat, userLon, userRadius, currentUser, filterSameAddress]);
 
   // Show "no results" toast ONLY when restrictive filter is active, and prevent duplicates
+  // Uses a composite key to ensure toast fires at most once per unique filter state
   useEffect(() => {
+    // No toast if no restrictive filter issue
     if (!noResultsInfo) {
       lastToastKeyRef.current = null;
       return;
     }
 
-    const toastKey = `${noResultsInfo.reason}-${noResultsInfo.radiusKm}`;
-    if (lastToastKeyRef.current === toastKey) return; // Prevent duplicate
+    // Build unique key for this filter state
+    const toastKey = `${noResultsInfo.reason}-${filterSameAddress}-${userRadius}`;
+    
+    // Skip if we already showed this exact toast
+    if (lastToastKeyRef.current === toastKey) {
+      return;
+    }
 
+    // Mark as shown BEFORE firing to prevent race conditions
     lastToastKeyRef.current = toastKey;
 
+    // Fire the appropriate toast based on reason
     if (noResultsInfo.reason === 'address') {
-      toast.info(t("feed.no_results_address"), { duration: 5000 });
+      toast.info(t("feed.no_results_address"), { duration: 5000, id: 'no-results-toast' });
     } else if (noResultsInfo.reason === 'radius') {
-      toast.info(t("feed.no_results_radius"), { duration: 5000 });
+      toast.info(t("feed.no_results_radius"), { duration: 5000, id: 'no-results-toast' });
     }
-  }, [noResultsInfo, t]);
+  }, [noResultsInfo?.reason, filterSameAddress, userRadius]);
 
   const handleDismissDisclaimer = () => {
     localStorage.setItem("disclaimerSeen", "true");
