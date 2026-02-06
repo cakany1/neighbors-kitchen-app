@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { exchangeOptions } from '@/utils/ingredientDatabase';
 import { hashToConsistentOffset } from '@/utils/fuzzyLocation';
 import { validateMealContent } from '@/utils/contentFilter';
+import { validatePrice, parseLocalizedNumber, MIN_PRICE_CHF, MAX_PRICE_CHF, mapDbPriceError } from '@/utils/priceValidation';
 import { TagSelector } from '@/components/meals/TagSelector';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -35,6 +36,7 @@ const AddMeal = () => {
   const [useStockPhoto, setUseStockPhoto] = useState(false);
   const [barterText, setBarterText] = useState('');
   const [containerPolicy, setContainerPolicy] = useState<'bring_container' | 'plate_ok' | 'either_ok'>('either_ok');
+  const [priceError, setPriceError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -235,20 +237,19 @@ const AddMeal = () => {
       return;
     }
 
-    // Validate minimum price if money is selected
-    const priceCents = formData.restaurantReferencePrice 
-      ? Math.round(parseFloat(formData.restaurantReferencePrice) * 100) 
-      : 0;
+    // Validate price using localized validation
+    const isMoneyMode = selectedExchangeOptions.includes('online');
+    const priceValidation = validatePrice(formData.restaurantReferencePrice, t, isMoneyMode);
     
-    if (selectedExchangeOptions.includes('online') && priceCents < 700) {
-      toast.error(t('add_meal.price_min_error'));
+    if (!priceValidation.isValid) {
+      toast.error(priceValidation.error);
+      setPriceError(priceValidation.error || null);
       return;
     }
-
-    if (selectedExchangeOptions.includes('online') && priceCents > 5000) {
-      toast.error(t('add_meal.price_max_error'));
-      return;
-    }
+    
+    const priceCents = formData.restaurantReferencePrice 
+      ? Math.round(parseLocalizedNumber(formData.restaurantReferencePrice) * 100) 
+      : 0;
 
     try {
       // Validate address data
@@ -406,7 +407,9 @@ const AddMeal = () => {
       if (insertError) {
         console.error('Insert error:', insertError);
         toast.dismiss(loadingToastId);
-        toast.error(`Fehler beim Erstellen: ${insertError.message || 'Bitte versuche es erneut.'}`);
+        // Map database constraint errors to localized messages
+        const friendlyError = mapDbPriceError(insertError.message || '', t);
+        toast.error(friendlyError || t('toast.meal_creation_error'));
         return;
       }
 
@@ -869,16 +872,30 @@ const AddMeal = () => {
                             </div>
                             <Input
                               id="price"
-                              type="number"
-                              step="0.50"
-                              min="7.00"
-                              max="50.00"
+                              type="text"
+                              inputMode="decimal"
                               value={formData.restaurantReferencePrice}
-                              onChange={(e) => setFormData({ ...formData, restaurantReferencePrice: e.target.value })}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setFormData({ ...formData, restaurantReferencePrice: val });
+                                // Real-time validation
+                                const validation = validatePrice(val, t, true);
+                                setPriceError(validation.isValid ? null : validation.error || null);
+                              }}
+                              onBlur={() => {
+                                // Validate on blur
+                                const validation = validatePrice(formData.restaurantReferencePrice, t, true);
+                                setPriceError(validation.isValid ? null : validation.error || null);
+                              }}
                               placeholder="12.00"
-                              className="pl-14 h-12 text-lg font-semibold text-right pr-4"
+                              className={`pl-14 h-12 text-lg font-semibold text-right pr-4 ${priceError ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                             />
                           </div>
+                          {priceError && (
+                            <p className="text-sm text-destructive font-medium">
+                              ⚠️ {priceError}
+                            </p>
+                          )}
                           <p className="text-xs text-muted-foreground">
                             {t('add_meal.price_hint')}
                           </p>
