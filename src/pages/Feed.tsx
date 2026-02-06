@@ -265,22 +265,39 @@ const Feed = () => {
           </p>
         </div>
 
-        {/* Same-Address Filter Toggle */}
-        {currentUser?.profile?.address_id && (
+        {/* Same-Address Filter Toggle - Always visible for logged-in users */}
+        {currentUser && (
           <div className="mb-4">
             <button
-              onClick={() => setFilterSameAddress(!filterSameAddress)}
+              onClick={() => {
+                if (!currentUser?.profile?.address_id) {
+                  toast.info(t("feed.no_address_set", "Bitte zuerst eine Adresse im Profil setzen"));
+                  return;
+                }
+                setFilterSameAddress(!filterSameAddress);
+              }}
               className={`w-full p-3 rounded-lg border-2 transition-all flex items-center gap-2 ${
-                filterSameAddress
+                filterSameAddress && currentUser?.profile?.address_id
                   ? 'border-secondary bg-secondary/10'
                   : 'border-border hover:border-secondary/50'
-              }`}
+              } ${!currentUser?.profile?.address_id ? 'opacity-60' : ''}`}
             >
               <Home className="w-4 h-4" />
               <span className="font-medium text-sm">
-                {filterSameAddress ? t("feed.my_address_only", "Nur meine Adresse") : t("feed.all_meals", "Alle Gerichte")}
+                {filterSameAddress && currentUser?.profile?.address_id 
+                  ? t("feed.my_address_only", "Nur meine Adresse") 
+                  : t("feed.all_meals", "Alle Gerichte")}
               </span>
+              {!currentUser?.profile?.address_id && (
+                <span className="text-xs text-muted-foreground ml-auto">(keine Adresse)</span>
+              )}
             </button>
+            {/* DEBUG: Show address_id values for verification */}
+            <div className="mt-2 p-2 bg-muted/50 rounded text-xs font-mono text-muted-foreground">
+              <div>my_address_id: {currentUser?.profile?.address_id || 'NULL'}</div>
+              <div>first_meal_address_id: {meals?.[0]?.address_id || 'NULL'}</div>
+              <div>filterSameAddress: {filterSameAddress ? 'true' : 'false'}</div>
+            </div>
           </div>
         )}
 
