@@ -215,12 +215,12 @@ const AddMeal = () => {
       : 0;
     
     if (selectedExchangeOptions.includes('online') && priceCents < 700) {
-      toast.error('Mindestpreis: CHF 7.00 (inkl. Gebühr)');
+      toast.error(t('add_meal.price_min_error'));
       return;
     }
 
     if (selectedExchangeOptions.includes('online') && priceCents > 5000) {
-      toast.error('Maximaler Preis: CHF 50.00. Für Catering kontaktiere uns bitte direkt.');
+      toast.error(t('add_meal.price_max_error'));
       return;
     }
 
