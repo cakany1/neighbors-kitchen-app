@@ -8,7 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock, Zap, UserCog } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock, Zap, UserCog, Download } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -293,7 +296,8 @@ const Admin = () => {
               first_name,
               last_name,
               nickname,
-              iban
+              iban,
+              last_payout_at
             )
           )
         `)
@@ -301,12 +305,21 @@ const Admin = () => {
 
       if (error) throw error;
 
+      // Get emails from admin-list-users edge function
+      const { data: usersData } = await supabase.functions.invoke('admin-list-users');
+      const emailMap = new Map(
+        usersData?.users?.map((u: any) => [u.id, u.email]) || []
+      );
+
       // Group by chef
       const groupedByChef = data?.reduce((acc: any, booking: any) => {
         const chefId = booking.meals.profiles.id;
         if (!acc[chefId]) {
           acc[chefId] = {
-            chef: booking.meals.profiles,
+            chef: {
+              ...booking.meals.profiles,
+              email: emailMap.get(chefId) || null,
+            },
             bookings: [],
             totalAmount: 0,
           };
@@ -449,24 +462,99 @@ const Admin = () => {
     },
   });
 
-  // Mark payout as paid mutation
+  // Payout note state
+  const [payoutNote, setPayoutNote] = useState('');
+  const [payoutDialogOpen, setPayoutDialogOpen] = useState(false);
+  const [selectedPayout, setSelectedPayout] = useState<any>(null);
+
+  // Mark payout as paid mutation (with note and audit logging)
   const markPaidMutation = useMutation({
-    mutationFn: async (bookingIds: string[]) => {
-      const { error } = await supabase
+    mutationFn: async ({ bookingIds, chefId, amount, note }: { 
+      bookingIds: string[]; 
+      chefId: string; 
+      amount: number;
+      note: string;
+    }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Update bookings to paid
+      const { error: bookingError } = await supabase
         .from('bookings')
         .update({ payout_status: 'paid' })
         .in('id', bookingIds);
 
-      if (error) throw error;
+      if (bookingError) throw bookingError;
+
+      // Update chef's last_payout_at
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ last_payout_at: new Date().toISOString() })
+        .eq('id', chefId);
+
+      if (profileError) throw profileError;
+
+      // Log to admin_actions for audit
+      const { error: auditError } = await supabase
+        .from('admin_actions')
+        .insert({
+          actor_id: user.id,
+          target_id: chefId,
+          action: 'payout_marked_paid',
+          metadata: {
+            booking_ids: bookingIds,
+            amount: amount,
+            note: note || null,
+            timestamp: new Date().toISOString(),
+          },
+        });
+
+      if (auditError) console.error('Audit log failed:', auditError);
     },
     onSuccess: () => {
       toast.success('Auszahlung als bezahlt markiert');
       queryClient.invalidateQueries({ queryKey: ['pendingPayouts'] });
+      setPayoutDialogOpen(false);
+      setPayoutNote('');
+      setSelectedPayout(null);
     },
     onError: () => {
       toast.error('Fehler beim Aktualisieren der Auszahlung');
     },
   });
+
+  // CSV Export function for payouts
+  const exportPayoutsCSV = () => {
+    if (!pendingPayouts || pendingPayouts.length === 0) {
+      toast.error('Keine Auszahlungen zum Exportieren');
+      return;
+    }
+
+    const headers = ['Vorname', 'Nachname', 'Email', 'IBAN', 'Betrag (CHF)', 'Letzte Auszahlung', 'Bookings'];
+    const rows = pendingPayouts.map((payout: any) => [
+      payout.chef.first_name || '',
+      payout.chef.last_name || '',
+      payout.chef.email || '',
+      payout.chef.iban || '',
+      payout.totalAmount.toFixed(2),
+      payout.chef.last_payout_at ? new Date(payout.chef.last_payout_at).toLocaleDateString('de-CH') : 'Nie',
+      payout.bookings.length.toString(),
+    ]);
+
+    const csvContent = [
+      headers.join(';'),
+      ...rows.map((row: string[]) => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(';'))
+    ].join('\n');
+
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `payouts_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('CSV exportiert');
+  };
 
   // FAQ request mutations
   const [faqAnswers, setFaqAnswers] = useState<Record<string, string>>({});
@@ -1798,11 +1886,19 @@ const Admin = () => {
           {/* Payouts Tab */}
           <TabsContent value="payouts" className="space-y-4">
             <Card>
-              <CardHeader>
-                <CardTitle>Auszahlungen / Payouts</CardTitle>
-                <CardDescription>
-                  Manage chef payout requests
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Auszahlungen / Payouts</CardTitle>
+                  <CardDescription>
+                    Manage chef payout requests
+                  </CardDescription>
+                </div>
+                {pendingPayouts && pendingPayouts.length > 0 && (
+                  <Button variant="outline" size="sm" onClick={exportPayoutsCSV}>
+                    <Download className="w-4 h-4 mr-2" />
+                    CSV Export
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
                 {payoutsLoading ? (
@@ -1820,15 +1916,26 @@ const Admin = () => {
                       <Card key={payout.chef.id} className="border-muted">
                         <CardContent className="pt-6">
                           <div className="flex items-start justify-between mb-4">
-                            <div>
+                            <div className="space-y-1">
                               <h3 className="font-semibold text-lg">
                                 {payout.chef.first_name} {payout.chef.last_name}
                               </h3>
                               <p className="text-sm text-muted-foreground">
                                 @{payout.chef.nickname}
                               </p>
-                              <p className="text-xs text-muted-foreground mt-1">
+                              {payout.chef.email && (
+                                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <Mail className="w-3 h-3" />
+                                  {payout.chef.email}
+                                </p>
+                              )}
+                              <p className="text-xs text-muted-foreground">
                                 IBAN: {payout.chef.iban || '⚠️ Missing'}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Letzte Auszahlung: {payout.chef.last_payout_at 
+                                  ? new Date(payout.chef.last_payout_at).toLocaleDateString('de-CH') 
+                                  : 'Nie'}
                               </p>
                             </div>
                             <div className="text-right">
@@ -1842,7 +1949,10 @@ const Admin = () => {
                           </div>
                           
                           <Button
-                            onClick={() => markPaidMutation.mutate(payout.bookings.map((b: any) => b.id))}
+                            onClick={() => {
+                              setSelectedPayout(payout);
+                              setPayoutDialogOpen(true);
+                            }}
                             disabled={markPaidMutation.isPending || !payout.chef.iban}
                             className="w-full"
                           >
@@ -1865,6 +1975,58 @@ const Admin = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Payout Confirmation Dialog */}
+            <Dialog open={payoutDialogOpen} onOpenChange={setPayoutDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Auszahlung bestätigen</DialogTitle>
+                  <DialogDescription>
+                    {selectedPayout && (
+                      <>
+                        Auszahlung an <strong>{selectedPayout.chef.first_name} {selectedPayout.chef.last_name}</strong> über <strong>CHF {selectedPayout.totalAmount.toFixed(2)}</strong> bestätigen?
+                      </>
+                    )}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="payout-note">Notiz (optional)</Label>
+                    <Textarea
+                      id="payout-note"
+                      placeholder="z.B. Überweisung am 06.02.2026, Ref: XYZ..."
+                      value={payoutNote}
+                      onChange={(e) => setPayoutNote(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => {
+                    setPayoutDialogOpen(false);
+                    setPayoutNote('');
+                    setSelectedPayout(null);
+                  }}>
+                    Abbrechen
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      if (selectedPayout) {
+                        markPaidMutation.mutate({
+                          bookingIds: selectedPayout.bookings.map((b: any) => b.id),
+                          chefId: selectedPayout.chef.id,
+                          amount: selectedPayout.totalAmount,
+                          note: payoutNote,
+                        });
+                      }
+                    }}
+                    disabled={markPaidMutation.isPending}
+                  >
+                    {markPaidMutation.isPending ? 'Wird gespeichert...' : 'Bestätigen'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
           {/* FAQ Requests Tab */}

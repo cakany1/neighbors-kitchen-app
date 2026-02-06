@@ -555,6 +555,7 @@ export type Database = {
           karma: number
           languages: string[] | null
           last_name: string
+          last_payout_at: string | null
           latitude: number | null
           longitude: number | null
           nickname: string | null
@@ -597,6 +598,7 @@ export type Database = {
           karma?: number
           languages?: string[] | null
           last_name: string
+          last_payout_at?: string | null
           latitude?: number | null
           longitude?: number | null
           nickname?: string | null
@@ -639,6 +641,7 @@ export type Database = {
           karma?: number
           languages?: string[] | null
           last_name?: string
+          last_payout_at?: string | null
           latitude?: number | null
           longitude?: number | null
           nickname?: string | null
