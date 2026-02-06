@@ -506,6 +506,10 @@ export type Database = {
           private_address: string | null
           private_city: string | null
           private_postal_code: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_details: string | null
+          rejection_reason: string | null
           role: string | null
           successful_pickups: number
           updated_at: string
@@ -544,6 +548,10 @@ export type Database = {
           private_address?: string | null
           private_city?: string | null
           private_postal_code?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_details?: string | null
+          rejection_reason?: string | null
           role?: string | null
           successful_pickups?: number
           updated_at?: string
@@ -582,6 +590,10 @@ export type Database = {
           private_address?: string | null
           private_city?: string | null
           private_postal_code?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_details?: string | null
+          rejection_reason?: string | null
           role?: string | null
           successful_pickups?: number
           updated_at?: string

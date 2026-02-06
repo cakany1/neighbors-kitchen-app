@@ -1511,6 +1511,8 @@ const Profile = () => {
               <VerificationDialog
                 userId={currentUser.id}
                 verificationStatus={profile?.verification_status || 'pending'}
+                rejectionReason={profile?.rejection_reason}
+                rejectionDetails={profile?.rejection_details}
                 onSuccess={() => queryClient.invalidateQueries({ queryKey: ['currentUser'] })}
               />
             )}

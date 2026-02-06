@@ -20,10 +20,21 @@ import { supabase } from '@/integrations/supabase/client';
 interface VerificationDialogProps {
   userId: string;
   verificationStatus: 'pending' | 'approved' | 'rejected';
+  rejectionReason?: string | null;
+  rejectionDetails?: string | null;
   onSuccess: () => void;
 }
 
-export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: VerificationDialogProps) => {
+const REASON_LABELS: Record<string, string> = {
+  blurred_photo: 'Unscharfes oder unlesbares Foto',
+  missing_document: 'Fehlendes Ausweisdokument',
+  incomplete_profile: 'Unvollständiges Profil',
+  duplicate_account: 'Duplikat-Konto erkannt',
+  document_mismatch: 'Daten stimmen nicht mit Dokument überein',
+  other: 'Anderer Grund',
+};
+
+export const VerificationDialog = ({ userId, verificationStatus, rejectionReason, rejectionDetails, onSuccess }: VerificationDialogProps) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [filePath, setFilePath] = useState('');
@@ -197,11 +208,20 @@ export const VerificationDialog = ({ userId, verificationStatus, onSuccess }: Ve
               </Label>
             </div>
           )}
-          {/* Rejection Notice */}
+          {/* Rejection Notice with Reason */}
           {verificationStatus === 'rejected' && (
             <Alert variant="destructive">
-              <AlertDescription className="text-xs">
-                Deine vorherige Verifizierung wurde abgelehnt. Bitte versuche es mit einem klareren Foto erneut.
+              <AlertDescription className="text-xs space-y-2">
+                <p className="font-semibold">Deine vorherige Verifizierung wurde abgelehnt.</p>
+                {rejectionReason && (
+                  <p>
+                    <span className="font-medium">Grund:</span> {REASON_LABELS[rejectionReason] || rejectionReason}
+                  </p>
+                )}
+                {rejectionDetails && (
+                  <p className="italic">"{rejectionDetails}"</p>
+                )}
+                <p className="mt-2">Bitte beachte die Hinweise oben und reiche erneut ein.</p>
               </AlertDescription>
             </Alert>
           )}
