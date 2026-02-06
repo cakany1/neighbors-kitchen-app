@@ -36,11 +36,11 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   const imageUrl = getProp(meal, "imageUrl", "image_url");
   const availablePortions = getProp(meal, "availablePortions", "available_portions");
 
-  // Pricing Logic
+  // Pricing Logic - values are stored in cents, convert to CHF
   const pricing = meal.pricing || {};
-  const pricingMin =
+  const pricingMinCents =
     getProp(pricing, "minimum", "pricing_minimum") ?? getProp(meal, "pricingMinimum", "pricing_minimum") ?? 0;
-  const minPrice = Number(pricingMin).toFixed(2);
+  const minPrice = (Number(pricingMinCents) / 100).toFixed(2);
 
   const location = meal.location || {};
   const neighborhood =
