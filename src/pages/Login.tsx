@@ -61,10 +61,11 @@ const Login = () => {
 
       if (isCustomDomain) {
         // Bypass auth-bridge for custom domains by getting OAuth URL directly (BYOK)
+        // For PKCE flow: redirect to app root - Supabase client handles token exchange
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: `${window.location.origin}/feed`,
+            redirectTo: window.location.origin, // Supabase appends tokens to this URL
             skipBrowserRedirect: true, // Critical: prevents redirect to preview domain
           },
         });

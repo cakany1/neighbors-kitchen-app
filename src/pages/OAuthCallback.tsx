@@ -7,7 +7,10 @@ import { Button } from '@/components/ui/button';
 /**
  * OAuth Callback Handler
  * This page handles the redirect from Google OAuth.
- * It processes the auth tokens from the URL and establishes the session.
+ * 
+ * Handles multiple OAuth flows:
+ * 1. Lovable Preview domains: Tokens come via auth-bridge
+ * 2. Custom domains (BYOK): Tokens in URL hash OR code exchange
  */
 const OAuthCallback = () => {
   const navigate = useNavigate();
@@ -18,24 +21,30 @@ const OAuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        const fullUrl = window.location.href;
+        console.log('OAuth Callback - Full URL:', fullUrl);
+        console.log('Search params:', location.search);
+        console.log('Hash:', location.hash);
+
         // Check for error in URL params (OAuth errors)
         const urlParams = new URLSearchParams(location.search);
         const errorParam = urlParams.get('error');
         const errorDescription = urlParams.get('error_description');
         
         if (errorParam) {
+          console.error('OAuth error from provider:', errorParam, errorDescription);
           setError(errorDescription || errorParam);
           setStatus('error');
           return;
         }
 
-        // Check for tokens in hash (Supabase OAuth returns tokens in hash)
+        // Method 1: Check for tokens in hash fragment (common for implicit flow)
         const hashParams = new URLSearchParams(location.hash.substring(1));
         const accessToken = hashParams.get('access_token');
         const refreshToken = hashParams.get('refresh_token');
         
         if (accessToken) {
-          // Set the session manually from hash params
+          console.log('Found tokens in hash, setting session...');
           const { data, error: sessionError } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken || '',
@@ -49,16 +58,44 @@ const OAuthCallback = () => {
           }
 
           if (data.session) {
+            console.log('Session established successfully from hash tokens');
             setStatus('success');
-            // Small delay to ensure session is fully established
-            setTimeout(() => {
-              navigate('/feed', { replace: true });
-            }, 500);
+            // Clear the URL and redirect
+            window.history.replaceState(null, '', '/');
+            setTimeout(() => navigate('/feed', { replace: true }), 300);
             return;
           }
         }
 
-        // If no tokens in hash, check if we already have a session
+        // Method 2: Check for authorization code (PKCE flow)
+        const code = urlParams.get('code');
+        if (code) {
+          console.log('Found authorization code, exchanging for session...');
+          // Supabase client automatically handles code exchange when it detects code in URL
+          // We just need to wait for the session
+          
+          // Give Supabase time to process the code
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          
+          if (sessionError) {
+            console.error('Code exchange error:', sessionError);
+            setError(sessionError.message);
+            setStatus('error');
+            return;
+          }
+          
+          if (session) {
+            console.log('Session established from code exchange');
+            setStatus('success');
+            setTimeout(() => navigate('/feed', { replace: true }), 300);
+            return;
+          }
+        }
+
+        // Method 3: Check if we already have a session (maybe callback already processed)
+        console.log('No tokens or code found, checking for existing session...');
         const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
         
         if (getSessionError) {
@@ -69,23 +106,35 @@ const OAuthCallback = () => {
         }
 
         if (session) {
+          console.log('Existing session found');
           setStatus('success');
           navigate('/feed', { replace: true });
           return;
         }
 
-        // No session and no tokens - something went wrong
-        // Wait a bit and try again (tokens might still be processing)
-        setTimeout(async () => {
-          const { data: { session: retrySession } } = await supabase.auth.getSession();
-          if (retrySession) {
+        // Method 4: Wait for auth state change (Supabase may still be processing)
+        console.log('No session yet, listening for auth state change...');
+        
+        let resolved = false;
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+          console.log('Auth state changed:', event, !!session);
+          if (session && !resolved) {
+            resolved = true;
+            subscription.unsubscribe();
             setStatus('success');
             navigate('/feed', { replace: true });
-          } else {
-            setError('Authentifizierung fehlgeschlagen. Bitte versuche es erneut.');
+          }
+        });
+
+        // Timeout fallback
+        setTimeout(() => {
+          if (!resolved) {
+            subscription.unsubscribe();
+            console.log('Auth callback timeout - no session established');
+            setError('Authentifizierung fehlgeschlagen. Die Sitzung konnte nicht erstellt werden.');
             setStatus('error');
           }
-        }, 2000);
+        }, 5000);
 
       } catch (err: any) {
         console.error('OAuth callback error:', err);
