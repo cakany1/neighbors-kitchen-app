@@ -437,7 +437,8 @@
   },
   "verification": {
     "phoneVerified": "Phone Verified",
-    "idVerified": "ID Verified"
+    "idVerified": "ID Verified",
+    "verified": "Verified"
   },
   "guestComposition": {
     "title": "Who will be visiting?",

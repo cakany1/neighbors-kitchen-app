@@ -516,27 +516,35 @@ const Profile = () => {
             )}
             
             <div className="flex items-center gap-4 mb-4">
-              {/* Main User Avatar */}
-              <div 
-                className="relative w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-3xl overflow-hidden group cursor-pointer"
-                onClick={() => !profile?.avatar_url && !avatarPreview && document.getElementById('avatar-upload')?.click()}
-              >
-                {(avatarPreview || profile?.avatar_url) ? (
-                  <img 
-                    src={avatarPreview || profile?.avatar_url} 
-                    alt={t('profile.your_profile_photo')} 
-                    className="w-full h-full object-cover" 
-                  />
-                ) : (
-                  <span className="opacity-60 hover:opacity-100 transition-opacity">📷</span>
-                )}
-                <label 
-                  htmlFor="avatar-upload" 
-                  className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                  title={t('profile.your_profile_photo')}
+              {/* Main User Avatar with Verified Badge */}
+              <div className="relative">
+                <div 
+                  className="relative w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-3xl overflow-hidden group cursor-pointer"
+                  onClick={() => !profile?.avatar_url && !avatarPreview && document.getElementById('avatar-upload')?.click()}
                 >
-                  <Upload className="w-6 h-6 text-white" />
-                </label>
+                  {(avatarPreview || profile?.avatar_url) ? (
+                    <img 
+                      src={avatarPreview || profile?.avatar_url} 
+                      alt={t('profile.your_profile_photo')} 
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <span className="opacity-60 hover:opacity-100 transition-opacity">📷</span>
+                  )}
+                  <label 
+                    htmlFor="avatar-upload" 
+                    className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    title={t('profile.your_profile_photo')}
+                  >
+                    <Upload className="w-6 h-6 text-white" />
+                  </label>
+                </div>
+                {/* Verified Badge positioned at bottom-right of avatar */}
+                {profile?.id_verified && (
+                  <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5" title={t('verification.verified')}>
+                    <VerificationBadge isVerified={true} size="md" />
+                  </div>
+                )}
                 <input
                   id="avatar-upload"
                   type="file"

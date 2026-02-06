@@ -451,7 +451,8 @@
   },
   "verification": {
     "phoneVerified": "Telefon verifiziert",
-    "idVerified": "ID verifiziert"
+    "idVerified": "ID verifiziert",
+    "verified": "Verifiziert"
   },
   "guestComposition": {
     "title": "Wer wird zu Besuch kommen?",
