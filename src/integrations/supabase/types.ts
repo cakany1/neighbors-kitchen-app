@@ -828,6 +828,39 @@ export type Database = {
           },
         ]
       }
+      stripe_webhook_events: {
+        Row: {
+          error_message: string | null
+          event_id: string
+          event_type: string
+          id: string
+          payload_summary: Json | null
+          processed_at: string
+          stripe_mode: string
+          success: boolean
+        }
+        Insert: {
+          error_message?: string | null
+          event_id: string
+          event_type: string
+          id?: string
+          payload_summary?: Json | null
+          processed_at?: string
+          stripe_mode: string
+          success?: boolean
+        }
+        Update: {
+          error_message?: string | null
+          event_id?: string
+          event_type?: string
+          id?: string
+          payload_summary?: Json | null
+          processed_at?: string
+          stripe_mode?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
