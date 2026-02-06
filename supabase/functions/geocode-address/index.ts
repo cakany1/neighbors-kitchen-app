@@ -100,14 +100,17 @@ Deno.serve(async (req) => {
 
     if (!results || results.length === 0) {
       safeLog(requestId, 'info', 'No geocoding results found', { query: addressQuery });
+      // Return success with null coordinates instead of error
+      // This allows the frontend to distinguish "not found" from "API error"
       return new Response(
         JSON.stringify({ 
-          error: 'Address not found',
           latitude: null,
           longitude: null,
+          display_name: null,
+          message: 'Address not found',
           requestId
         }),
-        { status: 404, headers: { ...getCorsHeaders(origin), ...rateLimitHeaders, 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...getCorsHeaders(origin), ...rateLimitHeaders, 'Content-Type': 'application/json' } }
       );
     }
 

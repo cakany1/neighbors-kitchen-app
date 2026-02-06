@@ -773,7 +773,9 @@
     "pickup_address": "Abholadresse",
     "pickup_address_hint": "Wo können Gäste das Essen abholen?",
     "change_address": "Adresse ändern",
-    "address_required": "Bitte gib eine Abholadresse ein"
+    "address_required": "Bitte gib eine Abholadresse ein",
+    "address_not_resolved": "Adresse konnte nicht gefunden werden. Bitte prüfe Strasse und Stadt.",
+    "geocoding_rate_limit": "Zu viele Anfragen. Bitte warte einen Moment und versuche es erneut."
   },
   "feed_page": {
     "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schliessen.",

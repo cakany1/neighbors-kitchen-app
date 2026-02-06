@@ -287,29 +287,49 @@ const AddMeal = () => {
         .single();
 
       // 1. Geocode chef's exact address
-      const { data: geoData, error: geoError } = await supabase.functions.invoke('geocode-address', {
-        body: {
-          street: addressData.street.trim(),
-          city: addressData.city.trim(),
-          postalCode: addressData.postalCode.trim() || ''
-        }
-      });
+      console.log('[AddMeal] Geocoding address:', addressData);
+      
+      let geoData = null;
+      let geoError = null;
+      
+      try {
+        const response = await supabase.functions.invoke('geocode-address', {
+          body: {
+            street: addressData.street.trim(),
+            city: addressData.city.trim(),
+            postalCode: addressData.postalCode.trim() || ''
+          }
+        });
+        geoData = response.data;
+        geoError = response.error;
+      } catch (invokeError) {
+        console.error('[AddMeal] Geocoding invoke error:', invokeError);
+        geoError = invokeError;
+      }
 
-      // Handle geocoding response with robust null checks
+      // Handle geocoding errors gracefully
       if (geoError) {
-        console.error('Geocoding error:', geoError);
+        console.error('[AddMeal] Geocoding error:', geoError);
         toast.dismiss(loadingToastId);
-        toast.error('Adresse konnte nicht gefunden werden. Bitte prüfe deine Profiladresse.');
+        // Check for rate limit error
+        if (geoError.message?.includes('Rate limit') || geoError.status === 429) {
+          toast.error(t('add_meal.geocoding_rate_limit'));
+        } else {
+          toast.error(t('add_meal.address_not_resolved'));
+        }
         return;
       }
 
-      // Check for valid coordinates (response uses 'latitude' and 'longitude', not 'lat' and 'lng')
+      // Check for valid coordinates - the API returns latitude/longitude as numbers
+      // It returns null values if the address was not found (404 response)
       if (!geoData || typeof geoData.latitude !== 'number' || typeof geoData.longitude !== 'number') {
-        console.error('Invalid geocoding response:', geoData);
+        console.error('[AddMeal] Invalid geocoding response:', geoData);
         toast.dismiss(loadingToastId);
-        toast.error('Adresse konnte nicht in Koordinaten umgewandelt werden. Bitte prüfe deine Profiladresse.');
+        toast.error(t('add_meal.address_not_resolved'));
         return;
       }
+      
+      console.log('[AddMeal] Geocoded successfully:', { lat: geoData.latitude, lng: geoData.longitude });
 
       // 2. Add CONSISTENT hash-based offset for fuzzy location (±300m ≈ ±0.003 degrees)
       // Using hash of user address ensures same offset for all meals from same location
