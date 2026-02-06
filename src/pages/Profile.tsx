@@ -79,6 +79,7 @@ const Profile = () => {
     gender: null as string | null,
     visibility_mode: 'all' as string,
     vacation_mode: false,
+    is_couple: false,
     notification_radius: 1000,
     allergens: [] as string[],
     dislikes: [] as string[],
@@ -194,6 +195,7 @@ const Profile = () => {
         gender: currentUser.profile.gender || null,
         visibility_mode: currentUser.profile.visibility_mode || 'all',
         vacation_mode: currentUser.profile.vacation_mode || false,
+        is_couple: currentUser.profile.is_couple || false,
         notification_radius: currentUser.profile.notification_radius || 1000,
         allergens: currentUser.profile.allergens || [],
         dislikes: currentUser.profile.dislikes || [],
@@ -275,6 +277,7 @@ const Profile = () => {
         gender: formData.gender || null,
         visibility_mode: formData.visibility_mode || 'all',
         vacation_mode: formData.vacation_mode,
+        is_couple: formData.is_couple,
         notification_radius: formData.notification_radius,
         allergens: formData.allergens,
         dislikes: formData.dislikes,
@@ -616,8 +619,8 @@ const Profile = () => {
                 />
               </div>
               
-              {/* Partner Avatar (if couple) */}
-              {profile?.is_couple && (
+              {/* Partner Avatar (if couple) - use formData for immediate toggle response */}
+              {formData.is_couple && (
                 <div className="space-y-1">
                   <div className="relative w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-3xl overflow-hidden group border-2 border-dashed border-border">
                     {(partnerPhotoPreview || profile?.partner_photo_url) ? (
@@ -917,9 +920,27 @@ const Profile = () => {
                 </p>
               </div>
             )}
+
+            {/* Couple Account Toggle */}
+            <div className="flex items-center justify-between py-3 border-t border-border">
+              <div className="space-y-0.5">
+                <Label htmlFor="is-couple" className="flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-primary" />
+                  {t('profile.couple_account')}
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {t('profile.couple_account_hint')}
+                </p>
+              </div>
+              <Switch
+                id="is-couple"
+                checked={formData.is_couple}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_couple: checked })}
+              />
+            </div>
             
             {/* Partner-Angaben (Nur für Paare) */}
-            {profile?.is_couple && (
+            {formData.is_couple && (
               <div className="pt-4 border-t border-border space-y-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Heart className="w-5 h-5 text-primary" />

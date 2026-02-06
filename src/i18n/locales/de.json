@@ -349,6 +349,8 @@
     "visibility_women_only_hint": "🔒 Nur weibliche Nutzerinnen sehen deine Gerichte",
     "visibility_women_fli_hint": "🌈 Frauen und Diverse/NB/Inter sehen deine Gerichte",
     "visibility_all_hint": "🌍 Alle Nutzer*innen sehen deine Gerichte",
+    "couple_account": "Paar-Konto",
+    "couple_account_hint": "Aktivieren, wenn ihr zu zweit Mahlzeiten teilt (Standard: 2 Portionen)",
     "partner_details": "Partner-Angaben (Nur für Paare)",
     "name_display_hint": "💡 Steuert, wie dein Name auf Mahlzeit-Karten angezeigt wird",
     "full_name_option": "Voller Name (Max Mustermann)",
