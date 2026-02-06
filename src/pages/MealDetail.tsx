@@ -14,6 +14,8 @@ import { TranslateButton } from "@/components/TranslateButton";
 import { ReportDialog } from "@/components/ReportDialog";
 import { AuthInterstitialModal } from "@/components/AuthInterstitialModal";
 import { ProfileWizard } from "@/components/ProfileWizard";
+import { VerificationBadge } from "@/components/VerificationBadge";
+import { RatingSummary } from "@/components/RatingSummary";
 import { checkAllergenMatch } from "@/utils/ingredientDatabase";
 import FuzzyLocationMap from "@/components/maps/FuzzyLocationMap";
 import ChatModal from "@/components/ChatModal";
@@ -446,13 +448,20 @@ const MealDetail = () => {
               <div className="flex items-center gap-2 text-muted-foreground">
                 <ChefHat className="w-4 h-4" />
                 <span
-                  className="hover:text-primary cursor-pointer transition-colors"
+                  className="hover:text-primary cursor-pointer transition-colors flex items-center gap-1"
                   onClick={() => navigate(`/profile/${meal.chef_id}`)}
                 >
                   {t("meal_detail.by")} {meal.chef?.first_name} {meal.chef?.last_name?.charAt(0)}.
+                  {meal.chef?.id_verified && <VerificationBadge isVerified={true} size="sm" />}
                 </span>
-                <Star className="w-4 h-4 fill-trust-gold text-trust-gold" />
-                <span className="text-trust-gold font-semibold">{meal.chef?.karma || 0}</span>
+              </div>
+              <div className="flex items-center gap-3 mt-1">
+                <RatingSummary userId={meal.chef_id} role="chef" size="sm" showLabel={false} />
+                <span className="text-muted-foreground">•</span>
+                <span className="flex items-center gap-1 text-sm">
+                  <Star className="w-3 h-3 fill-trust-gold text-trust-gold" />
+                  <span className="text-trust-gold font-medium">{meal.chef?.karma || 0}</span>
+                </span>
               </div>
             </div>
 
