@@ -25,6 +25,7 @@ import GalleryUpload from '@/components/GalleryUpload';
 import GalleryGrid from '@/components/GalleryGrid';
 import { BlockedUsersList } from '@/components/BlockedUsersList';
 import { FeedbackDialog } from '@/components/FeedbackDialog';
+import { generateAddressId } from '@/utils/addressHash';
 
 import { VerificationBadge } from '@/components/VerificationBadge';
 import { VerificationDialog } from '@/components/VerificationDialog';
@@ -273,6 +274,17 @@ const Profile = () => {
         }
       }
       
+      // TASK 18: Generate address_id when address is complete
+      let addressId = currentUser.profile?.address_id || null;
+      if (formData.private_address && formData.private_city) {
+        addressId = generateAddressId(
+          formData.private_address,
+          formData.private_city,
+          formData.private_postal_code || ''
+        );
+        console.log('[Profile] Generated address_id:', addressId);
+      }
+      
       const updateData: any = {
         nickname: formData.nickname || null,
         age: formData.age || null,
@@ -293,6 +305,7 @@ const Profile = () => {
         partner_gender: formData.partner_gender || null,
         latitude,
         longitude,
+        address_id: addressId, // TASK 18: Always save address_id
       };
 
       if (ibanUpdate !== undefined) {
@@ -308,7 +321,10 @@ const Profile = () => {
     },
     onSuccess: () => {
       toast.success('✅ Gespeichert');
+      // Invalidate queries so Feed immediately sees address_id
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      queryClient.invalidateQueries({ queryKey: ['meals'] });
+      queryClient.invalidateQueries({ queryKey: ['addMealUser'] });
       queryClient.invalidateQueries({ queryKey: ['chefWallet'] });
     },
     onError: (error: any) => {
