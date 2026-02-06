@@ -1349,6 +1349,11 @@ export type Database = {
         Returns: Json
       }
       cleanup_rate_limits: { Args: { max_age_hours?: number }; Returns: number }
+      djb2_hash: { Args: { input_text: string }; Returns: string }
+      generate_address_id: {
+        Args: { city: string; postal_code: string; street: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
