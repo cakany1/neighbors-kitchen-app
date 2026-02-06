@@ -16,7 +16,7 @@ const RadiusSliderMap = ({ lat, lng, radius }: RadiusSliderMapProps) => {
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    // Initialize map - enable all zoom/pan interactions
+    // Initialize map with ALL zoom/pan interactions explicitly enabled
     const map = L.map(mapRef.current, {
       scrollWheelZoom: true,
       touchZoom: true,
@@ -24,6 +24,8 @@ const RadiusSliderMap = ({ lat, lng, radius }: RadiusSliderMapProps) => {
       zoomControl: true,
       doubleClickZoom: true,
       boxZoom: true,
+      keyboard: true,
+      tap: true,
     }).setView([lat, lng], 13);
     mapInstanceRef.current = map;
 
@@ -41,26 +43,36 @@ const RadiusSliderMap = ({ lat, lng, radius }: RadiusSliderMapProps) => {
       weight: 2,
     }).addTo(map);
 
+    // Fit bounds to show the circle with padding
+    const bounds = circleRef.current.getBounds();
+    map.fitBounds(bounds, { padding: [20, 20] });
+
     // Cleanup on unmount
     return () => {
       map.remove();
       mapInstanceRef.current = null;
       circleRef.current = null;
     };
-  }, []);
+  }, [lat, lng]);
 
-  // Update circle radius when it changes
+  // Update circle radius when it changes and adjust view
   useEffect(() => {
-    if (circleRef.current) {
+    if (circleRef.current && mapInstanceRef.current) {
       circleRef.current.setRadius(radius * 1000);
+      // Fit bounds to show the updated circle
+      const bounds = circleRef.current.getBounds();
+      mapInstanceRef.current.fitBounds(bounds, { padding: [20, 20], animate: true });
     }
   }, [radius]);
 
   return (
     <div 
       ref={mapRef} 
-      className="w-full h-48 rounded-lg overflow-hidden border border-border"
-      style={{ zIndex: 0 }}
+      className="w-full h-48 rounded-lg overflow-hidden border border-border relative"
+      style={{ 
+        zIndex: 1,
+        touchAction: 'auto', // Allow touch gestures for pinch-zoom
+      }}
     />
   );
 };
