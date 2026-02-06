@@ -319,8 +319,15 @@ const Profile = () => {
 
       if (error) throw error;
     },
-    onSuccess: () => {
-      toast.success('✅ Gespeichert');
+    onSuccess: (_data, variables) => {
+      // TASK 18 DEBUG: Show saved address_id in toast
+      const savedAddressId = formData.private_address && formData.private_city
+        ? generateAddressId(formData.private_address, formData.private_city, formData.private_postal_code || '')
+        : null;
+      
+      toast.success(`✅ Gespeichert! address_id: ${savedAddressId || 'NULL'}`);
+      console.log('[Profile] Saved address_id:', savedAddressId);
+      
       // Invalidate queries so Feed immediately sees address_id
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
       queryClient.invalidateQueries({ queryKey: ['meals'] });
@@ -1122,6 +1129,19 @@ const Profile = () => {
             <p className="text-sm text-muted-foreground">
               {t('profile.settings_address_hint')}
             </p>
+            
+            {/* TASK 18 DEBUG: Show current address_id from DB */}
+            <div className="mt-3 p-3 bg-warning/20 border border-warning rounded text-xs font-mono">
+              <div className="font-bold text-foreground mb-1">🔍 TASK 18 DEBUG (Profile):</div>
+              <div>DB address_id: <strong>{profile?.address_id || 'NULL'}</strong></div>
+              <div>Form street: <strong>{formData.private_address || 'empty'}</strong></div>
+              <div>Form city: <strong>{formData.private_city || 'empty'}</strong></div>
+              <div>Would generate: <strong>
+                {formData.private_address && formData.private_city 
+                  ? generateAddressId(formData.private_address, formData.private_city, formData.private_postal_code || '')
+                  : 'NULL (need street+city)'}
+              </strong></div>
+            </div>
           </CardContent>
         </Card>
 
