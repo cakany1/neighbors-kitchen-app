@@ -925,5 +925,8 @@
     "done": "Let's go!",
     "explore_self": "Explore myself",
     "dont_show_again": "Don't show again"
+  },
+  "validation": {
+    "invalid_number": "Please enter a valid number."
   }
 }

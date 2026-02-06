@@ -920,5 +920,8 @@
     "done": "Los geht's!",
     "explore_self": "Selbst erkunden",
     "dont_show_again": "Nicht mehr anzeigen"
+  },
+  "validation": {
+    "invalid_number": "Bitte gib eine gültige Zahl ein."
   }
 }
