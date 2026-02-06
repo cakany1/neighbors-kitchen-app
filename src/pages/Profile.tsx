@@ -622,7 +622,11 @@ const Profile = () => {
               {/* Partner Avatar (if couple) - use formData for immediate toggle response */}
               {formData.is_couple && (
                 <div className="space-y-1">
-                  <div className="relative w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-3xl overflow-hidden group border-2 border-dashed border-border">
+                  <label 
+                    htmlFor="partner-avatar-upload" 
+                    className="relative w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-3xl overflow-hidden border-2 border-dashed border-border cursor-pointer block"
+                    title={t('profile.partner_photo_title')}
+                  >
                     {(partnerPhotoPreview || profile?.partner_photo_url) ? (
                       <img 
                         src={partnerPhotoPreview || profile?.partner_photo_url} 
@@ -632,14 +636,10 @@ const Profile = () => {
                     ) : (
                       <span>👥</span>
                     )}
-                    <label 
-                      htmlFor="partner-avatar-upload" 
-                      className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                      title={t('profile.partner_photo_title')}
-                    >
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                       <Upload className="w-6 h-6 text-white" />
-                    </label>
-                  </div>
+                    </div>
+                  </label>
                   <input
                     id="partner-avatar-upload"
                     type="file"
