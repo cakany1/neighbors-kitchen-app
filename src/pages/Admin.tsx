@@ -11,6 +11,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock, Zap, UserCog } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Helper function to check for incomplete profile fields
 const getProfileWarnings = (user: {
@@ -535,6 +536,35 @@ const Admin = () => {
     },
     onSuccess: ({ isDisabled }) => {
       toast.success(isDisabled ? 'Benutzer deaktiviert' : 'Benutzer reaktiviert');
+      queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
+    },
+    onError: (error: Error) => {
+      toast.error('Fehler: ' + error.message);
+    },
+  });
+
+  // Toggle user role mutation
+  const toggleRoleMutation = useMutation({
+    mutationFn: async ({ userId, makeAdmin }: { userId: string; makeAdmin: boolean }) => {
+      if (makeAdmin) {
+        // Add admin role
+        const { error } = await supabase
+          .from('user_roles')
+          .insert({ user_id: userId, role: 'admin' });
+        if (error) throw error;
+      } else {
+        // Remove admin role
+        const { error } = await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', userId)
+          .eq('role', 'admin');
+        if (error) throw error;
+      }
+      return { userId, makeAdmin };
+    },
+    onSuccess: ({ makeAdmin }) => {
+      toast.success(makeAdmin ? 'Admin-Rolle hinzugefügt' : 'Admin-Rolle entfernt');
       queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
     },
     onError: (error: Error) => {
@@ -1318,14 +1348,24 @@ const Admin = () => {
                             </td>
                             <td className="p-3 text-sm font-mono text-xs">{user.email || '-'}</td>
                             <td className="p-3">
-                              <div className="flex items-center gap-1">
-                                {user.roles?.includes('admin') && (
-                                  <Badge variant="default" className="text-[10px]">admin</Badge>
-                                )}
-                                {(!user.roles || user.roles.length === 0 || (user.roles.length === 1 && !user.roles.includes('admin'))) && (
-                                  <Badge variant="outline" className="text-[10px]">user</Badge>
-                                )}
-                              </div>
+                              <Select
+                                value={user.roles?.includes('admin') ? 'admin' : 'user'}
+                                onValueChange={(value) => {
+                                  toggleRoleMutation.mutate({ 
+                                    userId: user.id, 
+                                    makeAdmin: value === 'admin' 
+                                  });
+                                }}
+                                disabled={toggleRoleMutation.isPending}
+                              >
+                                <SelectTrigger className="w-24 h-7 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="user">user</SelectItem>
+                                  <SelectItem value="admin">admin</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </td>
                             <td className="p-3 text-sm">
                               {new Date(user.created_at).toLocaleDateString('de-CH')}
