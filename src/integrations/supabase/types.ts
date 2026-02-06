@@ -565,6 +565,7 @@ export type Database = {
           nickname: string | null
           no_shows: number
           notification_radius: number | null
+          notify_same_address_only: boolean | null
           partner_gender: string | null
           partner_name: string | null
           partner_photo_url: string | null
@@ -609,6 +610,7 @@ export type Database = {
           nickname?: string | null
           no_shows?: number
           notification_radius?: number | null
+          notify_same_address_only?: boolean | null
           partner_gender?: string | null
           partner_name?: string | null
           partner_photo_url?: string | null
@@ -653,6 +655,7 @@ export type Database = {
           nickname?: string | null
           no_shows?: number
           notification_radius?: number | null
+          notify_same_address_only?: boolean | null
           partner_gender?: string | null
           partner_name?: string | null
           partner_photo_url?: string | null

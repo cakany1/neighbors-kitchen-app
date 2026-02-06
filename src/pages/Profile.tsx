@@ -84,6 +84,7 @@ const Profile = () => {
     vacation_mode: false,
     is_couple: false,
     notification_radius: 1000,
+    notify_same_address_only: false,
     allergens: [] as string[],
     dislikes: [] as string[],
     languages: ['de'] as string[],
@@ -200,6 +201,7 @@ const Profile = () => {
         vacation_mode: currentUser.profile.vacation_mode || false,
         is_couple: currentUser.profile.is_couple || false,
         notification_radius: currentUser.profile.notification_radius || 1000,
+        notify_same_address_only: (currentUser.profile as any).notify_same_address_only || false,
         allergens: currentUser.profile.allergens || [],
         dislikes: currentUser.profile.dislikes || [],
         languages: currentUser.profile.languages || ['de'],
@@ -293,6 +295,7 @@ const Profile = () => {
         vacation_mode: formData.vacation_mode,
         is_couple: formData.is_couple,
         notification_radius: formData.notification_radius,
+        notify_same_address_only: formData.notify_same_address_only,
         allergens: formData.allergens,
         dislikes: formData.dislikes,
         languages: formData.languages,
@@ -305,7 +308,7 @@ const Profile = () => {
         partner_gender: formData.partner_gender || null,
         latitude,
         longitude,
-        address_id: addressId, // TASK 18: Always save address_id
+        address_id: addressId,
       };
 
       if (ibanUpdate !== undefined) {
@@ -319,16 +322,9 @@ const Profile = () => {
 
       if (error) throw error;
     },
-    onSuccess: (_data, variables) => {
-      // TASK 18 DEBUG: Show saved address_id in toast
-      const savedAddressId = formData.private_address && formData.private_city
-        ? generateAddressId(formData.private_address, formData.private_city, formData.private_postal_code || '')
-        : null;
-      
-      toast.success(`✅ Gespeichert! address_id: ${savedAddressId || 'NULL'}`);
-      console.log('[Profile] Saved address_id:', savedAddressId);
-      
-      // Invalidate queries so Feed immediately sees address_id
+    onSuccess: () => {
+      toast.success(t('toast.profile_saved', '✅ Gespeichert'));
+      // Invalidate queries so Feed immediately sees updated data
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
       queryClient.invalidateQueries({ queryKey: ['meals'] });
       queryClient.invalidateQueries({ queryKey: ['addMealUser'] });
@@ -1129,19 +1125,6 @@ const Profile = () => {
             <p className="text-sm text-muted-foreground">
               {t('profile.settings_address_hint')}
             </p>
-            
-            {/* TASK 18 DEBUG: Show current address_id from DB */}
-            <div className="mt-3 p-3 bg-warning/20 border border-warning rounded text-xs font-mono">
-              <div className="font-bold text-foreground mb-1">🔍 TASK 18 DEBUG (Profile):</div>
-              <div>DB address_id: <strong>{profile?.address_id || 'NULL'}</strong></div>
-              <div>Form street: <strong>{formData.private_address || 'empty'}</strong></div>
-              <div>Form city: <strong>{formData.private_city || 'empty'}</strong></div>
-              <div>Would generate: <strong>
-                {formData.private_address && formData.private_city 
-                  ? generateAddressId(formData.private_address, formData.private_city, formData.private_postal_code || '')
-                  : 'NULL (need street+city)'}
-              </strong></div>
-            </div>
           </CardContent>
         </Card>
 
@@ -1164,6 +1147,29 @@ const Profile = () => {
                 onCheckedChange={(checked) => setFormData({ ...formData, vacation_mode: checked })}
               />
             </div>
+
+            {/* Notification: Same address only toggle */}
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="notify-same-address" className="text-base">
+                  {t('profile.settings_notify_same_address', 'Nur Haus-Benachrichtigungen')}
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  {t('profile.settings_notify_same_address_desc', 'Nur über Essen aus meinem Haus informiert werden')}
+                </p>
+              </div>
+              <Switch
+                id="notify-same-address"
+                checked={formData.notify_same_address_only}
+                onCheckedChange={(checked) => setFormData({ ...formData, notify_same_address_only: checked })}
+                disabled={!currentUser?.profile?.address_id}
+              />
+            </div>
+            {!currentUser?.profile?.address_id && (
+              <p className="text-xs text-muted-foreground">
+                {t('profile.settings_notify_same_address_hint', 'Zuerst eine Adresse oben eingeben')}
+              </p>
+            )}
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
