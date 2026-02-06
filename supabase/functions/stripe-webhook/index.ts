@@ -1,33 +1,56 @@
+/**
+ * Stripe Webhook Edge Function
+ * Version: 2.0.0 - Live Ready
+ * 
+ * SECURITY FEATURES:
+ * - Cryptographic signature verification (HMAC-SHA256)
+ * - Environment-aware secrets (TEST vs LIVE)
+ * - Idempotency: duplicate events are ignored
+ * - Live/Test mode strict separation
+ * - No secrets in logs
+ * 
+ * Note: Webhooks come from Stripe servers, not browsers - no CORS needed
+ */
+
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.81.1";
 
-// Stripe webhooks come from Stripe's servers, not browsers, so no CORS needed
-// But we still need to verify the signature
-
+// Safe logger - never log secrets
 const logStep = (step: string, details?: Record<string, unknown>) => {
-  const safeDetails = details ? JSON.stringify(details) : '';
-  console.log(`[STRIPE-WEBHOOK] ${step}${safeDetails ? ` - ${safeDetails}` : ''}`);
+  // Mask sensitive fields
+  const safeDetails = details ? { ...details } : undefined;
+  if (safeDetails) {
+    const sensitiveKeys = ['secret', 'key', 'token', 'password', 'iban'];
+    for (const key of Object.keys(safeDetails)) {
+      if (sensitiveKeys.some(sk => key.toLowerCase().includes(sk))) {
+        safeDetails[key] = '***MASKED***';
+      }
+    }
+  }
+  const safeStr = safeDetails ? JSON.stringify(safeDetails) : '';
+  console.log(`[STRIPE-WEBHOOK] ${step}${safeStr ? ` - ${safeStr}` : ''}`);
 };
 
 /**
- * Determines Stripe mode from the event or secret key prefix
- * Test events have IDs starting with 'evt_' and objects with 'test' in livemode
+ * Determines Stripe mode from the event
  */
 function determineStripeMode(event: Stripe.Event): 'test' | 'live' {
-  // Stripe events have a livemode boolean property
   return event.livemode ? 'live' : 'test';
 }
 
 /**
  * Get the correct webhook secret based on mode
- * Supports both environment-specific secrets and fallback to generic secret
+ * LIVE mode requires STRIPE_WEBHOOK_SECRET_LIVE
+ * TEST mode uses STRIPE_WEBHOOK_SECRET_TEST or fallback
  */
 function getWebhookSecret(mode: 'test' | 'live' | null): string | null {
-  // Try mode-specific secrets first
   if (mode === 'live') {
     const liveSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET_LIVE');
     if (liveSecret) return liveSecret;
+    // CRITICAL: Do NOT fall back for LIVE mode - require explicit secret
+    logStep('ERROR: STRIPE_WEBHOOK_SECRET_LIVE not configured for LIVE mode');
+    return null;
   }
   
   if (mode === 'test') {
@@ -35,7 +58,7 @@ function getWebhookSecret(mode: 'test' | 'live' | null): string | null {
     if (testSecret) return testSecret;
   }
   
-  // Fall back to generic secret (for backwards compatibility)
+  // Fall back to generic secret for backwards compatibility (TEST only)
   return Deno.env.get('STRIPE_WEBHOOK_SECRET') || null;
 }
 
@@ -66,13 +89,13 @@ serve(async (req) => {
     // CRITICAL: Get the Stripe signature header
     const signature = req.headers.get('stripe-signature');
     if (!signature) {
-      logStep('ERROR: Missing stripe-signature header');
+      logStep('ERROR: Missing stripe-signature header - invalid_signature');
       return new Response('Missing signature', { status: 400 });
     }
 
     // Get the raw request body for signature verification
     const body = await req.text();
-    logStep('Received body length', { length: body.length });
+    logStep('Received body', { length: body.length });
 
     // Initialize Stripe
     const stripe = new Stripe(stripeSecretKey, {
@@ -84,16 +107,14 @@ serve(async (req) => {
       auth: { persistSession: false }
     });
 
-    // Try to determine mode from a preliminary parse (before signature verification)
-    // We'll verify with the correct secret based on mode
+    // Preliminary parse to determine mode (before signature verification)
     let preliminaryEvent: Stripe.Event | null = null;
     let stripeMode: 'test' | 'live' = 'test';
     
     try {
-      // Parse event without verification to determine mode
       preliminaryEvent = JSON.parse(body) as Stripe.Event;
       stripeMode = preliminaryEvent.livemode ? 'live' : 'test';
-      logStep('Detected Stripe mode from payload', { mode: stripeMode, livemode: preliminaryEvent.livemode });
+      logStep('Detected Stripe mode', { mode: stripeMode, livemode: preliminaryEvent.livemode });
     } catch {
       logStep('WARN: Could not parse preliminary event, defaulting to test mode');
     }
@@ -106,18 +127,18 @@ serve(async (req) => {
       
       // Record the failed event
       await supabase.from('stripe_webhook_events').insert({
-        event_id: preliminaryEvent?.id || 'unknown',
+        event_id: preliminaryEvent?.id || `unknown_${Date.now()}`,
         event_type: preliminaryEvent?.type || 'unknown',
         stripe_mode: stripeMode,
         success: false,
         error_message: `No webhook secret configured for ${stripeMode} mode`,
-        payload_summary: { attempted_mode: stripeMode }
-      });
+        payload_summary: { attempted_mode: stripeMode, error: 'missing_secret' }
+      }).onConflict('event_id').ignore();
       
       return new Response(`Server configuration error: No secret for ${stripeMode} mode`, { status: 500 });
     }
 
-    // CRITICAL: Verify webhook signature using constructEventAsync for Deno
+    // CRITICAL: Verify webhook signature using constructEventAsync
     let event: Stripe.Event;
     try {
       event = await stripe.webhooks.constructEventAsync(
@@ -128,7 +149,6 @@ serve(async (req) => {
         Stripe.createSubtleCryptoProvider()
       );
       
-      // Confirm mode from verified event
       stripeMode = determineStripeMode(event);
       logStep('Signature verification PASSED', { 
         eventType: event.type, 
@@ -138,19 +158,44 @@ serve(async (req) => {
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      logStep('ERROR: Signature verification FAILED', { error: errorMessage, attemptedMode: stripeMode });
+      logStep('ERROR: Signature verification FAILED - invalid_signature', { attemptedMode: stripeMode });
       
-      // Record the failed verification attempt
+      // Record the failed verification attempt (idempotent)
       await supabase.from('stripe_webhook_events').insert({
-        event_id: preliminaryEvent?.id || 'unknown',
+        event_id: preliminaryEvent?.id || `invalid_${Date.now()}`,
         event_type: preliminaryEvent?.type || 'unknown',
         stripe_mode: stripeMode,
         success: false,
-        error_message: `Signature verification failed: ${errorMessage}`,
-        payload_summary: { error: errorMessage }
-      });
+        error_message: `Signature verification failed: invalid_signature`,
+        payload_summary: { error: 'invalid_signature' }
+      }).onConflict('event_id').ignore();
       
-      return new Response(`Webhook signature verification failed: ${errorMessage}`, { status: 400 });
+      return new Response(`Webhook signature verification failed`, { status: 400 });
+    }
+
+    // ===== IDEMPOTENCY CHECK =====
+    // Check if we've already processed this event
+    const { data: existingEvent } = await supabase
+      .from('stripe_webhook_events')
+      .select('id, success')
+      .eq('event_id', event.id)
+      .maybeSingle();
+
+    if (existingEvent) {
+      logStep('DUPLICATE: Event already processed, ignoring', { 
+        eventId: event.id, 
+        previousSuccess: existingEvent.success 
+      });
+      // Return 200 OK for duplicates - Stripe expects success
+      return new Response(JSON.stringify({ 
+        received: true, 
+        type: event.type,
+        mode: stripeMode,
+        duplicate: true
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     // Log the successful webhook receipt
@@ -161,6 +206,7 @@ serve(async (req) => {
 
     // Handle different event types
     let processingError: string | null = null;
+    let bookingId: string | null = null;
     
     try {
       switch (event.type) {
@@ -174,7 +220,6 @@ serve(async (req) => {
           logStep('Processing checkout.session.completed', {
             sessionId: session.id,
             paymentStatus: session.payment_status,
-            customerId: session.customer,
             mode: stripeMode,
           });
 
@@ -192,7 +237,7 @@ serve(async (req) => {
           const chefContribution = session.metadata?.chef_contribution;
 
           if (!mealId || !userId) {
-            logStep('WARNING: Missing metadata', { mealId, userId });
+            logStep('WARNING: Missing metadata in session', { mealId: !!mealId, userId: !!userId });
             payloadSummary.warning = 'Missing metadata';
             break;
           }
@@ -200,25 +245,32 @@ serve(async (req) => {
           // Find the booking and update payment status
           const { data: booking, error: findError } = await supabase
             .from('bookings')
-            .select('id')
+            .select('id, status')
             .eq('meal_id', mealId)
             .eq('guest_id', userId)
-            .eq('status', 'confirmed')
+            .in('status', ['pending', 'confirmed'])
             .single();
 
           if (findError || !booking) {
             logStep('WARNING: Booking not found', { mealId, userId, error: findError?.message });
-            payloadSummary.warning = 'Booking not found';
+            payloadSummary.warning = 'booking_not_found';
+            payloadSummary.meal_id = mealId;
+            payloadSummary.user_id = userId;
             break;
           }
 
-          // Update booking with payment info
-          // IMPORTANT: In TEST mode, we still update the booking but the payment is simulated
+          bookingId = booking.id;
+
+          // CRITICAL: In LIVE mode, mark as pending payout
+          // In TEST mode, mark as test_mode (never goes to real payout)
+          const payoutStatus = stripeMode === 'live' ? 'pending' : 'test_mode';
+
           const { error: updateError } = await supabase
             .from('bookings')
             .update({
               payment_amount: chefContribution ? parseInt(chefContribution) : session.amount_total,
-              payout_status: stripeMode === 'live' ? 'pending' : 'test_mode',
+              payout_status: payoutStatus,
+              status: 'confirmed', // Ensure confirmed after payment
               updated_at: new Date().toISOString(),
             })
             .eq('id', booking.id);
@@ -232,10 +284,11 @@ serve(async (req) => {
               bookingId: booking.id, 
               amount: chefContribution,
               mode: stripeMode,
-              payoutStatus: stripeMode === 'live' ? 'pending' : 'test_mode'
+              payoutStatus
             });
             payloadSummary.booking_id = booking.id;
             payloadSummary.amount = chefContribution;
+            payloadSummary.payout_status = payoutStatus;
           }
           break;
         }
@@ -286,18 +339,26 @@ serve(async (req) => {
       payloadSummary.processing_error = processingError;
     }
 
-    // Record the webhook event for admin visibility
+    // Record the webhook event (with idempotency via unique constraint)
     const { error: insertError } = await supabase.from('stripe_webhook_events').insert({
       event_id: event.id,
       event_type: event.type,
       stripe_mode: stripeMode,
       success: !processingError,
       error_message: processingError,
-      payload_summary: payloadSummary
+      payload_summary: {
+        ...payloadSummary,
+        ...(bookingId && { booking_id: bookingId })
+      }
     });
 
     if (insertError) {
-      logStep('WARN: Failed to record webhook event', { error: insertError.message });
+      // If insert fails due to duplicate, that's fine (idempotency)
+      if (insertError.code === '23505') {
+        logStep('IDEMPOTENCY: Duplicate event insert ignored', { eventId: event.id });
+      } else {
+        logStep('WARN: Failed to record webhook event', { error: insertError.message });
+      }
     }
 
     // Update the current Stripe mode in admin_settings
@@ -309,8 +370,7 @@ serve(async (req) => {
         updated_at: new Date().toISOString()
       }, { onConflict: 'setting_key' });
 
-    // Always return 200 to acknowledge receipt (even if processing had issues)
-    // Stripe will retry on non-2xx responses
+    // Always return 200 to acknowledge receipt
     return new Response(JSON.stringify({ 
       received: true, 
       type: event.type,
