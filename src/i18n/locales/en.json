@@ -931,6 +931,7 @@
     "dont_show_again": "Don't show again"
   },
   "validation": {
-    "invalid_number": "Please enter a valid number."
+    "invalid_number": "Please enter a valid number.",
+    "content_rejected": "Please use respectful language. Offensive content is not allowed."
   }
 }
