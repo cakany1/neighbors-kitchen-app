@@ -2,6 +2,7 @@ import { ChefHat, User, HelpCircle, Shield, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -19,12 +20,20 @@ export const Header = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  // Check if user is authenticated
+  // Check if user is authenticated and get profile
   const { data: currentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      return user;
+      if (!user) return null;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('avatar_url, first_name')
+        .eq('id', user.id)
+        .single();
+      
+      return { ...user, profile };
     },
   });
 
@@ -133,9 +142,15 @@ export const Header = () => {
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="rounded-full p-0 w-8 h-8"
                   aria-label="Benutzermenü"
                 >
-                  <User className="w-5 h-5" />
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={currentUser.profile?.avatar_url || undefined} alt="Profile" />
+                    <AvatarFallback className="bg-primary/10">
+                      <User className="w-4 h-4" />
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
