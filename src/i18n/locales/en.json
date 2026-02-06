@@ -933,5 +933,13 @@
   "validation": {
     "invalid_number": "Please enter a valid number.",
     "content_rejected": "Please use respectful language. Offensive content is not allowed."
+  },
+  "ratings": {
+    "title": "Ratings",
+    "as_chef": "As Chef",
+    "as_guest": "As Guest",
+    "no_ratings_yet": "No ratings yet",
+    "review": "Review",
+    "reviews": "Reviews"
   }
 }

@@ -32,6 +32,7 @@ import { TwoFactorSettings } from '@/components/TwoFactorSettings';
 import { ReliabilityDisplay } from '@/components/ReliabilityDisplay';
 import { KarmaLevel } from '@/components/KarmaLevel';
 import { ChefBookings } from '@/components/ChefBookings';
+import { ProfileRatings } from '@/components/ProfileRatings';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -778,6 +779,13 @@ const Profile = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Ratings Display */}
+        {currentUser?.id && (
+          <div className="mb-6">
+            <ProfileRatings userId={currentUser.id} />
+          </div>
+        )}
 
         {/* Persönliche Angaben */}
         <Card className="mb-6">
