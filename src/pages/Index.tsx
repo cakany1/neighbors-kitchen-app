@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,12 +7,47 @@ import { ChefHat, Shield, Heart, Globe } from 'lucide-react';
 import { HeroFeedTeaser } from '@/components/HeroFeedTeaser';
 import { Footer } from '@/components/Footer';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, i18n } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
   
+  // Handle OAuth callback tokens that land on root (custom domain BYOK flow)
+  useEffect(() => {
+    const handleOAuthTokens = async () => {
+      const hash = location.hash;
+      
+      // Check if we have OAuth tokens in the URL hash
+      if (hash && hash.includes('access_token')) {
+        console.log('OAuth tokens detected on Index page, processing...');
+        const hashParams = new URLSearchParams(hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        
+        if (accessToken) {
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || '',
+          });
+          
+          if (data.session) {
+            console.log('Session established from OAuth tokens');
+            // Clear the hash and redirect to feed
+            window.history.replaceState(null, '', window.location.pathname);
+            navigate('/feed', { replace: true });
+            return;
+          } else if (error) {
+            console.error('Failed to set session from tokens:', error);
+          }
+        }
+      }
+    };
+    
+    handleOAuthTokens();
+  }, [location.hash, navigate]);
 
   useEffect(() => {
     // Device detection
