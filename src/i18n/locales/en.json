@@ -769,6 +769,8 @@
     "available_on": "Available on",
     "location": "Location",
     "delete": "Delete",
+    "admin_delete": "Delete (Admin)",
+    "admin_delete_success": "Meal deleted by admin",
     "report": "Report",
     "confirm_delete": "Do you really want to delete this meal? This action cannot be undone.",
     "delete_success": "Meal successfully deleted",

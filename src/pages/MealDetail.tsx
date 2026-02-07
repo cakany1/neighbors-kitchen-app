@@ -72,7 +72,15 @@ const MealDetail = () => {
       // User can access their own full profile
       const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
 
-      return { ...user, profile };
+      // Check if user is admin
+      const { data: adminRole } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      return { ...user, profile, isAdmin: !!adminRole };
     },
   });
 
@@ -350,11 +358,14 @@ const MealDetail = () => {
     mutationFn: async () => {
       if (!currentUser?.id || !meal) throw new Error("Missing user or meal");
 
+      // Check if user is admin deleting another user's meal
+      const isAdminDelete = (currentUser as any).isAdmin && currentUser.id !== meal.chef_id;
+
       // Call server-side function that handles karma penalty
       const { data, error } = await supabase.rpc("delete_meal_with_karma", {
         p_meal_id: meal.id,
         p_user_id: currentUser.id,
-        p_is_admin: false, // Regular user deletion
+        p_is_admin: isAdminDelete, // Admin delete = no karma penalty
       });
 
       if (error) throw error;
@@ -370,6 +381,8 @@ const MealDetail = () => {
     onSuccess: (result) => {
       if (result.karma_penalty && result.karma_penalty < 0) {
         toast.success(t("meal_detail.karma_penalty_applied"));
+      } else if ((currentUser as any).isAdmin && currentUser?.id !== meal?.chef_id) {
+        toast.success(t("meal_detail.admin_delete_success"));
       } else {
         toast.success(t("meal_detail.delete_success"));
       }
@@ -503,19 +516,26 @@ const MealDetail = () => {
 
             {/* Report or Delete Button */}
             <div className="flex flex-col items-end gap-1">
-              {currentUser?.id === meal.chef_id ? (
+              {(currentUser?.id === meal.chef_id || (currentUser as any)?.isAdmin) ? (
                 <>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDeleteMeal()}
                     className="text-muted-foreground hover:text-destructive"
-                    title={t("meal_detail.delete")}
+                    title={
+                      (currentUser as any)?.isAdmin && currentUser?.id !== meal.chef_id
+                        ? t("meal_detail.admin_delete")
+                        : t("meal_detail.delete")
+                    }
                   >
                     <Trash2 className="w-5 h-5" />
                   </Button>
-                  {isWithinGentlemanMinutes && (
+                  {isWithinGentlemanMinutes && currentUser?.id === meal.chef_id && (
                     <span className="text-xs text-muted-foreground">{t("meal_detail.delete_free_hint")}</span>
+                  )}
+                  {(currentUser as any)?.isAdmin && currentUser?.id !== meal.chef_id && (
+                    <span className="text-xs text-muted-foreground">Admin</span>
                   )}
                 </>
               ) : (
