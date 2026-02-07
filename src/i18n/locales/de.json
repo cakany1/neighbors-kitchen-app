@@ -729,6 +729,8 @@
     "available_on": "Verfügbar am",
     "location": "Standort",
     "delete": "Löschen",
+    "admin_delete": "Löschen (Admin)",
+    "admin_delete_success": "Gericht von Admin gelöscht",
     "report": "Melden",
     "confirm_delete": "Möchtest du dieses Gericht wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
     "delete_success": "Gericht wurde erfolgreich gelöscht",
