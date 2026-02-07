@@ -80,9 +80,14 @@ const AddMeal = () => {
       
       const { data: profile } = await supabase
         .from('profiles')
-        .select('gender, avatar_url, private_address, private_city, private_postal_code')
+        .select('gender, avatar_url, private_address, private_city, private_postal_code, is_couple, verification_status, partner_verification_status')
         .eq('id', user.id)
         .single();
+      
+      // Check if couple is fully verified
+      const isCoupleFullyVerified = profile?.is_couple 
+        ? (profile.verification_status === 'approved' && (profile as any).partner_verification_status === 'approved')
+        : true; // Non-couples don't need partner verification
       
       return { 
         id: user.id, 
@@ -92,6 +97,10 @@ const AddMeal = () => {
         privateAddress: profile?.private_address || '',
         privateCity: profile?.private_city || '',
         privatePostalCode: profile?.private_postal_code || '',
+        isCouple: profile?.is_couple || false,
+        verificationStatus: profile?.verification_status || 'pending',
+        partnerVerificationStatus: (profile as any)?.partner_verification_status || 'pending',
+        isCoupleFullyVerified,
       };
     },
     staleTime: 0, // Always fetch fresh data
@@ -468,6 +477,52 @@ const AddMeal = () => {
           <h1 className="text-2xl font-bold text-foreground mb-2">{t('add_meal.page_title')}</h1>
           <p className="text-muted-foreground">{t('add_meal.page_subtitle')}</p>
         </div>
+
+        {/* Couple Verification Block */}
+        {currentUser?.isCouple && !currentUser?.isCoupleFullyVerified && (
+          <Alert className="mb-6 border-orange-500 bg-orange-500/10">
+            <Shield className="h-5 w-5 text-orange-500" />
+            <AlertDescription className="space-y-3">
+              <div>
+                <strong className="text-orange-600 dark:text-orange-400">{t('add_meal.couple_verification_blocked')}</strong>
+                <p className="text-sm mt-1">{t('add_meal.couple_verification_blocked_desc')}</p>
+              </div>
+              <div className="flex flex-col gap-2 text-sm">
+                {currentUser.verificationStatus !== 'approved' && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-destructive">❌</span>
+                    <span>{t('add_meal.your_verification_missing')}</span>
+                  </div>
+                )}
+                {currentUser.verificationStatus === 'approved' && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-500">✅</span>
+                    <span>{t('add_meal.your_verification_done')}</span>
+                  </div>
+                )}
+                {currentUser.partnerVerificationStatus !== 'approved' && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-destructive">❌</span>
+                    <span>{t('add_meal.partner_verification_missing')}</span>
+                  </div>
+                )}
+                {currentUser.partnerVerificationStatus === 'approved' && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-500">✅</span>
+                    <span>{t('add_meal.partner_verification_done')}</span>
+                  </div>
+                )}
+              </div>
+              <Button 
+                variant="outline" 
+                className="w-full border-orange-500 hover:bg-orange-500/20"
+                onClick={() => navigate('/profile')}
+              >
+                {t('add_meal.go_to_verification')}
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title & Description */}

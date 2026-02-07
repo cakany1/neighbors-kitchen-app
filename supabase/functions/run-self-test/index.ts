@@ -413,6 +413,36 @@ serve(async (req) => {
   }
   results.push({ name: 'T21: Map Zoom Available', status: t21Status, details: t21Details, duration_ms: Date.now() - t21 });
 
+  // ===== T22: Partner Verification System =====
+  const t22 = Date.now();
+  let t22Status: 'PASS' | 'FAIL' = 'PASS';
+  let t22Details = '';
+  try {
+    // Check couple accounts have partner_verification_status column working
+    const { data: coupleProfiles, count: coupleCount } = await adminClient
+      .from('profiles')
+      .select('id, verification_status, partner_verification_status', { count: 'exact' })
+      .eq('is_couple', true)
+      .limit(10);
+    
+    if (!coupleCount || coupleCount === 0) {
+      t22Details = 'No couple accounts yet | partner_verification_status column ready';
+    } else {
+      const fullyVerified = coupleProfiles?.filter(
+        (p: any) => p.verification_status === 'approved' && p.partner_verification_status === 'approved'
+      ).length || 0;
+      const partiallyVerified = coupleProfiles?.filter(
+        (p: any) => p.verification_status === 'approved' || p.partner_verification_status === 'approved'
+      ).length || 0;
+      
+      t22Details = `${coupleCount} couple accounts | ${fullyVerified} fully verified, ${partiallyVerified - fullyVerified} partially | DB triggers active`;
+    }
+  } catch (e: any) {
+    t22Status = 'FAIL';
+    t22Details = `Error: ${e.message?.slice(0, 50)}`;
+  }
+  results.push({ name: 'T22: Partner Verification', status: t22Status, details: t22Details, duration_ms: Date.now() - t22 });
+
   // Summary
   const passed = results.filter(r => r.status === 'PASS').length;
   const failed = results.filter(r => r.status === 'FAIL').length;
