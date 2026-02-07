@@ -407,7 +407,20 @@
     "2fa_disable_failed": "2FA konnte nicht deaktiviert werden.",
     "partner_photo_uploaded": "Partner-Foto hochgeladen",
     "partner_photo_missing": "Kein Partner-Foto vorhanden",
-    "upload_via_avatar_section": "Du kannst das Foto oben im Profilbereich hochladen"
+    "upload_via_avatar_section": "Du kannst das Foto oben im Profilbereich hochladen",
+    "your_verification": "Deine Verifizierung",
+    "partner_verification": "Partner-Verifizierung",
+    "partner_verified": "Partner verifiziert",
+    "partner_blue_tick": "Dein Partner hat den blauen Haken erhalten",
+    "partner_verification_pending": "Partner-Verifizierung ausstehend",
+    "partner_checking_verification": "Wir prüfen die Identität deines Partners",
+    "partner_verification_required": "Partner-Verifizierung erforderlich",
+    "partner_verification_required_desc": "Als Paar-Account müssen beide Partner verifiziert werden, bevor ihr Gerichte anbieten oder Buchungen annehmen könnt.",
+    "upload_partner_id": "Partner-Ausweis hochladen",
+    "partner_id_uploaded": "Partner-Ausweis hochgeladen! Wir prüfen die Identität.",
+    "partner_id_hint": "Lade einen Ausweis (Pass, ID) deines Partners hoch. Wird nach Verifizierung automatisch gelöscht.",
+    "couple_verification_warning": "Paar-Verifizierung unvollständig",
+    "couple_verification_warning_desc": "Beide Partner müssen verifiziert sein, um Gerichte zu veröffentlichen und Buchungen zu bestätigen."
   },
   "guidelines": {
     "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (ausser beim Vor-Ort-Essen)",
@@ -803,7 +816,14 @@
     "estimated_value_title": "Geschätzter Wert",
     "estimated_value_desc": "Optional: Was würde dieses Gericht im Restaurant kosten? (Gesamtwert für alle Portionen)",
     "estimated_value_placeholder": "z.B. 35",
-    "estimated_value_hint": "Hilft Gästen den Wert einzuschätzen. Wir zeigen 'Geschätzter Wert' an."
+    "estimated_value_hint": "Hilft Gästen den Wert einzuschätzen. Wir zeigen 'Geschätzter Wert' an.",
+    "couple_verification_blocked": "Paar-Verifizierung erforderlich",
+    "couple_verification_blocked_desc": "Als Paar-Account müssen beide Partner verifiziert sein, bevor ihr Gerichte anbieten könnt.",
+    "your_verification_missing": "Deine Verifizierung fehlt",
+    "your_verification_done": "Du bist verifiziert",
+    "partner_verification_missing": "Partner-Verifizierung fehlt",
+    "partner_verification_done": "Partner ist verifiziert",
+    "go_to_verification": "Zur Verifizierung gehen"
   },
   "feed_page": {
     "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schliessen.",

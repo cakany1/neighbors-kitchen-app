@@ -275,7 +275,20 @@
     "2fa_disable_failed": "Could not disable 2FA.",
     "partner_photo_uploaded": "Partner photo uploaded",
     "partner_photo_missing": "No partner photo uploaded",
-    "upload_via_avatar_section": "You can upload the photo in the avatar section above"
+    "upload_via_avatar_section": "You can upload the photo in the avatar section above",
+    "your_verification": "Your Verification",
+    "partner_verification": "Partner Verification",
+    "partner_verified": "Partner Verified",
+    "partner_blue_tick": "Your partner has received the blue checkmark",
+    "partner_verification_pending": "Partner Verification Pending",
+    "partner_checking_verification": "We're verifying your partner's identity",
+    "partner_verification_required": "Partner Verification Required",
+    "partner_verification_required_desc": "As a couple account, both partners must be verified before you can offer meals or accept bookings.",
+    "upload_partner_id": "Upload Partner ID",
+    "partner_id_uploaded": "Partner ID uploaded! We're verifying the identity.",
+    "partner_id_hint": "Upload your partner's ID (passport, national ID). Will be automatically deleted after verification.",
+    "couple_verification_warning": "Couple Verification Incomplete",
+    "couple_verification_warning_desc": "Both partners must be verified to publish meals and accept bookings."
   },
   "auth": {
     "welcome_back": "Welcome back!",
@@ -843,7 +856,14 @@
     "estimated_value_title": "Estimated Value",
     "estimated_value_desc": "Optional: What would this dish cost at a restaurant? (Total value for all portions)",
     "estimated_value_placeholder": "e.g. 35",
-    "estimated_value_hint": "Helps guests understand the value. We display it as 'Estimated Value'."
+    "estimated_value_hint": "Helps guests understand the value. We display it as 'Estimated Value'.",
+    "couple_verification_blocked": "Couple Verification Required",
+    "couple_verification_blocked_desc": "As a couple account, both partners must be verified before you can offer meals.",
+    "your_verification_missing": "Your verification is missing",
+    "your_verification_done": "You are verified",
+    "partner_verification_missing": "Partner verification is missing",
+    "partner_verification_done": "Partner is verified",
+    "go_to_verification": "Go to Verification"
   },
   "feed_page": {
     "welcome_message": "Welcome to Neighbors Kitchen! This is a private food-sharing community. Please bring your own containers, respect the chefs' homes and pay fairly. Tap to close.",

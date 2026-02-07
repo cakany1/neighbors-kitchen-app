@@ -405,7 +405,7 @@ const AdminHealth = () => {
               End-to-End Self-Test
             </CardTitle>
             <CardDescription>
-              21 automatisierte Tests: Profile, Meals, Pricing, Content Filter, Privacy, Stripe Webhooks, Admin Roles, Map Coords
+              22 automatisierte Tests: Profile, Meals, Pricing, Content Filter, Privacy, Stripe, Admin, Map, Partner Verification
             </CardDescription>
           </CardHeader>
           <CardContent>

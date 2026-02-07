@@ -1646,30 +1646,141 @@ const Profile = () => {
             <p className="text-sm text-muted-foreground">
               {t('profile.verification_optional_desc')}
             </p>
-            {profile?.verification_status === 'approved' || profile?.id_verified ? (
-              <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
-                <div className="text-2xl">✅</div>
-                <div>
-                  <p className="font-semibold text-green-600 dark:text-green-400">{t('profile.verified_profile')}</p>
-                  <p className="text-xs text-muted-foreground">{t('profile.blue_tick_received')}</p>
+            
+            {/* Primary User Verification */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{t('profile.your_verification')}</Label>
+              {profile?.verification_status === 'approved' || profile?.id_verified ? (
+                <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <div className="text-2xl">✅</div>
+                  <div>
+                    <p className="font-semibold text-green-600 dark:text-green-400">{t('profile.verified_profile')}</p>
+                    <p className="text-xs text-muted-foreground">{t('profile.blue_tick_received')}</p>
+                  </div>
                 </div>
-              </div>
-            ) : profile?.verification_status === 'pending' ? (
-              <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                <div className="text-2xl">⏳</div>
-                <div>
-                  <p className="font-semibold text-yellow-600 dark:text-yellow-400">{t('profile.verification_pending')}</p>
-                  <p className="text-xs text-muted-foreground">{t('profile.checking_verification')}</p>
+              ) : profile?.verification_status === 'pending' ? (
+                <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                  <div className="text-2xl">⏳</div>
+                  <div>
+                    <p className="font-semibold text-yellow-600 dark:text-yellow-400">{t('profile.verification_pending')}</p>
+                    <p className="text-xs text-muted-foreground">{t('profile.checking_verification')}</p>
+                  </div>
                 </div>
+              ) : (
+                <VerificationDialog
+                  userId={currentUser.id}
+                  verificationStatus={profile?.verification_status || 'pending'}
+                  rejectionReason={profile?.rejection_reason}
+                  rejectionDetails={profile?.rejection_details}
+                  onSuccess={() => queryClient.invalidateQueries({ queryKey: ['currentUser'] })}
+                />
+              )}
+            </div>
+            
+            {/* Partner Verification - Only shown for couples */}
+            {formData.is_couple && (
+              <div className="space-y-2 pt-4 border-t border-border">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-primary" />
+                  {t('profile.partner_verification')}
+                </Label>
+                
+                {(profile as any)?.partner_verification_status === 'approved' ? (
+                  <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                    <div className="text-2xl">✅</div>
+                    <div>
+                      <p className="font-semibold text-green-600 dark:text-green-400">{t('profile.partner_verified')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.partner_blue_tick')}</p>
+                    </div>
+                  </div>
+                ) : (profile as any)?.partner_verification_status === 'pending' && (profile as any)?.partner_id_document_url ? (
+                  <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                    <div className="text-2xl">⏳</div>
+                    <div>
+                      <p className="font-semibold text-yellow-600 dark:text-yellow-400">{t('profile.partner_verification_pending')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.partner_checking_verification')}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <Alert className="border-orange-500/50 bg-orange-500/10">
+                      <AlertCircle className="h-4 w-4 text-orange-500" />
+                      <AlertDescription className="text-sm">
+                        <strong>{t('profile.partner_verification_required')}</strong>
+                        <br />
+                        {t('profile.partner_verification_required_desc')}
+                      </AlertDescription>
+                    </Alert>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="partner-id-upload" className="text-sm">{t('profile.upload_partner_id')}</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          id="partner-id-upload"
+                          type="file"
+                          accept="image/*"
+                          className="flex-1"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file || !currentUser?.id) return;
+                            
+                            if (file.size > 5 * 1024 * 1024) {
+                              toast.error(t('toast.file_too_large'));
+                              return;
+                            }
+                            
+                            try {
+                              const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+                              const fileName = `${currentUser.id}/partner-id.${fileExt}`;
+                              
+                              const { error: uploadError } = await supabase.storage
+                                .from('id-documents')
+                                .upload(fileName, file, { upsert: true });
+                              
+                              if (uploadError) throw uploadError;
+                              
+                              const { data } = supabase.storage
+                                .from('id-documents')
+                                .getPublicUrl(fileName);
+                              
+                              // Update profile with partner document URL and set status to pending
+                              await supabase
+                                .from('profiles')
+                                .update({ 
+                                  partner_id_document_url: data.publicUrl,
+                                  partner_verification_status: 'pending' as any
+                                })
+                                .eq('id', currentUser.id);
+                              
+                              toast.success(t('profile.partner_id_uploaded'));
+                              queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                            } catch (error: any) {
+                              toast.error(t('toast.upload_failed') + ': ' + error.message);
+                            }
+                          }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {t('profile.partner_id_hint')}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-            ) : (
-              <VerificationDialog
-                userId={currentUser.id}
-                verificationStatus={profile?.verification_status || 'pending'}
-                rejectionReason={profile?.rejection_reason}
-                rejectionDetails={profile?.rejection_details}
-                onSuccess={() => queryClient.invalidateQueries({ queryKey: ['currentUser'] })}
-              />
+            )}
+            
+            {/* Couple Verification Warning */}
+            {formData.is_couple && (
+              (profile?.verification_status !== 'approved' || (profile as any)?.partner_verification_status !== 'approved') && (
+                <Alert className="border-yellow-500/50 bg-yellow-500/10">
+                  <Shield className="h-4 w-4 text-yellow-600" />
+                  <AlertDescription className="text-sm">
+                    <strong>{t('profile.couple_verification_warning')}</strong>
+                    <br />
+                    {t('profile.couple_verification_warning_desc')}
+                  </AlertDescription>
+                </Alert>
+              )
             )}
           </CardContent>
         </Card>

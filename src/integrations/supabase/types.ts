@@ -567,8 +567,10 @@ export type Database = {
           notification_radius: number | null
           notify_same_address_only: boolean | null
           partner_gender: string | null
+          partner_id_document_url: string | null
           partner_name: string | null
           partner_photo_url: string | null
+          partner_verification_status: Database["public"]["Enums"]["verification_status"]
           phone_number: string | null
           phone_verified: boolean | null
           private_address: string | null
@@ -612,8 +614,10 @@ export type Database = {
           notification_radius?: number | null
           notify_same_address_only?: boolean | null
           partner_gender?: string | null
+          partner_id_document_url?: string | null
           partner_name?: string | null
           partner_photo_url?: string | null
+          partner_verification_status?: Database["public"]["Enums"]["verification_status"]
           phone_number?: string | null
           phone_verified?: boolean | null
           private_address?: string | null
@@ -657,8 +661,10 @@ export type Database = {
           notification_radius?: number | null
           notify_same_address_only?: boolean | null
           partner_gender?: string | null
+          partner_id_document_url?: string | null
           partner_name?: string | null
           partner_photo_url?: string | null
+          partner_verification_status?: Database["public"]["Enums"]["verification_status"]
           phone_number?: string | null
           phone_verified?: boolean | null
           private_address?: string | null
@@ -1226,6 +1232,9 @@ export type Database = {
           partner_gender: string | null
           partner_name: string | null
           partner_photo_url: string | null
+          partner_verification_status:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
           phone_verified: boolean | null
           role: string | null
           successful_pickups: number | null
@@ -1257,6 +1266,9 @@ export type Database = {
           partner_gender?: string | null
           partner_name?: string | null
           partner_photo_url?: string | null
+          partner_verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
           phone_verified?: boolean | null
           role?: string | null
           successful_pickups?: number | null
@@ -1288,6 +1300,9 @@ export type Database = {
           partner_gender?: string | null
           partner_name?: string | null
           partner_photo_url?: string | null
+          partner_verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
           phone_verified?: boolean | null
           role?: string | null
           successful_pickups?: number | null
@@ -1368,6 +1383,7 @@ export type Database = {
         Args: { p_booking_id: string; p_reason?: string }
         Returns: Json
       }
+      is_couple_fully_verified: { Args: { user_id: string }; Returns: boolean }
       mark_no_show: {
         Args: { p_booking_id: string; p_is_guest_noshow?: boolean }
         Returns: Json
