@@ -420,7 +420,19 @@
     "partner_id_uploaded": "Partner-Ausweis hochgeladen! Wir prüfen die Identität.",
     "partner_id_hint": "Lade einen Ausweis (Pass, ID) deines Partners hoch. Wird nach Verifizierung automatisch gelöscht.",
     "couple_verification_warning": "Paar-Verifizierung unvollständig",
-    "couple_verification_warning_desc": "Beide Partner müssen verifiziert sein, um Gerichte zu veröffentlichen und Buchungen zu bestätigen."
+    "couple_verification_warning_desc": "Beide Partner müssen verifiziert sein, um Gerichte zu veröffentlichen und Buchungen zu bestätigen.",
+    "photo_verification_title": "Foto-Verifizierung",
+    "photo_verified_badge": "✓ Foto verifiziert",
+    "photo_not_verified": "Foto noch nicht verifiziert",
+    "photo_verification_pending": "Foto-Verifizierung ausstehend",
+    "photo_verification_hint": "Dein Profilfoto muss von einem Admin verifiziert werden, bevor du Women-Only Gerichte anbieten kannst.",
+    "partner_photo_verified_badge": "✓ Partner-Foto verifiziert",
+    "partner_photo_not_verified": "Partner-Foto noch nicht verifiziert",
+    "partner_photo_verification_hint": "Das Foto deiner Partnerin muss verifiziert werden, bevor ihr Women-Only Gerichte anbieten könnt.",
+    "partner_id_optional_title": "Partner-Ausweis (Optional)",
+    "partner_id_optional_hint": "Optional: Lade den Ausweis deiner Partnerin hoch für ein erweitertes Vertrauenslevel. Blockiert keine Funktionen.",
+    "women_only_photo_verification_required": "Für Women-Only Gerichte muss auch das Profilfoto deiner Partnerin verifiziert sein.",
+    "your_photo_not_verified": "Dein Profilfoto muss verifiziert sein, bevor du Women-Only Gerichte anbieten kannst."
   },
   "guidelines": {
     "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (ausser beim Vor-Ort-Essen)",
@@ -823,7 +835,13 @@
     "your_verification_done": "Du bist verifiziert",
     "partner_verification_missing": "Partner-Verifizierung fehlt",
     "partner_verification_done": "Partner ist verifiziert",
-    "go_to_verification": "Zur Verifizierung gehen"
+    "go_to_verification": "Zur Verifizierung gehen",
+    "women_only_photo_blocked": "Foto-Verifizierung erforderlich",
+    "women_only_photo_blocked_desc": "Für Women-Only Gerichte müssen alle Profilfotos verifiziert sein.",
+    "your_photo_not_verified_msg": "Dein Profilfoto ist nicht verifiziert",
+    "your_photo_verified_msg": "Dein Profilfoto ist verifiziert",
+    "partner_photo_not_verified_msg": "Partner-Foto ist nicht verifiziert",
+    "partner_photo_verified_msg": "Partner-Foto ist verifiziert"
   },
   "feed_page": {
     "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schliessen.",

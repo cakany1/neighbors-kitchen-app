@@ -570,9 +570,11 @@ export type Database = {
           partner_id_document_url: string | null
           partner_name: string | null
           partner_photo_url: string | null
+          partner_photo_verified: boolean | null
           partner_verification_status: Database["public"]["Enums"]["verification_status"]
           phone_number: string | null
           phone_verified: boolean | null
+          photo_verified: boolean | null
           private_address: string | null
           private_city: string | null
           private_postal_code: string | null
@@ -617,9 +619,11 @@ export type Database = {
           partner_id_document_url?: string | null
           partner_name?: string | null
           partner_photo_url?: string | null
+          partner_photo_verified?: boolean | null
           partner_verification_status?: Database["public"]["Enums"]["verification_status"]
           phone_number?: string | null
           phone_verified?: boolean | null
+          photo_verified?: boolean | null
           private_address?: string | null
           private_city?: string | null
           private_postal_code?: string | null
@@ -664,9 +668,11 @@ export type Database = {
           partner_id_document_url?: string | null
           partner_name?: string | null
           partner_photo_url?: string | null
+          partner_photo_verified?: boolean | null
           partner_verification_status?: Database["public"]["Enums"]["verification_status"]
           phone_number?: string | null
           phone_verified?: boolean | null
+          photo_verified?: boolean | null
           private_address?: string | null
           private_city?: string | null
           private_postal_code?: string | null
