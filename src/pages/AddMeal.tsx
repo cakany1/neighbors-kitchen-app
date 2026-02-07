@@ -1310,6 +1310,15 @@ const AddMeal = () => {
             Fertig
           </Button>
 
+          {/* Pre-Publish Notice - Gentleman Minutes */}
+          <Alert className="border-muted bg-muted/30">
+            <AlertDescription className="text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">💡 {t('add_meal.gentleman_notice_title')}</span>
+              <br />
+              {t('add_meal.gentleman_notice_text')}
+            </AlertDescription>
+          </Alert>
+
           {/* Submit Button */}
           <Button 
             type="submit"

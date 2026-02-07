@@ -32,6 +32,7 @@ import {
   Gift,
   Flag,
   Languages,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -344,17 +345,34 @@ const MealDetail = () => {
     }
   };
 
-  // Delete meal mutation
+  // Delete meal mutation - uses server-side function with karma penalty
   const deleteMealMutation = useMutation({
     mutationFn: async () => {
       if (!currentUser?.id || !meal) throw new Error("Missing user or meal");
 
-      const { error } = await supabase.from("meals").delete().eq("id", meal.id).eq("chef_id", currentUser.id); // Security: Only owner can delete
+      // Call server-side function that handles karma penalty
+      const { data, error } = await supabase.rpc("delete_meal_with_karma", {
+        p_meal_id: meal.id,
+        p_user_id: currentUser.id,
+        p_is_admin: false, // Regular user deletion
+      });
 
       if (error) throw error;
+
+      const result = data as { success: boolean; message?: string; karma_penalty?: number };
+
+      if (!result.success) {
+        throw new Error(result.message || "Deletion failed");
+      }
+
+      return result;
     },
-    onSuccess: () => {
-      toast.success(t("meal_detail.delete_success"));
+    onSuccess: (result) => {
+      if (result.karma_penalty && result.karma_penalty < 0) {
+        toast.success(t("meal_detail.karma_penalty_applied"));
+      } else {
+        toast.success(t("meal_detail.delete_success"));
+      }
       navigate("/app");
     },
     onError: (error: any) => {
@@ -362,9 +380,27 @@ const MealDetail = () => {
     },
   });
 
+  // Calculate meal age for UI
+  const getMealAgeMinutes = () => {
+    if (!meal?.created_at) return 0;
+    return (Date.now() - new Date(meal.created_at).getTime()) / (1000 * 60);
+  };
+
+  const isWithinGentlemanMinutes = getMealAgeMinutes() <= 5;
+
   const handleDeleteMeal = () => {
-    if (window.confirm(t("meal_detail.confirm_delete"))) {
-      deleteMealMutation.mutate();
+    const ageMinutes = getMealAgeMinutes();
+    
+    if (ageMinutes > 5) {
+      // Show karma warning for meals older than 5 minutes
+      if (window.confirm(t("meal_detail.delete_karma_warning"))) {
+        deleteMealMutation.mutate();
+      }
+    } else {
+      // Free deletion within 5 minutes
+      if (window.confirm(t("meal_detail.confirm_delete"))) {
+        deleteMealMutation.mutate();
+      }
     }
   };
 
@@ -466,17 +502,22 @@ const MealDetail = () => {
             </div>
 
             {/* Report or Delete Button */}
-            <div className="flex gap-2">
+            <div className="flex flex-col items-end gap-1">
               {currentUser?.id === meal.chef_id ? (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDeleteMeal()}
-                  className="text-muted-foreground hover:text-destructive"
-                  title={t("meal_detail.delete")}
-                >
-                  <Flag className="w-5 h-5" />
-                </Button>
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteMeal()}
+                    className="text-muted-foreground hover:text-destructive"
+                    title={t("meal_detail.delete")}
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </Button>
+                  {isWithinGentlemanMinutes && (
+                    <span className="text-xs text-muted-foreground">{t("meal_detail.delete_free_hint")}</span>
+                  )}
+                </>
               ) : (
                 <Button
                   variant="ghost"

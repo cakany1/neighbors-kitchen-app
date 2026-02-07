@@ -1373,6 +1373,10 @@ export type Database = {
         Returns: Json
       }
       cleanup_rate_limits: { Args: { max_age_hours?: number }; Returns: number }
+      delete_meal_with_karma: {
+        Args: { p_is_admin?: boolean; p_meal_id: string; p_user_id: string }
+        Returns: Json
+      }
       djb2_hash: { Args: { input_text: string }; Returns: string }
       generate_address_id: {
         Args: { city: string; postal_code: string; street: string }

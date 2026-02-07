@@ -751,7 +751,10 @@
     "show_original": "Original anzeigen",
     "show_english": "Englisch anzeigen",
     "translate_to_german": "Ins Deutsche übersetzen",
-    "translate_to_english": "Translate to English"
+    "translate_to_english": "Translate to English",
+    "delete_karma_warning": "Diese Mahlzeit ist älter als 5 Minuten. Beim Löschen verlierst du 10 Karma Punkte. Fortfahren?",
+    "delete_free_hint": "Löschen ist kostenlos (innerhalb 5 Minuten)",
+    "karma_penalty_applied": "Gericht gelöscht. -10 Karma"
   },
   "postPickup": {
     "title_barter": "Wie viel war dir das Essen wert?",
@@ -841,7 +844,9 @@
     "your_photo_not_verified_msg": "Dein Profilfoto ist nicht verifiziert",
     "your_photo_verified_msg": "Dein Profilfoto ist verifiziert",
     "partner_photo_not_verified_msg": "Partner-Foto ist nicht verifiziert",
-    "partner_photo_verified_msg": "Partner-Foto ist verifiziert"
+    "partner_photo_verified_msg": "Partner-Foto ist verifiziert",
+    "gentleman_notice_title": "Gut zu wissen",
+    "gentleman_notice_text": "Du kannst deine Mahlzeit innerhalb von 5 Minuten kostenlos löschen. Danach ist Löschen weiterhin möglich, kostet aber 10 Karma Punkte."
   },
   "feed_page": {
     "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schliessen.",
