@@ -288,7 +288,19 @@
     "partner_id_uploaded": "Partner ID uploaded! We're verifying the identity.",
     "partner_id_hint": "Upload your partner's ID (passport, national ID). Will be automatically deleted after verification.",
     "couple_verification_warning": "Couple Verification Incomplete",
-    "couple_verification_warning_desc": "Both partners must be verified to publish meals and accept bookings."
+    "couple_verification_warning_desc": "Both partners must be verified to publish meals and accept bookings.",
+    "photo_verification_title": "Photo Verification",
+    "photo_verified_badge": "✓ Photo verified",
+    "photo_not_verified": "Photo not yet verified",
+    "photo_verification_pending": "Photo verification pending",
+    "photo_verification_hint": "Your profile photo must be verified by an admin before you can offer Women-Only meals.",
+    "partner_photo_verified_badge": "✓ Partner photo verified",
+    "partner_photo_not_verified": "Partner photo not yet verified",
+    "partner_photo_verification_hint": "Your partner's photo must be verified before you can offer Women-Only meals as a couple.",
+    "partner_id_optional_title": "Partner ID (Optional)",
+    "partner_id_optional_hint": "Optional: Upload your partner's ID for an enhanced trust level. Does not block any features.",
+    "women_only_photo_verification_required": "For Women-Only meals, your partner's profile photo must also be verified.",
+    "your_photo_not_verified": "Your profile photo must be verified before you can offer Women-Only meals."
   },
   "auth": {
     "welcome_back": "Welcome back!",
@@ -863,7 +875,13 @@
     "your_verification_done": "You are verified",
     "partner_verification_missing": "Partner verification is missing",
     "partner_verification_done": "Partner is verified",
-    "go_to_verification": "Go to Verification"
+    "go_to_verification": "Go to Verification",
+    "women_only_photo_blocked": "Photo Verification Required",
+    "women_only_photo_blocked_desc": "For Women-Only meals, all profile photos must be verified.",
+    "your_photo_not_verified_msg": "Your profile photo is not verified",
+    "your_photo_verified_msg": "Your profile photo is verified",
+    "partner_photo_not_verified_msg": "Partner photo is not verified",
+    "partner_photo_verified_msg": "Partner photo is verified"
   },
   "feed_page": {
     "welcome_message": "Welcome to Neighbors Kitchen! This is a private food-sharing community. Please bring your own containers, respect the chefs' homes and pay fairly. Tap to close.",

@@ -1066,6 +1066,81 @@ const Profile = () => {
                     💡 {t('profile.partner_gender_hint')}
                   </p>
                 </div>
+                
+                {/* Photo Verification Status for Partner */}
+                <div className="pt-4 border-t border-border space-y-3">
+                  <Label className="font-semibold">{t('profile.photo_verification_title')}</Label>
+                  
+                  {/* Partner Photo Verification Status */}
+                  <div className="p-3 rounded-lg bg-muted/50 space-y-2">
+                    {profile?.partner_photo_verified ? (
+                      <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                        <span>✅</span>
+                        <span className="text-sm font-medium">{t('profile.partner_photo_verified_badge')}</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                        <span>⏳</span>
+                        <span className="text-sm font-medium">{t('profile.partner_photo_not_verified')}</span>
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      {t('profile.partner_photo_verification_hint')}
+                    </p>
+                  </div>
+                  
+                  {/* Optional Partner ID Upload */}
+                  <div className="p-3 rounded-lg bg-muted/30 border border-dashed border-border">
+                    <Label className="text-sm font-medium">{t('profile.partner_id_optional_title')}</Label>
+                    <p className="text-xs text-muted-foreground mt-1 mb-2">
+                      {t('profile.partner_id_optional_hint')}
+                    </p>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      className="text-xs"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        
+                        if (file.size > MAX_FILE_SIZE) {
+                          toast.error(t('profile.file_too_large'));
+                          return;
+                        }
+                        
+                        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+                          toast.error(t('profile.images_only'));
+                          return;
+                        }
+                        
+                        try {
+                          const fileExt = file.name.split('.').pop();
+                          const fileName = `${currentUser?.id}/partner-id-${Date.now()}.${fileExt}`;
+                          
+                          const { error: uploadError } = await supabase.storage
+                            .from('id-documents')
+                            .upload(fileName, file, { cacheControl: '3600', upsert: false });
+                          
+                          if (uploadError) throw uploadError;
+                          
+                          await supabase
+                            .from('profiles')
+                            .update({ partner_id_document_url: fileName })
+                            .eq('id', currentUser?.id);
+                          
+                          toast.success(t('profile.partner_id_uploaded'));
+                          refetchUser();
+                        } catch (error: any) {
+                          console.error('Partner ID upload error:', error);
+                          toast.error(t('profile.upload_error'));
+                        }
+                      }}
+                    />
+                    {profile?.partner_id_document_url && (
+                      <p className="text-xs text-green-600 mt-2">✅ {t('profile.partner_id_uploaded')}</p>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </CardContent>
@@ -1674,6 +1749,28 @@ const Profile = () => {
                   rejectionDetails={profile?.rejection_details}
                   onSuccess={() => queryClient.invalidateQueries({ queryKey: ['currentUser'] })}
                 />
+              )}
+            </div>
+            
+            {/* Photo Verification Status - Separate from ID verification */}
+            <div className="space-y-2 pt-4 border-t border-border">
+              <Label className="text-sm font-medium">{t('profile.photo_verification_title')}</Label>
+              {profile?.photo_verified ? (
+                <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <div className="text-xl">📸</div>
+                  <div>
+                    <p className="font-semibold text-green-600 dark:text-green-400">{t('profile.photo_verified_badge')}</p>
+                    <p className="text-xs text-muted-foreground">{t('profile.photo_verification_hint')}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                  <div className="text-xl">📸</div>
+                  <div>
+                    <p className="font-semibold text-amber-600 dark:text-amber-400">{t('profile.photo_not_verified')}</p>
+                    <p className="text-xs text-muted-foreground">{t('profile.photo_verification_hint')}</p>
+                  </div>
+                </div>
               )}
             </div>
             

@@ -80,14 +80,23 @@ const AddMeal = () => {
       
       const { data: profile } = await supabase
         .from('profiles')
-        .select('gender, avatar_url, private_address, private_city, private_postal_code, is_couple, verification_status, partner_verification_status')
+        .select('gender, avatar_url, private_address, private_city, private_postal_code, is_couple, verification_status, partner_verification_status, photo_verified, partner_photo_verified, visibility_mode')
         .eq('id', user.id)
         .single();
       
-      // Check if couple is fully verified
+      // Check if couple is fully verified (for ID verification)
       const isCoupleFullyVerified = profile?.is_couple 
         ? (profile.verification_status === 'approved' && (profile as any).partner_verification_status === 'approved')
         : true; // Non-couples don't need partner verification
+      
+      // Check photo verification for women-only meals
+      const isPhotoVerified = (profile as any)?.photo_verified || false;
+      const isPartnerPhotoVerified = (profile as any)?.partner_photo_verified || false;
+      
+      // For women-only: both photos must be verified (if couple)
+      const canOfferWomenOnly = profile?.is_couple 
+        ? (isPhotoVerified && isPartnerPhotoVerified)
+        : isPhotoVerified;
       
       return { 
         id: user.id, 
@@ -101,6 +110,10 @@ const AddMeal = () => {
         verificationStatus: profile?.verification_status || 'pending',
         partnerVerificationStatus: (profile as any)?.partner_verification_status || 'pending',
         isCoupleFullyVerified,
+        photoVerified: isPhotoVerified,
+        partnerPhotoVerified: isPartnerPhotoVerified,
+        canOfferWomenOnly,
+        visibilityMode: (profile as any)?.visibility_mode || 'all',
       };
     },
     staleTime: 0, // Always fetch fresh data
@@ -205,6 +218,13 @@ const AddMeal = () => {
     
     // MVP: Profile photo is OPTIONAL for standard meals
     // Only require avatar for verified-only meals (future feature)
+    
+    // WOMEN-ONLY PHOTO VERIFICATION CHECK
+    // Block at frontend level for better UX (DB trigger also enforces this)
+    if (currentUser?.visibilityMode === 'women_only' && !currentUser?.canOfferWomenOnly) {
+      toast.error(t('profile.women_only_photo_verification_required'));
+      return;
+    }
     
     // CONTENT FILTER: Use centralized filter with normalization
     const contentCheck = validateMealContent(formData.title, formData.description);
@@ -516,6 +536,52 @@ const AddMeal = () => {
               <Button 
                 variant="outline" 
                 className="w-full border-orange-500 hover:bg-orange-500/20"
+                onClick={() => navigate('/profile')}
+              >
+                {t('add_meal.go_to_verification')}
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Women-Only Photo Verification Block - Only when visibility is women_only */}
+        {currentUser?.visibilityMode === 'women_only' && !currentUser?.canOfferWomenOnly && (
+          <Alert className="mb-6 border-pink-500 bg-pink-500/10">
+            <Shield className="h-5 w-5 text-pink-500" />
+            <AlertDescription className="space-y-3">
+              <div>
+                <strong className="text-pink-600 dark:text-pink-400">{t('add_meal.women_only_photo_blocked')}</strong>
+                <p className="text-sm mt-1">{t('add_meal.women_only_photo_blocked_desc')}</p>
+              </div>
+              <div className="flex flex-col gap-2 text-sm">
+                {!currentUser.photoVerified && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-destructive">❌</span>
+                    <span>{t('add_meal.your_photo_not_verified_msg')}</span>
+                  </div>
+                )}
+                {currentUser.photoVerified && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-500">✅</span>
+                    <span>{t('add_meal.your_photo_verified_msg')}</span>
+                  </div>
+                )}
+                {currentUser.isCouple && !currentUser.partnerPhotoVerified && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-destructive">❌</span>
+                    <span>{t('add_meal.partner_photo_not_verified_msg')}</span>
+                  </div>
+                )}
+                {currentUser.isCouple && currentUser.partnerPhotoVerified && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-500">✅</span>
+                    <span>{t('add_meal.partner_photo_verified_msg')}</span>
+                  </div>
+                )}
+              </div>
+              <Button 
+                variant="outline" 
+                className="w-full border-pink-500 hover:bg-pink-500/20"
                 onClick={() => navigate('/profile')}
               >
                 {t('add_meal.go_to_verification')}
