@@ -71,121 +71,99 @@ export const AdminStripeStatus = () => {
     );
   }
 
+  const totalEvents = (webhookEvents?.length || 0);
+
   return (
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CreditCard className="h-5 w-5 text-primary" />
-            <CardTitle className="text-lg">Stripe Status</CardTitle>
+            <CardTitle className="text-lg">Stripe Webhook-Protokoll</CardTitle>
           </div>
-          <div className="flex gap-2">
-            <Badge variant={liveEventCount > 0 ? "default" : "secondary"} className="gap-1">
-              {liveEventCount > 0 ? (
-                <CheckCircle className="h-3 w-3" />
-              ) : (
-                <AlertTriangle className="h-3 w-3" />
-              )}
-              LIVE
-            </Badge>
-            <Badge variant="outline" className="gap-1">
-              <CheckCircle className="h-3 w-3" />
-              TEST
-            </Badge>
-          </div>
+          <Badge variant="outline">
+            {totalEvents} empfangen
+          </Badge>
         </div>
         <CardDescription>
-          Webhook-Events der letzten Tage
+          Letzte empfangene Webhook-Events (Test & Live)
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Live Mode Status */}
-        <div className="rounded-lg border p-3 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-sm flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-              Live Mode
-            </span>
-            <Badge variant={lastLiveEvent ? "default" : "secondary"}>
-              {liveEventCount} Events
-            </Badge>
+        {/* Summary row */}
+        <div className="flex gap-3">
+          <div className="flex-1 rounded-lg border p-3 text-center">
+            <div className="text-2xl font-bold">{testEventCount}</div>
+            <div className="text-xs text-muted-foreground">Test-Events</div>
           </div>
-          {lastLiveEvent ? (
-            <div className="text-sm text-muted-foreground space-y-1">
-              <div className="flex items-center justify-between">
-                <span>Letztes Event:</span>
-                <span className="font-mono text-xs">{formatEventType(lastLiveEvent.event_type)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  Zeitpunkt:
-                </span>
-                <span>{formatEventTime(lastLiveEvent.processed_at)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Status:</span>
-                {lastLiveEvent.success ? (
-                  <Badge variant="outline" className="text-primary border-primary gap-1">
-                    <CheckCircle className="h-3 w-3" /> Erfolgreich
-                  </Badge>
-                ) : (
-                  <Badge variant="destructive" className="gap-1">
-                    <XCircle className="h-3 w-3" /> Fehler
-                  </Badge>
-                )}
-              </div>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">
-              Noch keine Live-Webhooks empfangen
-            </p>
-          )}
+          <div className="flex-1 rounded-lg border p-3 text-center">
+            <div className="text-2xl font-bold">{liveEventCount}</div>
+            <div className="text-xs text-muted-foreground">Live-Events</div>
+          </div>
         </div>
 
-        {/* Test Mode Status */}
-        <div className="rounded-lg border border-dashed p-3 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-sm flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-muted-foreground" />
-              Test Mode
-            </span>
-            <Badge variant="outline">
-              {testEventCount} Events
-            </Badge>
-          </div>
-          {lastTestEvent ? (
-            <div className="text-sm text-muted-foreground space-y-1">
-              <div className="flex items-center justify-between">
-                <span>Letztes Event:</span>
-                <span className="font-mono text-xs">{formatEventType(lastTestEvent.event_type)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  Zeitpunkt:
-                </span>
-                <span>{formatEventTime(lastTestEvent.processed_at)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Status:</span>
-                {lastTestEvent.success ? (
-                  <Badge variant="outline" className="text-primary border-primary gap-1">
-                    <CheckCircle className="h-3 w-3" /> Erfolgreich
-                  </Badge>
-                ) : (
-                  <Badge variant="destructive" className="gap-1">
-                    <XCircle className="h-3 w-3" /> Fehler
-                  </Badge>
-                )}
-              </div>
+        {/* Last Live Event */}
+        {lastLiveEvent && (
+          <div className="rounded-lg border p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-medium text-sm flex items-center gap-2">
+                <Badge variant="default" className="text-xs">LIVE</Badge>
+                Letztes Event
+              </span>
+              {lastLiveEvent.success ? (
+                <Badge variant="outline" className="text-primary border-primary gap-1">
+                  <CheckCircle className="h-3 w-3" /> OK
+                </Badge>
+              ) : (
+                <Badge variant="destructive" className="gap-1">
+                  <XCircle className="h-3 w-3" /> Fehler
+                </Badge>
+              )}
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">
-              Noch keine Test-Webhooks empfangen
-            </p>
-          )}
-        </div>
+            <div className="text-sm text-muted-foreground flex justify-between">
+              <span className="font-mono text-xs">{formatEventType(lastLiveEvent.event_type)}</span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {formatEventTime(lastLiveEvent.processed_at)}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Last Test Event */}
+        {lastTestEvent && (
+          <div className="rounded-lg border border-dashed p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-medium text-sm flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs">TEST</Badge>
+                Letztes Event
+              </span>
+              {lastTestEvent.success ? (
+                <Badge variant="outline" className="text-primary border-primary gap-1">
+                  <CheckCircle className="h-3 w-3" /> OK
+                </Badge>
+              ) : (
+                <Badge variant="destructive" className="gap-1">
+                  <XCircle className="h-3 w-3" /> Fehler
+                </Badge>
+              )}
+            </div>
+            <div className="text-sm text-muted-foreground flex justify-between">
+              <span className="font-mono text-xs">{formatEventType(lastTestEvent.event_type)}</span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {formatEventTime(lastTestEvent.processed_at)}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* No events message */}
+        {!lastTestEvent && !lastLiveEvent && (
+          <p className="text-sm text-muted-foreground italic text-center py-4">
+            Noch keine Webhook-Events empfangen
+          </p>
+        )}
 
         {/* Recent Errors */}
         {recentErrors.length > 0 && (
