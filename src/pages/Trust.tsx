@@ -1,7 +1,7 @@
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Shield, Lock, Users, ChefHat, Ban, Heart } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, Users, ChefHat, Ban, Heart, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
@@ -78,9 +78,51 @@ const Trust = () => {
                 <span className="text-muted-foreground">Alle Verbindungen sind verschlüsselt (HTTPS)</span>
               </li>
             </ul>
-          </section>
+           </section>
 
-          {/* Nutzerkontrollen */}
+           {/* Datenstandort Schweiz */}
+           <section>
+             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+               <Globe className="w-5 h-5 text-primary" />
+               Datenstandort Schweiz
+             </h2>
+             <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+               <p className="text-foreground font-medium mb-3">
+                 🇨🇭 Alle Nutzerdaten werden ausschliesslich in der Schweiz gespeichert.
+               </p>
+               <ul className="space-y-3">
+                 <li className="flex items-start gap-3">
+                   <span className="text-primary mt-1">•</span>
+                   <span className="text-muted-foreground">
+                     <strong>Region:</strong> AWS Zürich (eu-central-2)
+                   </span>
+                 </li>
+                 <li className="flex items-start gap-3">
+                   <span className="text-primary mt-1">•</span>
+                   <span className="text-muted-foreground">
+                     <strong>Datenschutz:</strong> Unterliegen dem Schweizer Datenschutzgesetz (DSG)
+                   </span>
+                 </li>
+                 <li className="flex items-start gap-3">
+                   <span className="text-primary mt-1">•</span>
+                   <span className="text-muted-foreground">
+                     <strong>Keine Weitergabe:</strong> Daten verlassen die Schweiz nicht
+                   </span>
+                 </li>
+                 <li className="flex items-start gap-3">
+                   <span className="text-primary mt-1">•</span>
+                   <span className="text-muted-foreground">
+                     <strong>Transparenz:</strong> Infrastruktur überprüfbar im Admin-Dashboard
+                   </span>
+                 </li>
+               </ul>
+               <p className="text-sm text-muted-foreground mt-4 italic">
+                 Weitere technische Details: <a href="/privacy" className="text-primary hover:underline">Datenschutzerklärung</a>
+               </p>
+             </div>
+           </section>
+
+           {/* Nutzerkontrollen */}
           <section>
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" />
