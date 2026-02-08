@@ -578,6 +578,8 @@ export type Database = {
           private_address: string | null
           private_city: string | null
           private_postal_code: string | null
+          referral_rewarded: boolean | null
+          referred_by: string | null
           rejected_at: string | null
           rejected_by: string | null
           rejection_details: string | null
@@ -627,6 +629,8 @@ export type Database = {
           private_address?: string | null
           private_city?: string | null
           private_postal_code?: string | null
+          referral_rewarded?: boolean | null
+          referred_by?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_details?: string | null
@@ -676,6 +680,8 @@ export type Database = {
           private_address?: string | null
           private_city?: string | null
           private_postal_code?: string | null
+          referral_rewarded?: boolean | null
+          referred_by?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_details?: string | null
@@ -687,7 +693,29 @@ export type Database = {
           verification_status?: Database["public"]["Enums"]["verification_status"]
           visibility_mode?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profile_ratings"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       push_subscriptions: {
         Row: {

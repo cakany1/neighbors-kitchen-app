@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 // Using direct Supabase OAuth for BYOK (custom Google credentials on custom domain)
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -27,6 +28,9 @@ const Signup = () => {
     lastName: '',
     isCouple: false,
   });
+
+  // Get referrer ID from URL param
+  const referrerId = searchParams.get('ref');
 
   // Scroll to top on mount
   useEffect(() => {
@@ -199,17 +203,25 @@ const Signup = () => {
         return;
       }
 
-      // Step 2: Create minimal profile with couple info
+      // Step 2: Create minimal profile with couple info and referrer
       console.log('Creating minimal profile...');
+      const profileData: Record<string, any> = {
+        id: data.user.id,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        languages: [i18n.language || 'de'],
+        is_couple: formData.isCouple,
+      };
+      
+      // Add referrer if valid UUID was provided
+      if (referrerId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(referrerId)) {
+        profileData.referred_by = referrerId;
+        console.log('Referrer captured:', referrerId);
+      }
+      
       const { error: profileError } = await supabase
         .from('profiles')
-        .upsert({
-          id: data.user.id,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          languages: [i18n.language || 'de'],
-          is_couple: formData.isCouple,
-        }, { onConflict: 'id' });
+        .upsert(profileData as any, { onConflict: 'id' });
 
       if (profileError) {
         setLoading(false);

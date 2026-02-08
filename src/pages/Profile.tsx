@@ -497,18 +497,9 @@ const Profile = () => {
                   
                   try {
                     await navigator.clipboard.writeText(referralLink);
-                    
-                    // Add 5 Karma
-                    const currentKarma = profile?.karma || 100;
-                    const { error } = await supabase
-                      .from('profiles')
-                      .update({ karma: currentKarma + 5 })
-                      .eq('id', currentUser?.id || '');
-                    
-                    if (!error) {
-                      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
-                      toast.success(t('profile.link_copied'));
-                    }
+                    // NOTE: Karma is now granted only when the invited user 
+                    // registers AND verifies their email
+                    toast.success(t('profile.link_copied_no_karma'));
                   } catch (err) {
                     toast.error('Error copying link');
                   }

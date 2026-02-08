@@ -95,6 +95,9 @@ const VerifyEmail = () => {
       }
 
       if (user?.email_confirmed_at) {
+        // Grant referral karma to the person who referred this user
+        await grantReferralKarma(user.id);
+        
         toast.success(t('verify_email.verified_success'));
         navigate('/feed');
       } else {
@@ -105,6 +108,55 @@ const VerifyEmail = () => {
       toast.error(t('verify_email.check_failed'));
     } finally {
       setCheckingVerification(false);
+    }
+  };
+
+  // Grant karma to the referrer when user verifies their email
+  const grantReferralKarma = async (userId: string) => {
+    try {
+      // Get the profile to check if there's a referrer
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('referred_by, referral_rewarded')
+        .eq('id', userId)
+        .single();
+
+      // If no referrer or already rewarded, skip
+      if (!profile?.referred_by || profile?.referral_rewarded) {
+        return;
+      }
+
+      // Get the referrer's current karma
+      const { data: referrer } = await supabase
+        .from('profiles')
+        .select('karma')
+        .eq('id', profile.referred_by)
+        .single();
+
+      if (!referrer) {
+        return;
+      }
+
+      // Grant +5 karma to referrer
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ karma: (referrer.karma || 100) + 5 })
+        .eq('id', profile.referred_by);
+
+      if (updateError) {
+        console.error('Failed to grant referral karma:', updateError);
+        return;
+      }
+
+      // Mark this referral as rewarded
+      await supabase
+        .from('profiles')
+        .update({ referral_rewarded: true } as any)
+        .eq('id', userId);
+
+      console.log('Referral karma granted to:', profile.referred_by);
+    } catch (err) {
+      console.error('Error granting referral karma:', err);
     }
   };
 
