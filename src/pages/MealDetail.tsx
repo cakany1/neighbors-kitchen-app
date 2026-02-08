@@ -268,7 +268,9 @@ const MealDetail = () => {
     };
   };
 
-  // Check if user is the chef (for self-booking prevention)
+  // Check if user is the OWNER of this meal (chef who created it)
+  // This is true ONLY if the current user's ID exactly matches the meal's chef_id
+  // Admins viewing other users' meals will return false (admin id !== chef_id)
   const isOwnMeal = currentUser?.id === meal?.chef_id;
 
   const handleRequestBooking = () => {
