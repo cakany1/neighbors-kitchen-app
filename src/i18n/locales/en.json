@@ -359,7 +359,9 @@
     "save_new_password": "Save New Password",
     "passwords_dont_match": "Passwords do not match.",
     "password_too_short": "Password must be at least 8 characters.",
-    "password_updated": "Password successfully changed! You are now logged in."
+    "password_updated": "Password successfully changed! You are now logged in.",
+    "email_not_verified": "Email not verified",
+    "email_not_verified_desc": "Please click the verification link in your email to activate your account."
   },
   "signup": {
     "phoneNumber": "Phone Number",
@@ -751,7 +753,12 @@
     "file_too_large": "File too large! Max 5MB.",
     "images_only": "Only images allowed!",
     "photo_after_registration": "You can upload your profile photo and partner photo after registration on your profile page.",
-    "partner_photo_after_registration": "You can upload the partner photo after registration."
+    "partner_photo_after_registration": "You can upload the partner photo after registration.",
+    "verification_title": "Welcome to Neighbors Kitchen!",
+    "verification_message": "We've sent you an email. Please verify your address to activate your account.",
+    "email_sent_to": "Email sent to:",
+    "go_to_login": "Go to Login",
+    "check_spam_hint": "📧 No email received? Please check your spam folder."
   },
   "meal_detail": {
     "loading": "Loading...",

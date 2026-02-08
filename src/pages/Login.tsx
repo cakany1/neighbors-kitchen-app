@@ -117,6 +117,16 @@ const Login = () => {
 
       if (error) {
         setLoading(false);
+        
+        // Check for email not confirmed error
+        if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
+          toast.error(t('auth.email_not_verified'), {
+            description: t('auth.email_not_verified_desc'),
+            duration: 10000,
+          });
+          return;
+        }
+        
         toast.error(error.message || t('auth.login_failed'), {
           duration: 10000,
         });
@@ -128,6 +138,18 @@ const Login = () => {
         toast.error('Anmeldung fehlgeschlagen', {
           duration: 10000,
         });
+        return;
+      }
+
+      // Double-check email verification status
+      if (!data.user.email_confirmed_at) {
+        setLoading(false);
+        toast.error(t('auth.email_not_verified'), {
+          description: t('auth.email_not_verified_desc'),
+          duration: 10000,
+        });
+        // Sign out the user since they shouldn't be able to proceed
+        await supabase.auth.signOut();
         return;
       }
 
