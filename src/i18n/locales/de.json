@@ -751,6 +751,7 @@
     "estimated_restaurant_value": "Im Restaurant wären das ca. CHF {{amount}}.- ({{portions}} Portionen)",
     "estimated_value": "Geschätzter Wert",
     "show_original": "Original anzeigen",
+    "show_translated": "Übersetzung anzeigen",
     "show_english": "Englisch anzeigen",
     "translate_to_german": "Ins Deutsche übersetzen",
     "translate_to_english": "Translate to English",

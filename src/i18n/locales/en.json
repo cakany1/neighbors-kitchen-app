@@ -791,6 +791,7 @@
     "estimated_restaurant_value": "This would cost approx. CHF {{amount}}.- in a restaurant ({{portions}} portions)",
     "estimated_value": "Estimated Value",
     "show_original": "Show original",
+    "show_translated": "Show translation",
     "show_english": "Show English",
     "translate_to_german": "Ins Deutsche übersetzen",
     "translate_to_english": "Translate to English",

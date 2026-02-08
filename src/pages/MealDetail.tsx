@@ -56,8 +56,14 @@ const MealDetail = () => {
   const [showOriginal, setShowOriginal] = useState(false);
 
   // Use pre-translated content based on current language, but respect showOriginal toggle
+  // showOriginal=false means show in current UI language, showOriginal=true means show original (DE)
   const getDisplayText = (originalText: string, translatedText: string | null | undefined) => {
-    return !showOriginal && i18n.language === "en" && translatedText ? translatedText : originalText;
+    // If showOriginal is true, always show original German text
+    if (showOriginal) return originalText;
+    // If UI is English and translation exists, show English translation
+    if (i18n.language === "en" && translatedText) return translatedText;
+    // Default: show original text (German)
+    return originalText;
   };
 
   // Fetch current user - SECURITY: Own profile can access all fields
@@ -579,18 +585,13 @@ const MealDetail = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">{t("meal_detail.about_dish")}</CardTitle>
-                {/* Show translate button when UI language differs from original language */}
-                {((i18n.language === "en" && (meal as any).description_en) ||
-                  (i18n.language === "de" && (meal as any).description_en)) && (
+                {/* Show translate toggle only when English translation exists */}
+                {(meal as any).description_en && (
                   <Button variant="ghost" size="sm" onClick={() => setShowOriginal(!showOriginal)}>
                     <Languages className="w-4 h-4 mr-2" />
-                    {i18n.language === "en"
-                      ? showOriginal
-                        ? t("meal_detail.translate_to_english")
-                        : t("meal_detail.show_original")
-                      : showOriginal
-                        ? t("meal_detail.show_original")
-                        : t("meal_detail.translate_to_english")}
+                    {showOriginal
+                      ? t("meal_detail.show_translated")
+                      : t("meal_detail.show_original")}
                   </Button>
                 )}
               </div>
