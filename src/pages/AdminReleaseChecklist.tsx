@@ -15,28 +15,41 @@ interface ChecklistItem {
   key: string;
   label: string;
   description: string;
-  category: "auth" | "meals" | "payments" | "safety" | "forms";
+  category: "auth" | "meals" | "payments" | "safety" | "notifications";
 }
 
 const CHECKLIST_ITEMS: ChecklistItem[] = [
+  // Authentication
   { key: "signup_works", label: "Signup works", description: "New user can register with email", category: "auth" },
   { key: "email_verification", label: "Email verification works", description: "Verification email is sent and link works", category: "auth" },
+  { key: "login_works", label: "Login works", description: "Existing user can log in successfully", category: "auth" },
+  { key: "partner_linking", label: "Partner linking optional", description: "Household linking works with dual confirmation, nothing blocked if skipped", category: "auth" },
+  
+  // Meals & Booking
   { key: "add_meal_works", label: "Add meal works", description: "Chef can create and publish a meal", category: "meals" },
   { key: "delete_under_5min", label: "Delete <5 min works", description: "Meal deletion within 5 min has no karma penalty", category: "meals" },
   { key: "delete_over_5min_karma", label: "Delete >5 min gives -10 karma", description: "Meal deletion after 5 min deducts 10 karma", category: "meals" },
-  { key: "stripe_test_works", label: "Stripe test works", description: "Test payment flow completes successfully", category: "payments" },
-  { key: "captcha_visible", label: "Captcha visible", description: "Turnstile captcha appears on signup/contact", category: "safety" },
-  { key: "women_only_logic", label: "Women-only logic", description: "Women-only meals only visible to verified women", category: "safety" },
-  { key: "partner_linking", label: "Partner linking", description: "Couple accounts can link partner profiles", category: "auth" },
-  { key: "contact_form_works", label: "Contact form works", description: "Contact form submits and sends notification", category: "forms" },
+  { key: "ai_preview_labeled", label: "AI meal preview labeled", description: "AI-generated images show 'Beispielbild' badge and require confirmation", category: "meals" },
+  
+  // Payments
+  { key: "stripe_test_visible", label: "Stripe TEST visible", description: "Test mode indicator visible in admin, test payments work", category: "payments" },
+  { key: "stripe_live_visible", label: "Stripe LIVE visible", description: "Live mode indicator visible, real payments processed", category: "payments" },
+  
+  // Safety & Privacy
+  { key: "captcha_contact", label: "CAPTCHA on contact works", description: "Turnstile captcha appears and validates on contact form", category: "safety" },
+  { key: "women_only_logic", label: "Women-only flow works", description: "Women-only meals require photo verification, only visible to verified women", category: "safety" },
+  { key: "vacation_mode", label: "Vacation mode works", description: "User can enable vacation mode, meals hidden from feed", category: "safety" },
+  
+  // Notifications
+  { key: "notifications_behave", label: "Notifications behave correctly", description: "Email notifications sent for bookings, cancellations, ratings", category: "notifications" },
 ];
 
 const CATEGORY_LABELS: Record<string, string> = {
-  auth: "Authentication",
-  meals: "Meals & Booking",
-  payments: "Payments",
-  safety: "Safety & Privacy",
-  forms: "Forms",
+  auth: "🔐 Authentication",
+  meals: "🍽️ Meals & Booking",
+  payments: "💳 Payments",
+  safety: "🛡️ Safety & Privacy",
+  notifications: "🔔 Notifications",
 };
 
 interface CheckState {
@@ -199,25 +212,36 @@ export default function AdminReleaseChecklist() {
           </div>
         </div>
 
-        {/* Progress Summary */}
+        {/* Progress Summary with Status Indicator */}
         <Card className="mb-6">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Progress</span>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">
+                  {progress === 100 ? "🟢" : progress > 0 ? "🟡" : "🔴"}
+                </span>
+                <span className="text-sm font-medium">
+                  {progress === 100 ? "Ready for Release" : progress > 0 ? "In Progress" : "Not Started"}
+                </span>
+              </div>
               <span className="text-sm text-muted-foreground">
-                {checkedCount} / {totalCount} checks completed
+                {checkedCount} / {totalCount} checks completed ({progress}%)
               </span>
             </div>
             <div className="w-full bg-muted rounded-full h-3">
               <div
                 className={`h-3 rounded-full transition-all ${
-                  progress === 100 ? "bg-accent" : "bg-primary"
+                  progress === 100 
+                    ? "bg-green-500" 
+                    : progress > 0 
+                      ? "bg-yellow-500" 
+                      : "bg-red-500"
                 }`}
-                style={{ width: `${progress}%` }}
+                style={{ width: `${Math.max(progress, 5)}%` }}
               />
             </div>
             {progress === 100 && (
-              <p className="text-accent-foreground text-sm mt-2 flex items-center gap-1">
+              <p className="text-green-600 text-sm mt-2 flex items-center gap-1">
                 <CheckCircle2 className="h-4 w-4" />
                 All checks passed! Ready for release.
               </p>
