@@ -20,7 +20,8 @@ import {
   MessageSquare,
   CreditCard,
   Lock,
-  Zap
+  Zap,
+  Globe
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -245,7 +246,7 @@ const AdminHealth = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
@@ -297,6 +298,18 @@ const AdminHealth = () => {
                       : '-'}
                   </p>
                   <p className="text-sm text-muted-foreground">Letzte Laufzeit</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-primary/30">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <Globe className="w-8 h-8 text-primary" />
+                <div>
+                  <p className="text-xs font-bold">🇨🇭 Schweiz</p>
+                  <p className="text-xs text-muted-foreground">Zürich (eu-central-2)</p>
                 </div>
               </div>
             </CardContent>
