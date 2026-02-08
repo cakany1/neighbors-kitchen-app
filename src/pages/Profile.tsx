@@ -35,6 +35,7 @@ import { KarmaLevel } from '@/components/KarmaLevel';
 import { RatingSummary } from '@/components/RatingSummary';
 import { ChefBookings } from '@/components/ChefBookings';
 import { ProfileRatings } from '@/components/ProfileRatings';
+import { HouseholdLinking } from '@/components/HouseholdLinking';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -1520,6 +1521,9 @@ const Profile = () => {
             <ChefBookings userId={currentUser.id} />
           </CardContent>
         </Card>
+
+        {/* Household Linking */}
+        <HouseholdLinking userId={currentUser.id} userEmail={currentUser.email || ''} />
 
         {/* Blocked Users Management */}
         <BlockedUsersList currentUserId={currentUser.id} />
