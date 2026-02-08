@@ -118,12 +118,10 @@ const Login = () => {
       if (error) {
         setLoading(false);
         
-        // Check for email not confirmed error
+        // If email not confirmed, allow through but redirect to verification screen
         if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
-          toast.error(t('auth.email_not_verified'), {
-            description: t('auth.email_not_verified_desc'),
-            duration: 10000,
-          });
+          // Try to sign in anyway - Supabase may allow it
+          navigate('/verify-email');
           return;
         }
         
@@ -141,15 +139,10 @@ const Login = () => {
         return;
       }
 
-      // Double-check email verification status
+      // If email not verified, redirect to verification screen (soft-gate)
       if (!data.user.email_confirmed_at) {
         setLoading(false);
-        toast.error(t('auth.email_not_verified'), {
-          description: t('auth.email_not_verified_desc'),
-          duration: 10000,
-        });
-        // Sign out the user since they shouldn't be able to proceed
-        await supabase.auth.signOut();
+        navigate('/verify-email');
         return;
       }
 

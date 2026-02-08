@@ -398,7 +398,28 @@
     "last_name_required": "Please enter your last name",
     "profile_creation_failed": "Could not create profile",
     "account_exists_wrong_password": "This account already exists but the password is wrong. Please log in.",
-    "complete_profile_later": "💡 You can complete your profile later. Photo and address are only needed when booking."
+    "complete_profile_later": "💡 You can complete your profile later. Photo and address are only needed when booking.",
+    "verification_title": "Welcome to Neighbors Kitchen!",
+    "verification_message": "We've sent you an email. Please confirm your address to activate your account.",
+    "email_sent_to": "Email sent to:",
+    "go_to_login": "Back to Login",
+    "check_spam_hint": "📧 Didn't receive an email? Please check your spam folder."
+  },
+  "verify_email": {
+    "title": "Email Verification Required",
+    "description": "Please verify your email address to access all features of Neighbors Kitchen.",
+    "sent_to": "Email sent to:",
+    "check_status": "Check Verification",
+    "resend_button": "Resend Verification Email",
+    "resend_cooldown": "Resend in {{seconds}}s",
+    "resend_success": "Verification email has been resent!",
+    "resend_failed": "Could not send email. Please try again later.",
+    "no_email": "No email address found",
+    "verified_success": "Email successfully verified! Welcome to Neighbors Kitchen 🎉",
+    "not_yet_verified": "Email not yet verified. Please click the link in your email.",
+    "check_failed": "Could not check status",
+    "spam_hint": "📧 Didn't receive an email? Please check your spam folder.",
+    "logout": "Log Out"
   },
   "guidelines": {
     "bringContainer": "Bring your own container or plate for takeaway (except when dining in)",
