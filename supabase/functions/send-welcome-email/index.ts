@@ -1,10 +1,11 @@
 /**
- * Send Welcome Email Edge Function
+ * Send Welcome Email Edge Function (Combined Welcome + Verification)
  * 
  * Features:
  * - Uses shared utils for CORS, auth, and logging
  * - Origin validation for production security
  * - Bilingual email support (DE/EN)
+ * - INCLUDES email verification link in the same email
  */
 
 import { 
@@ -12,15 +13,16 @@ import {
   handleCors,
   generateRequestId,
   safeLog,
-  verifyAuth,
   checkOrigin,
   jsonError
 } from '../_shared/utils.ts'
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 interface WelcomeEmailRequest {
   email: string;
   firstName: string;
   language?: string;
+  verificationToken?: string;
 }
 
 Deno.serve(async (req) => {
@@ -36,14 +38,9 @@ Deno.serve(async (req) => {
   if (originError) return originError;
 
   try {
-    // Authentication check
-    const auth = await verifyAuth(req, requestId);
-    if (!auth.success) {
-      return auth.response!;
-    }
-    const authenticatedEmail = auth.user?.email;
-
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
     if (!RESEND_API_KEY) {
       throw new Error("RESEND_API_KEY is not configured");
@@ -51,19 +48,47 @@ Deno.serve(async (req) => {
 
     const { email, firstName, language = 'de' }: WelcomeEmailRequest = await req.json();
 
-    // Security: Only allow sending welcome email to the authenticated user's own email
-    if (email !== authenticatedEmail) {
-      return jsonError('You can only send welcome emails to your own email address', 403, requestId, undefined, origin);
+    if (!email || !firstName) {
+      return jsonError('Missing required fields: email and firstName', 400, requestId, undefined, origin);
     }
 
-    safeLog(requestId, 'info', 'Sending welcome email', { userId: auth.user?.id });
+    safeLog(requestId, 'info', 'Sending combined welcome + verification email', { email });
+
+    // Generate verification link using Supabase magic link
+    let verificationUrl = 'https://www.neighbors-kitchen.ch/login';
+    
+    if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+          auth: { autoRefreshToken: false, persistSession: false }
+        });
+        
+        // Generate magic link for email verification
+        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+          type: 'magiclink',
+          email: email,
+          options: {
+            redirectTo: 'https://www.neighbors-kitchen.ch/feed',
+          }
+        });
+        
+        if (!linkError && linkData?.properties?.action_link) {
+          verificationUrl = linkData.properties.action_link;
+          safeLog(requestId, 'info', 'Verification link generated successfully');
+        } else {
+          safeLog(requestId, 'warn', 'Failed to generate verification link', { error: linkError });
+        }
+      } catch (linkErr) {
+        safeLog(requestId, 'warn', 'Error generating verification link', { error: String(linkErr) });
+      }
+    }
 
     // German and English versions
     const isGerman = language === 'de';
     
     const subject = isGerman 
-      ? `Willkommen bei Neighbors Kitchen, ${firstName}! 🍳`
-      : `Welcome to Neighbors Kitchen, ${firstName}! 🍳`;
+      ? `Willkommen bei Neighbors Kitchen, ${firstName}! Bitte bestätige deine E-Mail 📧`
+      : `Welcome to Neighbors Kitchen, ${firstName}! Please verify your email 📧`;
 
     const htmlContent = isGerman 
       ? `
@@ -76,30 +101,31 @@ Deno.serve(async (req) => {
           <h2 style="color: #333;">Hallo ${firstName}! 👋</h2>
           
           <p style="color: #555; line-height: 1.6;">
-            Herzlich willkommen in unserer Community! Du kannst jetzt sofort loslegen und Gerichte in deiner Nachbarschaft entdecken.
+            Herzlich willkommen in unserer Community! Bitte bestätige deine E-Mail-Adresse, um dein Konto zu aktivieren.
           </p>
           
-          <div style="background: #FFF5EB; border-left: 4px solid #F77B1C; padding: 15px; margin: 20px 0; border-radius: 4px;">
-            <p style="margin: 0; color: #333;"><strong>🎉 Du hast 100 Karma-Punkte als Willkommensbonus erhalten!</strong></p>
+          <div style="background: #FFF5EB; border-left: 4px solid #F77B1C; padding: 20px; margin: 25px 0; border-radius: 4px; text-align: center;">
+            <p style="margin: 0 0 15px 0; color: #333; font-weight: bold;">📧 Bitte bestätige deine E-Mail-Adresse:</p>
+            <a href="${verificationUrl}" 
+               style="background: #F77B1C; color: white; padding: 14px 35px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; font-size: 16px;">
+              E-Mail bestätigen →
+            </a>
+          </div>
+          
+          <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 15px; margin: 20px 0; border-radius: 4px;">
+            <p style="margin: 0; color: #333;"><strong>🎉 Du erhältst 100 Karma-Punkte als Willkommensbonus!</strong></p>
           </div>
           
           <h3 style="color: #333; margin-top: 25px;">So funktioniert's:</h3>
           <ul style="color: #555; line-height: 1.8;">
-            <li>🍲 <strong>Stöbere sofort los</strong> – entdecke Gerichte im Feed</li>
-            <li>📸 <strong>Beim ersten Buchen</strong> wirst du nach Profilfoto, Adresse und Telefon gefragt</li>
+            <li>📧 <strong>Bestätige deine E-Mail</strong> – klicke auf den Button oben</li>
+            <li>🍲 <strong>Stöbere los</strong> – entdecke Gerichte im Feed</li>
             <li>👨‍🍳 <strong>Teile deine Kochkünste</strong> und biete überschüssiges Essen an</li>
             <li>⭐ <strong>Sammle Karma</strong> durch Teilen und Zuverlässigkeit</li>
-            <li>🔒 <strong>Optional:</strong> Verifiziere dein Profil für den blauen Haken</li>
           </ul>
           
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="https://share-kitchen-basel.lovable.app/feed" 
-               style="background: #F77B1C; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">
-              Jetzt stöbern →
-            </a>
-          </div>
-          
           <p style="color: #888; font-size: 12px; text-align: center; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+            Falls du diesen Account nicht erstellt hast, kannst du diese E-Mail ignorieren.<br><br>
             Neighbors Kitchen Basel – Teile Essen, baue Vertrauen und rette Lebensmittel in deiner Nachbarschaft.
           </p>
         </div>
@@ -114,30 +140,31 @@ Deno.serve(async (req) => {
           <h2 style="color: #333;">Hello ${firstName}! 👋</h2>
           
           <p style="color: #555; line-height: 1.6;">
-            Welcome to our community! You can start browsing meals in your neighborhood right away.
+            Welcome to our community! Please verify your email address to activate your account.
           </p>
           
-          <div style="background: #FFF5EB; border-left: 4px solid #F77B1C; padding: 15px; margin: 20px 0; border-radius: 4px;">
-            <p style="margin: 0; color: #333;"><strong>🎉 You've received 100 Karma points as a welcome bonus!</strong></p>
+          <div style="background: #FFF5EB; border-left: 4px solid #F77B1C; padding: 20px; margin: 25px 0; border-radius: 4px; text-align: center;">
+            <p style="margin: 0 0 15px 0; color: #333; font-weight: bold;">📧 Please verify your email address:</p>
+            <a href="${verificationUrl}" 
+               style="background: #F77B1C; color: white; padding: 14px 35px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; font-size: 16px;">
+              Verify Email →
+            </a>
+          </div>
+          
+          <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 15px; margin: 20px 0; border-radius: 4px;">
+            <p style="margin: 0; color: #333;"><strong>🎉 You'll receive 100 Karma points as a welcome bonus!</strong></p>
           </div>
           
           <h3 style="color: #333; margin-top: 25px;">How it works:</h3>
           <ul style="color: #555; line-height: 1.8;">
-            <li>🍲 <strong>Browse right away</strong> – discover meals in the feed</li>
-            <li>📸 <strong>When you book</strong>, you'll be asked for your photo, address, and phone</li>
+            <li>📧 <strong>Verify your email</strong> – click the button above</li>
+            <li>🍲 <strong>Browse meals</strong> – discover food in the feed</li>
             <li>👨‍🍳 <strong>Share your cooking</strong> and offer excess food</li>
             <li>⭐ <strong>Earn Karma</strong> through sharing and reliability</li>
-            <li>🔒 <strong>Optional:</strong> Verify your profile for the blue badge</li>
           </ul>
           
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="https://share-kitchen-basel.lovable.app/feed" 
-               style="background: #F77B1C; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">
-              Start Browsing →
-            </a>
-          </div>
-          
           <p style="color: #888; font-size: 12px; text-align: center; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+            If you didn't create this account, you can safely ignore this email.<br><br>
             Neighbors Kitchen Basel – Share food, build trust and save meals in your neighborhood.
           </p>
         </div>
@@ -165,7 +192,7 @@ Deno.serve(async (req) => {
       throw new Error(data.message || "Failed to send email");
     }
 
-    safeLog(requestId, 'info', 'Welcome email sent successfully');
+    safeLog(requestId, 'info', 'Combined welcome + verification email sent successfully');
 
     return new Response(JSON.stringify({ ...data, requestId }), {
       status: 200,

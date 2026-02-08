@@ -18,6 +18,8 @@ const Signup = () => {
   const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -218,7 +220,7 @@ const Signup = () => {
         return;
       }
 
-      // Step 3: Send welcome email (non-blocking)
+      // Step 3: Send combined welcome + verification email (non-blocking)
       try {
         await supabase.functions.invoke('send-welcome-email', {
           body: {
@@ -246,19 +248,56 @@ const Signup = () => {
         console.error('Admin notification failed (non-blocking):', notifyError);
       }
 
-      toast.success(t('auth.account_created'));
-      // Redirect directly to feed - user can browse immediately
-      navigate('/feed');
+      // Step 5: Show confirmation screen instead of redirecting
+      setRegisteredEmail(formData.email);
+      setSignupSuccess(true);
+      setLoading(false);
     } catch (error: any) {
       setLoading(false);
       console.error('Signup error:', error);
       toast.error(error.message || t('auth.account_creation_failed'), {
         duration: 10000,
       });
-    } finally {
-      setLoading(false);
     }
   };
+
+  // Show success confirmation screen after signup
+  if (signupSuccess) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center">
+                <span className="text-4xl">📧</span>
+              </div>
+            </div>
+            <CardTitle className="text-2xl text-secondary">{t('signup.verification_title')}</CardTitle>
+            <CardDescription className="text-base mt-2">
+              {t('signup.verification_message')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-muted/50 rounded-lg p-4 text-center">
+              <p className="text-sm text-muted-foreground mb-1">{t('signup.email_sent_to')}</p>
+              <p className="font-medium text-foreground">{registeredEmail}</p>
+            </div>
+            
+            <Button
+              onClick={() => navigate('/login')}
+              className="w-full"
+            >
+              {t('signup.go_to_login')}
+            </Button>
+            
+            <p className="text-xs text-center text-muted-foreground">
+              {t('signup.check_spam_hint')}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
