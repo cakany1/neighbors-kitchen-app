@@ -118,7 +118,8 @@ const Privacy = () => {
             </h2>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-4">
               <li>Ihre Daten werden in einer PostgreSQL-Datenbank bei Supabase gespeichert.</li>
-              <li>Server-Standort: Europäische Union (Frankfurt, Deutschland).</li>
+              <li>Server-Standort: Schweiz (AWS Zürich, eu-central-2).</li>
+              <li>Ihre Daten unterliegen dem Schweizer Datenschutzgesetz (DSG) und verlassen die Schweiz nicht.</li>
               <li>Bei Login via Google OAuth speichern wir keine Passwörter – die Authentifizierung erfolgt direkt über Google.</li>
               <li>Daten werden so lange gespeichert, wie Ihr Konto aktiv ist.</li>
             </ul>
