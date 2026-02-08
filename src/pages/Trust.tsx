@@ -110,9 +110,9 @@ const Trust = () => {
                    </span>
                  </li>
                  <li className="flex items-start gap-3">
-                   <span className="text-primary mt-1">•</span>
+                  <span className="text-primary mt-1">•</span>
                    <span className="text-muted-foreground">
-                     <strong>Transparenz:</strong> Infrastruktur überprüfbar im Admin-Dashboard
+                     <strong>Verifizierbar:</strong> AWS Region eu-central-2 öffentlich dokumentiert
                    </span>
                  </li>
                </ul>
