@@ -894,6 +894,64 @@ export type Database = {
           },
         ]
       }
+      release_checks: {
+        Row: {
+          check_key: string
+          checked_at: string | null
+          checked_by: string | null
+          created_at: string
+          id: string
+          is_checked: boolean
+          note: string | null
+          release_version: string
+          updated_at: string
+        }
+        Insert: {
+          check_key: string
+          checked_at?: string | null
+          checked_by?: string | null
+          created_at?: string
+          id?: string
+          is_checked?: boolean
+          note?: string | null
+          release_version: string
+          updated_at?: string
+        }
+        Update: {
+          check_key?: string
+          checked_at?: string | null
+          checked_by?: string | null
+          created_at?: string
+          id?: string
+          is_checked?: boolean
+          note?: string | null
+          release_version?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "release_checks_checked_by_fkey"
+            columns: ["checked_by"]
+            isOneToOne: false
+            referencedRelation: "profile_ratings"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "release_checks_checked_by_fkey"
+            columns: ["checked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "release_checks_checked_by_fkey"
+            columns: ["checked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reports: {
         Row: {
           created_at: string | null

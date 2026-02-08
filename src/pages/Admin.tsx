@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock, Zap, UserCog, Download, Activity } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock, Zap, UserCog, Download, Activity, ClipboardCheck } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -937,6 +937,14 @@ const Admin = () => {
             >
               <Zap className="w-4 h-4" />
               System Health
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/admin/release-checklist')}
+              className="gap-2"
+            >
+              <ClipboardCheck className="w-4 h-4" />
+              Release QA
             </Button>
             <Button 
               onClick={() => {
