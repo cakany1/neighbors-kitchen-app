@@ -200,12 +200,8 @@ const MealDetail = () => {
     }
   }, [existingBooking]);
 
-  // Set default quantity for couples
-  useEffect(() => {
-    if (currentUser?.profile?.is_couple) {
-      setBookingQuantity(2);
-    }
-  }, [currentUser?.profile?.is_couple]);
+  // NOTE: Couples can freely choose 1 or 2 portions (partner may be absent)
+  // Default remains 1, UI shows both options for couples
 
   const matchingAllergens = checkAllergenMatch(meal?.allergens || [], currentUser?.profile?.allergens || []);
 
