@@ -720,6 +720,22 @@
     "go_to_login": "Zur Anmeldung",
     "check_spam_hint": "📧 Keine E-Mail erhalten? Bitte prüfe auch deinen Spam-Ordner."
   },
+  "verify_email": {
+    "title": "E-Mail-Bestätigung erforderlich",
+    "description": "Bitte bestätige deine E-Mail-Adresse, um alle Funktionen von Neighbors Kitchen nutzen zu können.",
+    "sent_to": "E-Mail gesendet an:",
+    "check_status": "Bestätigung prüfen",
+    "resend_button": "Bestätigungs-E-Mail erneut senden",
+    "resend_cooldown": "Erneut senden in {{seconds}}s",
+    "resend_success": "Bestätigungs-E-Mail wurde erneut gesendet!",
+    "resend_failed": "E-Mail konnte nicht gesendet werden. Bitte versuche es später erneut.",
+    "no_email": "Keine E-Mail-Adresse gefunden",
+    "verified_success": "E-Mail erfolgreich bestätigt! Willkommen bei Neighbors Kitchen 🎉",
+    "not_yet_verified": "E-Mail noch nicht bestätigt. Bitte klicke auf den Link in deiner E-Mail.",
+    "check_failed": "Status konnte nicht geprüft werden",
+    "spam_hint": "📧 Keine E-Mail erhalten? Bitte prüfe auch deinen Spam-Ordner.",
+    "logout": "Ausloggen"
+  },
   "meal_detail": {
     "loading": "Lädt...",
     "not_found": "Gericht nicht gefunden",

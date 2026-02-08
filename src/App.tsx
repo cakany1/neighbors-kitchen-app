@@ -16,6 +16,7 @@ import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 import Impressum from "./pages/Impressum";
 import Privacy from "./pages/Privacy";
@@ -31,8 +32,9 @@ import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useAnalyticsTracking } from "./hooks/useAnalyticsTracking";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const queryClient = new QueryClient();
 
@@ -70,21 +72,12 @@ const AppRoutes = () => {
       {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
       <div className="relative z-0 flex flex-col min-h-screen pb-24">
         <Routes>
+          {/* Public routes - no auth required */}
           <Route path="/" element={<Index />} />
           <Route path="/app" element={<Navigate to="/feed" replace />} />
-          <Route path="/feed" element={<Feed />} />
-          <Route path="/map" element={<MapView />} />
-          <Route path="/add-meal" element={<AddMeal />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/profile/:chefId" element={<ChefProfile />} />
-          <Route path="/meal/:id" element={<MealDetail />} />
-          <Route path="/payment/:id" element={<Payment />} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/chat/:bookingId" element={<Chat />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/admin/health" element={<AdminHealth />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/impressum" element={<Impressum />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/agb" element={<AGB />} />
@@ -93,6 +86,22 @@ const AppRoutes = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/story" element={<Story />} />
           <Route path="/trust" element={<Trust />} />
+          
+          {/* Public but can view - no verification required for viewing */}
+          <Route path="/feed" element={<Feed />} />
+          <Route path="/map" element={<MapView />} />
+          <Route path="/meal/:id" element={<MealDetail />} />
+          <Route path="/profile/:chefId" element={<ChefProfile />} />
+          
+          {/* Protected routes - require verified email */}
+          <Route path="/add-meal" element={<ProtectedRoute><AddMeal /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/payment/:id" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+          <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+          <Route path="/chat/:bookingId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+          <Route path="/admin/health" element={<ProtectedRoute><AdminHealth /></ProtectedRoute>} />
+          
           {/* OAuth callback routes - handles both with and without tilde */}
           <Route path="/~oauth/callback" element={<OAuthCallback />} />
           <Route path="/%7Eoauth/callback" element={<OAuthCallback />} />
