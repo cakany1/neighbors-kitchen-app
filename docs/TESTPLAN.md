@@ -260,6 +260,33 @@ Dieser Testplan dokumentiert alle Features der App und deren Teststatus.
 
 ---
 
+## 16. 🎭 Playwright E2E Tests
+
+| Test Suite | Status | Notizen |
+|------------|--------|---------|
+| navigation.spec.ts | ⏳ | Homepage, Story, Trust, FAQ, Contact |
+| auth.spec.ts | ⏳ | Login, Signup, Validation |
+| feed.spec.ts | ⏳ | Feed & Map Loading |
+| story-journey.spec.ts | ⏳ | Story → Partnerships Navigation |
+| mobile.spec.ts | ⏳ | Mobile UX Tests |
+
+### E2E Test-Befehle:
+```bash
+# Tests lokal ausführen
+npx playwright test
+
+# Mit UI
+npx playwright test --ui
+
+# Einzelne Suite
+npx playwright test e2e/navigation.spec.ts
+
+# Mobile Tests
+npx playwright test e2e/mobile.spec.ts
+```
+
+---
+
 ## 16. ⚖️ Legal & Compliance
 
 | Feature | Status | Notizen |
