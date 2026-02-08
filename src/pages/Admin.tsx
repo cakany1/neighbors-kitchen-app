@@ -55,6 +55,7 @@ const getProfileWarnings = (user: {
 };
 import { IdDocumentViewer } from '@/components/IdDocumentViewer';
 import { AdminAnalyticsDashboard } from '@/components/AdminAnalyticsDashboard';
+import { AdminStripeStatus } from '@/components/AdminStripeStatus';
 import { AdminUserProfileDialog } from '@/components/AdminUserProfileDialog';
 import { AdminMessageDialog } from '@/components/AdminMessageDialog';
 import { AdminNotificationSettings } from '@/components/AdminNotificationSettings';
@@ -1689,6 +1690,9 @@ const Admin = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Stripe Status */}
+            <AdminStripeStatus />
 
             {/* Live Analytics Dashboard */}
             <AdminAnalyticsDashboard />
