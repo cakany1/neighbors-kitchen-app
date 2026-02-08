@@ -108,21 +108,7 @@ const Trust = () => {
                    <span className="text-muted-foreground">
                      <strong>Keine Weitergabe:</strong> Daten verlassen die Schweiz nicht
                    </span>
-                 </li>
-                 <li className="flex items-start gap-3">
-                  <span className="text-primary mt-1">•</span>
-                   <span className="text-muted-foreground">
-                     <strong>Verifizierbar:</strong>{' '}
-                     <a 
-                       href="https://aws.amazon.com/about-aws/global-infrastructure/regions_az/" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       className="text-primary hover:underline"
-                     >
-                       AWS bestätigt: eu-central-2 = Zürich →
-                     </a>
-                   </span>
-                 </li>
+                </li>
                </ul>
                <p className="text-sm text-muted-foreground mt-4 italic">
                  Weitere technische Details: <a href="/privacy" className="text-primary hover:underline">Datenschutzerklärung</a>
