@@ -311,6 +311,45 @@ export type Database = {
         }
         Relationships: []
       }
+      household_links: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          id: string
+          invitee_confirmed: boolean
+          invitee_email: string
+          invitee_id: string | null
+          requester_confirmed: boolean
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          invitee_confirmed?: boolean
+          invitee_email: string
+          invitee_id?: string | null
+          requester_confirmed?: boolean
+          requester_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          invitee_confirmed?: boolean
+          invitee_email?: string
+          invitee_id?: string | null
+          requester_confirmed?: boolean
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       language_requests: {
         Row: {
           created_at: string | null
