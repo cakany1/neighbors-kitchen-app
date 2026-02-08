@@ -798,8 +798,8 @@ const MealDetail = () => {
         </div>
       </main>
 
-      {/* Aktionsbuttons - Sticky on Mobile */}
-      <div className="fixed md:sticky bottom-16 md:bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t border-border z-40">
+      {/* Aktionsbuttons - Sticky on Mobile, above BottomNav + safe area */}
+      <div className="fixed md:sticky left-0 right-0 p-4 bg-background/95 backdrop-blur border-t border-border z-40 bottom-[calc(4rem+env(safe-area-inset-bottom))] md:bottom-0">
         <div className="max-w-lg mx-auto flex gap-2">
           {/* Self-chat/booking block for own meal */}
           {isOwnMeal ? (
