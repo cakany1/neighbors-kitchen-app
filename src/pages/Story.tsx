@@ -123,10 +123,10 @@ const StoryPage = () => {
                </div>
 
                <a href="/partnerships" className="text-center p-6 rounded-xl hover:bg-primary/5 transition-colors group cursor-pointer">
-                 <div className="w-16 h-16 rounded-full bg-secondary/10 group-hover:bg-secondary/20 flex items-center justify-center mx-auto mb-4 transition-colors">
-                   <Building2 className="w-8 h-8 text-secondary" />
+                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 transition-colors">
+                   <Building2 className="w-8 h-8 text-primary" />
                  </div>
-                 <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
+                 <h3 className="font-semibold text-lg mb-2">
                    {isEn ? "For Institutions" : "Für Institutionen"}
                  </h3>
                  <p className="text-muted-foreground text-sm">
