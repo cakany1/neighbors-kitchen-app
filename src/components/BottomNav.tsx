@@ -6,7 +6,7 @@ export const BottomNav = () => {
   const { t } = useTranslation();
   
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 pwa-safe-bottom">
       <div className="max-w-lg mx-auto flex items-center justify-around h-16 px-2">
         <NavLink
           to="/feed"
