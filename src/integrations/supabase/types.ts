@@ -168,9 +168,11 @@ export type Database = {
         Row: {
           cancellation_reason: string | null
           cancelled_at: string | null
+          chef_rated: boolean | null
           created_at: string
           guest_composition: string | null
           guest_id: string
+          guest_rated: boolean | null
           id: string
           meal_id: string
           no_show_marked_at: string | null
@@ -183,9 +185,11 @@ export type Database = {
         Insert: {
           cancellation_reason?: string | null
           cancelled_at?: string | null
+          chef_rated?: boolean | null
           created_at?: string
           guest_composition?: string | null
           guest_id: string
+          guest_rated?: boolean | null
           id?: string
           meal_id: string
           no_show_marked_at?: string | null
@@ -198,9 +202,11 @@ export type Database = {
         Update: {
           cancellation_reason?: string | null
           cancelled_at?: string | null
+          chef_rated?: boolean | null
           created_at?: string
           guest_composition?: string | null
           guest_id?: string
+          guest_rated?: boolean | null
           id?: string
           meal_id?: string
           no_show_marked_at?: string | null
