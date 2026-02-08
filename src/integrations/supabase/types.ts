@@ -1268,20 +1268,20 @@ export type Database = {
           visibility_mode: string | null
         }
         Insert: {
-          age?: number | null
+          age?: never
           allergens?: string[] | null
           avatar_url?: string | null
           created_at?: string | null
           dislikes?: string[] | null
           display_real_name?: boolean | null
-          first_name?: string | null
+          first_name?: never
           gender?: string | null
           id?: string | null
           id_verified?: boolean | null
           is_couple?: boolean | null
           karma?: number | null
           languages?: string[] | null
-          last_name?: string | null
+          last_name?: never
           nickname?: string | null
           no_shows?: number | null
           notification_radius?: number | null
@@ -1302,20 +1302,20 @@ export type Database = {
           visibility_mode?: string | null
         }
         Update: {
-          age?: number | null
+          age?: never
           allergens?: string[] | null
           avatar_url?: string | null
           created_at?: string | null
           dislikes?: string[] | null
           display_real_name?: boolean | null
-          first_name?: string | null
+          first_name?: never
           gender?: string | null
           id?: string | null
           id_verified?: boolean | null
           is_couple?: boolean | null
           karma?: number | null
           languages?: string[] | null
-          last_name?: string | null
+          last_name?: never
           nickname?: string | null
           no_shows?: number | null
           notification_radius?: number | null
