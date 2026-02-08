@@ -221,38 +221,23 @@ const Trust = () => {
             </div>
           </section>
 
-          {/* Für Quartiere & Gemeinden */}
-          <section className="pt-4 border-t border-border">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" />
-              Für Quartiere, Gemeinden & Organisationen
-            </h2>
-            <div className="space-y-4">
-              <p className="text-muted-foreground leading-relaxed">
-                Neighbors Kitchen wird bereits heute als digitale Nachbarschaftsinfrastruktur gedacht.
-              </p>
-              <p className="text-muted-foreground leading-relaxed">
-                Neben der privaten Nutzung eignet sich die Plattform auch für Quartiere, Wohnbaugenossenschaften 
-                und Gemeinden – etwa zur Förderung von Begegnung, zur Reduktion von Lebensmittelverschwendung 
-                oder als niedrigschwellige Präventionsmassnahme gegen soziale Isolation.
-              </p>
-              <p className="text-muted-foreground leading-relaxed">
-                Dabei bleibt die Community selbstorganisiert.<br />
-                Die Rolle von Institutionen ist unterstützend – nicht steuernd.
-              </p>
-              <p className="text-muted-foreground leading-relaxed">
-                Bei Interesse an einer lokalen Partnerschaft freuen wir uns über eine Kontaktaufnahme.
-              </p>
-              <p className="mt-4">
-                <a 
-                  href="mailto:hello@neighbors-kitchen.ch" 
-                  className="text-primary hover:underline font-medium"
-                >
-                  hello@neighbors-kitchen.ch
-                </a>
-              </p>
-            </div>
-          </section>
+          {/* Link to Partnerships */}
+           <section className="pt-4 border-t border-border">
+             <div className="p-4 bg-muted/50 border border-border rounded-lg flex items-center justify-between">
+               <div className="flex items-center gap-3">
+                 <Users className="w-5 h-5 text-primary" />
+                 <span className="text-muted-foreground">
+                   Für Quartiere, Gemeinden & Organisationen
+                 </span>
+               </div>
+               <a 
+                 href="/partnerships" 
+                 className="text-primary hover:underline font-medium text-sm flex items-center gap-1"
+               >
+                 Mehr erfahren →
+               </a>
+             </div>
+           </section>
 
         </div>
       </main>

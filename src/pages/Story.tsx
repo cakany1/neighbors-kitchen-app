@@ -1,7 +1,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTranslation } from "react-i18next";
-import { Heart, Users, Leaf, Home } from "lucide-react";
+import { Heart, Users, Leaf, Home, Building2 } from "lucide-react";
 
 const StoryPage = () => {
   const { t, i18n } = useTranslation();
@@ -79,49 +79,63 @@ const StoryPage = () => {
             </div>
 
             {/* Values Grid */}
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center p-6">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">
-                  {isEn ? "Community" : "Gemeinschaft"}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {isEn
-                    ? "Connect with neighbors through the joy of sharing food"
-                    : "Verbinde dich mit Nachbarn durch die Freude am Teilen"}
-                </p>
-              </div>
+             <div className="grid md:grid-cols-4 gap-6">
+               <div className="text-center p-6">
+                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                   <Users className="w-8 h-8 text-primary" />
+                 </div>
+                 <h3 className="font-semibold text-lg mb-2">
+                   {isEn ? "Community" : "Gemeinschaft"}
+                 </h3>
+                 <p className="text-muted-foreground text-sm">
+                   {isEn
+                     ? "Connect with neighbors through the joy of sharing food"
+                     : "Verbinde dich mit Nachbarn durch die Freude am Teilen"}
+                 </p>
+               </div>
 
-              <div className="text-center p-6">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Leaf className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">
-                  {isEn ? "Sustainability" : "Nachhaltigkeit"}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {isEn
-                    ? "Reduce food waste and cook more consciously"
-                    : "Reduziere Lebensmittelverschwendung und koche bewusster"}
-                </p>
-              </div>
+               <div className="text-center p-6">
+                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                   <Leaf className="w-8 h-8 text-primary" />
+                 </div>
+                 <h3 className="font-semibold text-lg mb-2">
+                   {isEn ? "Sustainability" : "Nachhaltigkeit"}
+                 </h3>
+                 <p className="text-muted-foreground text-sm">
+                   {isEn
+                     ? "Reduce food waste and cook more consciously"
+                     : "Reduziere Lebensmittelverschwendung und koche bewusster"}
+                 </p>
+               </div>
 
-              <div className="text-center p-6">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Home className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">
-                  {isEn ? "Home Cooking" : "Hausgemacht"}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {isEn
-                    ? "Enjoy authentic, homemade meals from your neighborhood"
-                    : "Geniesse authentische, hausgemachte Gerichte aus der Nachbarschaft"}
-                </p>
-              </div>
-            </div>
+               <div className="text-center p-6">
+                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                   <Home className="w-8 h-8 text-primary" />
+                 </div>
+                 <h3 className="font-semibold text-lg mb-2">
+                   {isEn ? "Home Cooking" : "Hausgemacht"}
+                 </h3>
+                 <p className="text-muted-foreground text-sm">
+                   {isEn
+                     ? "Enjoy authentic, homemade meals from your neighborhood"
+                     : "Geniesse authentische, hausgemachte Gerichte aus der Nachbarschaft"}
+                 </p>
+               </div>
+
+               <a href="/partnerships" className="text-center p-6 rounded-xl hover:bg-primary/5 transition-colors group cursor-pointer">
+                 <div className="w-16 h-16 rounded-full bg-secondary/10 group-hover:bg-secondary/20 flex items-center justify-center mx-auto mb-4 transition-colors">
+                   <Building2 className="w-8 h-8 text-secondary" />
+                 </div>
+                 <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
+                   {isEn ? "For Institutions" : "Für Institutionen"}
+                 </h3>
+                 <p className="text-muted-foreground text-sm">
+                   {isEn
+                     ? "Partnerships for districts, municipalities & organizations"
+                     : "Partnerschaften für Quartiere, Gemeinden & Organisationen"}
+                 </p>
+               </a>
+             </div>
           </div>
         </section>
       </main>
