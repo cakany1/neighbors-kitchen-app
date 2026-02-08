@@ -112,7 +112,15 @@ const Trust = () => {
                  <li className="flex items-start gap-3">
                   <span className="text-primary mt-1">•</span>
                    <span className="text-muted-foreground">
-                     <strong>Verifizierbar:</strong> AWS Region eu-central-2 öffentlich dokumentiert
+                     <strong>Verifizierbar:</strong>{' '}
+                     <a 
+                       href="https://aws.amazon.com/about-aws/global-infrastructure/regions_az/" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       className="text-primary hover:underline"
+                     >
+                       AWS bestätigt: eu-central-2 = Zürich →
+                     </a>
                    </span>
                  </li>
                </ul>
