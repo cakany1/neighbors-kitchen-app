@@ -160,13 +160,17 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
-  
-  /* PWA Safe Area Support - prevents content from being hidden behind notch/status bar */
-  html {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+}
+
+/* PWA Safe Area Support - only affects standalone mode (home screen app) */
+@supports (padding-top: env(safe-area-inset-top)) {
+  @media all and (display-mode: standalone) {
+    .pwa-safe-top {
+      padding-top: env(safe-area-inset-top);
+    }
+    .pwa-safe-bottom {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
   }
 }
 
