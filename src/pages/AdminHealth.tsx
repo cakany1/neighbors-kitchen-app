@@ -21,11 +21,16 @@ import {
   CreditCard,
   Lock,
   Zap,
-  Globe
+  Globe,
+  ClipboardCheck,
+  ExternalLink
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+
+// Total number of checklist items - keep in sync with AdminReleaseChecklist
+const TOTAL_CHECKLIST_ITEMS = 14;
 
 interface TestResult {
   name: string;
@@ -47,6 +52,91 @@ interface SelfTestResponse {
   results: TestResult[];
   timestamp: string;
 }
+
+// Release Checklist Summary Component
+const ReleaseChecklistSummary = ({ navigate }: { navigate: (path: string) => void }) => {
+  const today = new Date();
+  const releaseVersion = `v${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, "0")}.${String(today.getDate()).padStart(2, "0")}`;
+
+  const { data: checklistData, isLoading } = useQuery({
+    queryKey: ['releaseChecklistSummary', releaseVersion],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('release_checks')
+        .select('is_checked')
+        .eq('release_version', releaseVersion);
+
+      if (error) throw error;
+      
+      const checkedCount = data?.filter(c => c.is_checked).length || 0;
+      return { checkedCount, total: TOTAL_CHECKLIST_ITEMS };
+    },
+  });
+
+  const checkedCount = checklistData?.checkedCount || 0;
+  const total = checklistData?.total || TOTAL_CHECKLIST_ITEMS;
+  const progress = Math.round((checkedCount / total) * 100);
+
+  const statusEmoji = progress === 100 ? "🟢" : progress > 0 ? "🟡" : "🔴";
+  const statusText = progress === 100 ? "Ready" : progress > 0 ? "In Progress" : "Not Started";
+
+  return (
+    <Card className="border-2 border-primary/30">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <ClipboardCheck className="w-5 h-5 text-primary" />
+            Release Checklist
+          </CardTitle>
+          <Badge variant="outline" className="text-lg px-3 py-1">
+            {statusEmoji} {checkedCount} / {total}
+          </Badge>
+        </div>
+        <CardDescription>
+          Manuelle QA-Prüfpunkte vor Go-Live
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {isLoading ? (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <RefreshCw className="w-4 h-4 animate-spin" />
+            Lädt...
+          </div>
+        ) : (
+          <>
+            <div className="w-full bg-muted rounded-full h-3">
+              <div
+                className={`h-3 rounded-full transition-all ${
+                  progress === 100 
+                    ? "bg-green-500" 
+                    : progress > 0 
+                      ? "bg-yellow-500" 
+                      : "bg-red-500"
+                }`}
+                style={{ width: `${Math.max(progress, 5)}%` }}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                {statusText} • Version {releaseVersion}
+              </span>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/admin/release-checklist')}
+                className="gap-1"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Zur Checklist
+              </Button>
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
 
 const AdminHealth = () => {
   const navigate = useNavigate();
@@ -530,35 +620,8 @@ const AdminHealth = () => {
           </Card>
         )}
 
-        {/* Manual QA Checklist */}
-        <Card>
-          <CardHeader>
-            <CardTitle>📋 Manuelle QA-Checkliste</CardTitle>
-            <CardDescription>
-              Zusätzliche manuelle Prüfpunkte vor Go-Live
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3">
-              {[
-                { id: 'meal-create', label: 'Meal erstellen → erscheint im Feed', icon: <Database className="w-4 h-4" /> },
-                { id: 'booking-flow', label: 'Booking → Bestätigung → Status korrekt', icon: <CreditCard className="w-4 h-4" /> },
-                { id: 'cancel-flow', label: 'Stornierung → Deadline-Check → Inventory restore', icon: <XCircle className="w-4 h-4" /> },
-                { id: 'noshow-flow', label: 'No-Show markieren → Reliability Score Update', icon: <AlertTriangle className="w-4 h-4" /> },
-                { id: 'rating-flow', label: 'Bewertung → Sichtbarkeit nach beidseitiger Bewertung', icon: <CheckCircle className="w-4 h-4" /> },
-                { id: 'chat-flow', label: 'Chat → Nachrichten werden zugestellt', icon: <MessageSquare className="w-4 h-4" /> },
-                { id: 'profile-gate', label: 'Unvollständiges Profil → Booking blockiert', icon: <Users className="w-4 h-4" /> },
-                { id: 'self-book', label: 'Eigenes Meal buchen → Blockiert', icon: <Lock className="w-4 h-4" /> },
-              ].map(item => (
-                <div key={item.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                  {item.icon}
-                  <span className="flex-1">{item.label}</span>
-                  <Badge variant="outline">Manuell prüfen</Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Release Checklist Summary */}
+        <ReleaseChecklistSummary navigate={navigate} />
 
         {/* GO/NO-GO Decision */}
         <Card className="border-2 border-primary">
