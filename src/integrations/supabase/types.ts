@@ -41,6 +41,45 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_reads: {
+        Row: {
+          action: string
+          admin_id: string
+          context: string | null
+          created_at: string
+          fields_accessed: string[]
+          id: string
+          ip_address: string | null
+          notes: string | null
+          target_user_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          action?: string
+          admin_id: string
+          context?: string | null
+          created_at?: string
+          fields_accessed?: string[]
+          id?: string
+          ip_address?: string | null
+          notes?: string | null
+          target_user_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          context?: string | null
+          created_at?: string
+          fields_accessed?: string[]
+          id?: string
+          ip_address?: string | null
+          notes?: string | null
+          target_user_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       admin_settings: {
         Row: {
           id: string
@@ -1146,6 +1185,23 @@ export type Database = {
       }
     }
     Views: {
+      admin_reads_summary: {
+        Row: {
+          action: string | null
+          admin_first_name: string | null
+          admin_id: string | null
+          admin_last_name: string | null
+          context: string | null
+          created_at: string | null
+          fields_count: number | null
+          id: string | null
+          notes: string | null
+          target_first_name: string | null
+          target_last_name: string | null
+          target_user_id: string | null
+        }
+        Relationships: []
+      }
       chef_rating_summary: {
         Row: {
           avg_rating: number | null
@@ -1417,6 +1473,18 @@ export type Database = {
     }
     Functions: {
       admin_delete_user: { Args: { target_user_id: string }; Returns: Json }
+      admin_log_user_export: {
+        Args: {
+          p_context?: string
+          p_export_format?: string
+          p_target_user_id: string
+        }
+        Returns: Json
+      }
+      admin_view_user_sensitive_data: {
+        Args: { p_context?: string; p_target_user_id: string }
+        Returns: Json
+      }
       book_meal: {
         Args: { p_guest_id: string; p_meal_id: string }
         Returns: Json

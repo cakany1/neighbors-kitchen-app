@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock, Zap, UserCog, Download, Activity, ClipboardCheck } from 'lucide-react';
+import { Shield, Users, ChefHat, Calendar, AlertCircle, CheckCircle, XCircle, ImagePlus, MessageCircleQuestion, AlertTriangle, Mail, Send, MessageSquare, Settings, Bell, BellOff, History, Clock, Zap, UserCog, Download, Activity, ClipboardCheck, Eye } from 'lucide-react';
+import { AdminReadAuditLog } from '@/components/AdminReadAuditLog';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -1129,6 +1130,10 @@ const Admin = () => {
                 )}
               </TabsTrigger>
               <TabsTrigger value="payouts" className="whitespace-nowrap">Payouts</TabsTrigger>
+              <TabsTrigger value="audit" className="whitespace-nowrap">
+                <Eye className="w-4 h-4 mr-1" />
+                Audit Log
+              </TabsTrigger>
               <TabsTrigger value="health" className="whitespace-nowrap" onClick={() => navigate('/admin/health')}>
                 <Activity className="w-4 h-4 mr-1" />
                 Health
@@ -1928,6 +1933,11 @@ const Admin = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Audit Log Tab */}
+          <TabsContent value="audit" className="space-y-4">
+            <AdminReadAuditLog />
           </TabsContent>
 
           {/* Payouts Tab */}
