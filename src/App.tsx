@@ -28,6 +28,7 @@ import Story from "./pages/Story";
 import Trust from "./pages/Trust";
 import Partnerships from "./pages/Partnerships";
 import AdminHealth from "./pages/AdminHealth";
+import AdminReleaseChecklist from "./pages/AdminReleaseChecklist";
 import OAuthCallback from "./pages/OAuthCallback";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { CookieBanner } from "./components/CookieBanner";
@@ -103,6 +104,7 @@ const AppRoutes = () => {
           <Route path="/chat/:bookingId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
           <Route path="/admin/health" element={<ProtectedRoute><AdminHealth /></ProtectedRoute>} />
+          <Route path="/admin/release-checklist" element={<ProtectedRoute><AdminReleaseChecklist /></ProtectedRoute>} />
           
           {/* OAuth callback routes - handles both with and without tilde */}
           <Route path="/~oauth/callback" element={<OAuthCallback />} />
