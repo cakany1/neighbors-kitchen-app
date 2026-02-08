@@ -335,6 +335,7 @@ export type Database = {
       meals: {
         Row: {
           address_id: string | null
+          ai_image_confirmed: boolean | null
           allergens: string[] | null
           arrival_time: string | null
           available_portions: number
@@ -356,6 +357,7 @@ export type Database = {
           id: string
           image_url: string | null
           ingredients: string[] | null
+          is_ai_generated: boolean | null
           is_cooking_experience: boolean
           is_stock_photo: boolean | null
           max_seats: number | null
@@ -375,6 +377,7 @@ export type Database = {
         }
         Insert: {
           address_id?: string | null
+          ai_image_confirmed?: boolean | null
           allergens?: string[] | null
           arrival_time?: string | null
           available_portions?: number
@@ -396,6 +399,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           ingredients?: string[] | null
+          is_ai_generated?: boolean | null
           is_cooking_experience?: boolean
           is_stock_photo?: boolean | null
           max_seats?: number | null
@@ -415,6 +419,7 @@ export type Database = {
         }
         Update: {
           address_id?: string | null
+          ai_image_confirmed?: boolean | null
           allergens?: string[] | null
           arrival_time?: string | null
           available_portions?: number
@@ -436,6 +441,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           ingredients?: string[] | null
+          is_ai_generated?: boolean | null
           is_cooking_experience?: boolean
           is_stock_photo?: boolean | null
           max_seats?: number | null

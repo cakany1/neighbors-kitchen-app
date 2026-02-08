@@ -14,13 +14,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, Shield, Plus, Minus, Calendar as CalendarIcon, Keyboard } from 'lucide-react';
+import { Upload, Shield, Plus, Minus, Calendar as CalendarIcon, Keyboard, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { exchangeOptions } from '@/utils/ingredientDatabase';
 import { hashToConsistentOffset } from '@/utils/fuzzyLocation';
 import { validateMealContent } from '@/utils/contentFilter';
 import { validatePrice, parseLocalizedNumber, MIN_PRICE_CHF, MAX_PRICE_CHF, mapDbPriceError } from '@/utils/priceValidation';
 import { TagSelector } from '@/components/meals/TagSelector';
+import { AIImageGenerator } from '@/components/meals/AIImageGenerator';
 import { generateAddressId } from '@/utils/addressHash';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -38,6 +39,11 @@ const AddMeal = () => {
   const [barterText, setBarterText] = useState('');
   const [containerPolicy, setContainerPolicy] = useState<'bring_container' | 'plate_ok' | 'either_ok'>('either_ok');
   const [priceError, setPriceError] = useState<string | null>(null);
+  
+  // AI Image state
+  const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
+  const [aiImageConfirmed, setAiImageConfirmed] = useState(false);
+  const [isAiGenerated, setIsAiGenerated] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -268,6 +274,12 @@ const AddMeal = () => {
       return;
     }
 
+    // AI Image confirmation check
+    if (isAiGenerated && !aiImageConfirmed) {
+      toast.error(t('add_meal.ai_confirm_required', 'Bitte bestätige, dass das KI-Bild dein Gericht repräsentiert.'));
+      return;
+    }
+
     // Validate price using localized validation
     const isMoneyMode = selectedExchangeOptions.includes('online');
     const priceValidation = validatePrice(formData.restaurantReferencePrice, t, isMoneyMode);
@@ -450,11 +462,15 @@ const AddMeal = () => {
         address_id: addressId,
         allergens: selectedAllergens.length > 0 ? selectedAllergens : null,
         tags: tags.length > 0 ? tags : null,
-        is_stock_photo: useStockPhoto,
+        is_stock_photo: useStockPhoto && !isAiGenerated,
         handover_mode: 'pickup_box',
         unit_type: 'portions',
         is_cooking_experience: false,
         container_policy: containerPolicy,
+        // AI Image fields
+        image_url: aiImageUrl || null,
+        is_ai_generated: isAiGenerated,
+        ai_image_confirmed: aiImageConfirmed,
       };
 
       // 5. Insert meal into database
@@ -1204,47 +1220,96 @@ const AddMeal = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <CardContent className="space-y-6 pt-2">
-                    {/* Photo Upload */}
-                    <div>
-                      <Label className="block mb-2 font-medium">Foto vom Gericht</Label>
-                      {!useStockPhoto ? (
-                        <>
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            className="w-full h-16 flex items-center justify-center gap-2"
-                          >
-                            <Upload className="w-5 h-5" />
-                            <span>Foto hochladen +</span>
-                          </Button>
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => setUseStockPhoto(true)}
-                            className="w-full mt-2"
-                          >
-                            Noch nicht gekocht? Symbolbild verwenden
-                          </Button>
-                        </>
-                      ) : (
-                        <div className="space-y-3">
-                          <Alert>
-                            <AlertDescription>
-                              📷 Ein Symbolbild wird mit dem Badge &quot;Symbolbild&quot; angezeigt
-                            </AlertDescription>
-                          </Alert>
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            onClick={() => setUseStockPhoto(false)}
-                            className="w-full"
-                          >
-                            Eigenes Foto hochladen
-                          </Button>
-                        </div>
-                      )}
-                    </div>
+                    {/* Photo Options */}
+                     <div className="space-y-4">
+                       <Label className="block font-medium">{t('add_meal.photo_label', 'Foto vom Gericht')}</Label>
+                       
+                       {/* AI Image Generator - Primary Option */}
+                       <div className="p-4 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5">
+                         <div className="flex items-center gap-2 mb-3">
+                           <Sparkles className="w-5 h-5 text-primary" />
+                           <span className="font-medium text-primary">
+                             {t('add_meal.ai_preview_title', 'KI-Vorschaubild')}
+                           </span>
+                           <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
+                             {t('common.new', 'Neu')}
+                           </span>
+                         </div>
+                         <p className="text-sm text-muted-foreground mb-4">
+                           {t('add_meal.ai_preview_desc', 'Noch nicht gekocht? Generiere ein Vorschaubild basierend auf deinem Rezept.')}
+                         </p>
+                         <AIImageGenerator
+                           title={formData.title}
+                           description={formData.description}
+                           ingredients={formData.ingredients}
+                           onImageGenerated={(url) => {
+                             setAiImageUrl(url);
+                             setIsAiGenerated(true);
+                             setUseStockPhoto(false);
+                           }}
+                           onConfirmationChange={setAiImageConfirmed}
+                           isConfirmed={aiImageConfirmed}
+                           currentImageUrl={aiImageUrl || undefined}
+                           isAIImage={isAiGenerated}
+                         />
+                       </div>
+
+                       {/* Divider */}
+                       <div className="flex items-center gap-3">
+                         <div className="flex-1 border-t border-border" />
+                         <span className="text-xs text-muted-foreground">{t('common.or', 'oder')}</span>
+                         <div className="flex-1 border-t border-border" />
+                       </div>
+
+                       {/* Traditional Photo Upload */}
+                       {!isAiGenerated && (
+                         <>
+                           <Button 
+                             type="button" 
+                             variant="outline" 
+                             className="w-full h-14 flex items-center justify-center gap-2"
+                           >
+                             <Upload className="w-5 h-5" />
+                             <span>{t('add_meal.upload_photo', 'Echtes Foto hochladen')}</span>
+                           </Button>
+                           <Button 
+                             type="button" 
+                             variant="ghost" 
+                             size="sm" 
+                             onClick={() => setUseStockPhoto(true)}
+                             className="w-full"
+                           >
+                             {t('add_meal.use_stock_photo', 'Symbolbild verwenden')}
+                           </Button>
+                         </>
+                       )}
+
+                       {/* Stock Photo Selected */}
+                       {useStockPhoto && !isAiGenerated && (
+                         <Alert>
+                           <AlertDescription>
+                             📷 {t('add_meal.stock_photo_notice', 'Ein Symbolbild wird mit dem Badge "Symbolbild" angezeigt')}
+                           </AlertDescription>
+                         </Alert>
+                       )}
+
+                       {/* Reset AI Image */}
+                       {isAiGenerated && (
+                         <Button
+                           type="button"
+                           variant="ghost"
+                           size="sm"
+                           onClick={() => {
+                             setAiImageUrl(null);
+                             setIsAiGenerated(false);
+                             setAiImageConfirmed(false);
+                           }}
+                           className="w-full text-muted-foreground"
+                         >
+                           {t('add_meal.remove_ai_image', 'KI-Bild entfernen')}
+                         </Button>
+                       )}
+                     </div>
 
                     {/* Allergens & Tags */}
                     <TagSelector

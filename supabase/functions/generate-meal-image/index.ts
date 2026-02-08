@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
     // Get anon client for user-scoped operations
     const anonClient = getAnonClient(req.headers.get('Authorization')!);
 
-    // Verify that the user owns the meal they're trying to update
+    // If mealId provided, verify ownership (for updating existing meals)
     if (mealId) {
       const { data: mealData, error: mealError } = await anonClient
         .from('meals')
@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    safeLog(requestId, 'info', 'Generating image', { userId, mealId });
+    safeLog(requestId, 'info', 'Generating image', { userId, mealId: mealId || 'preview' });
 
     // Generate image using Lovable AI
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -105,7 +105,9 @@ Deno.serve(async (req) => {
     
     // Upload to Supabase storage using admin client
     const adminClient = getAdminClient();
-    const fileName = `meal-${mealId}-${Date.now()}.png`;
+    const fileName = mealId 
+      ? `meal-${mealId}-${Date.now()}.png`
+      : `preview-${userId}-${Date.now()}.png`;
     
     const { data: uploadData, error: uploadError } = await adminClient.storage
       .from('gallery')

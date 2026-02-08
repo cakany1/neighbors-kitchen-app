@@ -645,7 +645,11 @@
     "minimum": "Mindestpreis",
     "payWhatYouWant": "Zahl was du willst",
     "restaurantValue": "Restaurant Wert",
-    "availablePortions": "Verfügbare Portionen"
+    "availablePortions": "Verfügbare Portionen",
+    "stockPhoto": "Symbolbild",
+    "realPhoto": "Echt",
+    "aiPreview": "KI-Vorschau",
+    "aiImageDisclaimer": "Beispielbild – tatsächliches Gericht kann abweichen"
   },
   "signup": {
     "phoneNumber": "Telefonnummer",
@@ -874,7 +878,14 @@
     "partner_photo_not_verified_msg": "Partner-Foto ist nicht verifiziert",
     "partner_photo_verified_msg": "Partner-Foto ist verifiziert",
     "gentleman_notice_title": "Gut zu wissen",
-    "gentleman_notice_text": "Du kannst deine Mahlzeit innerhalb von 5 Minuten kostenlos löschen. Danach ist Löschen weiterhin möglich, kostet aber 10 Karma Punkte."
+    "gentleman_notice_text": "Du kannst deine Mahlzeit innerhalb von 5 Minuten kostenlos löschen. Danach ist Löschen weiterhin möglich, kostet aber 10 Karma Punkte.",
+    "ai_preview_title": "KI-Vorschaubild",
+    "ai_preview_desc": "Noch nicht gekocht? Generiere ein Vorschaubild basierend auf deinem Rezept.",
+    "ai_confirm_required": "Bitte bestätige, dass das KI-Bild dein Gericht repräsentiert.",
+    "photo_label": "Foto vom Gericht",
+    "upload_photo": "Echtes Foto hochladen",
+    "remove_ai_image": "KI-Bild entfernen",
+    "stock_photo_notice": "Ein Symbolbild wird mit dem Badge 'Symbolbild' angezeigt"
   },
   "feed_page": {
     "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schliessen.",

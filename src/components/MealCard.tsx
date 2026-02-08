@@ -1,7 +1,7 @@
 import { Meal } from "@/types/meal";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, ChefHat, Package, Home, Ghost, UtensilsCrossed } from "lucide-react";
+import { MapPin, ChefHat, Package, Home, Ghost, UtensilsCrossed, Sparkles, Camera } from "lucide-react";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { KarmaLevel } from "@/components/KarmaLevel";
 import { RatingSummary } from "@/components/RatingSummary";
@@ -36,6 +36,8 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
 
   const imageUrl = getProp(meal, "imageUrl", "image_url");
   const availablePortions = getProp(meal, "availablePortions", "available_portions");
+  const isAiGenerated = getProp(meal, "isAiGenerated", "is_ai_generated") || false;
+  const isStockPhoto = getProp(meal, "isStockPhoto", "is_stock_photo") || false;
 
   // Pricing Logic - DB stores values in cents (e.g., 1200 = CHF 12.00)
   // Mock data uses CHF directly (e.g., 12 = CHF 12.00)
@@ -70,7 +72,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
       onClick={onClick}
     >
       {/* Image Area */}
-      <div className="relative h-48 bg-muted">
+       <div className="relative h-48 bg-muted">
         {imageUrl ? (
           <img src={imageUrl} alt={meal.title} className="w-full h-full object-cover" />
         ) : (
@@ -78,10 +80,31 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
             <ChefHat className="w-16 h-16 text-muted-foreground" />
           </div>
         )}
+        {/* Top Right Badges */}
         <div className="absolute top-3 right-3 flex flex-col gap-2">
           {availablePortions > 0 && (
             <Badge className="bg-primary/90 backdrop-blur text-primary-foreground font-bold shadow-sm">
               {availablePortions} {t("meal.portionsAvailable", "left")}
+            </Badge>
+          )}
+        </div>
+        {/* Top Left - AI/Stock Badge */}
+        <div className="absolute top-3 left-3 flex gap-2">
+          {isAiGenerated && (
+            <Badge className="bg-amber-500/90 backdrop-blur text-white border-0 flex items-center gap-1 shadow-sm">
+              <Sparkles className="w-3 h-3" />
+              KI
+            </Badge>
+          )}
+          {isStockPhoto && !isAiGenerated && (
+            <Badge variant="secondary" className="bg-muted/90 backdrop-blur border-0 shadow-sm">
+              📷 {t("meal.stockPhoto", "Symbolbild")}
+            </Badge>
+          )}
+          {!isAiGenerated && !isStockPhoto && imageUrl && (
+            <Badge className="bg-green-500/90 backdrop-blur text-white border-0 flex items-center gap-1 shadow-sm">
+              <Camera className="w-3 h-3" />
+              {t("meal.realPhoto", "Echt")}
             </Badge>
           )}
         </div>
