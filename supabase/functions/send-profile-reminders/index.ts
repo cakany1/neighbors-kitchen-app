@@ -12,6 +12,7 @@ interface IncompleteProfile {
   phone_number: string | null;
   private_address: string | null;
   languages: string[] | null;
+  vacation_mode: boolean | null;
 }
 
 Deno.serve(async (req) => {
@@ -108,10 +109,14 @@ Deno.serve(async (req) => {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
     // Get all profiles with incomplete critical fields
-    const { data: incompleteProfiles, error: profilesError } = await supabase
+    // TASK 32: Filter out users in vacation mode in-memory (they don't want notifications)
+    const { data: rawProfiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('id, first_name, avatar_url, phone_number, private_address, languages')
+      .select('id, first_name, avatar_url, phone_number, private_address, languages, vacation_mode')
       .or('avatar_url.is.null,phone_number.is.null,private_address.is.null')
+
+    // Filter out users with vacation_mode enabled
+    const incompleteProfiles = rawProfiles?.filter(p => !p.vacation_mode) || []
 
     if (profilesError) {
       console.error(`[${requestId}] Error fetching profiles:`, profilesError)
