@@ -36,6 +36,7 @@ import { OnboardingTour } from "./components/OnboardingTour";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useAnalyticsTracking } from "./hooks/useAnalyticsTracking";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { useState } from "react";
 
 const queryClient = new QueryClient();
@@ -67,6 +68,7 @@ const AppRoutes = () => {
 
   return (
     <>
+      <ScrollToTop />
       <Toaster />
       <Sonner />
       <InstallPrompt />
