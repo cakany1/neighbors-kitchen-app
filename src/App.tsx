@@ -26,6 +26,7 @@ import Install from "./pages/Install";
 import Contact from "./pages/Contact";
 import Story from "./pages/Story";
 import Trust from "./pages/Trust";
+import Partnerships from "./pages/Partnerships";
 import AdminHealth from "./pages/AdminHealth";
 import OAuthCallback from "./pages/OAuthCallback";
 import { InstallPrompt } from "./components/InstallPrompt";
@@ -86,6 +87,7 @@ const AppRoutes = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/story" element={<Story />} />
           <Route path="/trust" element={<Trust />} />
+          <Route path="/partnerships" element={<Partnerships />} />
           
           {/* Public but can view - no verification required for viewing */}
           <Route path="/feed" element={<Feed />} />

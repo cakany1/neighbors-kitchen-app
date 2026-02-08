@@ -449,7 +449,8 @@
   "navigation": {
     "feed": "Feed",
     "map": "Karte",
-    "addMeal": "Essen anbieten",
+    "addMeal": "Anbieten",
+    "partnerships": "Partner",
     "profile": "Profil"
   },
   "map": {
