@@ -134,6 +134,9 @@ const StoryPage = () => {
                      ? "Partnerships for districts, municipalities & organizations"
                      : "Partnerschaften für Quartiere, Gemeinden & Organisationen"}
                  </p>
+                 <p className="text-primary text-sm mt-2 group-hover:underline">
+                   {isEn ? "Click here to learn more →" : "Klicken Sie hier um mehr zu erfahren →"}
+                 </p>
                </a>
              </div>
           </div>
