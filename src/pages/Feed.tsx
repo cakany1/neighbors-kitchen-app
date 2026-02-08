@@ -361,54 +361,64 @@ const Feed = () => {
           </div>
         ) : (
           <div className="grid gap-4">
-            {(filteredAndSortedMeals || []).map((meal) => (
-              <MealCard
-                key={meal.id}
-                meal={{
-                  id: meal.id,
-                  title: isGuestMode
-                    ? meal.title
-                        .split(" ")
-                        .map((_, i) => (i < 2 ? "█████" : _))
-                        .join(" ")
-                    : meal.title,
-                  description: isGuestMode ? meal.description.slice(0, 50) + "..." : meal.description,
-                  chef: {
-                    firstName: meal.chef?.first_name || "Chef",
-                    lastName: meal.chef?.last_name || "",
-                    karma: meal.chef?.karma || 0,
-                    isVerified: meal.chef?.id_verified || meal.chef?.phone_verified || false,
-                  },
-                  location: {
-                    neighborhood: meal.neighborhood,
-                    fuzzyLat: parseFloat(String(meal.fuzzy_lat)),
-                    fuzzyLng: parseFloat(String(meal.fuzzy_lng)),
-                  },
-                  distance: "calculatedDistance" in meal ? ((meal as any).calculatedDistance as number) : undefined,
-                  tags: meal.tags || [],
-                  imageUrl: meal.image_url || undefined,
-                  pricing: {
-                    minimum: meal.pricing_minimum || 0,
-                    suggested: meal.pricing_suggested || undefined,
-                  },
-                  exchange_mode: (meal as any).exchange_mode || 'money',
-                  handover_mode: (meal as any).handover_mode || 'pickup',
+            {(filteredAndSortedMeals || []).map((meal) => {
+              // Demo meals (IDs starting with "demo-") are fully visible to guests
+              const isDemoMeal = meal.id?.startsWith("demo-");
+              const shouldObfuscate = isGuestMode && !isDemoMeal;
+              
+              return (
+                <MealCard
+                  key={meal.id}
+                  meal={{
+                    id: meal.id,
+                    title: shouldObfuscate
+                      ? meal.title
+                          .split(" ")
+                          .map((_, i) => (i < 2 ? "█████" : _))
+                          .join(" ")
+                      : meal.title,
+                    description: shouldObfuscate ? meal.description.slice(0, 50) + "..." : meal.description,
+                    chef: {
+                      firstName: meal.chef?.first_name || "Chef",
+                      lastName: meal.chef?.last_name || "",
+                      karma: meal.chef?.karma || 0,
+                      isVerified: meal.chef?.id_verified || meal.chef?.phone_verified || false,
+                    },
+                    location: {
+                      neighborhood: meal.neighborhood,
+                      fuzzyLat: parseFloat(String(meal.fuzzy_lat)),
+                      fuzzyLng: parseFloat(String(meal.fuzzy_lng)),
+                    },
+                    distance: "calculatedDistance" in meal ? ((meal as any).calculatedDistance as number) : undefined,
+                    tags: meal.tags || [],
+                    imageUrl: meal.image_url || undefined,
+                    pricing: {
+                      minimum: meal.pricing_minimum || 0,
+                      suggested: meal.pricing_suggested || undefined,
+                    },
+                    exchange_mode: (meal as any).exchange_mode || 'money',
+                    handover_mode: (meal as any).handover_mode || 'pickup',
 
-                  isCookingExperience: meal.is_cooking_experience,
-                  availablePortions: meal.available_portions,
-                  allergens: meal.allergens || [],
-                  scheduledDate: meal.scheduled_date,
-                }}
-                onClick={() => {
-                  if (isGuestMode) {
-                    setShowGuestModal(true);
-                  } else {
-                    navigate(`/meal/${meal.id}`);
-                  }
-                }}
-                userAllergens={userAllergens}
-              />
-            ))}
+                    isCookingExperience: meal.is_cooking_experience,
+                    availablePortions: meal.available_portions,
+                    allergens: meal.allergens || [],
+                    scheduledDate: meal.scheduled_date,
+                  }}
+                  onClick={() => {
+                    // Demo meals allow full viewing for guests, real meals require registration
+                    if (isGuestMode && !isDemoMeal) {
+                      setShowGuestModal(true);
+                    } else if (isGuestMode && isDemoMeal) {
+                      // Show full demo meal detail for guests
+                      setShowGuestModal(true);
+                    } else {
+                      navigate(`/meal/${meal.id}`);
+                    }
+                  }}
+                  userAllergens={userAllergens}
+                />
+              );
+            })}
           </div>
         )}
       </main>
