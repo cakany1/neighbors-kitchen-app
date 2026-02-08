@@ -470,7 +470,10 @@
     "restaurantValue": "Restaurant Value",
     "minimum": "Minimum",
     "portionsAvailable": "Available Portions",
-    "availablePortions": "Available Portions"
+    "stockPhoto": "Stock image",
+    "realPhoto": "Real",
+    "aiPreview": "AI Preview",
+    "aiImageDisclaimer": "Preview image – actual dish may vary"
   },
   "form": {
     "title": "Title",
@@ -919,7 +922,14 @@
     "partner_photo_not_verified_msg": "Partner photo is not verified",
     "partner_photo_verified_msg": "Partner photo is verified",
     "gentleman_notice_title": "Good to know",
-    "gentleman_notice_text": "You can delete your meal for free within 5 minutes. After that, deletion is still possible but costs 10 Karma points."
+    "gentleman_notice_text": "You can delete your meal for free within 5 minutes. After that, deletion is still possible but costs 10 Karma points.",
+    "ai_preview_title": "AI Preview Image",
+    "ai_preview_desc": "Not cooked yet? Generate a preview image based on your recipe.",
+    "ai_confirm_required": "Please confirm that the AI image represents your dish.",
+    "photo_label": "Photo of your dish",
+    "upload_photo": "Upload real photo",
+    "remove_ai_image": "Remove AI image",
+    "stock_photo_notice": "A stock image will be shown with a 'Stock image' badge"
   },
   "feed_page": {
     "welcome_message": "Welcome to Neighbors Kitchen! This is a private food-sharing community. Please bring your own containers, respect the chefs' homes and pay fairly. Tap to close.",

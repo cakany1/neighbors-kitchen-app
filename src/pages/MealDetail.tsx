@@ -33,6 +33,8 @@ import {
   Flag,
   Languages,
   Trash2,
+  Sparkles,
+  Camera,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -465,10 +467,26 @@ const MealDetail = () => {
               <ChefHat className="w-20 h-20 text-muted-foreground" />
             </div>
           )}
-          <div className="absolute top-3 right-3 flex flex-col gap-2">
-            {meal.is_stock_photo && (
+          {/* Top Left - AI/Stock/Real Badge */}
+          <div className="absolute top-3 left-3 flex gap-2">
+            {(meal as any).is_ai_generated && (
+              <Badge className="bg-amber-500/90 backdrop-blur text-white border-0 flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                {t("meal.aiPreview")}
+              </Badge>
+            )}
+            {meal.is_stock_photo && !(meal as any).is_ai_generated && (
               <Badge className="bg-background/80 backdrop-blur">{t("meal_card.symbolic_image")}</Badge>
             )}
+            {!meal.is_stock_photo && !(meal as any).is_ai_generated && meal.image_url && (
+              <Badge className="bg-green-500/90 backdrop-blur text-white border-0 flex items-center gap-1">
+                <Camera className="w-3 h-3" />
+                {t("meal.realPhoto")}
+              </Badge>
+            )}
+          </div>
+          {/* Top Right - Portions Badge */}
+          <div className="absolute top-3 right-3 flex flex-col gap-2">
             {meal.available_portions > 0 && (
               <Badge className="bg-primary/90 backdrop-blur text-primary-foreground font-bold text-sm">
                 {t("meal_detail.still_available")} {meal.available_portions}{" "}
@@ -487,6 +505,17 @@ const MealDetail = () => {
               </Badge>
             )}
           </div>
+          {/* AI Image Disclaimer Overlay */}
+          {(meal as any).is_ai_generated && (
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+              <div className="flex items-center gap-2 text-white">
+                <AlertTriangle className="w-4 h-4 text-yellow-400 shrink-0" />
+                <span className="text-xs font-medium">
+                  {t("meal.aiImageDisclaimer")}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="p-4 space-y-4">
