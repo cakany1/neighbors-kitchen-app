@@ -1,0 +1,31 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "TEAM_ID.app.lovable.625e9f2209024c99a696890f601a3230"
+        ],
+        "components": [
+          {
+            "/": "/verify-email*",
+            "comment": "Email verification deep link"
+          },
+          {
+            "/": "/login*",
+            "comment": "Password reset deep link (token in URL)"
+          },
+          {
+            "/": "/auth/callback*",
+            "comment": "OAuth callback deep link"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "TEAM_ID.app.lovable.625e9f2209024c99a696890f601a3230"
+    ]
+  }
+}
