@@ -23,7 +23,8 @@ import {
   Zap,
   Globe,
   ClipboardCheck,
-  ExternalLink
+  ExternalLink,
+  Bell
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -223,6 +224,57 @@ const AdminHealth = () => {
     },
     enabled: isAdmin === true,
     refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Fetch Push Notification status
+  const { data: pushStatus } = useQuery({
+    queryKey: ['pushStatus'],
+    queryFn: async () => {
+      // Get total active tokens by platform
+      const { data: tokenStats, error: tokenError } = await supabase
+        .from('device_push_tokens')
+        .select('platform, environment, is_active')
+        .eq('is_active', true);
+
+      if (tokenError) throw tokenError;
+
+      const stats = {
+        ios: tokenStats?.filter(t => t.platform === 'ios').length || 0,
+        android: tokenStats?.filter(t => t.platform === 'android').length || 0,
+        web: tokenStats?.filter(t => t.platform === 'web').length || 0,
+        production: tokenStats?.filter(t => t.environment === 'production').length || 0,
+        development: tokenStats?.filter(t => t.environment === 'development').length || 0,
+        total: tokenStats?.length || 0,
+      };
+
+      // Get last registered token
+      const { data: lastToken } = await supabase
+        .from('device_push_tokens')
+        .select('platform, environment, created_at, updated_at')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      // Get recent push notifications (last 24h)
+      const { data: recentPushes } = await supabase
+        .from('push_notification_logs')
+        .select('status, notification_type')
+        .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+      const pushStats = {
+        sent: recentPushes?.filter(p => p.status === 'sent').length || 0,
+        failed: recentPushes?.filter(p => p.status === 'failed').length || 0,
+        total: recentPushes?.length || 0,
+      };
+
+      return {
+        tokens: stats,
+        lastToken,
+        pushStats,
+      };
+    },
+    enabled: isAdmin === true,
+    refetchInterval: 30000,
   });
 
   // Run self-test mutation
@@ -494,6 +546,115 @@ const AdminHealth = () => {
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
                   Noch keine Stripe-Webhooks empfangen. Stellen Sie sicher, dass der Webhook in Stripe Dashboard konfiguriert ist.
+                </AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Push Notification Status Card */}
+        <Card className="border-2 border-primary/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="w-5 h-5 text-primary" />
+              Push Notifications
+            </CardTitle>
+            <CardDescription>
+              Registrierte Geräte und Benachrichtigungsstatus
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Token Stats by Platform */}
+              <div className="p-4 rounded-lg bg-muted/50">
+                <span className="text-sm font-medium">Aktive Geräte</span>
+                <div className="flex gap-4 mt-2">
+                  <div className="text-center">
+                    <p className="text-lg font-bold">{pushStatus?.tokens?.ios || 0}</p>
+                    <p className="text-xs text-muted-foreground">iOS</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold">{pushStatus?.tokens?.android || 0}</p>
+                    <p className="text-xs text-muted-foreground">Android</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold">{pushStatus?.tokens?.web || 0}</p>
+                    <p className="text-xs text-muted-foreground">Web</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Environment Stats */}
+              <div className="p-4 rounded-lg bg-muted/50">
+                <span className="text-sm font-medium">Nach Umgebung</span>
+                <div className="flex gap-4 mt-2">
+                  <div className="text-center">
+                    <p className="text-lg font-bold">{pushStatus?.tokens?.production || 0}</p>
+                    <p className="text-xs text-muted-foreground">Prod</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold">{pushStatus?.tokens?.development || 0}</p>
+                    <p className="text-xs text-muted-foreground">Dev</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold">{pushStatus?.tokens?.total || 0}</p>
+                    <p className="text-xs text-muted-foreground">Total</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Last Token Registered */}
+              <div className="p-4 rounded-lg bg-muted/50">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Letztes Token</span>
+                  {pushStatus?.lastToken ? (
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Clock className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </div>
+                {pushStatus?.lastToken ? (
+                  <>
+                    <Badge variant="outline" className="mt-2">
+                      {pushStatus.lastToken.platform} • {pushStatus.lastToken.environment}
+                    </Badge>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {new Date(pushStatus.lastToken.updated_at).toLocaleString('de-DE')}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Noch keine Tokens registriert
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Push Stats (last 24h) */}
+            <div className="p-4 rounded-lg bg-muted/50">
+              <span className="text-sm font-medium">Letzte 24h Benachrichtigungen</span>
+              <div className="flex gap-6 mt-2">
+                <div className="text-center">
+                  <p className="text-lg font-bold">{pushStatus?.pushStats?.sent || 0}</p>
+                  <p className="text-xs text-muted-foreground">Gesendet</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-lg font-bold text-destructive">{pushStatus?.pushStats?.failed || 0}</p>
+                  <p className="text-xs text-muted-foreground">Fehlgeschlagen</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-lg font-bold">{pushStatus?.pushStats?.total || 0}</p>
+                  <p className="text-xs text-muted-foreground">Total</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Warning if no tokens */}
+            {pushStatus?.tokens?.total === 0 && (
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  Noch keine Push-Tokens registriert. Stellen Sie sicher, dass die App auf einem Gerät installiert ist und Push-Berechtigungen erteilt wurden.
                 </AlertDescription>
               </Alert>
             )}
