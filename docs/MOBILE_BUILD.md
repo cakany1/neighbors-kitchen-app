@@ -166,18 +166,40 @@ npx cap update android
 
 ---
 
+## Generate App Icons & Splash Screens
+
+### One-Time Setup
+Icons and splash screens are **auto-generated** from source images:
+
+```bash
+# Generate all iOS + Android sizes
+npm run cap:icons
+
+# Or manually
+bash scripts/generate-assets.sh      # macOS/Linux
+scripts/generate-assets.bat           # Windows
+```
+
+This creates:
+- **iOS**: `ios/App/App/Assets.xcassets/` (AppIcon + Splash)
+- **Android**: `android/app/src/main/res/` (drawable + mipmap folders)
+
+### Source Images
+Located in `src/assets/`:
+- `app-icon.png` — 1024x1024 (main icon)
+- `splash-screen.png` — 1920x1080 (splash screen)
+
+See [ICON_SPLASH_CONFIG.md](./ICON_SPLASH_CONFIG.md) for details on updating these files.
+
 ## App Assets Checklist
 
-Before store submission, ensure you have:
+Before store submission, verify:
 
-### Android (`android/app/src/main/res/`)
-- [ ] `mipmap-*/ic_launcher.png` — App icons (48-192px)
-- [ ] `mipmap-*/ic_launcher_round.png` — Round icons
-- [ ] `drawable/splash.png` — Splash screen
-
-### iOS (`ios/App/App/Assets.xcassets/`)
-- [ ] `AppIcon.appiconset/` — All icon sizes (20-1024px)
-- [ ] `Splash.imageset/` — Splash images
+### Generated Assets
+- [ ] `npm run cap:icons` executed successfully
+- [ ] iOS: `ios/App/App/Assets.xcassets/AppIcon.appiconset/` has all sizes
+- [ ] Android: `android/app/src/main/res/drawable-*/` has splash variants
+- [ ] Android: `android/app/src/main/res/mipmap-*/` has icon variants
 
 ### Store Listings
 - [ ] Screenshots (phone + tablet)
