@@ -37,6 +37,13 @@
     "understood": "Got it",
     "cancel": "Cancel"
   },
+  "photo_picker": {
+    "upload_photo": "Upload Photo",
+    "take_photo": "Take Photo",
+    "choose_from_gallery": "Choose from Gallery",
+    "file_too_large": "File too large (max 5MB)",
+    "invalid_file_type": "Only JPEG, PNG, WebP or GIF allowed"
+  },
   "chat": {
     "loading": "Loading...",
     "hide_translations": "Hide",
