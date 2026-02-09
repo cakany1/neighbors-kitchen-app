@@ -83,6 +83,10 @@
     "view_details": "View Details"
   },
   "profile": {
+    "compliance_and_legal": "Compliance & Legal",
+    "app_version": "App Version",
+    "privacy_policy": "Privacy Policy",
+    "contact_support": "Contact Support",
     "chef_bookings_title": "Bookings for Your Meals",
     "karma": "Karma",
     "mealsShared": "Meals Shared",

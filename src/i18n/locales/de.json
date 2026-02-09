@@ -217,6 +217,10 @@
     "translated_successfully": "Erfolgreich übersetzt"
   },
   "profile": {
+    "compliance_and_legal": "Datenschutz & Rechtliches",
+    "app_version": "App-Version",
+    "privacy_policy": "Datenschutzerklärung",
+    "contact_support": "Support kontaktieren",
     "chef_bookings_title": "Buchungen für deine Gerichte",
     "karma": "Karma",
     "mealsShared": "Mahlzeiten geteilt",

@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Star, Award, ChefHat, Heart, Globe, Shield, Loader2, Upload, AlertCircle, ChevronDown } from 'lucide-react';
+import { Star, Award, ChefHat, Heart, Globe, Shield, Loader2, Upload, AlertCircle, ChevronDown, FileText, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { allergenOptions, dislikeCategories } from '@/utils/ingredientDatabase';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,6 +36,8 @@ import { RatingSummary } from '@/components/RatingSummary';
 import { ChefBookings } from '@/components/ChefBookings';
 import { ProfileRatings } from '@/components/ProfileRatings';
 import { HouseholdLinking } from '@/components/HouseholdLinking';
+import { ComplianceLinks } from '@/components/ComplianceLinks';
+import { AppVersionBadge } from '@/components/AppVersionBadge';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -1917,6 +1919,23 @@ const Profile = () => {
             >
               {t('auth.logout')}
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Compliance & Legal */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5" />
+              {t('profile.compliance_and_legal')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ComplianceLinks variant="settings" />
+            <div className="pt-2 border-t border-border flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">{t('profile.app_version')}</span>
+              <AppVersionBadge />
+            </div>
           </CardContent>
         </Card>
 
