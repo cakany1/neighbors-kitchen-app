@@ -942,6 +942,7 @@
     "gentleman_notice_title": "Good to know",
     "gentleman_notice_text": "You can delete your meal for free within 5 minutes. After that, deletion is still possible but costs 10 Karma points.",
     "ai_preview_title": "AI Preview Image",
+    "ai_preview_placeholder": "Preview will appear here once you generate an image.",
     "ai_preview_desc": "Not cooked yet? Generate a preview image based on your recipe.",
     "ai_confirm_required": "Please confirm that the AI image represents your dish.",
     "photo_label": "Photo of your dish",

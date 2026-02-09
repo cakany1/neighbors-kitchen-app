@@ -898,6 +898,7 @@
     "gentleman_notice_title": "Gut zu wissen",
     "gentleman_notice_text": "Du kannst deine Mahlzeit innerhalb von 5 Minuten kostenlos löschen. Danach ist Löschen weiterhin möglich, kostet aber 10 Karma Punkte.",
     "ai_preview_title": "KI-Vorschaubild",
+    "ai_preview_placeholder": "Vorschau erscheint hier, sobald du ein Bild generierst.",
     "ai_preview_desc": "Noch nicht gekocht? Generiere ein Vorschaubild basierend auf deinem Rezept.",
     "ai_confirm_required": "Bitte bestätige, dass das KI-Bild dein Gericht repräsentiert.",
     "photo_label": "Foto vom Gericht",
