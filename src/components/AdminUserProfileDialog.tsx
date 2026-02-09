@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +9,7 @@ import {
   CheckCircle, XCircle, User, Phone, MapPin, Globe, Heart, 
   Shield, Star, Calendar, AlertTriangle, CreditCard, MessageSquare
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserProfile {
   id: string;
@@ -95,6 +97,43 @@ const StatusBadge = ({ filled, label }: { filled: boolean; label: string }) => (
 );
 
 export function AdminUserProfileDialog({ user, open, onOpenChange, onSendMessage }: AdminUserProfileDialogProps) {
+  const hasLoggedRef = useRef<string | null>(null);
+
+  // Log admin read when dialog opens with a user
+  useEffect(() => {
+    if (!open || !user?.id) return;
+    
+    // Prevent duplicate logging for the same user in the same session
+    if (hasLoggedRef.current === user.id) return;
+    
+    const logAdminRead = async () => {
+      try {
+        // Use the SECURITY DEFINER function to log and retrieve data
+        const { error } = await supabase.rpc('admin_view_user_sensitive_data', {
+          p_target_user_id: user.id,
+          p_context: 'admin_user_profile_dialog'
+        });
+        
+        if (error) {
+          console.error('Failed to log admin read:', error);
+        } else {
+          hasLoggedRef.current = user.id;
+        }
+      } catch (err) {
+        console.error('Error logging admin read:', err);
+      }
+    };
+    
+    logAdminRead();
+  }, [open, user?.id]);
+
+  // Reset logged ref when dialog closes
+  useEffect(() => {
+    if (!open) {
+      hasLoggedRef.current = null;
+    }
+  }, [open]);
+
   if (!user) return null;
 
   const formatDate = (dateStr: string | null) => {
