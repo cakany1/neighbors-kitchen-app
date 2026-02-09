@@ -862,6 +862,7 @@
     "error": "Payment failed. Please try again."
   },
   "add_meal": {
+    "karma_deletion_warning": "You can delete your meal free of charge within 5 minutes. After that, deletion is still possible but costs 10 Karma points.",
     "page_title": "Share a Meal",
     "page_subtitle": "Create an offer for your home-cooked dish",
     "whats_cooking": "What's cooking today? *",
