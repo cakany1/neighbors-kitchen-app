@@ -818,6 +818,7 @@
     "error": "Zahlung fehlgeschlagen. Bitte erneut versuchen."
   },
   "add_meal": {
+    "karma_deletion_warning": "Du kannst deine Mahlzeit innerhalb von 5 Minuten kostenlos löschen. Danach ist Löschen weiterhin möglich, kostet aber 10 Karma Punkte.",
     "page_title": "Essen anbieten",
     "page_subtitle": "Erstelle ein Angebot für dein selbstgekochtes Gericht",
     "whats_cooking": "Was gibt's heute? *",
