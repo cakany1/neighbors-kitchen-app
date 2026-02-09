@@ -133,7 +133,7 @@ const Admin = () => {
       if (err1) throw err1;
 
       // Query 2: Partner verification pending (couple accounts with partner doc uploaded)
-      const { data: partnerPending, error: err2 } = await supabase
+      const { data: partnerDocPending, error: err2 } = await supabase
         .from('profiles')
         .select(selectFields)
         .eq('is_couple', true)
@@ -144,12 +144,24 @@ const Admin = () => {
 
       if (err2) throw err2;
 
-      // Merge and deduplicate
+      // Query 3: Partner photo not verified (couple accounts with partner photo uploaded)
+      const { data: partnerPhotoPending, error: err3 } = await supabase
+        .from('profiles')
+        .select(selectFields)
+        .eq('is_couple', true)
+        .eq('partner_photo_verified', false)
+        .not('partner_photo_url', 'is', null)
+        .order('created_at', { ascending: false });
+
+      if (err3) throw err3;
+
+      // Merge and deduplicate all three queries
       const allPending = [...(primaryPending || [])];
       const existingIds = new Set(allPending.map(u => u.id));
-      for (const user of (partnerPending || [])) {
+      for (const user of [...(partnerDocPending || []), ...(partnerPhotoPending || [])]) {
         if (!existingIds.has(user.id)) {
           allPending.push(user);
+          existingIds.add(user.id);
         }
       }
 
