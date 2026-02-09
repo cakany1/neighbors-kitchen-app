@@ -116,6 +116,31 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
           <div className="flex justify-between items-start">
             <h3 className="font-semibold text-lg leading-tight mb-1 text-foreground">{displayTitle}</h3>
           </div>
+
+          {/* Short description */}
+          {meal.description && (
+            <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+              {!showOriginal && i18n.language === "en" && (meal as any).descriptionEn
+                ? (meal as any).descriptionEn
+                : meal.description}
+            </p>
+          )}
+
+          {/* AI Preview Thumbnail — small inline image if AI-generated */}
+          {isAiGenerated && imageUrl && (
+            <div className="mb-2 flex items-center gap-2">
+              <img
+                src={imageUrl}
+                alt="AI preview"
+                className="w-10 h-10 rounded object-cover border border-border"
+                loading="lazy"
+              />
+              <span className="text-[10px] text-muted-foreground italic">
+                {t("meal.ai_preview", "KI-Vorschau")}
+              </span>
+            </div>
+          )}
+
           <div className="flex flex-col gap-1.5 text-sm text-muted-foreground">
              <div className="flex items-center gap-2">
                <span className="font-medium text-foreground flex items-center gap-1">

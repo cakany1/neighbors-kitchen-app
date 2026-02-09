@@ -38,6 +38,7 @@ import { ProfileRatings } from '@/components/ProfileRatings';
 import { HouseholdLinking } from '@/components/HouseholdLinking';
 import { ComplianceLinks } from '@/components/ComplianceLinks';
 import { AppVersionBadge } from '@/components/AppVersionBadge';
+import { ChangePasswordSection } from '@/components/ChangePasswordSection';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -1878,6 +1879,12 @@ const Profile = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Change Password */}
+        <ChangePasswordSection
+          userEmail={currentUser.email || ''}
+          isOAuthUser={currentUser.app_metadata?.provider === 'google' || currentUser.app_metadata?.providers?.includes('google')}
+        />
 
         {/* Optional: 2FA Settings */}
         <TwoFactorSettings userId={currentUser.id} />
