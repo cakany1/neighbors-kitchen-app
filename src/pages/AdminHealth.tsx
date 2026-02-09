@@ -403,9 +403,9 @@ const AdminHealth = () => {
       <Header />
       
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        {/* Environment Badge */}
+        {/* Environment Badge with Status Indicators */}
         <div className={`px-4 py-3 rounded-lg border-l-4 ${envInfo.bgColor}`}>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <Server className="w-5 h-5" />
               <div>
@@ -413,6 +413,23 @@ const AdminHealth = () => {
                 <p className="text-xs text-muted-foreground">
                   Hostname: {envInfo.hostname} • Supabase: {envInfo.supabaseProjectId || 'N/A'}
                 </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {/* DB Status Indicator */}
+              <div className="flex items-center gap-1.5 text-xs font-medium">
+                <span className={`inline-block w-2.5 h-2.5 rounded-full ${
+                  dbCheckLoading ? 'bg-yellow-400 animate-pulse' : dbCheck?.connected ? 'bg-green-500' : 'bg-red-500'
+                }`} />
+                <span>Supabase</span>
+                {dbCheck?.connected && <span className="text-muted-foreground">({dbCheck.latency}ms)</span>}
+              </div>
+              {/* GitHub Status Indicator */}
+              <div className="flex items-center gap-1.5 text-xs font-medium">
+                <span className={`inline-block w-2.5 h-2.5 rounded-full ${
+                  githubLoading ? 'bg-yellow-400 animate-pulse' : githubStatus?.indicator === 'none' ? 'bg-green-500' : githubStatus?.indicator === 'minor' ? 'bg-yellow-400' : 'bg-red-500'
+                }`} />
+                <span>GitHub</span>
               </div>
             </div>
           </div>
