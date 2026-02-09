@@ -2,9 +2,11 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Smartphone, Share2, Menu, Plus, ExternalLink, Download } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Smartphone, Share2, Menu, Plus, ExternalLink, Download, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 
 // Placeholder URLs – replace with actual store links once published
 const APP_STORE_URL = ''; // e.g. https://apps.apple.com/app/neighbors-kitchen/id...
@@ -13,6 +15,7 @@ const PLAY_STORE_URL = ''; // e.g. https://play.google.com/store/apps/details?id
 const Install = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [pwaOpen, setPwaOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -22,10 +25,10 @@ const Install = () => {
         <div className="mb-6 text-center">
           <Smartphone className="w-16 h-16 mx-auto mb-4 text-primary" />
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            {t('install.title', 'Neighbors Kitchen herunterladen')}
+            {t('install.title', 'App herunterladen')}
           </h1>
           <p className="text-muted-foreground">
-            {t('install.subtitle', 'Lade die App herunter oder installiere sie direkt auf deinem Gerät')}
+            {t('install.subtitle_store', 'Neighbors Kitchen ist im App Store und bei Google Play erhältlich.')}
           </p>
         </div>
 
@@ -34,11 +37,8 @@ const Install = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Download className="w-5 h-5 text-primary" />
-              {t('install.native_apps', 'Native App')}
+              {t('install.download_app', 'App herunterladen')}
             </CardTitle>
-            <CardDescription>
-              {t('install.native_apps_desc', 'Erhältlich im App Store und Google Play')}
-            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button
@@ -87,82 +87,6 @@ const Install = () => {
           </CardContent>
         </Card>
 
-        {/* PWA Fallback Section */}
-        <div className="mb-4">
-          <p className="text-sm font-medium text-muted-foreground text-center">
-            {t('install.or_install_pwa', '— oder direkt im Browser installieren —')}
-          </p>
-        </div>
-
-        {/* iOS PWA */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <span className="text-2xl">🍎</span>
-              iPhone (Safari)
-            </CardTitle>
-            <CardDescription>
-              {t('install.pwa_fallback_hint', 'Falls die App noch nicht im Store ist')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground rounded-full font-bold">1</div>
-              <div className="flex-1">
-                <p className="font-medium mb-1">Öffne das Teilen-Menü</p>
-                <p className="text-sm text-muted-foreground">Tippe auf 📤 unten in Safari</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground rounded-full font-bold">2</div>
-              <div className="flex-1">
-                <p className="font-medium mb-1">"Zum Home-Bildschirm"</p>
-                <p className="text-sm text-muted-foreground">Scrolle und tippe auf die Option</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground rounded-full font-bold">3</div>
-              <div className="flex-1">
-                <p className="font-medium mb-1">Bestätigen</p>
-                <p className="text-sm text-muted-foreground">App erscheint auf dem Home-Bildschirm <Plus className="inline w-4 h-4" /></p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Android PWA */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <span className="text-2xl">🤖</span>
-              Android (Chrome)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground rounded-full font-bold">1</div>
-              <div className="flex-1">
-                <p className="font-medium mb-1">Browser-Menü öffnen</p>
-                <p className="text-sm text-muted-foreground">Tippe auf <Menu className="inline w-4 h-4" /> oben rechts</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground rounded-full font-bold">2</div>
-              <div className="flex-1">
-                <p className="font-medium mb-1">"App installieren" wählen</p>
-                <p className="text-sm text-muted-foreground">Oder "Zum Startbildschirm hinzufügen"</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-primary text-primary-foreground rounded-full font-bold">3</div>
-              <div className="flex-1">
-                <p className="font-medium mb-1">Bestätigen</p>
-                <p className="text-sm text-muted-foreground">App erscheint auf dem Startbildschirm</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Push Notifications Info */}
         <Card className="mb-6">
           <CardHeader>
@@ -189,32 +113,44 @@ const Install = () => {
           </CardContent>
         </Card>
 
-        {/* Benefits */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">{t('install.benefits_title', 'Vorteile')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <span className="text-green-500 font-bold">✓</span>
-                <span>{t('install.benefit_fast', 'Schneller Zugriff vom Home-Bildschirm')}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-green-500 font-bold">✓</span>
-                <span>{t('install.benefit_push', 'Push-Benachrichtigungen für neue Gerichte')}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-green-500 font-bold">✓</span>
-                <span>{t('install.benefit_native', 'Fühlt sich an wie eine native App')}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-green-500 font-bold">✓</span>
-                <span>{t('install.benefit_offline', 'Funktioniert auch offline')}</span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
+        {/* PWA Fallback — hidden behind collapsible */}
+        <Collapsible open={pwaOpen} onOpenChange={setPwaOpen}>
+          <CollapsibleTrigger asChild>
+            <button className="w-full text-center text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors py-2 flex items-center justify-center gap-1">
+              {t('install.alternative_install', 'Alternative Installation (Browser)')}
+              <ChevronDown className={`w-3 h-3 transition-transform ${pwaOpen ? 'rotate-180' : ''}`} />
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4 mt-2">
+            {/* iOS PWA */}
+            <Card className="border-muted">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <span>🍎</span> iPhone (Safari)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-xs text-muted-foreground">
+                <p>1. Tippe auf <Share2 className="inline w-3 h-3" /> (Teilen-Menü)</p>
+                <p>2. Wähle "Zum Home-Bildschirm"</p>
+                <p>3. Bestätigen</p>
+              </CardContent>
+            </Card>
+
+            {/* Android PWA */}
+            <Card className="border-muted">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <span>🤖</span> Android (Chrome)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-xs text-muted-foreground">
+                <p>1. Tippe auf <Menu className="inline w-3 h-3" /> (Menü)</p>
+                <p>2. Wähle "App installieren"</p>
+                <p>3. Bestätigen</p>
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
 
         <div className="mt-8 text-center">
           <Button onClick={() => navigate('/feed')} size="lg" className="w-full">

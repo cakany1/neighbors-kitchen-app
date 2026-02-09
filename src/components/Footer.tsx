@@ -54,13 +54,13 @@ export const Footer = () => {
           </Link>
           <span className="text-muted-foreground/30">|</span>
 
-          {/* Install App (Hervorgehoben) */}
+          {/* App herunterladen */}
           <Link
             to="/install"
             className="flex items-center gap-1 text-primary font-medium hover:text-primary/80 transition-colors"
           >
             <Smartphone className="w-4 h-4" />
-            {t("footer.install_app")}
+            {t("install.download_app", "App herunterladen")}
           </Link>
         </div>
       </div>

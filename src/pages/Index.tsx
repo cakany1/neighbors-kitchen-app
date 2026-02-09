@@ -88,7 +88,7 @@ const Index = () => {
                 variant="ghost"
                 onClick={() => navigate('/install')}
               >
-                {t('landing.install_app')}
+                {t('install.download_app', 'App herunterladen')}
               </Button>
               <Button
                 variant="ghost"
