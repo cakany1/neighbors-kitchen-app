@@ -639,6 +639,34 @@ const AddMeal = () => {
                   className="mt-2"
                 />
               </div>
+              {/* AI Image Preview - Directly below description */}
+              <div className="p-4 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-primary">
+                    {t('add_meal.ai_preview_title', 'KI-Vorschaubild')}
+                  </span>
+                </div>
+                {!aiImageUrl && !isAiGenerated ? (
+                  <p className="text-xs text-muted-foreground mb-3">
+                    {t('add_meal.ai_preview_placeholder', 'Vorschau erscheint hier, sobald du ein Bild generierst.')}
+                  </p>
+                ) : null}
+                <AIImageGenerator
+                  title={formData.title}
+                  description={formData.description}
+                  ingredients={formData.ingredients}
+                  onImageGenerated={(url) => {
+                    setAiImageUrl(url);
+                    setIsAiGenerated(true);
+                    setUseStockPhoto(false);
+                  }}
+                  onConfirmationChange={setAiImageConfirmed}
+                  isConfirmed={aiImageConfirmed}
+                  currentImageUrl={aiImageUrl || undefined}
+                  isAIImage={isAiGenerated}
+                />
+              </div>
             </CardContent>
           </Card>
 
@@ -1221,46 +1249,9 @@ const AddMeal = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <CardContent className="space-y-6 pt-2">
-                    {/* Photo Options */}
+                    {/* Photo Options - Upload only (AI preview moved above) */}
                      <div className="space-y-4">
                        <Label className="block font-medium">{t('add_meal.photo_label', 'Foto vom Gericht')}</Label>
-                       
-                       {/* AI Image Generator - Primary Option */}
-                       <div className="p-4 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5">
-                         <div className="flex items-center gap-2 mb-3">
-                           <Sparkles className="w-5 h-5 text-primary" />
-                           <span className="font-medium text-primary">
-                             {t('add_meal.ai_preview_title', 'KI-Vorschaubild')}
-                           </span>
-                           <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
-                             {t('common.new', 'Neu')}
-                           </span>
-                         </div>
-                         <p className="text-sm text-muted-foreground mb-4">
-                           {t('add_meal.ai_preview_desc', 'Noch nicht gekocht? Generiere ein Vorschaubild basierend auf deinem Rezept.')}
-                         </p>
-                         <AIImageGenerator
-                           title={formData.title}
-                           description={formData.description}
-                           ingredients={formData.ingredients}
-                           onImageGenerated={(url) => {
-                             setAiImageUrl(url);
-                             setIsAiGenerated(true);
-                             setUseStockPhoto(false);
-                           }}
-                           onConfirmationChange={setAiImageConfirmed}
-                           isConfirmed={aiImageConfirmed}
-                           currentImageUrl={aiImageUrl || undefined}
-                           isAIImage={isAiGenerated}
-                         />
-                       </div>
-
-                       {/* Divider */}
-                       <div className="flex items-center gap-3">
-                         <div className="flex-1 border-t border-border" />
-                         <span className="text-xs text-muted-foreground">{t('common.or', 'oder')}</span>
-                         <div className="flex-1 border-t border-border" />
-                       </div>
 
                        {/* Traditional Photo Upload */}
                        {!isAiGenerated && (
