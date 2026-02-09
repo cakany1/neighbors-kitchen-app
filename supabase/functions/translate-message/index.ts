@@ -29,6 +29,10 @@ Deno.serve(async (req) => {
   const originError = checkOrigin(req, requestId);
   if (originError) return originError;
 
+  // Server-side limits
+  const MAX_TRANSLATION_LENGTH = 5000;
+  const MIN_TRANSLATION_LENGTH = 1;
+
   try {
     // Authentication check
     const auth = await verifyAuth(req, requestId);
@@ -37,6 +41,29 @@ Deno.serve(async (req) => {
     }
 
     const { text, targetLanguage, sourceLanguage } = await req.json();
+    
+    // Input validation - server-side enforcement
+    if (!text || typeof text !== 'string') {
+      safeLog(requestId, 'warn', 'Invalid input: missing or invalid text');
+      return jsonError('Text is required', 400, requestId, undefined, origin);
+    }
+    
+    const trimmedText = text.trim();
+    
+    if (trimmedText.length < MIN_TRANSLATION_LENGTH) {
+      safeLog(requestId, 'warn', 'Input too short', { length: trimmedText.length });
+      return jsonError('Text is too short', 400, requestId, undefined, origin);
+    }
+    
+    if (trimmedText.length > MAX_TRANSLATION_LENGTH) {
+      safeLog(requestId, 'warn', 'Input too long', { length: trimmedText.length, max: MAX_TRANSLATION_LENGTH });
+      return jsonError(`Text exceeds maximum length of ${MAX_TRANSLATION_LENGTH} characters`, 400, requestId, undefined, origin);
+    }
+
+    if (!targetLanguage || !sourceLanguage) {
+      return jsonError('Source and target language are required', 400, requestId, undefined, origin);
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -46,6 +73,7 @@ Deno.serve(async (req) => {
     safeLog(requestId, 'info', 'Translating message', { 
       from: sourceLanguage, 
       to: targetLanguage, 
+      textLength: trimmedText.length,
       userId: auth.user?.id 
     });
 
@@ -64,7 +92,7 @@ Deno.serve(async (req) => {
           },
           {
             role: "user",
-            content: text
+            content: trimmedText
           }
         ],
       }),

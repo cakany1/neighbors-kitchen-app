@@ -6,6 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Constants for validation
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
 interface GalleryUploadProps {
   userId: string;
 }
@@ -42,15 +46,15 @@ const GalleryUpload = ({ userId }: GalleryUploadProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Datei zu gross (max 5MB)');
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(`Datei zu gross (max ${MAX_FILE_SIZE / 1024 / 1024}MB)`);
       return;
     }
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Nur Bilder sind erlaubt');
+    // Validate file type - strict whitelist
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast.error('Nur JPEG, PNG, WebP oder GIF erlaubt');
       return;
     }
 
