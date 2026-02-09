@@ -76,61 +76,141 @@ This ensures the app uses the bundled web assets instead of the dev server.
 
 ## Android Build (AAB for Google Play)
 
-**Works on:** Mac, Windows, Linux
+**Works on:** Mac, Windows, Linux  
+**Output:** `android/app/release/app-release.aab`
 
 ### Step-by-Step
 
 ```bash
-# 1. Build and sync
+# 1. Prepare for production (optional, but recommended)
+# Edit capacitor.config.ts and comment out the server block
+
+# 2. Build and open Android Studio
 npm run cap:android
 
-# 2. Android Studio opens automatically
-# 3. In Android Studio menu: Build → Generate Signed Bundle / APK
+# 3. In Android Studio: Build → Generate Signed Bundle / APK
 # 4. Select "Android App Bundle"
-# 5. Create or use existing keystore (KEEP THIS SAFE!)
+# 5. Create or select existing keystore
 # 6. Select "release" build variant
-# 7. Output: app/release/app-release.aab
+# 7. AAB will be generated at: android/app/release/app-release.aab
 ```
 
-### Keystore Creation (First Time)
+### Keystore (Release Signing)
+
+The keystore is a certificate that signs your app:
+
+**First release:**
 - Android Studio will prompt you to create one
-- Store the `.jks` file and passwords securely
-- You'll need these for every future release
+- Choose a strong password (100+ characters recommended)
+- Store the `.jks` file and passwords in a secure location
+- You'll need these for every future release update
+
+**Future releases:**
+- Android Studio will ask for the same keystore
+- Provide the path and passwords
+- App will be signed with the same key
 
 ### Upload to Google Play
+
 1. Go to [Google Play Console](https://play.google.com/console)
-2. Create app → Upload AAB
-3. Complete store listing, content rating, pricing
+2. Create app entry
+3. Upload AAB to Internal Testing → Production track
+4. Complete store listing, screenshots, permissions
+5. Submit for review
 
 ---
 
 ## iOS Build (Xcode Archive for App Store)
 
-**Works on:** Mac only (requires Xcode)
+**Works on:** Mac only (requires Xcode)  
+**Output:** App Bundle uploaded via Xcode to App Store Connect
 
 ### Step-by-Step
 
 ```bash
-# 1. Build and sync
+# 1. Prepare for production (optional, but recommended)
+# Edit capacitor.config.ts and comment out the server block
+
+# 2. Build and open Xcode
 npm run cap:ios
 
-# 2. Xcode opens automatically
-# 3. Select your target device as "Any iOS Device (arm64)"
+# 3. In Xcode: Select your device as "Any iOS Device (arm64)"
 # 4. Menu: Product → Archive
-# 5. When complete, Organizer window opens
+# 5. Organizer window opens automatically
 # 6. Click "Distribute App" → "App Store Connect"
-# 7. Follow prompts to upload
+# 7. Follow upload prompts
 ```
 
 ### Before Archiving
-1. **Signing:** Select your team in Xcode → Signing & Capabilities
-2. **Bundle ID:** Must match `appId` in capacitor.config.ts
-3. **Version:** Update in Xcode → General → Identity
 
-### App Store Connect
-1. Go to [App Store Connect](https://appstoreconnect.apple.com)
-2. Create new app with matching Bundle ID
-3. Upload build, complete metadata, submit for review
+1. **Signing & Capabilities:**
+   - Select your app target in Xcode left panel
+   - Go to "Signing & Capabilities" tab
+   - Select your team account
+   - Xcode will auto-manage signing certificate
+
+2. **Bundle ID:**
+   - Must match `appId` in `capacitor.config.ts`
+   - Default: `app.lovable.625e9f2209024c99a696890f601a3230`
+
+3. **Version & Build:**
+   - General tab → Identity section
+   - Version: `1.0.0` (user-visible version)
+   - Build: `1` (increment for each internal build)
+
+4. **Certificates:**
+   - If first time: Xcode menu → Preferences → Accounts
+   - Add your Apple ID
+   - Download certificates
+
+### Upload to App Store
+
+1. Xcode Organizer → "Distribute App"
+2. Select "App Store Connect" method
+3. Follow signing/upload wizard
+4. Go to [App Store Connect](https://appstoreconnect.apple.com)
+5. Complete app metadata, screenshots, privacy policy
+6. Submit for review (typically 24-48 hours)
+
+---
+
+## Clean/Reset Native Projects
+
+If native projects are corrupted or out of sync:
+
+```bash
+# Option 1: Full clean (removes ios/ and android/ folders)
+npm run cap:clean
+
+# Option 2: Sync without clean
+npm run cap:sync
+
+# Option 3: Manual steps
+rm -rf ios android
+npx cap add ios
+npx cap add android
+npx cap sync
+```
+
+---
+
+## After `git pull` (Team Workflow)
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Sync native projects with latest code
+npm run cap:sync
+
+# 3. If native code was changed, rebuild:
+npm run cap:ios      # Xcode
+npm run cap:android  # Android Studio
+```
+
+---
+
+## Cross-Platform Support
 
 ---
 
