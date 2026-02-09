@@ -106,26 +106,54 @@ const Admin = () => {
   });
 
   // Fetch pending verifications (sorted by newest first) - ALL profile fields
+  // Includes BOTH primary verification_status='pending' AND partner_verification_status='pending' (with doc uploaded)
   const { data: pendingVerifications, isLoading: verificationsLoading } = useQuery({
     queryKey: ['pendingVerifications'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const selectFields = `
+        id, first_name, last_name, nickname, gender, phone_number, phone_verified,
+        avatar_url, verification_status, id_verified, id_document_url,
+        partner_name, partner_photo_url, partner_gender, is_couple,
+        partner_verification_status, partner_id_document_url, partner_photo_verified,
+        photo_verified,
+        private_address, private_city, private_postal_code,
+        age, allergens, dislikes, languages, role, visibility_mode,
+        karma, successful_pickups, no_shows, vacation_mode, notification_radius,
+        latitude, longitude, iban, display_real_name,
+        created_at, updated_at
+      `;
+
+      // Query 1: Primary verification pending
+      const { data: primaryPending, error: err1 } = await supabase
         .from('profiles')
-        .select(`
-          id, first_name, last_name, nickname, gender, phone_number, phone_verified,
-          avatar_url, verification_status, id_verified, id_document_url,
-          partner_name, partner_photo_url, partner_gender, is_couple,
-          private_address, private_city, private_postal_code,
-          age, allergens, dislikes, languages, role, visibility_mode,
-          karma, successful_pickups, no_shows, vacation_mode, notification_radius,
-          latitude, longitude, iban, display_real_name,
-          created_at, updated_at
-        `)
+        .select(selectFields)
         .eq('verification_status', 'pending')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data;
+      if (err1) throw err1;
+
+      // Query 2: Partner verification pending (couple accounts with partner doc uploaded)
+      const { data: partnerPending, error: err2 } = await supabase
+        .from('profiles')
+        .select(selectFields)
+        .eq('is_couple', true)
+        .eq('partner_verification_status', 'pending')
+        .not('partner_id_document_url', 'is', null)
+        .neq('verification_status', 'pending') // avoid duplicates with query 1
+        .order('created_at', { ascending: false });
+
+      if (err2) throw err2;
+
+      // Merge and deduplicate
+      const allPending = [...(primaryPending || [])];
+      const existingIds = new Set(allPending.map(u => u.id));
+      for (const user of (partnerPending || [])) {
+        if (!existingIds.has(user.id)) {
+          allPending.push(user);
+        }
+      }
+
+      return allPending;
     },
     enabled: isAdmin,
   });
@@ -1203,6 +1231,22 @@ const Admin = () => {
                                 </p>
                               </div>
                               <div className="flex flex-wrap gap-2">
+                                {/* Verification type labels */}
+                                {(user as any).verification_status === 'pending' && (
+                                  <Badge variant="destructive" className="gap-1">
+                                    🪪 ID-Verifizierung
+                                  </Badge>
+                                )}
+                                {(user as any).is_couple && (user as any).partner_verification_status === 'pending' && (user as any).partner_id_document_url && (
+                                  <Badge variant="destructive" className="gap-1 bg-pink-600">
+                                    👫 Partner-Verifizierung
+                                  </Badge>
+                                )}
+                                {(user as any).is_couple && !(user as any).partner_photo_verified && (user as any).partner_photo_url && (
+                                  <Badge variant="secondary" className="gap-1">
+                                    📸 Partner-Foto prüfen
+                                  </Badge>
+                                )}
                                 <Badge variant="outline">
                                   {user.gender === 'female' ? '👩' : user.gender === 'male' ? '👨' : '🌈'} {user.gender || 'Unbekannt'}
                                 </Badge>
@@ -1304,7 +1348,7 @@ const Admin = () => {
                               )}
                               
                               {user.partner_name && (
-                                <div className="mt-2 p-3 bg-muted/50 rounded-lg">
+                                <div className="mt-2 p-3 bg-muted/50 rounded-lg space-y-2">
                                   <div className="flex items-center gap-3">
                                     {user.partner_photo_url && (
                                       <Avatar className="w-12 h-12 cursor-pointer hover:ring-2 ring-primary" onClick={() => {
@@ -1319,8 +1363,71 @@ const Admin = () => {
                                       <p className="text-sm text-muted-foreground">
                                         Partner: {user.partner_name} ({user.partner_gender})
                                       </p>
+                                      <div className="flex gap-2 mt-1">
+                                        <Badge variant={(user as any).partner_verification_status === 'approved' ? 'default' : 'secondary'} className="text-xs">
+                                          Partner-ID: {(user as any).partner_verification_status || 'pending'}
+                                        </Badge>
+                                        <Badge variant={(user as any).partner_photo_verified ? 'default' : 'secondary'} className="text-xs">
+                                          Partner-Foto: {(user as any).partner_photo_verified ? '✓ verifiziert' : 'ausstehend'}
+                                        </Badge>
+                                      </div>
                                     </div>
                                   </div>
+                                  {/* Partner ID Document */}
+                                  {(user as any).partner_id_document_url && (
+                                    <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded">
+                                      <p className="text-xs font-medium mb-1">🪪 Partner-ID-Dokument</p>
+                                      <IdDocumentViewer 
+                                        filePath={(user as any).partner_id_document_url} 
+                                        userId={user.id}
+                                      />
+                                    </div>
+                                  )}
+                                  {/* Partner Approve/Photo Verify Buttons */}
+                                  {((user as any).partner_verification_status === 'pending' || !(user as any).partner_photo_verified) && (
+                                    <div className="flex gap-2 mt-2">
+                                      {(user as any).partner_verification_status === 'pending' && (user as any).partner_id_document_url && (
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          className="text-xs"
+                                          onClick={async () => {
+                                            const { error } = await supabase
+                                              .from('profiles')
+                                              .update({ partner_verification_status: 'approved' as any })
+                                              .eq('id', user.id);
+                                            if (error) { toast.error('Fehler: ' + error.message); return; }
+                                            toast.success('Partner-ID verifiziert ✓');
+                                            queryClient.invalidateQueries({ queryKey: ['pendingVerifications'] });
+                                            queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
+                                          }}
+                                        >
+                                          <CheckCircle className="w-3 h-3 mr-1" />
+                                          Partner-ID genehmigen
+                                        </Button>
+                                      )}
+                                      {!(user as any).partner_photo_verified && (user as any).partner_photo_url && (
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          className="text-xs"
+                                          onClick={async () => {
+                                            const { error } = await supabase
+                                              .from('profiles')
+                                              .update({ partner_photo_verified: true })
+                                              .eq('id', user.id);
+                                            if (error) { toast.error('Fehler: ' + error.message); return; }
+                                            toast.success('Partner-Foto verifiziert ✓');
+                                            queryClient.invalidateQueries({ queryKey: ['pendingVerifications'] });
+                                            queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
+                                          }}
+                                        >
+                                          <ImagePlus className="w-3 h-3 mr-1" />
+                                          Partner-Foto verifizieren
+                                        </Button>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               )}
                               <p className="text-xs text-muted-foreground">
