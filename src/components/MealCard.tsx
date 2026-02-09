@@ -1,7 +1,8 @@
 import { Meal } from "@/types/meal";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, ChefHat, Package, Home, Ghost, UtensilsCrossed, Sparkles, Camera } from "lucide-react";
+import { MapPin, ChefHat, Package, Home, Ghost, UtensilsCrossed, Sparkles, Camera, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { KarmaLevel } from "@/components/KarmaLevel";
 import { RatingSummary } from "@/components/RatingSummary";
@@ -38,6 +39,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   const availablePortions = getProp(meal, "availablePortions", "available_portions");
   const isAiGenerated = getProp(meal, "isAiGenerated", "is_ai_generated") || false;
   const isStockPhoto = getProp(meal, "isStockPhoto", "is_stock_photo") || false;
+  const isDemo = (meal as any).is_demo || (meal as any).isDemo || (meal.id || "").startsWith("demo-") || false;
 
   // Pricing Logic - DB stores values in cents (e.g., 1200 = CHF 12.00)
   // Mock data uses CHF directly (e.g., 12 = CHF 12.00)
@@ -88,25 +90,37 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
             </Badge>
           )}
         </div>
-        {/* Top Left - AI/Stock Badge */}
+        {/* Top Left - Source Badge: Demo > AI > Stock > Real */}
         <div className="absolute top-3 left-3 flex gap-2">
-          {isAiGenerated && (
-            <Badge className="bg-amber-500/90 backdrop-blur text-white border-0 flex items-center gap-1 shadow-sm">
+          {isDemo ? (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="secondary" className="bg-muted/90 backdrop-blur border-0 flex items-center gap-1 shadow-sm cursor-help">
+                    <Info className="w-3 h-3" />
+                    {t("meal.demoBadge", "Beispiel")}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-[200px]">
+                  <p className="text-xs">{t("meal.demoTooltip", "Beispielgericht – so könnten Angebote aussehen.")}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : isAiGenerated ? (
+            <Badge className="bg-purple-500/90 backdrop-blur text-white border-0 flex items-center gap-1 shadow-sm">
               <Sparkles className="w-3 h-3" />
-              KI
+              {t("meal.aiPreviewBadge", "KI Vorschau")}
             </Badge>
-          )}
-          {isStockPhoto && !isAiGenerated && (
+          ) : isStockPhoto ? (
             <Badge variant="secondary" className="bg-muted/90 backdrop-blur border-0 shadow-sm">
               📷 {t("meal.stockPhoto", "Symbolbild")}
             </Badge>
-          )}
-          {!isAiGenerated && !isStockPhoto && imageUrl && (
+          ) : imageUrl ? (
             <Badge className="bg-green-500/90 backdrop-blur text-white border-0 flex items-center gap-1 shadow-sm">
               <Camera className="w-3 h-3" />
               {t("meal.realPhoto", "Echt")}
             </Badge>
-          )}
+          ) : null}
         </div>
       </div>
 
