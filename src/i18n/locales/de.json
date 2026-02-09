@@ -139,9 +139,13 @@
     "guest_login_required": "Registriere dich, um dieses Essen zu retten!",
     "guest_login_desc": "Erstelle ein kostenloses Konto, um Gerichte zu buchen und mit deiner Nachbarschaft zu teilen.",
     "my_address_only": "Nur meine Adresse",
+    "address_filter_hint": "Filtert Angebote nach deiner Adresse.",
     "all_meals": "Alle Gerichte",
     "no_results_address": "Keine Treffer an deiner Adresse. Filter ausschalten, um mehr zu sehen.",
-    "no_results_radius": "Keine Treffer im gewählten Radius. Radius erhöhen oder Filter ausschalten."
+    "no_results_radius": "Keine Treffer im gewählten Radius. Radius erhöhen oder Filter ausschalten.",
+    "empty_address_title": "An deiner Adresse gibt es gerade keine Angebote.",
+    "empty_address_text": "Schalte den Filter aus, um alle Angebote zu sehen.",
+    "empty_address_button": "Filter ausschalten"
   },
   "admin": {
     "title": "Admin Dashboard",
