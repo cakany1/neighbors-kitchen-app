@@ -37,9 +37,13 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useAnalyticsTracking } from "./hooks/useAnalyticsTracking";
 import { ScrollToTop } from "./components/ScrollToTop";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { detectEnvironment } from "@/utils/environment";
 
 const queryClient = new QueryClient();
+
+// Safety check state - defined outside component
+let stagingMismatchError = false;
 
 // Inner component that uses router hooks
 const AppRoutes = () => {
@@ -48,6 +52,21 @@ const AppRoutes = () => {
   
   // Initialize analytics tracking
   useAnalyticsTracking();
+
+  // SAFETY GUARD: Verify staging environment is truly isolated (runs once on mount)
+  useEffect(() => {
+    const envInfo = detectEnvironment();
+    const supabaseProjectId = envInfo.supabaseProjectId;
+    
+    // PROD Supabase ref
+    const prodRef = 'ziyocgrzijovpfhzutzs';
+    
+    // If marked as staging but using PROD database, warn
+    if (envInfo.environment === 'staging' && supabaseProjectId === prodRef) {
+      console.error('[SAFETY GUARD] STAGING environment detected but using PRODUCTION database!');
+      stagingMismatchError = true;
+    }
+  }, []);
 
   // TOUR LOGIC DISABLED FOR STABILITY
   // useEffect(() => {
@@ -65,6 +84,33 @@ const AppRoutes = () => {
   //     localStorage.removeItem('just_registered'); // Clear the flag
   //   }
   // }, [location.pathname]);
+
+  // SAFETY ERROR DISPLAY: Show error if mismatch detected
+  if (stagingMismatchError) {
+    const env = detectEnvironment();
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="max-w-md bg-card rounded-lg border-2 border-destructive p-6 space-y-4">
+          <h1 className="text-2xl font-bold text-destructive">🚨 ENVIRONMENT MISMATCH</h1>
+          <p className="text-destructive/90 font-mono text-sm">
+            Staging environment detected but connected to PRODUCTION database (ziyocgrzijovpfhzutzs).
+          </p>
+          <p className="text-destructive/90 text-sm">
+            This is a critical safety violation. All requests are BLOCKED.
+          </p>
+          <div className="bg-destructive/10 rounded p-3">
+            <p className="text-xs text-destructive/80 font-mono">
+              <strong>Hostname:</strong> {env.hostname}<br />
+              <strong>Supabase Ref:</strong> {env.supabaseProjectId}
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Contact your team lead. This staging instance must use a separate Supabase project.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
