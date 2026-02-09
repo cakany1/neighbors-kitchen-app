@@ -317,6 +317,45 @@ export type Database = {
         }
         Relationships: []
       }
+      device_push_tokens: {
+        Row: {
+          created_at: string
+          device_id: string | null
+          environment: string
+          id: string
+          is_active: boolean
+          last_used_at: string | null
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_id?: string | null
+          environment?: string
+          id?: string
+          is_active?: boolean
+          last_used_at?: string | null
+          platform: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string | null
+          environment?: string
+          id?: string
+          is_active?: boolean
+          last_used_at?: string | null
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       faq_requests: {
         Row: {
           admin_answer: string | null
@@ -803,6 +842,59 @@ export type Database = {
             columns: ["referred_by"]
             isOneToOne: false
             referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      push_notification_logs: {
+        Row: {
+          body: string | null
+          created_at: string
+          data: Json | null
+          environment: string
+          error_message: string | null
+          id: string
+          notification_type: string
+          sent_at: string | null
+          status: string
+          title: string | null
+          token_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          data?: Json | null
+          environment?: string
+          error_message?: string | null
+          id?: string
+          notification_type: string
+          sent_at?: string | null
+          status?: string
+          title?: string | null
+          token_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          data?: Json | null
+          environment?: string
+          error_message?: string | null
+          id?: string
+          notification_type?: string
+          sent_at?: string | null
+          status?: string
+          title?: string | null
+          token_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_notification_logs_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "device_push_tokens"
             referencedColumns: ["id"]
           },
         ]
