@@ -41,48 +41,13 @@ const Signup = () => {
   const handleGoogleSignup = async () => {
     setGoogleLoading(true);
     try {
-      // Detect if we're on a custom domain (not lovable.app preview)
-      const isCustomDomain =
-        !window.location.hostname.includes('lovable.app') &&
-        !window.location.hostname.includes('lovableproject.com') &&
-        !window.location.hostname.includes('localhost');
+      const { error } = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: window.location.origin,
+      });
 
-      if (isCustomDomain) {
-        // Bypass auth-bridge for custom domains by getting OAuth URL directly
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: `${window.location.origin}/feed`,
-            skipBrowserRedirect: true, // Critical: prevents redirect to preview domain
-          },
-        });
-
-        if (error) {
-          toast.error(error.message || t('auth.account_creation_failed'));
-          setGoogleLoading(false);
-          return;
-        }
-
-        // Validate OAuth URL before redirect (security: prevent open redirect)
-        if (data?.url) {
-          const oauthUrl = new URL(data.url);
-          const allowedHosts = ['accounts.google.com', 'ziyocgrzijovpfhzutzs.supabase.co'];
-          if (allowedHosts.some((host) => oauthUrl.hostname.includes(host))) {
-            window.location.href = data.url;
-          } else {
-            throw new Error('Invalid OAuth redirect URL');
-          }
-        }
-      } else {
-        // For Lovable preview domains, use Lovable Cloud managed OAuth
-        const { error } = await lovable.auth.signInWithOAuth('google', {
-          redirect_uri: window.location.origin,
-        });
-
-        if (error) {
-          toast.error(error.message || t('auth.account_creation_failed'));
-          setGoogleLoading(false);
-        }
+      if (error) {
+        toast.error(error.message || t('auth.account_creation_failed'));
+        setGoogleLoading(false);
       }
     } catch (error: any) {
       console.error('Google signup error:', error);
