@@ -32,7 +32,7 @@ const StoryPage = () => {
             <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
               <div className="order-2 md:order-1">
               <img
-                  src="https://ziyocgrzijovpfhzutzs.supabase.co/storage/v1/object/public/gallery/neighbors-sharing.jpg"
+                  src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/gallery/neighbors-sharing.jpg`}
                   alt="Neighbors sharing food"
                   className="rounded-2xl shadow-2xl w-full h-auto object-cover aspect-[4/5]"
                 />

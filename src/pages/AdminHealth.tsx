@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -145,8 +145,35 @@ const AdminHealth = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [lastTestResult, setLastTestResult] = useState<SelfTestResponse | null>(null);
-  
-  // Detect current environment
+
+  // Live DB connection check
+  const { data: dbCheck, isLoading: dbCheckLoading } = useQuery({
+    queryKey: ['dbConnectionCheck'],
+    queryFn: async () => {
+      const start = performance.now();
+      const { count, error } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+      const latency = Math.round(performance.now() - start);
+      return { connected: !error, latency, error: error?.message || null };
+    },
+    refetchInterval: 30000,
+  });
+
+  // GitHub Status check
+  const { data: githubStatus, isLoading: githubLoading } = useQuery({
+    queryKey: ['githubStatus'],
+    queryFn: async () => {
+      const res = await fetch('https://www.githubstatus.com/api/v2/status.json');
+      if (!res.ok) throw new Error('GitHub Status API unreachable');
+      const json = await res.json();
+      return {
+        indicator: json.status?.indicator as string,
+        description: json.status?.description as string,
+      };
+    },
+    refetchInterval: 60000,
+  });
   const envInfo = detectEnvironment();
 
   // Check if current user is admin
@@ -479,7 +506,99 @@ const AdminHealth = () => {
           </Card>
         </div>
 
-        {/* Stripe Status Card */}
+        {/* Live System Checks */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* DB Connection Check */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Database className="w-5 h-5 text-primary" />
+                Datenbank Verbindung
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {dbCheckLoading ? (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <RefreshCw className="w-4 h-4 animate-spin" /> Prüfe...
+                </div>
+              ) : dbCheck?.connected ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                    <span className="font-medium text-green-700">Verbunden</span>
+                  </div>
+                  <Badge variant="outline">{dbCheck.latency} ms Latenz</Badge>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <XCircle className="w-5 h-5 text-red-500" />
+                    <span className="font-medium text-red-700">Fehler</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{dbCheck?.error}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* GitHub Status */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Globe className="w-5 h-5 text-primary" />
+                GitHub System Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {githubLoading ? (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <RefreshCw className="w-4 h-4 animate-spin" /> Prüfe...
+                </div>
+              ) : githubStatus ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    {githubStatus.indicator === 'none' ? (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    ) : (
+                      <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                    )}
+                    <span className="font-medium">{githubStatus.description}</span>
+                  </div>
+                  <Badge variant="outline">{githubStatus.indicator}</Badge>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <XCircle className="w-5 h-5 text-red-500" />
+                  <span className="text-sm">Nicht erreichbar</span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Environment Check */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Server className="w-5 h-5 text-primary" />
+                Aktuelle Umgebung
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Badge className={envInfo.label === 'PRODUCTION' ? 'bg-red-600' : 'bg-yellow-600'}>
+                  {envInfo.label}
+                </Badge>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-mono text-muted-foreground break-all">
+                  <span className="font-semibold text-foreground">VITE_SUPABASE_URL:</span><br />
+                  {import.meta.env.VITE_SUPABASE_URL || '⚠️ nicht gesetzt'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <Card className="border-2 border-primary/30">
           <CardHeader>
             <div className="flex items-center justify-between">
