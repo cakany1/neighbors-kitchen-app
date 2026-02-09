@@ -488,6 +488,9 @@
     "stockPhoto": "Stock image",
     "realPhoto": "Real",
     "aiPreview": "AI Preview",
+    "aiPreviewBadge": "AI Preview",
+    "demoBadge": "Example",
+    "demoTooltip": "Example meal – this is what offers could look like.",
     "aiImageDisclaimer": "Preview image – actual dish may vary"
   },
   "form": {

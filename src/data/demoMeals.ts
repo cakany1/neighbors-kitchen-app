@@ -1,4 +1,5 @@
 // Central Demo Meals Data - Optimized for Display
+// All demo meals are explicitly flagged with is_demo: true
 export const DEMO_MEALS = [
   {
     id: "demo-1",
@@ -34,7 +35,8 @@ export const DEMO_MEALS = [
     exchange_mode: "money",
     estimated_restaurant_value: 23.5,
     ingredients: ["Hackfleisch", "Tomaten", "Lasagne-Nudeln", "Béchamelsauce", "Parmesan"],
-    is_stock_photo: false,
+    is_stock_photo: true,
+    is_demo: true,
     women_only: false,
   },
   {
@@ -57,7 +59,7 @@ export const DEMO_MEALS = [
     neighborhood: "St. Johann",
     tags: ["Vegan", "Thai", "Scharf"],
     allergens: [],
-    available_portions: 3, // KORRIGIERT: Nur noch 3 Portionen!
+    available_portions: 3,
     pricing_minimum: 0,
     pricing_suggested: 0,
     is_cooking_experience: false,
@@ -71,7 +73,8 @@ export const DEMO_MEALS = [
     exchange_mode: "barter",
     estimated_restaurant_value: 18,
     ingredients: ["Kokosmilch", "Rote Curry-Paste", "Gemüse", "Tofu", "Basilikum"],
-    is_stock_photo: false,
+    is_stock_photo: true,
+    is_demo: true,
     women_only: false,
   },
   {
@@ -94,7 +97,7 @@ export const DEMO_MEALS = [
     neighborhood: "Kleinbasel",
     tags: ["Dessert", "Vegetarisch", "Süss"],
     allergens: ["Milch/Laktose", "Gluten (Getreide)", "Eier"],
-    available_portions: 2, // KORRIGIERT: 2 Portionen
+    available_portions: 2,
     pricing_minimum: 9,
     pricing_suggested: 9,
     is_cooking_experience: false,
@@ -108,7 +111,8 @@ export const DEMO_MEALS = [
     exchange_mode: "money",
     estimated_restaurant_value: 16,
     ingredients: ["Frischkäse", "Eier", "Zucker", "Erdbeeren", "Butterkekse"],
-    is_stock_photo: false,
+    is_stock_photo: true,
+    is_demo: true,
     women_only: false,
   },
 ];

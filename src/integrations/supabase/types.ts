@@ -482,6 +482,7 @@ export type Database = {
           ingredients: string[] | null
           is_ai_generated: boolean | null
           is_cooking_experience: boolean
+          is_demo: boolean
           is_stock_photo: boolean | null
           max_seats: number | null
           neighborhood: string
@@ -524,6 +525,7 @@ export type Database = {
           ingredients?: string[] | null
           is_ai_generated?: boolean | null
           is_cooking_experience?: boolean
+          is_demo?: boolean
           is_stock_photo?: boolean | null
           max_seats?: number | null
           neighborhood: string
@@ -566,6 +568,7 @@ export type Database = {
           ingredients?: string[] | null
           is_ai_generated?: boolean | null
           is_cooking_experience?: boolean
+          is_demo?: boolean
           is_stock_photo?: boolean | null
           max_seats?: number | null
           neighborhood?: string

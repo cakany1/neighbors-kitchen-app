@@ -666,6 +666,9 @@
     "stockPhoto": "Symbolbild",
     "realPhoto": "Echt",
     "aiPreview": "KI-Vorschau",
+    "aiPreviewBadge": "KI Vorschau",
+    "demoBadge": "Beispiel",
+    "demoTooltip": "Beispielgericht – so könnten Angebote aussehen.",
     "aiImageDisclaimer": "Beispielbild – tatsächliches Gericht kann abweichen"
   },
   "signup": {
