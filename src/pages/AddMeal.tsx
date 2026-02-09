@@ -514,19 +514,19 @@ const AddMeal = () => {
           <p className="text-muted-foreground">{t('add_meal.page_subtitle')}</p>
         </div>
 
-        {/* Couple Verification Block */}
+        {/* Couple Verification Info — informational only, does NOT block meal creation */}
         {currentUser?.isCouple && !currentUser?.isCoupleFullyVerified && (
-          <Alert className="mb-6 border-orange-500 bg-orange-500/10">
-            <Shield className="h-5 w-5 text-orange-500" />
+          <Alert className="mb-6 border-amber-500/50 bg-amber-500/5">
+            <Shield className="h-5 w-5 text-amber-500" />
             <AlertDescription className="space-y-3">
               <div>
-                <strong className="text-orange-600 dark:text-orange-400">{t('add_meal.couple_verification_blocked')}</strong>
-                <p className="text-sm mt-1">{t('add_meal.couple_verification_blocked_desc')}</p>
+                <strong className="text-amber-600 dark:text-amber-400">{t('add_meal.couple_verification_info', 'Hinweis zur Paar-Verifizierung')}</strong>
+                <p className="text-sm mt-1">{t('add_meal.couple_verification_info_desc', 'Für bestimmte Funktionen (z.B. Women-Only Gerichte) müssen beide Partner verifiziert sein.')}</p>
               </div>
               <div className="flex flex-col gap-2 text-sm">
                 {currentUser.verificationStatus !== 'approved' && (
                   <div className="flex items-center gap-2">
-                    <span className="text-destructive">❌</span>
+                    <span className="text-amber-500">⏳</span>
                     <span>{t('add_meal.your_verification_missing')}</span>
                   </div>
                 )}
@@ -538,7 +538,7 @@ const AddMeal = () => {
                 )}
                 {currentUser.partnerVerificationStatus !== 'approved' && (
                   <div className="flex items-center gap-2">
-                    <span className="text-destructive">❌</span>
+                    <span className="text-amber-500">⏳</span>
                     <span>{t('add_meal.partner_verification_missing')}</span>
                   </div>
                 )}
@@ -551,7 +551,8 @@ const AddMeal = () => {
               </div>
               <Button 
                 variant="outline" 
-                className="w-full border-orange-500 hover:bg-orange-500/20"
+                size="sm"
+                className="w-full border-amber-500/50 hover:bg-amber-500/10"
                 onClick={() => navigate('/profile')}
               >
                 {t('add_meal.go_to_verification')}
