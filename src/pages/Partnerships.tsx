@@ -252,6 +252,20 @@ const Partnerships = () => {
           </CardContent>
         </Card>
 
+        {/* Corporate Sponsorship Note */}
+        <Card className="border-muted">
+          <CardContent className="pt-6">
+            <h3 className="font-semibold text-sm mb-1">
+              {isGerman ? 'Partnerschaften & Sponsoring' : 'Partnerships & Sponsorship'}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {isGerman
+                ? 'Neben öffentlichen Institutionen und staatlichen Organisationen können auch Unternehmen als Sponsor- oder Partnerorganisation auftreten. Bei Interesse wenden Sie sich bitte über unsere Kontaktseite an uns.'
+                : 'In addition to public institutions and government organizations, companies may also act as sponsor or partner organizations. If interested, please reach out via our contact page.'}
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Trust Link */}
         <div className="text-center">
           <Button 
