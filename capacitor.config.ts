@@ -34,12 +34,16 @@ const config: CapacitorConfig = {
   
   ios: {
     contentInset: 'automatic',
-    scheme: 'Neighbors Kitchen'
+    scheme: 'neighbors-kitchen',
+    // Universal Links - add your domain to Associated Domains in Xcode
+    // Format: applinks:share-kitchen-basel.lovable.app
   },
   
   android: {
     allowMixedContent: true,
-    backgroundColor: '#FFFFFF'
+    backgroundColor: '#FFFFFF',
+    // App Links are configured via intent-filters in AndroidManifest.xml
+    // after running: npx cap add android
   }
 };
 
