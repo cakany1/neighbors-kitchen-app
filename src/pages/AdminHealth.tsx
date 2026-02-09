@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
@@ -143,6 +143,7 @@ const ReleaseChecklistSummary = ({ navigate }: { navigate: (path: string) => voi
 
 const AdminHealth = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [lastTestResult, setLastTestResult] = useState<SelfTestResponse | null>(null);
   
   // Detect current environment
@@ -481,13 +482,29 @@ const AdminHealth = () => {
         {/* Stripe Status Card */}
         <Card className="border-2 border-primary/30">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-primary" />
-              Stripe Zahlungssystem
-            </CardTitle>
-            <CardDescription>
-              Webhook-Status und Transaktionsübersicht
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-primary" />
+                  Stripe Zahlungssystem
+                </CardTitle>
+                <CardDescription>
+                  Webhook-Status und Transaktionsübersicht
+                </CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  queryClient.invalidateQueries({ queryKey: ['stripeStatus'] });
+                  toast.success('Stripe-Daten aktualisiert');
+                }}
+                className="gap-1"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Aktualisieren
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -575,13 +592,29 @@ const AdminHealth = () => {
         {/* Push Notification Status Card */}
         <Card className="border-2 border-primary/30">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="w-5 h-5 text-primary" />
-              Push Notifications
-            </CardTitle>
-            <CardDescription>
-              Registrierte Geräte und Benachrichtigungsstatus
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="w-5 h-5 text-primary" />
+                  Push Notifications
+                </CardTitle>
+                <CardDescription>
+                  Registrierte Geräte und Benachrichtigungsstatus
+                </CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  queryClient.invalidateQueries({ queryKey: ['pushStatus'] });
+                  toast.success('Push-Daten aktualisiert');
+                }}
+                className="gap-1"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Aktualisieren
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -678,6 +711,40 @@ const AdminHealth = () => {
                 </AlertDescription>
               </Alert>
             )}
+          </CardContent>
+        </Card>
+
+        {/* View Logs Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ExternalLink className="w-5 h-5" />
+              Logs & Debugging
+            </CardTitle>
+            <CardDescription>
+              Wo du Logs für Webhooks und Edge Functions findest
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="p-3 rounded-lg bg-muted/50 space-y-1">
+              <p className="font-medium text-sm">📋 Stripe Webhook Logs</p>
+              <p className="text-xs text-muted-foreground">
+                Lovable Cloud → Cloud Tab → Edge Functions → <code className="bg-muted px-1 rounded">stripe-webhook</code> → Logs einsehen.
+                Alternativ: Stripe Dashboard → Developers → Webhooks → Events.
+              </p>
+            </div>
+            <div className="p-3 rounded-lg bg-muted/50 space-y-1">
+              <p className="font-medium text-sm">🔔 Push Notification Logs</p>
+              <p className="text-xs text-muted-foreground">
+                Lovable Cloud → Cloud Tab → Edge Functions → <code className="bg-muted px-1 rounded">send-push-notification</code> / <code className="bg-muted px-1 rounded">trigger-push-notification</code> → Logs.
+              </p>
+            </div>
+            <div className="p-3 rounded-lg bg-muted/50 space-y-1">
+              <p className="font-medium text-sm">🗃️ Datenbank-Logs</p>
+              <p className="text-xs text-muted-foreground">
+                Lovable Cloud → Cloud Tab → Database → Tabellen <code className="bg-muted px-1 rounded">stripe_webhook_events</code> und <code className="bg-muted px-1 rounded">push_notification_logs</code> direkt einsehen.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
