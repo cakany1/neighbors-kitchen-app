@@ -314,8 +314,8 @@ const Feed = () => {
         {/* TASK 18: Same-Address Filter Toggle - Always visible for logged-in users */}
         {currentUser && (
           <TooltipProvider>
-            <div className="mb-4 flex items-center gap-3 rounded-lg border border-border bg-card p-3">
-              <MapPin className="w-4 h-4 shrink-0 text-muted-foreground" />
+            <div className="mb-4 flex items-center gap-3 rounded-full border border-border bg-card p-3 px-5 shadow-sm">
+              <Home className="w-5 h-5 shrink-0 text-foreground" />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Label
