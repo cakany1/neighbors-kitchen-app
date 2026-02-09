@@ -37,6 +37,13 @@
     "understood": "Verstanden",
     "cancel": "Abbrechen"
   },
+  "photo_picker": {
+    "upload_photo": "Foto hochladen",
+    "take_photo": "Foto aufnehmen",
+    "choose_from_gallery": "Aus Galerie wählen",
+    "file_too_large": "Datei zu gross (max 5MB)",
+    "invalid_file_type": "Nur JPEG, PNG, WebP oder GIF erlaubt"
+  },
   "actions": {
     "view_details": "Details ansehen"
   },

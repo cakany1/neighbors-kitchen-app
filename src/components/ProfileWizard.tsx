@@ -15,8 +15,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Camera, MapPin, Phone, CheckCircle, Loader2, Upload } from "lucide-react";
+import { Camera, MapPin, Phone, CheckCircle, Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { PhotoPicker } from "@/components/PhotoPicker";
 
 interface ProfileWizardProps {
   open: boolean;
@@ -70,16 +71,13 @@ export function ProfileWizard({
   const progress = totalSteps > 0 ? ((currentStep + 1) / totalSteps) * 100 : 100;
   const currentStepType = steps[currentStep];
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>, isPartner = false) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (isPartner) {
-        setPartnerPhotoFile(file);
-        setPartnerPhotoPreview(URL.createObjectURL(file));
-      } else {
-        setPhotoFile(file);
-        setPhotoPreview(URL.createObjectURL(file));
-      }
+  const handlePhotoChange = (file: File, previewUrl: string, isPartner = false) => {
+    if (isPartner) {
+      setPartnerPhotoFile(file);
+      setPartnerPhotoPreview(previewUrl);
+    } else {
+      setPhotoFile(file);
+      setPhotoPreview(previewUrl);
     }
   };
 
@@ -240,19 +238,13 @@ export function ProfileWizard({
                   <Camera className="w-12 h-12 text-muted-foreground" />
                 </div>
               )}
-              <Label htmlFor="photo-upload" className="cursor-pointer">
-                <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
-                  <Upload className="w-4 h-4" />
-                  {t("wizard.choose_photo")}
-                </div>
-                <Input
-                  id="photo-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handlePhotoChange(e, false)}
-                />
-              </Label>
+              <PhotoPicker
+                onPhotoSelected={(file, previewUrl) => handlePhotoChange(file, previewUrl, false)}
+                bucket="avatars"
+                uploadPath={userId ? `${userId}/avatar` : undefined}
+                variant="default"
+                label={t("wizard.choose_photo")}
+              />
             </div>
             <p className="text-sm text-muted-foreground text-center">
               {t("wizard.photo_hint")}
@@ -275,19 +267,13 @@ export function ProfileWizard({
                   <Camera className="w-12 h-12 text-muted-foreground" />
                 </div>
               )}
-              <Label htmlFor="partner-photo-upload" className="cursor-pointer">
-                <div className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-colors">
-                  <Upload className="w-4 h-4" />
-                  {t("wizard.choose_partner_photo")}
-                </div>
-                <Input
-                  id="partner-photo-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handlePhotoChange(e, true)}
-                />
-              </Label>
+              <PhotoPicker
+                onPhotoSelected={(file, previewUrl) => handlePhotoChange(file, previewUrl, true)}
+                bucket="avatars"
+                uploadPath={userId ? `${userId}/partner` : undefined}
+                variant="secondary"
+                label={t("wizard.choose_partner_photo")}
+              />
             </div>
             <p className="text-sm text-muted-foreground text-center">
               {t("wizard.partner_photo_hint")}
