@@ -237,16 +237,6 @@ const Index = () => {
             </Card>
           </section>
 
-          {/* Partnerships & Sponsorship */}
-          <section className="mb-16 max-w-3xl mx-auto text-center">
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              {t('landing.partnerships_title')}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {t('landing.partnerships_text')}
-            </p>
-          </section>
-
         </main>
         <Footer />
       </div>
