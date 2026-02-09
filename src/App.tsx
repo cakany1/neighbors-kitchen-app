@@ -30,7 +30,7 @@ import Partnerships from "./pages/Partnerships";
 import AdminHealth from "./pages/AdminHealth";
 import AdminReleaseChecklist from "./pages/AdminReleaseChecklist";
 import OAuthCallback from "./pages/OAuthCallback";
-import { InstallPrompt } from "./components/InstallPrompt";
+// PWA InstallPrompt removed for native store launch
 import { CookieBanner } from "./components/CookieBanner";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -117,7 +117,7 @@ const AppRoutes = () => {
       <ScrollToTop />
       <Toaster />
       <Sonner />
-      <InstallPrompt />
+      {/* InstallPrompt removed for native store launch */}
       <CookieBanner />
       {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
       <div className="relative z-0 flex flex-col min-h-screen pb-24">

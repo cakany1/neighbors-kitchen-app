@@ -106,7 +106,7 @@ export const Header = () => {
             onClick={() => navigate('/install')}
             className="hidden md:flex"
           >
-            {t('landing.install_app')}
+            {t('install.download_app', 'App herunterladen')}
           </Button>
           <LanguageSwitcher />
           <Button
