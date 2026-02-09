@@ -8,7 +8,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Lock, Home } from "lucide-react";
+import { AlertCircle, Lock, Home, MapPin } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { getDistance } from "@/utils/distance";
@@ -310,34 +311,46 @@ const Feed = () => {
 
         {/* TASK 18: Same-Address Filter Toggle - Always visible for logged-in users */}
         {currentUser && (
-          <div className="mb-4">
-            <button
-              onClick={() => {
-                if (!currentUser?.profile?.address_id) {
-                  toast.info(t("feed.no_address_set", "Bitte zuerst eine Adresse im Profil setzen"));
-                  return;
-                }
-                setFilterSameAddress(!filterSameAddress);
-              }}
-              className={`w-full p-3 rounded-lg border-2 transition-all flex items-center gap-2 ${
-                filterSameAddress && currentUser?.profile?.address_id
-                  ? 'border-secondary bg-secondary/10'
-                  : 'border-border hover:border-secondary/50'
-              } ${!currentUser?.profile?.address_id ? 'opacity-60' : ''}`}
-            >
-              <Home className="w-4 h-4" />
-              <span className="font-medium text-sm">
-                {filterSameAddress && currentUser?.profile?.address_id 
-                  ? t("feed.my_address_only", "Nur meine Adresse") 
-                  : t("feed.all_meals", "Alle Gerichte")}
-              </span>
-              {!currentUser?.profile?.address_id && (
-                <span className="text-xs text-muted-foreground ml-auto">
-                  ({t("feed.no_address_hint", "keine Adresse")})
-                </span>
-              )}
-            </button>
-          </div>
+          <TooltipProvider>
+            <div className="mb-4">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => {
+                      if (!currentUser?.profile?.address_id) {
+                        toast.info(t("feed.no_address_set", "Bitte zuerst eine Adresse im Profil setzen"));
+                        return;
+                      }
+                      setFilterSameAddress(!filterSameAddress);
+                    }}
+                    className={`w-full p-3 rounded-lg border-2 transition-all flex items-center gap-2 ${
+                      filterSameAddress && currentUser?.profile?.address_id
+                        ? 'border-secondary bg-secondary/10'
+                        : 'border-border hover:border-secondary/50'
+                    } ${!currentUser?.profile?.address_id ? 'opacity-60' : ''}`}
+                  >
+                    <MapPin className="w-4 h-4 shrink-0" />
+                    <span className="font-medium text-sm">
+                      {filterSameAddress && currentUser?.profile?.address_id 
+                        ? t("feed.my_address_only") 
+                        : t("feed.all_meals")}
+                    </span>
+                    <span className="text-xs text-muted-foreground ml-1 hidden sm:inline">
+                      {t("feed.address_filter_hint")}
+                    </span>
+                    {!currentUser?.profile?.address_id && (
+                      <span className="text-xs text-muted-foreground ml-auto">
+                        ({t("feed.no_address_hint", "keine Adresse")})
+                      </span>
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t("feed.address_filter_hint")}</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </TooltipProvider>
         )}
 
         {!userLat || !userLon ? (
@@ -356,8 +369,19 @@ const Feed = () => {
             <SkeletonMealCard />
           </div>
         ) : !filteredAndSortedMeals || filteredAndSortedMeals.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">{t("feed.no_meals_radius", { radius: userRadius / 1000 })}</p>
+          <div className="text-center py-12 px-4">
+            {filterSameAddress ? (
+              <>
+                <MapPin className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-foreground mb-1">{t("feed.empty_address_title")}</h3>
+                <p className="text-muted-foreground text-sm mb-4">{t("feed.empty_address_text")}</p>
+                <Button variant="outline" onClick={() => setFilterSameAddress(false)}>
+                  {t("feed.empty_address_button")}
+                </Button>
+              </>
+            ) : (
+              <p className="text-muted-foreground">{t("feed.no_meals_radius", { radius: userRadius / 1000 })}</p>
+            )}
           </div>
         ) : (
           <div className="grid gap-4">
