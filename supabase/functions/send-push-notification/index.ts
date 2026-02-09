@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { encode as base64url } from "https://deno.land/std@0.190.0/encoding/base64url.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,36 +10,129 @@ const corsHeaders = {
 
 interface PushPayload {
   type: 'new_meal_nearby' | 'booking_update' | 'message' | 'rating' | 'custom';
-  user_ids?: string[];           // Specific users to notify
-  radius_km?: number;            // For nearby notifications
-  center_lat?: number;           // For nearby notifications
-  center_lng?: number;           // For nearby notifications
+  user_ids?: string[];
+  radius_km?: number;
+  center_lat?: number;
+  center_lng?: number;
   title: string;
   body: string;
-  data?: Record<string, string>; // Custom data for deep linking
+  data?: Record<string, string>;
   environment?: 'development' | 'staging' | 'production';
 }
 
-interface FCMMessage {
-  to: string;
-  notification: {
-    title: string;
-    body: string;
-    sound?: string;
-    badge?: number;
+interface FCMv1Message {
+  message: {
+    token: string;
+    notification: {
+      title: string;
+      body: string;
+    };
+    data?: Record<string, string>;
+    android?: {
+      priority: 'high' | 'normal';
+      notification?: {
+        sound: string;
+        click_action: string;
+      };
+    };
+    apns?: {
+      payload: {
+        aps: {
+          sound: string;
+          badge?: number;
+        };
+      };
+    };
   };
-  data?: Record<string, string>;
-  priority: 'high' | 'normal';
+}
+
+// Generate JWT for Firebase service account authentication
+async function createServiceAccountJWT(): Promise<string> {
+  const clientEmail = Deno.env.get('FIREBASE_CLIENT_EMAIL');
+  const privateKeyPem = Deno.env.get('FIREBASE_PRIVATE_KEY');
+  
+  if (!clientEmail || !privateKeyPem) {
+    throw new Error('Firebase service account credentials not configured');
+  }
+
+  // Decode the private key (handle escaped newlines from env)
+  const privateKey = privateKeyPem.replace(/\\n/g, '\n');
+  
+  const now = Math.floor(Date.now() / 1000);
+  const exp = now + 3600; // 1 hour expiry
+
+  const header = {
+    alg: 'RS256',
+    typ: 'JWT',
+  };
+
+  const payload = {
+    iss: clientEmail,
+    sub: clientEmail,
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now,
+    exp: exp,
+    scope: 'https://www.googleapis.com/auth/firebase.messaging',
+  };
+
+  const encodedHeader = base64url(new TextEncoder().encode(JSON.stringify(header)));
+  const encodedPayload = base64url(new TextEncoder().encode(JSON.stringify(payload)));
+  const unsignedToken = `${encodedHeader}.${encodedPayload}`;
+
+  // Import the private key and sign
+  const pemContents = privateKey
+    .replace('-----BEGIN PRIVATE KEY-----', '')
+    .replace('-----END PRIVATE KEY-----', '')
+    .replace(/\s/g, '');
+  
+  const binaryKey = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
+  
+  const cryptoKey = await crypto.subtle.importKey(
+    'pkcs8',
+    binaryKey,
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+
+  const signature = await crypto.subtle.sign(
+    'RSASSA-PKCS1-v1_5',
+    cryptoKey,
+    new TextEncoder().encode(unsignedToken)
+  );
+
+  const encodedSignature = base64url(new Uint8Array(signature));
+  return `${unsignedToken}.${encodedSignature}`;
+}
+
+// Exchange JWT for OAuth2 access token
+async function getAccessToken(): Promise<string> {
+  const jwt = await createServiceAccountJWT();
+  
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: jwt,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to get access token: ${error}`);
+  }
+
+  const data = await response.json();
+  return data.access_token;
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Verify authentication
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -49,10 +143,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const fcmServerKey = Deno.env.get('FCM_SERVER_KEY');
+    const projectId = Deno.env.get('FIREBASE_PROJECT_ID');
 
-    if (!fcmServerKey) {
-      console.error('FCM_SERVER_KEY not configured');
+    if (!projectId) {
+      console.error('FIREBASE_PROJECT_ID not configured');
       return new Response(JSON.stringify({ error: 'Push notifications not configured' }), {
         status: 503,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -60,18 +154,15 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Parse request body
     const payload: PushPayload = await req.json();
     const { type, user_ids, radius_km, center_lat, center_lng, title, body, data, environment = 'production' } = payload;
 
     console.log('[Push] Sending notification:', { type, userCount: user_ids?.length, environment });
 
-    // Get target tokens based on notification type
+    // Get target tokens
     let tokens: { id: string; token: string; user_id: string; platform: string }[] = [];
 
     if (user_ids && user_ids.length > 0) {
-      // Send to specific users
       const { data: tokenData, error } = await supabase
         .from('device_push_tokens')
         .select('id, token, user_id, platform')
@@ -82,8 +173,6 @@ const handler = async (req: Request): Promise<Response> => {
       if (error) throw error;
       tokens = tokenData || [];
     } else if (radius_km && center_lat && center_lng && type === 'new_meal_nearby') {
-      // Find users within radius who have notification preferences set
-      // This uses the profiles table with lat/lng
       const { data: nearbyProfiles, error: profileError } = await supabase
         .from('profiles')
         .select('id, latitude, longitude, notification_radius')
@@ -92,15 +181,11 @@ const handler = async (req: Request): Promise<Response> => {
 
       if (profileError) throw profileError;
 
-      // Filter by distance (simple Haversine approximation)
       const nearbyUserIds = (nearbyProfiles || [])
         .filter(profile => {
           if (!profile.latitude || !profile.longitude) return false;
-          const userRadius = profile.notification_radius || 5; // Default 5km
-          const distance = calculateDistance(
-            center_lat, center_lng,
-            profile.latitude, profile.longitude
-          );
+          const userRadius = profile.notification_radius || 5;
+          const distance = calculateDistance(center_lat, center_lng, profile.latitude, profile.longitude);
           return distance <= Math.min(radius_km, userRadius);
         })
         .map(p => p.id);
@@ -120,11 +205,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (tokens.length === 0) {
       console.log('[Push] No tokens found for notification');
-      return new Response(JSON.stringify({ 
-        success: true, 
-        sent: 0, 
-        message: 'No active tokens found' 
-      }), {
+      return new Response(JSON.stringify({ success: true, sent: 0, message: 'No active tokens found' }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -132,55 +213,57 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`[Push] Found ${tokens.length} tokens to notify`);
 
-    // Send to FCM
+    // Get OAuth2 access token for FCM v1 API
+    const accessToken = await getAccessToken();
+    const fcmUrl = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
+
     const results = await Promise.allSettled(
       tokens.map(async (tokenRecord) => {
-        const message: FCMMessage = {
-          to: tokenRecord.token,
-          notification: {
-            title,
-            body,
-            sound: 'default',
+        const message: FCMv1Message = {
+          message: {
+            token: tokenRecord.token,
+            notification: { title, body },
+            data: { ...data, type, click_action: 'FLUTTER_NOTIFICATION_CLICK' },
+            android: {
+              priority: 'high',
+              notification: { sound: 'default', click_action: 'FLUTTER_NOTIFICATION_CLICK' },
+            },
+            apns: {
+              payload: { aps: { sound: 'default' } },
+            },
           },
-          data: {
-            ...data,
-            type,
-            click_action: 'FLUTTER_NOTIFICATION_CLICK',
-          },
-          priority: 'high',
         };
 
-        const response = await fetch('https://fcm.googleapis.com/fcm/send', {
+        const response = await fetch(fcmUrl, {
           method: 'POST',
           headers: {
-            'Authorization': `key=${fcmServerKey}`,
+            'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(message),
         });
 
         const result = await response.json();
+        const success = response.ok;
 
         // Log the notification
-        await supabase
-          .from('push_notification_logs')
-          .insert({
-            user_id: tokenRecord.user_id,
-            token_id: tokenRecord.id,
-            notification_type: type,
-            title,
-            body,
-            data: data || {},
-            status: response.ok && result.success === 1 ? 'sent' : 'failed',
-            error_message: result.results?.[0]?.error || null,
-            environment,
-            sent_at: new Date().toISOString(),
-          });
+        await supabase.from('push_notification_logs').insert({
+          user_id: tokenRecord.user_id,
+          token_id: tokenRecord.id,
+          notification_type: type,
+          title,
+          body,
+          data: data || {},
+          status: success ? 'sent' : 'failed',
+          error_message: result.error?.message || null,
+          environment,
+          sent_at: new Date().toISOString(),
+        });
 
-        // Handle invalid tokens
-        if (result.results?.[0]?.error === 'NotRegistered' || 
-            result.results?.[0]?.error === 'InvalidRegistration') {
-          // Deactivate invalid token
+        // Handle invalid tokens (UNREGISTERED, INVALID_ARGUMENT for bad token)
+        if (result.error?.code === 404 || result.error?.details?.some((d: any) => 
+          d.errorCode === 'UNREGISTERED' || d.errorCode === 'INVALID_ARGUMENT'
+        )) {
           await supabase
             .from('device_push_tokens')
             .update({ is_active: false })
@@ -188,7 +271,7 @@ const handler = async (req: Request): Promise<Response> => {
           console.log(`[Push] Deactivated invalid token: ${tokenRecord.id}`);
         }
 
-        return { tokenId: tokenRecord.id, success: response.ok && result.success === 1, result };
+        return { tokenId: tokenRecord.id, success, result };
       })
     );
 
@@ -218,17 +301,13 @@ const handler = async (req: Request): Promise<Response> => {
   }
 };
 
-// Simple Haversine distance calculation (returns km)
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371; // Earth's radius in km
+  const R = 6371;
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
-  const a = 
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 function toRad(deg: number): number {
