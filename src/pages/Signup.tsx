@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-// Using direct Supabase OAuth for BYOK (custom Google credentials on custom domain)
+import { lovable } from '@/integrations/lovable';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,6 +19,7 @@ const Signup = () => {
   const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
   const [formData, setFormData] = useState({
@@ -73,12 +74,9 @@ const Signup = () => {
           }
         }
       } else {
-        // For Lovable preview domains, use normal flow (auth-bridge handles it)
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: `${window.location.origin}/feed`,
-          },
+        // For Lovable preview domains, use Lovable Cloud managed OAuth
+        const { error } = await lovable.auth.signInWithOAuth('google', {
+          redirect_uri: window.location.origin,
         });
 
         if (error) {
@@ -94,7 +92,24 @@ const Signup = () => {
   };
 
 
-  // Password strength calculation
+  const handleAppleSignup = async () => {
+    setAppleLoading(true);
+    try {
+      const { error } = await lovable.auth.signInWithOAuth('apple', {
+        redirect_uri: window.location.origin,
+      });
+      if (error) {
+        toast.error(error.message || t('auth.account_creation_failed'));
+        setAppleLoading(false);
+      }
+    } catch (error: any) {
+      console.error('Apple signup error:', error);
+      toast.error(error.message || t('auth.account_creation_failed'));
+      setAppleLoading(false);
+    }
+  };
+
+
   const passwordStrength = useMemo(() => {
     const pwd = formData.password;
     if (pwd.length === 0) return { level: 0, label: '', color: '' };
@@ -355,6 +370,23 @@ const Signup = () => {
             {t('auth.google_signup')}
           </Button>
 
+          {/* Apple Sign In */}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full mb-3 gap-2"
+            onClick={handleAppleSignup}
+            disabled={appleLoading}
+          >
+            {appleLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+              </svg>
+            )}
+            {t('auth.apple_signup', 'Mit Apple registrieren')}
+          </Button>
 
           <div className="relative mb-4">
             <Separator />

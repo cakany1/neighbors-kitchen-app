@@ -1367,14 +1367,7 @@ const AddMeal = () => {
             Fertig
           </Button>
 
-          {/* Karma Deletion Warning - Required Disclosure */}
-          <Alert className="border-l-4 border-l-warning bg-warning/5 mb-6">
-            <AlertDescription className="text-sm">
-              <p className="font-semibold text-warning mb-2">⏱️ {t('add_meal.karma_deletion_warning')}</p>
-            </AlertDescription>
-          </Alert>
-
-          {/* Pre-Publish Notice - Gentleman Minutes */}
+          {/* Pre-Publish Info — single clean block */}
           <Alert className="border-muted bg-muted/30">
             <AlertDescription className="text-sm text-muted-foreground">
               <span className="font-medium text-foreground">💡 {t('add_meal.gentleman_notice_title')}</span>
