@@ -58,15 +58,21 @@ const AppRoutes = () => {
     const envInfo = detectEnvironment();
     const supabaseProjectId = envInfo.supabaseProjectId;
     
-    // PROD Supabase ref
+  // PROD Supabase ref (current production project)
     const prodRef = 'ziyocgrzijovpfhzutzs';
-    
-    // If marked as staging but using PROD database, warn
+
+  // 1) If marked as staging but using PROD database -> block
     if (envInfo.environment === 'staging' && supabaseProjectId === prodRef) {
-      console.error('[SAFETY GUARD] STAGING environment detected but using PRODUCTION database!');
-      stagingMismatchError = true;
-    }
-  }, []);
+    console.error('[SAFETY GUARD] STAGING environment detected but using PRODUCTION database!');
+    stagingMismatchError = true;
+}
+
+  // 2) If marked as production but NOT using PROD database -> block
+    if (envInfo.environment === 'production' && supabaseProjectId && supabaseProjectId !== prodRef) {
+    console.error('[SAFETY GUARD] PRODUCTION environment detected but NOT using PRODUCTION database!');
+    stagingMismatchError = true;
+}
+, []);
 
   // TOUR LOGIC DISABLED FOR STABILITY
   // useEffect(() => {
