@@ -398,6 +398,17 @@ const AdminHealth = () => {
     }
   };
 
+  // Compute Go/No-Go readiness from latest available data (persists across page loads)
+  const latestRun = lastTestResult || (previousRuns?.[0] ? {
+    status: previousRuns[0].status as 'passed' | 'failed',
+    summary: previousRuns[0].summary as SelfTestResponse['summary'],
+    timestamp: (previousRuns[0].completed_at || previousRuns[0].created_at) as string,
+  } : null);
+  const dbOk = dbCheck?.connected === true;
+  const testPassed = latestRun?.status === 'passed';
+  const testRun = !!latestRun;
+  const isGoLiveReady = dbOk && testPassed;
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <Header />
@@ -453,6 +464,57 @@ const AdminHealth = () => {
           >
             Zurück zum Admin
           </Button>
+        </div>
+
+        {/* Go/No-Go Readiness Banner */}
+        <div className={`p-5 rounded-xl border-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+          isGoLiveReady ? 'bg-green-50 border-green-500 dark:bg-green-950/30 dark:border-green-700' :
+          !testRun ? 'bg-yellow-50 border-yellow-500 dark:bg-yellow-950/30 dark:border-yellow-700' :
+          'bg-red-50 border-red-500 dark:bg-red-950/30 dark:border-red-700'
+        }`}>
+          <div className="flex items-center gap-3">
+            {isGoLiveReady ? (
+              <CheckCircle className="w-8 h-8 text-green-600 shrink-0" />
+            ) : !testRun ? (
+              <AlertTriangle className="w-8 h-8 text-yellow-600 shrink-0" />
+            ) : (
+              <XCircle className="w-8 h-8 text-red-600 shrink-0" />
+            )}
+            <div>
+              <p className={`text-lg font-bold ${
+                isGoLiveReady ? 'text-green-800 dark:text-green-200' :
+                !testRun ? 'text-yellow-800 dark:text-yellow-200' :
+                'text-red-800 dark:text-red-200'
+              }`}>
+                {isGoLiveReady ? '✅ READY – Go-Live freigegeben' :
+                 !testRun ? '⏳ PENDING – Self-Test ausführen' :
+                 '❌ NOT READY – Probleme beheben'}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                DB: {dbOk ? '✓' : '✗'}
+                {' • Self-Test: '}
+                {testRun
+                  ? (testPassed
+                    ? `✓ ${latestRun?.summary?.passed}/${latestRun?.summary?.total}`
+                    : `✗ ${latestRun?.summary?.failed} fehlgeschlagen`)
+                  : 'ausstehend'}
+                {latestRun?.timestamp && ` • ${new Date(latestRun.timestamp).toLocaleString('de-DE')}`}
+              </p>
+            </div>
+          </div>
+          {!testRun && (
+            <Button
+              onClick={() => runTestMutation.mutate()}
+              disabled={runTestMutation.isPending}
+              size="sm"
+            >
+              {runTestMutation.isPending ? (
+                <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> Läuft...</>
+              ) : (
+                <><Play className="w-4 h-4 mr-1" /> Test starten</>
+              )}
+            </Button>
+          )}
         </div>
 
         {/* Quick Stats */}
@@ -895,7 +957,7 @@ const AdminHealth = () => {
               End-to-End Self-Test
             </CardTitle>
             <CardDescription>
-              22 automatisierte Tests: Profile, Meals, Pricing, Content Filter, Privacy, Stripe, Admin, Map, Partner Verification
+              26 automatisierte Tests: Infrastruktur, Profile, Meals, Pricing, Content Filter, Privacy, Stripe, Admin, Map, Partner Verification
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -1015,28 +1077,33 @@ const AdminHealth = () => {
           <CardHeader>
             <CardTitle className="text-xl">🚦 GO/NO-GO Entscheidung</CardTitle>
           </CardHeader>
-          <CardContent>
-            {lastTestResult?.status === 'passed' ? (
-              <Alert className="border-green-500 bg-green-50">
+          <CardContent className="space-y-3">
+            {isGoLiveReady ? (
+              <Alert className="border-green-500 bg-green-50 dark:bg-green-950/30">
                 <CheckCircle className="h-5 w-5 text-green-600" />
-                <AlertDescription className="text-green-800 font-medium">
-                  ✅ GO - Alle automatisierten Tests bestanden. Manuelle Prüfung empfohlen.
+                <AlertDescription className="text-green-800 dark:text-green-200 font-medium">
+                  ✅ GO – Alle Checks bestanden. DB ✓ • Self-Test {latestRun?.summary?.passed}/{latestRun?.summary?.total} ✓
                 </AlertDescription>
               </Alert>
-            ) : lastTestResult?.status === 'failed' ? (
-              <Alert variant="destructive">
-                <XCircle className="h-5 w-5" />
-                <AlertDescription className="font-medium">
-                  ❌ NO-GO - {lastTestResult.summary.failed} Tests fehlgeschlagen. Bitte Fehler beheben.
-                </AlertDescription>
-              </Alert>
-            ) : (
+            ) : !testRun ? (
               <Alert>
                 <AlertTriangle className="h-5 w-5" />
                 <AlertDescription>
                   ⏳ Self-Test noch nicht ausgeführt. Bitte Tests starten.
                 </AlertDescription>
               </Alert>
+            ) : (
+              <Alert variant="destructive">
+                <XCircle className="h-5 w-5" />
+                <AlertDescription className="font-medium">
+                  ❌ NO-GO – {!dbOk ? 'DB nicht erreichbar. ' : ''}{!testPassed ? `${latestRun?.summary?.failed} Test(s) fehlgeschlagen.` : ''} Bitte Fehler beheben.
+                </AlertDescription>
+              </Alert>
+            )}
+            {latestRun?.timestamp && (
+              <p className="text-xs text-muted-foreground">
+                Letzter Test: {new Date(latestRun.timestamp).toLocaleString('de-DE')}
+              </p>
             )}
           </CardContent>
         </Card>
