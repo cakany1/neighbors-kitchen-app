@@ -54,13 +54,29 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
-      const { error } = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: `${window.location.origin}/~oauth/callback`,
-      });
+      const isLovableDomain = window.location.hostname.includes('.lovable.app');
 
-      if (error) {
-        toast.error(error.message || t('auth.login_failed'));
-        setGoogleLoading(false);
+      if (isLovableDomain) {
+        // Lovable-managed OAuth flow (uses /~oauth/initiate bridge)
+        const { error } = await lovable.auth.signInWithOAuth('google', {
+          redirect_uri: `${window.location.origin}/~oauth/callback`,
+        });
+        if (error) {
+          toast.error(error.message || t('auth.login_failed'));
+          setGoogleLoading(false);
+        }
+      } else {
+        // Custom domain: bypass Lovable bridge, use Supabase OAuth directly
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/~oauth/callback`,
+          },
+        });
+        if (error) {
+          toast.error(error.message || t('auth.login_failed'));
+          setGoogleLoading(false);
+        }
       }
     } catch (error: any) {
       console.error('Google login error:', error);
