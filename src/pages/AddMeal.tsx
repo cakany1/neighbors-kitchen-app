@@ -740,9 +740,10 @@ const AddMeal = () => {
                     const dateInput = document.createElement('input');
                     dateInput.type = 'date';
                     dateInput.value = formData.scheduledDate;
+                    dateInput.min = new Date().toISOString().split('T')[0];
                     dateInput.onchange = (e) => {
                       const target = e.target as HTMLInputElement;
-                      if (target.value) {
+                      if (target.value && target.value >= new Date().toISOString().split('T')[0]) {
                         setFormData({ ...formData, scheduledDate: target.value });
                       }
                     };
@@ -769,7 +770,9 @@ const AddMeal = () => {
                     if (input.length === 10) {
                       try {
                         const parsedDate = parse(input, 'dd.MM.yyyy', new Date());
-                        if (!isNaN(parsedDate.getTime())) {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (!isNaN(parsedDate.getTime()) && parsedDate >= today) {
                           const isoDate = format(parsedDate, 'yyyy-MM-dd');
                           setFormData({ ...formData, scheduledDate: isoDate });
                         }
