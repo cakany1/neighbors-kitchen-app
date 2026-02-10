@@ -142,7 +142,7 @@ const MealDetail = () => {
           ingredients,
           is_stock_photo,
           women_only,
-          chef:profiles_public!chef_id (
+          chef:profiles_public!fk_meals_profiles (
             first_name,
             last_name,
             nickname,
