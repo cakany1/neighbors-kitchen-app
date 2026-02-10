@@ -58,6 +58,66 @@ serve(async (req) => {
   const results: TestResult[] = [];
   const start = Date.now();
 
+  // ===== INFRASTRUCTURE: Go/No-Go Gate Checks =====
+
+  // INFRA-1: DB Reachability
+  const ti1 = Date.now();
+  try {
+    const { error: dbErr } = await adminClient.from('profiles').select('id').limit(1);
+    results.push({
+      name: 'INFRA: DB Reachability',
+      status: dbErr ? 'FAIL' : 'PASS',
+      details: dbErr ? `DB error: ${dbErr.message}` : 'SELECT query successful',
+      duration_ms: Date.now() - ti1
+    });
+  } catch (e: any) {
+    results.push({ name: 'INFRA: DB Reachability', status: 'FAIL', details: (e.message || '').slice(0, 80), duration_ms: Date.now() - ti1 });
+  }
+
+  // INFRA-2: Auth Health (already validated by admin JWT check above)
+  results.push({
+    name: 'INFRA: Auth Health',
+    status: 'PASS',
+    details: `Admin JWT valid (${user.id.slice(0, 8)}...)`,
+    duration_ms: 0
+  });
+
+  // INFRA-3: Storage Health (gallery bucket)
+  const ti3 = Date.now();
+  try {
+    const { error: storageErr } = await adminClient.storage.from('gallery').list('', { limit: 1 });
+    results.push({
+      name: 'INFRA: Storage (Gallery)',
+      status: storageErr ? 'FAIL' : 'PASS',
+      details: storageErr ? `Storage error: ${storageErr.message}` : 'gallery bucket accessible',
+      duration_ms: Date.now() - ti3
+    });
+  } catch (e: any) {
+    results.push({ name: 'INFRA: Storage (Gallery)', status: 'FAIL', details: (e.message || '').slice(0, 80), duration_ms: Date.now() - ti3 });
+  }
+
+  // INFRA-4: Push Token Readiness
+  const ti4 = Date.now();
+  try {
+    const { count: tokenCount, error: tokenErr } = await adminClient
+      .from('device_push_tokens')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_active', true);
+
+    if (tokenErr) {
+      results.push({ name: 'INFRA: Push Readiness', status: 'FAIL', details: `Token query error: ${tokenErr.message}`, duration_ms: Date.now() - ti4 });
+    } else {
+      results.push({
+        name: 'INFRA: Push Readiness',
+        status: 'PASS',
+        details: tokenCount && tokenCount > 0 ? `${tokenCount} active push token(s)` : 'No active tokens (no devices registered yet)',
+        duration_ms: Date.now() - ti4
+      });
+    }
+  } catch (e: any) {
+    results.push({ name: 'INFRA: Push Readiness', status: 'FAIL', details: (e.message || '').slice(0, 80), duration_ms: Date.now() - ti4 });
+  }
+
   // ===== T1: Profile Structure =====
   const t1 = Date.now();
   const { data: profiles } = await adminClient.from('profiles').select('id, gender, phone_number').limit(5);
