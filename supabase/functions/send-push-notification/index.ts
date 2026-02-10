@@ -143,7 +143,40 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const projectId = Deno.env.get('FIREBASE_PROJECT_ID');
+
+    // SECURITY: Verify caller is admin or service-role
+    const token = authHeader.replace('Bearer ', '');
+    if (token !== supabaseServiceKey) {
+      // Not service-role — check if caller is admin
+      const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } }
+      });
+      const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+      if (authError || !user) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      // Check admin role
+      const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
+      const { data: roleData } = await supabaseService
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (!roleData) {
+        console.warn(`[Push] Non-admin user ${user.id} attempted to call send-push-notification`);
+        return new Response(JSON.stringify({ error: 'Forbidden: Admin access required' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    }
 
     if (!projectId) {
       console.error('FIREBASE_PROJECT_ID not configured');
