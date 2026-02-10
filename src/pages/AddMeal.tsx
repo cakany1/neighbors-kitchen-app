@@ -432,9 +432,9 @@ const AddMeal = () => {
         // Continue without translations if they fail
       }
 
-      // Parse estimated value (optional) - stored in cents
+      // Parse estimated value (optional) - stored in cents, clamped to max CHF 200
       const estimatedValueCents = formData.estimatedValue 
-        ? Math.round(parseLocalizedNumber(formData.estimatedValue) * 100)
+        ? Math.min(Math.round(parseLocalizedNumber(formData.estimatedValue) * 100), 20000)
         : null;
 
       const mealData = {
