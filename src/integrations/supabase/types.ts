@@ -1633,7 +1633,7 @@ export type Database = {
         Returns: Json
       }
       user_can_view_meal_address: {
-        Args: { meal_id: string; user_id: string }
+        Args: { p_meal_id: string; p_user_id: string }
         Returns: boolean
       }
       withdraw_meal: { Args: { p_meal_id: string }; Returns: Json }
