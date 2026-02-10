@@ -830,7 +830,7 @@
     "delete_failed": "Deletion failed",
     "demo_meal_notice": "👋 This is a demo meal",
     "demo_meal_hint": "You can't actually book it, but feel free to explore the app!",
-    "profile_incomplete": "Please complete your profile (Address & Phone) to book meals",
+    "profile_incomplete": "Please complete your profile (Gender, Phone & Address) to book meals",
     "confirm_cancel": "Do you really want to cancel this booking?",
     "chat_with_chef": "Ask the Chef",
     "demo_chat_blocked": "This is a demo meal. Chat is not available.",
@@ -967,7 +967,11 @@
     "booking_failed": "Booking failed",
     "booking_cancelled": "Booking cancelled",
     "cancel_failed": "Cancellation failed",
-    "profile_incomplete": "Please complete your profile (Address & Phone) to book meals"
+    "profile_incomplete": "Please complete your profile (Gender, Phone & Address) to book meals",
+    "gender_required": "Please select your gender.",
+    "phone_required": "Please enter your phone number.",
+    "phone_invalid_format": "Please enter a valid phone number (min. 8 characters).",
+    "profile_fields_required": "Please fill in the required fields: gender and phone number."
   },
   "modal": {
     "almost_done": "Almost there!",

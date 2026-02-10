@@ -231,7 +231,7 @@ const MealDetail = () => {
 
       // BOOKING GATE: Check profile completion
       const profile = currentUser.profile;
-      const isProfileComplete = profile?.phone_number && profile?.private_address && profile?.private_city;
+      const isProfileComplete = profile?.phone_number && profile?.gender && profile?.private_address && profile?.private_city;
 
       if (!isProfileComplete) {
         toast.error(t("toast.profile_incomplete"));
@@ -315,12 +315,12 @@ const MealDetail = () => {
       return;
     }
 
-    // PROFILE GATE: Only check address and phone (NOT photo, NOT partner photo)
+    // PROFILE GATE: Check gender, phone, and address (NOT photo, NOT phone_verified)
     const profile = currentUser.profile;
-    const isProfileComplete = profile?.phone_number && profile?.private_address && profile?.private_city;
+    const isProfileComplete = profile?.phone_number && profile?.gender && profile?.private_address && profile?.private_city;
 
     if (!isProfileComplete) {
-      toast.error("Bitte vervollständige dein Profil (Telefon & Adresse) bevor du buchst.");
+      toast.error(t("toast.profile_incomplete", "Bitte vervollständige dein Profil (Geschlecht, Telefon & Adresse) bevor du buchst."));
       navigate("/profile");
       return;
     }
