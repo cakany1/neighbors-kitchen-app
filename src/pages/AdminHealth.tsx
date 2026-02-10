@@ -413,6 +413,9 @@ const AdminHealth = () => {
                 <p className="text-xs text-muted-foreground">
                   Hostname: {envInfo.hostname} • Supabase: {envInfo.supabaseProjectId || 'N/A'}
                 </p>
+                <p className="text-xs text-muted-foreground/70 mt-0.5">
+                  Preview nutzt dasselbe Backend wie dieses Projekt. Echte Isolierung erst mit Remix.
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
