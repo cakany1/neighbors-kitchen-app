@@ -15,7 +15,7 @@ import { ReportDialog } from "@/components/ReportDialog";
 import { AuthInterstitialModal } from "@/components/AuthInterstitialModal";
 import { ProfileWizard } from "@/components/ProfileWizard";
 import { VerificationBadge } from "@/components/VerificationBadge";
-import { RatingSummary } from "@/components/RatingSummary";
+import { RatingSummary, type ProfileRatingsData } from "@/components/RatingSummary";
 import { checkAllergenMatch } from "@/utils/ingredientDatabase";
 import FuzzyLocationMap from "@/components/maps/FuzzyLocationMap";
 import ChatModal from "@/components/ChatModal";
@@ -94,18 +94,18 @@ const MealDetail = () => {
 
   // Fetch meal data with chef - SECURITY: Never fetch exact_address here
   // GUEST MODE: Check demo meals first
-  const { data: meal, isLoading } = useQuery({
+  const { data: mealData, isLoading } = useQuery({
     queryKey: ["meal", id],
     queryFn: async () => {
       // Check if this is a demo meal (with safety check)
       const safeDemoMeals = DEMO_MEALS && Array.isArray(DEMO_MEALS) ? DEMO_MEALS : [];
       const demoMeal = safeDemoMeals.find((m) => m.id === id);
       if (demoMeal) {
-        return demoMeal;
+        return { meal: demoMeal, chefRatings: null as ProfileRatingsData | null };
       }
 
       // SECURITY: Use meals_public view to prevent exact_address exposure
-      const { data, error } = await supabase
+      const { data: mealRow, error } = await supabase
         .from("meals_public")
         .select(
           `
@@ -157,9 +157,24 @@ const MealDetail = () => {
         .single();
 
       if (error) throw error;
-      return data;
+
+      // Co-fetch chef rating summary (single loading state, no race condition)
+      let chefRatings: ProfileRatingsData | null = null;
+      if (mealRow.chef_id) {
+        const { data: ratingsData } = await (supabase as any)
+          .from("profile_ratings")
+          .select("*")
+          .eq("user_id", mealRow.chef_id)
+          .maybeSingle();
+        chefRatings = ratingsData as ProfileRatingsData | null;
+      }
+
+      return { meal: mealRow, chefRatings };
     },
   });
+
+  const meal = mealData?.meal;
+  const chefRatings = mealData?.chefRatings ?? null;
 
   // SECURITY: Only fetch exact address AFTER booking is confirmed
   const { data: confirmedAddress } = useQuery({
@@ -538,7 +553,7 @@ const MealDetail = () => {
                 </span>
               </div>
               <div className="flex items-center gap-3 mt-1">
-                <RatingSummary userId={meal.chef_id} role="chef" size="sm" showLabel={false} />
+                <RatingSummary userId={meal.chef_id} role="chef" size="sm" showLabel={false} summary={chefRatings} />
                 <span className="text-muted-foreground">•</span>
                 <span className="flex items-center gap-1 text-sm">
                   <Star className="w-3 h-3 fill-trust-gold text-trust-gold" />
