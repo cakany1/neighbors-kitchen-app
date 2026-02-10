@@ -758,9 +758,11 @@ const MealDetail = () => {
             <div className="flex items-center justify-between p-4 bg-secondary/10 rounded-lg border border-secondary/20">
               <span className="text-sm text-muted-foreground">{t("meal_detail.estimated_value", "Geschätzter Wert")}</span>
               <span className="text-lg font-semibold text-secondary">
-                ~CHF {((meal as any).estimated_restaurant_value > 100 
-                  ? ((meal as any).estimated_restaurant_value / 100) 
-                  : (meal as any).estimated_restaurant_value
+                ~CHF {Math.min(
+                  (meal as any).estimated_restaurant_value > 100 
+                    ? (meal as any).estimated_restaurant_value / 100 
+                    : (meal as any).estimated_restaurant_value,
+                  200
                 ).toFixed(0)}.-
                 <span className="text-xs font-normal text-muted-foreground ml-1">
                   ({meal.available_portions} {t("meal_detail.portions", "Portionen")})

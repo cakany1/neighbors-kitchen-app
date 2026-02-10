@@ -50,9 +50,9 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   const pricingMinCents = Number(pricingMinRaw) > 100 ? Number(pricingMinRaw) : Number(pricingMinRaw) * 100;
   const minPrice = (pricingMinCents / 100).toFixed(2);
 
-  // Estimated restaurant value - stored in cents in DB, CHF in mock data
+  // Estimated restaurant value - stored in cents in DB, CHF in mock data; clamped to max CHF 200
   const estimatedValueRaw = (meal as any).estimated_restaurant_value || (meal as any).estimatedRestaurantValue || 0;
-  const estimatedValueCHF = Number(estimatedValueRaw) > 100 ? Number(estimatedValueRaw) / 100 : Number(estimatedValueRaw);
+  const estimatedValueCHF = Math.min(Number(estimatedValueRaw) > 100 ? Number(estimatedValueRaw) / 100 : Number(estimatedValueRaw), 200);
 
   const location = meal.location || {};
   const neighborhood =
