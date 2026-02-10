@@ -45,8 +45,28 @@ Deno.serve(async (req) => {
       return jsonError("Minimum amount is CHF 7.00", 400, requestId, undefined, origin);
     }
 
-    // Initialize Stripe
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    // Initialize Stripe with environment safety guard
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+    if (!stripeKey) {
+      safeLog(requestId, 'error', 'STRIPE_SECRET_KEY not configured');
+      return jsonError("Payment system not configured", 500, requestId, undefined, origin);
+    }
+
+    // Detect Stripe mode from key prefix
+    const stripeMode = stripeKey.startsWith("sk_live_") ? "live" : "test";
+    const requestOrigin = req.headers.get("origin") || "";
+    const isProductionOrigin = requestOrigin.includes("neighbors-kitchen.ch") || 
+                                requestOrigin.includes("share-kitchen-basel.lovable.app");
+
+    // SECURITY: Warn if test key is used on production origin
+    if (stripeMode === "test" && isProductionOrigin) {
+      safeLog(requestId, 'warn', 'TEST Stripe key used on PRODUCTION origin', {
+        origin: requestOrigin,
+        mode: stripeMode
+      });
+    }
+
+    const stripe = new Stripe(stripeKey, {
       apiVersion: "2025-08-27.basil",
     });
 
@@ -57,7 +77,8 @@ Deno.serve(async (req) => {
     safeLog(requestId, 'info', 'Creating payment session', { 
       userId: user.id, 
       mealId, 
-      amount 
+      amount,
+      stripeMode
     });
 
     // Create Checkout Session with dynamic pricing
@@ -103,7 +124,7 @@ Deno.serve(async (req) => {
     safeLog(requestId, 'info', 'Payment session created', { sessionId: session.id });
 
     return new Response(
-      JSON.stringify({ url: session.url, sessionId: session.id, requestId }),
+      JSON.stringify({ url: session.url, sessionId: session.id, requestId, stripeMode }),
       { headers: { ...getCorsHeaders(origin), "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error: unknown) {
