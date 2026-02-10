@@ -3,19 +3,21 @@ import { Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
-interface RatingSummaryProps {
-  userId: string;
-  role?: 'chef' | 'guest';
-  size?: 'sm' | 'md';
-  showLabel?: boolean;
-}
-
-interface ProfileRatingsData {
+export interface ProfileRatingsData {
   user_id: string;
   chef_total: number;
   chef_avg: number;
   guest_total: number;
   guest_avg: number;
+}
+
+interface RatingSummaryProps {
+  userId: string;
+  role?: 'chef' | 'guest';
+  size?: 'sm' | 'md';
+  showLabel?: boolean;
+  /** Pre-loaded summary – skips internal query when provided */
+  summary?: ProfileRatingsData | null;
 }
 
 const formatRatingCount = (count: number, locale: string): string => {
@@ -33,10 +35,11 @@ export const RatingSummary = ({
   role = 'chef',
   size = 'md',
   showLabel = true,
+  summary,
 }: RatingSummaryProps) => {
   const { t, i18n } = useTranslation();
 
-  const { data: ratings } = useQuery({
+  const { data: fetchedRatings } = useQuery({
     queryKey: ['ratingsSummary', userId],
     queryFn: async (): Promise<ProfileRatingsData | null> => {
       const supabaseAny = supabase as any;
@@ -53,8 +56,10 @@ export const RatingSummary = ({
 
       return data as ProfileRatingsData;
     },
-    enabled: !!userId,
+    enabled: !!userId && summary === undefined,
   });
+
+  const ratings = summary !== undefined ? summary : fetchedRatings;
 
   const isChef = role === 'chef';
   const total = isChef ? Number(ratings?.chef_total) || 0 : Number(ratings?.guest_total) || 0;
