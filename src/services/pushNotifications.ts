@@ -78,10 +78,19 @@ export const requestPushPermissions = async (): Promise<boolean> => {
  */
 export const registerPushToken = async (token: string): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    // SECURITY: Double-check auth session validity before sending token
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     
-    if (!user) {
-      console.log('[Push] No authenticated user, skipping token registration');
+    if (sessionError || !session?.user) {
+      console.log('[Push] No valid session, skipping token registration');
+      return false;
+    }
+
+    // Additional server-side validation: getUser() verifies the JWT with the server
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.log('[Push] Server rejected auth token, skipping token registration');
       return false;
     }
 
@@ -92,6 +101,7 @@ export const registerPushToken = async (token: string): Promise<boolean> => {
     console.log('[Push] Registering token:', { platform, deviceId, environment, tokenPreview: token.substring(0, 20) + '...' });
 
     // Upsert token (update if exists, insert if new)
+    // RLS ensures user_id must match auth.uid()
     const { error } = await supabase
       .from('device_push_tokens')
       .upsert({
