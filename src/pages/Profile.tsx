@@ -248,6 +248,23 @@ const Profile = () => {
   const updateProfileMutation = useMutation({
     mutationFn: async (ibanUpdate?: string) => {
       if (!currentUser?.id) throw new Error('Not authenticated');
+
+      // REQUIRED FIELD VALIDATION: gender + phone
+      const validationErrors: string[] = [];
+      
+      if (!formData.gender) {
+        validationErrors.push(t('toast.gender_required', 'Bitte wähle dein Geschlecht aus.'));
+      }
+      
+      if (!formData.phone_number?.trim()) {
+        validationErrors.push(t('toast.phone_required', 'Bitte gib deine Telefonnummer an.'));
+      } else if (formData.phone_number.replace(/[\s\-\(\)]/g, '').length < 8) {
+        validationErrors.push(t('toast.phone_invalid_format', 'Bitte gib eine gültige Telefonnummer ein (mind. 8 Zeichen).'));
+      }
+      
+      if (validationErrors.length > 0) {
+        throw new Error(validationErrors.join('\n'));
+      }
       
       let latitude = currentUser.profile?.latitude || null;
       let longitude = currentUser.profile?.longitude || null;
@@ -901,7 +918,7 @@ const Profile = () => {
             </div>
             
             <div>
-              <Label htmlFor="gender">{t('profile.gender_label')}</Label>
+              <Label htmlFor="gender">{t('profile.gender_label')} <span className="text-destructive">*</span></Label>
               <Select
                 value={formData.gender || undefined}
                 onValueChange={(value) => {
@@ -1151,7 +1168,7 @@ const Profile = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="phone">{t('profile.settings_mobile')}</Label>
+              <Label htmlFor="phone">{t('profile.settings_mobile')} <span className="text-destructive">*</span></Label>
               <Input
                 id="phone"
                 type="tel"

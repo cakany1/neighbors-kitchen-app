@@ -186,7 +186,11 @@
     "faq_times_asked": "mal gefragt"
   },
   "toast": {
-    "profile_incomplete": "Bitte vervollständige dein Profil (Adresse & Telefon), um Gerichte zu buchen.",
+    "profile_incomplete": "Bitte vervollständige dein Profil (Geschlecht, Telefon & Adresse), um Gerichte zu buchen.",
+    "gender_required": "Bitte wähle dein Geschlecht aus.",
+    "phone_required": "Bitte gib deine Telefonnummer an.",
+    "phone_invalid_format": "Bitte gib eine gültige Telefonnummer ein (mind. 8 Zeichen).",
+    "profile_fields_required": "Bitte fülle die Pflichtfelder aus: Geschlecht und Telefonnummer.",
     "booking_sent": "Buchungsanfrage an {name} gesendet",
     "booking_failed": "Buchung fehlgeschlagen",
     "login_required": "Bitte melde dich an, um dieses Gericht zu buchen",
@@ -786,7 +790,7 @@
     "delete_failed": "Löschen fehlgeschlagen",
     "demo_meal_notice": "👋 Dies ist ein Demo-Gericht",
     "demo_meal_hint": "Du kannst es nicht wirklich buchen, aber probiere die App gerne aus!",
-    "profile_incomplete": "Bitte vervollständige dein Profil (Adresse & Telefon), um Mahlzeiten zu buchen",
+    "profile_incomplete": "Bitte vervollständige dein Profil (Geschlecht, Telefon & Adresse), um Mahlzeiten zu buchen",
     "confirm_cancel": "Möchtest du diese Buchung wirklich stornieren?",
     "chat_with_chef": "Frage an den Chef",
     "demo_chat_blocked": "Dies ist ein Demo-Gericht. Der Chat ist nicht verfügbar.",
@@ -923,7 +927,7 @@
     "booking_failed": "Buchung fehlgeschlagen",
     "booking_cancelled": "Buchung storniert",
     "cancel_failed": "Stornierung fehlgeschlagen",
-    "profile_incomplete": "Bitte vervollständige dein Profil (Adresse & Telefon), um Mahlzeiten zu buchen"
+    "profile_incomplete": "Bitte vervollständige dein Profil (Geschlecht, Telefon & Adresse), um Mahlzeiten zu buchen"
   },
   "modal": {
     "almost_done": "Fast geschafft!",
