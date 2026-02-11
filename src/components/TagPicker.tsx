@@ -3,45 +3,10 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X, Plus } from 'lucide-react';
+import { normalize } from '@/utils/canonical_map';
 
-/** Synonym → canonical value mapping (DE/EN) */
-const SYNONYM_MAP: Record<string, string> = {
-  // Allergens
-  erdnuss: 'peanuts', erdnüsse: 'peanuts', peanut: 'peanuts',
-  nüsse: 'nuts', nuss: 'nuts', 'tree nuts': 'nuts', schalenfrüchte: 'nuts',
-  milch: 'dairy', laktose: 'dairy', lactose: 'dairy', milk: 'dairy', sahne: 'dairy', käse: 'dairy',
-  gluten: 'gluten', weizen: 'gluten', wheat: 'gluten', mehl: 'gluten',
-  eier: 'eggs', ei: 'eggs', egg: 'eggs',
-  fisch: 'fish', fish: 'fish',
-  soja: 'soy', soy: 'soy', tofu: 'soy',
-  sellerie: 'celery', celery: 'celery',
-  senf: 'mustard', mustard: 'mustard',
-  sesam: 'sesame', sesame: 'sesame', tahini: 'sesame',
-  sulfite: 'sulphites', sulfit: 'sulphites', schwefeldioxid: 'sulphites',
-  lupinen: 'lupin', lupine: 'lupin', lupin: 'lupin',
-  krebstiere: 'crustaceans', garnelen: 'crustaceans', shrimp: 'crustaceans', shellfish: 'crustaceans',
-  weichtiere: 'molluscs', muscheln: 'molluscs', tintenfisch: 'molluscs',
-  // Tags
-  vegetarisch: 'vegetarian', veggie: 'vegetarian', vegi: 'vegetarian', vegetarian: 'vegetarian',
-  vegan: 'vegan', pflanzlich: 'vegan',
-  halal: 'halal',
-  koscher: 'kosher', kosher: 'kosher',
-  scharf: 'spicy', spicy: 'spicy', pikant: 'spicy',
-  glutenfrei: 'gluten_free', 'gluten-free': 'gluten_free',
-  laktosefrei: 'lactose_free', 'lactose-free': 'lactose_free',
-  bio: 'organic', organic: 'organic',
-  hausgemacht: 'homemade', homemade: 'homemade', selbstgemacht: 'homemade',
-  kindgerecht: 'kid_friendly', kinderfreundlich: 'kid_friendly',
-  pescatarian: 'pescatarian', pescetarisch: 'pescatarian',
-  low_carb: 'low_carb', 'low carb': 'low_carb', kohlenhydratarm: 'low_carb',
-  mild: 'mild',
-};
-
-/** Default normalization: lowercase, trim, apply synonym mapping */
-export function normalizeTag(raw: string): string {
-  const key = raw.toLowerCase().trim();
-  return SYNONYM_MAP[key] ?? key;
-}
+/** Re-export normalize as normalizeTag for backward compatibility */
+export const normalizeTag = normalize;
 
 export interface PredefinedOption {
   value: string;

@@ -1,3 +1,5 @@
+import { matchAllergens } from '@/utils/canonical_map';
+
 // Mock ingredient database for allergen auto-detection
 export const ingredientDB: Record<string, string[]> = {
   // Gluten sources
@@ -158,11 +160,9 @@ export function detectAllergens(ingredients: string[]): string[] {
 }
 
 /**
- * Checks if a meal contains allergens that match user's profile
- * @param mealAllergens Allergens in the meal
- * @param userAllergens User's allergens from profile
- * @returns Array of matching allergens
+ * Checks if a meal contains allergens that match user's profile.
+ * Uses canonical normalization so "Milch/Laktose" matches "dairy" etc.
  */
 export function checkAllergenMatch(mealAllergens: string[], userAllergens: string[]): string[] {
-  return mealAllergens.filter(allergen => userAllergens.includes(allergen));
+  return matchAllergens(userAllergens, mealAllergens);
 }
