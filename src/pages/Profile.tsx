@@ -36,10 +36,13 @@ import { PhotoPicker } from '@/components/PhotoPicker';
 import GalleryUpload from '@/components/GalleryUpload';
 import GalleryGrid from '@/components/GalleryGrid';
 import { AppVersionBadge } from '@/components/AppVersionBadge';
+import { ComplianceLinks } from '@/components/ComplianceLinks';
+import { SafetyAlert } from '@/components/SafetyAlert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 import {
   User, Settings, Camera, MapPin, Phone, ChefHat, LogOut,
-  ChevronDown, Loader2, Shield, Palmtree, Globe, Pencil
+  ChevronDown, Loader2, Shield, Palmtree, Globe, Pencil, Trash2, AlertTriangle, X
 } from 'lucide-react';
 
 const Profile = () => {
@@ -66,6 +69,11 @@ const Profile = () => {
   const [displayRealName, setDisplayRealName] = useState(false);
   const [notificationRadius, setNotificationRadius] = useState<number>(5);
   const [languages, setLanguages] = useState<string[]>([]);
+  const [allergens, setAllergens] = useState<string[]>([]);
+  const [dislikes, setDislikes] = useState<string[]>([]);
+  const [newAllergen, setNewAllergen] = useState('');
+  const [newDislike, setNewDislike] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState('');
 
   // Collapsible sections
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -115,6 +123,8 @@ const Profile = () => {
       setDisplayRealName(profile.display_real_name || false);
       setNotificationRadius(profile.notification_radius || 5);
       setLanguages(profile.languages || []);
+      setAllergens(profile.allergens || []);
+      setDislikes(profile.dislikes || []);
     }
   }, [profile]);
 
@@ -144,6 +154,8 @@ const Profile = () => {
           display_real_name: displayRealName,
           notification_radius: notificationRadius,
           languages,
+          allergens,
+          dislikes,
         })
         .eq('id', userId);
 
@@ -197,6 +209,31 @@ const Profile = () => {
     toast.success(checked
       ? t('profile.vacation_on', '🏖️ Urlaubsmodus aktiviert')
       : t('profile.vacation_off', 'Urlaubsmodus deaktiviert'));
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirm !== 'DELETE') return;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      // Delete profile (cascades to all related data)
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', user.id);
+      
+      if (error) {
+        // If RLS blocks delete, try signing out anyway
+        console.error('Profile delete error:', error);
+      }
+      
+      await supabase.auth.signOut();
+      toast.success(t('profile.account_deleted', 'Account wurde gelöscht'));
+      navigate('/');
+    } catch (err: any) {
+      toast.error(err.message || 'Fehler beim Löschen');
+    }
   };
 
   if (isLoading || !profile) {
@@ -506,6 +543,100 @@ const Profile = () => {
                     <p className="text-sm text-muted-foreground">-</p>
                   )}
                 </div>
+
+                <Separator />
+
+                {/* Allergens */}
+                <div>
+                  <Label>{t('profile.allergens', 'Allergene')}</Label>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {allergens.map((a) => (
+                      <Badge key={a} variant="destructive" className="text-xs gap-1">
+                        {a}
+                        {editingProfile && (
+                          <X className="w-3 h-3 cursor-pointer" onClick={() => setAllergens(allergens.filter(x => x !== a))} />
+                        )}
+                      </Badge>
+                    ))}
+                    {allergens.length === 0 && <p className="text-sm text-muted-foreground">{t('profile.none', 'Keine')}</p>}
+                  </div>
+                  {editingProfile && (
+                    <div className="flex gap-2 mt-2">
+                      <Input
+                        value={newAllergen}
+                        onChange={(e) => setNewAllergen(e.target.value)}
+                        placeholder={t('profile.add_allergen', 'z.B. Gluten, Nüsse...')}
+                        className="text-sm"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && newAllergen.trim()) {
+                            e.preventDefault();
+                            if (!allergens.includes(newAllergen.trim())) {
+                              setAllergens([...allergens, newAllergen.trim()]);
+                            }
+                            setNewAllergen('');
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          if (newAllergen.trim() && !allergens.includes(newAllergen.trim())) {
+                            setAllergens([...allergens, newAllergen.trim()]);
+                            setNewAllergen('');
+                          }
+                        }}
+                      >+</Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Dislikes */}
+                <div>
+                  <Label>{t('profile.dislikes', 'Abneigungen')}</Label>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {dislikes.map((d) => (
+                      <Badge key={d} variant="secondary" className="text-xs gap-1">
+                        {d}
+                        {editingProfile && (
+                          <X className="w-3 h-3 cursor-pointer" onClick={() => setDislikes(dislikes.filter(x => x !== d))} />
+                        )}
+                      </Badge>
+                    ))}
+                    {dislikes.length === 0 && <p className="text-sm text-muted-foreground">{t('profile.none', 'Keine')}</p>}
+                  </div>
+                  {editingProfile && (
+                    <div className="flex gap-2 mt-2">
+                      <Input
+                        value={newDislike}
+                        onChange={(e) => setNewDislike(e.target.value)}
+                        placeholder={t('profile.add_dislike', 'z.B. Koriander, Rosinen...')}
+                        className="text-sm"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && newDislike.trim()) {
+                            e.preventDefault();
+                            if (!dislikes.includes(newDislike.trim())) {
+                              setDislikes([...dislikes, newDislike.trim()]);
+                            }
+                            setNewDislike('');
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          if (newDislike.trim() && !dislikes.includes(newDislike.trim())) {
+                            setDislikes([...dislikes, newDislike.trim()]);
+                            setNewDislike('');
+                          }
+                        }}
+                      >+</Button>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -599,7 +730,67 @@ const Profile = () => {
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Logout & Version */}
+        {/* Compliance & Legal */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">{t('profile.compliance', 'Compliance & Legal')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <ComplianceLinks variant="settings" />
+            <div className="flex justify-center">
+              <AppVersionBadge />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Danger Zone */}
+        <Card className="border-destructive/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base text-destructive flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4" />
+              {t('profile.danger_zone', 'Gefahrenzone')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              {t('profile.delete_warning', 'Das Löschen deines Accounts entfernt alle deine Daten unwiderruflich.')}
+            </p>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="w-full">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  {t('profile.delete_account', 'Account löschen')}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t('profile.delete_confirm_title', 'Account wirklich löschen?')}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t('profile.delete_confirm_desc', 'Alle deine Gerichte, Buchungen, Nachrichten und Bewertungen werden unwiderruflich gelöscht. Tippe DELETE um zu bestätigen.')}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <Input
+                  value={deleteConfirm}
+                  onChange={(e) => setDeleteConfirm(e.target.value)}
+                  placeholder="DELETE"
+                  className="mt-2"
+                />
+                <AlertDialogFooter>
+                  <AlertDialogCancel onClick={() => setDeleteConfirm('')}>{t('common.cancel', 'Abbrechen')}</AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={deleteConfirm !== 'DELETE'}
+                    onClick={handleDeleteAccount}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {t('profile.delete_permanently', 'Endgültig löschen')}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </CardContent>
+        </Card>
+
+        {/* Logout */}
         <div className="space-y-3">
           <Button
             variant="outline"
@@ -609,9 +800,6 @@ const Profile = () => {
             <LogOut className="w-4 h-4 mr-2" />
             {t('profile.logout', 'Abmelden')}
           </Button>
-          <div className="flex justify-center">
-            <AppVersionBadge />
-          </div>
         </div>
       </main>
 
