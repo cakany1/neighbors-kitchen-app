@@ -37,12 +37,11 @@ import GalleryUpload from '@/components/GalleryUpload';
 import GalleryGrid from '@/components/GalleryGrid';
 import { AppVersionBadge } from '@/components/AppVersionBadge';
 import { ComplianceLinks } from '@/components/ComplianceLinks';
-import { SafetyAlert } from '@/components/SafetyAlert';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 import {
   User, Settings, Camera, MapPin, Phone, ChefHat, LogOut,
-  ChevronDown, Loader2, Shield, Palmtree, Globe, Pencil, Trash2, AlertTriangle, X
+  ChevronDown, Loader2, Shield, Palmtree, Globe, Pencil, Trash2, AlertTriangle, X, Heart, Eye, CreditCard, Users
 } from 'lucide-react';
 
 const Profile = () => {
@@ -74,6 +73,11 @@ const Profile = () => {
   const [newAllergen, setNewAllergen] = useState('');
   const [newDislike, setNewDislike] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [isCoupleToggle, setIsCoupleToggle] = useState(false);
+  const [partnerName, setPartnerName] = useState('');
+  const [partnerGender, setPartnerGender] = useState('');
+  const [visibilityMode, setVisibilityMode] = useState('all');
+  const [iban, setIban] = useState('');
 
   // Collapsible sections
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -125,6 +129,11 @@ const Profile = () => {
       setLanguages(profile.languages || []);
       setAllergens(profile.allergens || []);
       setDislikes(profile.dislikes || []);
+      setIsCoupleToggle(profile.is_couple || false);
+      setPartnerName(profile.partner_name || '');
+      setPartnerGender(profile.partner_gender || '');
+      setVisibilityMode(profile.visibility_mode || 'all');
+      setIban(profile.iban || '');
     }
   }, [profile]);
 
@@ -156,6 +165,11 @@ const Profile = () => {
           languages,
           allergens,
           dislikes,
+          is_couple: isCoupleToggle,
+          partner_name: partnerName || null,
+          partner_gender: partnerGender || null,
+          visibility_mode: visibilityMode,
+          iban: iban || null,
         })
         .eq('id', userId);
 
@@ -192,6 +206,46 @@ const Profile = () => {
 
     toast.success(t('profile.photo_updated', '📷 Foto aktualisiert'));
     queryClient.invalidateQueries({ queryKey: ['currentUser', userId] });
+  };
+
+  const handlePartnerPhotoUpload = async (file: File) => {
+    if (!userId) return;
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}/partner-${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('gallery')
+      .upload(fileName, file, { upsert: true });
+
+    if (uploadError) {
+      toast.error(`Upload fehlgeschlagen: ${uploadError.message}`);
+      return;
+    }
+
+    const { data } = supabase.storage.from('gallery').getPublicUrl(fileName);
+    await supabase
+      .from('profiles')
+      .update({ partner_photo_url: `${data.publicUrl}?t=${Date.now()}` })
+      .eq('id', userId);
+
+    toast.success(t('profile.partner_photo_updated', '📷 Partnerfoto aktualisiert'));
+    queryClient.invalidateQueries({ queryKey: ['currentUser', userId] });
+  };
+
+  // Visibility mode options filtered by gender
+  const getVisibilityOptions = () => {
+    if (gender === 'male') return [{ value: 'all', label: t('profile.visibility_all', 'Alle') }];
+    if (gender === 'female' || gender === 'woman')
+      return [
+        { value: 'all', label: t('profile.visibility_all', 'Alle') },
+        { value: 'women_fli', label: t('profile.visibility_women_fli', 'Women + FLI') },
+        { value: 'women_only', label: t('profile.visibility_women_only', 'Nur Frauen') },
+      ];
+    // diverse / other / non-binary
+    return [
+      { value: 'all', label: t('profile.visibility_all', 'Alle') },
+      { value: 'women_fli', label: t('profile.visibility_women_fli', 'Women + FLI') },
+    ];
   };
 
   const handleLogout = async () => {
@@ -637,10 +691,144 @@ const Profile = () => {
                     </div>
                   )}
                 </div>
+
+                <Separator />
+
+                {/* Couple Account Toggle */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="flex items-center gap-2">
+                      <Users className="w-3 h-3" />
+                      {t('profile.couple_account', 'Paar-Konto')}
+                    </Label>
+                    <Switch
+                      checked={isCoupleToggle}
+                      onCheckedChange={setIsCoupleToggle}
+                      disabled={!editingProfile}
+                    />
+                  </div>
+
+                  {isCoupleToggle && (
+                    <div className="space-y-3 pl-2 border-l-2 border-primary/20 ml-2">
+                      {/* Partner Name */}
+                      <div>
+                        <Label htmlFor="partnerName">{t('profile.partner_name', 'Partner-Name')}</Label>
+                        {editingProfile ? (
+                          <Input
+                            id="partnerName"
+                            value={partnerName}
+                            onChange={(e) => setPartnerName(e.target.value)}
+                            placeholder={t('profile.partner_name_placeholder', 'Name des Partners')}
+                          />
+                        ) : (
+                          <p className="text-sm">{profile.partner_name || '-'}</p>
+                        )}
+                      </div>
+
+                      {/* Partner Gender */}
+                      <div>
+                        <Label>{t('profile.partner_gender', 'Geschlecht des Partners')}</Label>
+                        {editingProfile ? (
+                          <Select value={partnerGender} onValueChange={setPartnerGender}>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t('profile.select_gender', 'Wählen')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="female">{t('profile.female', 'Weiblich')}</SelectItem>
+                              <SelectItem value="male">{t('profile.male', 'Männlich')}</SelectItem>
+                              <SelectItem value="non-binary">{t('profile.non_binary', 'Nicht-binär')}</SelectItem>
+                              <SelectItem value="other">{t('profile.other', 'Andere')}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <p className="text-sm">{profile.partner_gender || '-'}</p>
+                        )}
+                      </div>
+
+                      {/* Partner Photo */}
+                      <div>
+                        <Label>{t('profile.partner_photo', 'Partner-Foto')}</Label>
+                        <div className="flex items-center gap-3 mt-1">
+                          <Avatar className="w-14 h-14">
+                            <AvatarImage src={profile.partner_photo_url || undefined} />
+                            <AvatarFallback><Heart className="w-5 h-5" /></AvatarFallback>
+                          </Avatar>
+                          <PhotoPicker
+                            onPhotoSelected={(file) => handlePartnerPhotoUpload(file)}
+                            bucket="gallery"
+                            uploadPath={`${userId}/partner`}
+                            variant="outline"
+                            size="sm"
+                            label={t('profile.upload_partner_photo', 'Foto hochladen')}
+                          />
+                        </div>
+                        {profile.partner_photo_verified && (
+                          <Badge variant="outline" className="mt-1 text-xs text-green-600">
+                            ✓ {t('profile.partner_verified', 'Verifiziert')}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <Separator />
+
+                {/* Visibility Mode */}
+                <div>
+                  <Label className="flex items-center gap-2">
+                    <Eye className="w-3 h-3" />
+                    {t('profile.visibility_mode', 'Sichtbarkeitsmodus')}
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    {t('profile.visibility_hint', 'Bestimmt wer deine Angebote sehen kann')}
+                  </p>
+                  {editingProfile ? (
+                    <Select value={visibilityMode} onValueChange={setVisibilityMode}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getVisibilityOptions().map(opt => (
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <p className="text-sm">
+                      {getVisibilityOptions().find(o => o.value === (profile.visibility_mode || 'all'))?.label || profile.visibility_mode}
+                    </p>
+                  )}
+                </div>
+
+                {/* IBAN — only for chefs */}
+                {(profile.role === 'chef' || profile.role === 'both' || profile.role === 'admin') && (
+                  <>
+                    <Separator />
+                    <div>
+                      <Label className="flex items-center gap-2">
+                        <CreditCard className="w-3 h-3" />
+                        {t('profile.iban', 'IBAN (für Auszahlungen)')}
+                      </Label>
+                      {editingProfile ? (
+                        <Input
+                          value={iban}
+                          onChange={(e) => setIban(e.target.value.toUpperCase())}
+                          placeholder="CH93 0076 2011 6238 5295 7"
+                          className="font-mono text-sm"
+                        />
+                      ) : (
+                        <p className="text-sm font-mono">
+                          {profile.iban ? `${profile.iban.substring(0, 4)} •••• •••• ${profile.iban.slice(-4)}` : '-'}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
 
-            {/* Verification */}
+
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
