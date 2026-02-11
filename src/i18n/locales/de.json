@@ -69,7 +69,8 @@
      "go_to_login": "Zur Anmeldung gehen",
      "check_spam_hint": "Überprüfe auch deinen Spam-Ordner, falls du die E-Mail nicht siehst.",
      "leaked_password_title": "Passwort in Datenpanne gefunden?",
-     "leaked_password_hint": "Wir überprüfen dein Passwort gegen die größte Datenbank von gehackten Passwörtern. Falls es dort auftaucht, solltest du ein anderes wählen."
+     "leaked_password_hint": "Wir überprüfen dein Passwort gegen die größte Datenbank von gehackten Passwörtern. Falls es dort auftaucht, solltest du ein anderes wählen.",
+     "complete_profile_later": "Du kannst dein Profil nach der Registrierung vervollständigen."
    },
    "auth": {
      "welcome_back": "Willkommen zurück!",
@@ -95,6 +96,8 @@
     "sign_in_link": "Einloggen",
     "welcome_toast": "Willkommen zurück!",
     "login_failed": "Anmeldung fehlgeschlagen",
+    "profile_repair_failed": "Profil-Reparatur fehlgeschlagen. Bitte kontaktiere den Support.",
+    "profile_restored": "Profil wiederhergestellt! Willkommen zurück.",
     "account_created": "Konto erstellt! Willkommen bei Neighbors Kitchen 🎉",
     "account_creation_failed": "Kontoerstellung fehlgeschlagen",
     "weak_password": "Dieses Passwort ist zu schwach und leicht zu erraten. Bitte wähle ein anderes.",
