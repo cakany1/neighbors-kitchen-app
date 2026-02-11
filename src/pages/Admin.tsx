@@ -688,9 +688,20 @@ const Admin = () => {
       if (!result.success) throw new Error(result.message);
       return result;
     },
-    onSuccess: () => {
+    onSuccess: (_, userId) => {
       toast.success('Benutzer erfolgreich gelöscht');
-      queryClient.invalidateQueries({ queryKey: ['allUsers'] });
+      
+      // Optimistic UI: immediately remove deleted user from cached list
+      const previousUsers = queryClient.getQueryData<any[]>(['allUsersAdmin']);
+      if (previousUsers) {
+        queryClient.setQueryData(
+          ['allUsersAdmin'],
+          previousUsers.filter(user => user.id !== userId)
+        );
+      }
+      
+      // Then invalidate to ensure server truth
+      queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
     onError: (error: Error) => {
@@ -1758,7 +1769,14 @@ const Admin = () => {
                                 <Button
                                   variant="destructive"
                                   size="sm"
-                                  onClick={() => {
+                                  onClick={async () => {
+                                    // Guard: prevent deleting own user
+                                    const { data: { user: currentUser } } = await supabase.auth.getUser();
+                                    if (currentUser?.id === user.id) {
+                                      toast.error('Sie können Ihr eigenes Konto nicht löschen');
+                                      return;
+                                    }
+                                    
                                     if (window.confirm(`Benutzer ${user.first_name} ${user.last_name} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
                                       deleteUserMutation.mutate(user.id);
                                     }
