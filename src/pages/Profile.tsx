@@ -1,125 +1,140 @@
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Header } from '@/components/Header';
-import { BottomNav } from '@/components/BottomNav';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Star, Award, ChefHat, Heart, Globe, Shield, Loader2, Upload, AlertCircle, ChevronDown, FileText, Mail } from 'lucide-react';
-import { toast } from 'sonner';
-import { allergenOptions, dislikeCategories } from '@/utils/ingredientDatabase';
-import { supabase } from '@/integrations/supabase/client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import RadiusSliderMap from '@/components/maps/RadiusSliderMap';
-import GalleryUpload from '@/components/GalleryUpload';
-import GalleryGrid from '@/components/GalleryGrid';
-import { BlockedUsersList } from '@/components/BlockedUsersList';
-import { FeedbackDialog } from '@/components/FeedbackDialog';
-import { generateAddressId } from '@/utils/addressHash';
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { Header } from "@/components/Header";
+import { BottomNav } from "@/components/BottomNav";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Star,
+  Award,
+  ChefHat,
+  Heart,
+  Globe,
+  Shield,
+  Loader2,
+  Upload,
+  AlertCircle,
+  ChevronDown,
+  FileText,
+  Mail,
+} from "lucide-react";
+import { toast } from "sonner";
+import { allergenOptions, dislikeCategories } from "@/utils/ingredientDatabase";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import RadiusSliderMap from "@/components/maps/RadiusSliderMap";
+import GalleryUpload from "@/components/GalleryUpload";
+import GalleryGrid from "@/components/GalleryGrid";
+import { BlockedUsersList } from "@/components/BlockedUsersList";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
+import { generateAddressId } from "@/utils/addressHash";
 
-import { VerificationBadge } from '@/components/VerificationBadge';
-import { VerificationDialog } from '@/components/VerificationDialog';
-import { TwoFactorSettings } from '@/components/TwoFactorSettings';
-import { ReliabilityDisplay } from '@/components/ReliabilityDisplay';
-import { KarmaLevel } from '@/components/KarmaLevel';
-import { RatingSummary } from '@/components/RatingSummary';
-import { ChefBookings } from '@/components/ChefBookings';
-import { ProfileRatings } from '@/components/ProfileRatings';
-import { HouseholdLinking } from '@/components/HouseholdLinking';
-import { ComplianceLinks } from '@/components/ComplianceLinks';
-import { AppVersionBadge } from '@/components/AppVersionBadge';
-import { ChangePasswordSection } from '@/components/ChangePasswordSection';
+import { VerificationBadge } from "@/components/VerificationBadge";
+import { VerificationDialog } from "@/components/VerificationDialog";
+import { TwoFactorSettings } from "@/components/TwoFactorSettings";
+import { ReliabilityDisplay } from "@/components/ReliabilityDisplay";
+import { KarmaLevel } from "@/components/KarmaLevel";
+import { RatingSummary } from "@/components/RatingSummary";
+import { ChefBookings } from "@/components/ChefBookings";
+import { ProfileRatings } from "@/components/ProfileRatings";
+import { HouseholdLinking } from "@/components/HouseholdLinking";
+import { ComplianceLinks } from "@/components/ComplianceLinks";
+import { AppVersionBadge } from "@/components/AppVersionBadge";
+import { ChangePasswordSection } from "@/components/ChangePasswordSection";
 
 const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'de', name: 'Deutsch (German)' },
-  { code: 'fr', name: 'Français (French)' },
-  { code: 'it', name: 'Italiano (Italian)' },
-  { code: 'es', name: 'Español (Spanish)' },
-  { code: 'pt', name: 'Português (Portuguese)' },
-  { code: 'ar', name: 'العربية (Arabic)' },
-  { code: 'tr', name: 'Türkçe (Turkish)' },
-  { code: 'vi', name: 'Tiếng Việt (Vietnamese)' },
-  { code: 'th', name: 'ไทย (Thai)' },
-  { code: 'zh', name: '中文 (Chinese)' },
+  { code: "en", name: "English" },
+  { code: "de", name: "Deutsch (German)" },
+  { code: "fr", name: "Français (French)" },
+  { code: "it", name: "Italiano (Italian)" },
+  { code: "es", name: "Español (Spanish)" },
+  { code: "pt", name: "Português (Portuguese)" },
+  { code: "ar", name: "العربية (Arabic)" },
+  { code: "tr", name: "Türkçe (Turkish)" },
+  { code: "vi", name: "Tiếng Việt (Vietnamese)" },
+  { code: "th", name: "ไทย (Thai)" },
+  { code: "zh", name: "中文 (Chinese)" },
 ];
 
 const genderOptions = [
-  { value: 'woman', label: '👩 Woman (Frau)' },
-  { value: 'man', label: '👨 Man (Mann)' },
-  { value: 'diverse', label: '🌈 Diverse / Non-Binary / Inter' },
-  { value: 'none', label: '🔒 Keine Angabe' },
+  { value: "woman", label: "👩 Woman (Frau)" },
+  { value: "man", label: "👨 Man (Mann)" },
+  { value: "diverse", label: "🌈 Diverse / Non-Binary / Inter" },
+  { value: "none", label: "🔒 Keine Angabe" },
 ];
 
 const visibilityModeOptions = [
-  { value: 'women_only', label: '👩 Women Only (Nur Frauen)', allowedFor: ['woman'] },
-  { value: 'women_fli', label: '👩🌈 Women + Diverse/NB/Inter (FLI)', allowedFor: ['woman', 'diverse', 'none'] },
-  { value: 'all', label: '🌍 All Users (Alle Nutzer*innen)', allowedFor: ['woman', 'man', 'diverse', 'none'] },
+  { value: "women_only", label: "👩 Women Only (Nur Frauen)", allowedFor: ["woman"] },
+  { value: "women_fli", label: "👩🌈 Women + Diverse/NB/Inter (FLI)", allowedFor: ["woman", "diverse", "none"] },
+  { value: "all", label: "🌍 All Users (Alle Nutzer*innen)", allowedFor: ["woman", "man", "diverse", "none"] },
 ];
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const Profile = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  
+
   // Local preview states for immediate feedback
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [partnerPhotoPreview, setPartnerPhotoPreview] = useState<string | null>(null);
-  
+
   // Form state for editing (excludes first_name/last_name - read-only)
   const [formData, setFormData] = useState({
-    nickname: '',
+    nickname: "",
     age: null as number | null,
     gender: null as string | null,
-    visibility_mode: 'all' as string,
+    visibility_mode: "all" as string,
     vacation_mode: false,
     is_couple: false,
     notification_radius: 1000,
     notify_same_address_only: false,
     allergens: [] as string[],
     dislikes: [] as string[],
-    languages: ['de'] as string[],
-    phone_number: '',
-    private_address: '',
-    private_city: '',
-    private_postal_code: '',
-    partner_photo_url: '',
-    partner_name: '',
+    languages: ["de"] as string[],
+    phone_number: "",
+    private_address: "",
+    private_city: "",
+    private_postal_code: "",
+    partner_photo_url: "",
+    partner_name: "",
     partner_gender: null as string | null,
   });
 
-  const [customLanguageInput, setCustomLanguageInput] = useState('');
+  const [customLanguageInput, setCustomLanguageInput] = useState("");
 
   // Fetch current user and profile - staleTime: 0 ensures fresh data after navigation
-  const { data: currentUser, isLoading: userLoading, refetch: refetchUser } = useQuery({
-    queryKey: ['currentUser'],
+  const {
+    data: currentUser,
+    isLoading: userLoading,
+    refetch: refetchUser,
+  } = useQuery({
+    queryKey: ["currentUser"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
-        navigate('/login');
+        navigate("/login");
         return null;
       }
-      
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-      
-      console.log('[Profile] Fetched avatar_url:', profile?.avatar_url);
+
+      const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+
+      console.log("[Profile] Fetched avatar_url:", profile?.avatar_url);
       return { ...user, profile };
     },
     staleTime: 0, // Always refetch on mount to get latest avatar
@@ -127,17 +142,17 @@ const Profile = () => {
 
   // Check if user is admin
   const { data: isAdmin } = useQuery({
-    queryKey: ['isAdmin', currentUser?.id],
+    queryKey: ["isAdmin", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return false;
-      
+
       const { data: roles } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', currentUser.id)
-        .eq('role', 'admin')
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", currentUser.id)
+        .eq("role", "admin")
         .maybeSingle();
-      
+
       return !!roles;
     },
     enabled: !!currentUser?.id,
@@ -145,39 +160,41 @@ const Profile = () => {
 
   // Fetch chef's wallet balance
   const { data: walletData, isLoading: walletLoading } = useQuery({
-    queryKey: ['chefWallet', currentUser?.id],
+    queryKey: ["chefWallet", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return { balance: 0, requestedAmount: 0 };
-      
+
       // Get all bookings where this user is the chef and payout_status is 'accumulating'
       const { data: bookings, error } = await supabase
-        .from('bookings')
-        .select('payment_amount, meal_id, meals!inner(chef_id)')
-        .eq('meals.chef_id', currentUser.id)
-        .eq('payout_status', 'accumulating');
-      
+        .from("bookings")
+        .select("payment_amount, meal_id, meals!inner(chef_id)")
+        .eq("meals.chef_id", currentUser.id)
+        .eq("payout_status", "accumulating");
+
       if (error) throw error;
-      
+
       // Calculate balance (payment_amount - 10% platform fee)
-      const balance = bookings?.reduce((sum, booking) => {
-        const amount = booking.payment_amount || 0;
-        const netAmount = amount * 0.9; // Chef gets 90%, platform takes 10%
-        return sum + netAmount;
-      }, 0) || 0;
-      
+      const balance =
+        bookings?.reduce((sum, booking) => {
+          const amount = booking.payment_amount || 0;
+          const netAmount = amount * 0.9; // Chef gets 90%, platform takes 10%
+          return sum + netAmount;
+        }, 0) || 0;
+
       // Get requested amount
       const { data: requestedBookings } = await supabase
-        .from('bookings')
-        .select('payment_amount, meal_id, meals!inner(chef_id)')
-        .eq('meals.chef_id', currentUser.id)
-        .eq('payout_status', 'requested');
-      
-      const requestedAmount = requestedBookings?.reduce((sum, booking) => {
-        const amount = booking.payment_amount || 0;
-        const netAmount = amount * 0.9;
-        return sum + netAmount;
-      }, 0) || 0;
-      
+        .from("bookings")
+        .select("payment_amount, meal_id, meals!inner(chef_id)")
+        .eq("meals.chef_id", currentUser.id)
+        .eq("payout_status", "requested");
+
+      const requestedAmount =
+        requestedBookings?.reduce((sum, booking) => {
+          const amount = booking.payment_amount || 0;
+          const netAmount = amount * 0.9;
+          return sum + netAmount;
+        }, 0) || 0;
+
       return { balance, requestedAmount };
     },
     enabled: !!currentUser?.id,
@@ -185,12 +202,12 @@ const Profile = () => {
 
   // Check if user just registered (needs photo upload prompt)
   const [showPhotoPrompt, setShowPhotoPrompt] = useState(false);
-  
+
   useEffect(() => {
-    const needsPhotoUpload = localStorage.getItem('needs_photo_upload');
-    if (needsPhotoUpload === 'true') {
+    const needsPhotoUpload = localStorage.getItem("needs_photo_upload");
+    if (needsPhotoUpload === "true") {
       setShowPhotoPrompt(true);
-      localStorage.removeItem('needs_photo_upload');
+      localStorage.removeItem("needs_photo_upload");
     }
   }, []);
 
@@ -198,44 +215,48 @@ const Profile = () => {
   useEffect(() => {
     if (currentUser?.profile) {
       setFormData({
-        nickname: currentUser.profile.nickname || '',
+        nickname: currentUser.profile.nickname || "",
         age: currentUser.profile.age || null,
         gender: currentUser.profile.gender || null,
-        visibility_mode: currentUser.profile.visibility_mode || 'all',
+        visibility_mode: currentUser.profile.visibility_mode || "all",
         vacation_mode: currentUser.profile.vacation_mode || false,
         is_couple: currentUser.profile.is_couple || false,
         notification_radius: currentUser.profile.notification_radius || 1000,
         notify_same_address_only: (currentUser.profile as any).notify_same_address_only || false,
         allergens: currentUser.profile.allergens || [],
         dislikes: currentUser.profile.dislikes || [],
-        languages: currentUser.profile.languages || ['de'],
-        phone_number: currentUser.profile.phone_number || '',
-        private_address: currentUser.profile.private_address || '',
-        private_city: currentUser.profile.private_city || '',
-        private_postal_code: currentUser.profile.private_postal_code || '',
-        partner_photo_url: currentUser.profile.partner_photo_url || '',
-        partner_name: currentUser.profile.partner_name || '',
+        languages: currentUser.profile.languages || ["de"],
+        phone_number: currentUser.profile.phone_number || "",
+        private_address: currentUser.profile.private_address || "",
+        private_city: currentUser.profile.private_city || "",
+        private_postal_code: currentUser.profile.private_postal_code || "",
+        partner_photo_url: currentUser.profile.partner_photo_url || "",
+        partner_name: currentUser.profile.partner_name || "",
         partner_gender: currentUser.profile.partner_gender || null,
       });
     }
   }, [currentUser]);
 
   // Geocoding helper function - uses Edge Function with auth
-  const getCoordinates = async (street: string, city: string, postalCode: string): Promise<{ lat: number; lon: number } | null> => {
+  const getCoordinates = async (
+    street: string,
+    city: string,
+    postalCode: string,
+  ): Promise<{ lat: number; lon: number } | null> => {
     try {
-      const { data, error } = await supabase.functions.invoke('geocode-address', {
-        body: { street, city, postalCode }
+      const { data, error } = await supabase.functions.invoke("geocode-address", {
+        body: { street, city, postalCode },
       });
-      
+
       if (error) {
         console.error("Geocoding edge function error:", error);
         return null;
       }
-      
+
       if (data?.latitude && data?.longitude) {
         return { lat: data.latitude, lon: data.longitude };
       }
-      
+
       console.warn("Geocoding returned no coordinates:", data);
       return null;
     } catch (error) {
@@ -247,72 +268,78 @@ const Profile = () => {
   // Update profile mutation (including IBAN)
   const updateProfileMutation = useMutation({
     mutationFn: async (ibanUpdate?: string) => {
-      if (!currentUser?.id) throw new Error('Not authenticated');
+      if (!currentUser?.id) throw new Error("Not authenticated");
 
       // REQUIRED FIELD VALIDATION: gender + phone
       const validationErrors: string[] = [];
-      
+
       if (!formData.gender) {
-        validationErrors.push(t('toast.gender_required', 'Bitte wähle dein Geschlecht aus.'));
+        validationErrors.push(t("toast.gender_required", "Bitte wähle dein Geschlecht aus."));
       }
-      
+
       if (!formData.phone_number?.trim()) {
-        validationErrors.push(t('toast.phone_required', 'Bitte gib deine Telefonnummer an.'));
-      } else if (formData.phone_number.replace(/[\s\-\(\)]/g, '').length < 8) {
-        validationErrors.push(t('toast.phone_invalid_format', 'Bitte gib eine gültige Telefonnummer ein (mind. 8 Zeichen).'));
+        validationErrors.push(t("toast.phone_required", "Bitte gib deine Telefonnummer an."));
+      } else if (formData.phone_number.replace(/[\s\-()]/g, "").length < 8) {
+        validationErrors.push(
+          t("toast.phone_invalid_format", "Bitte gib eine gültige Telefonnummer ein (mind. 8 Zeichen)."),
+        );
       }
-      
+
       if (validationErrors.length > 0) {
-        throw new Error(validationErrors.join('\n'));
+        throw new Error(validationErrors.join("\n"));
       }
-      
+
       let latitude = currentUser.profile?.latitude || null;
       let longitude = currentUser.profile?.longitude || null;
 
       // Check if address fields have changed
-      const addressChanged = 
+      const addressChanged =
         formData.private_address !== currentUser.profile?.private_address ||
         formData.private_city !== currentUser.profile?.private_city ||
         formData.private_postal_code !== currentUser.profile?.private_postal_code;
 
       // Geocode address if it has changed and is complete
       if (addressChanged && formData.private_address && formData.private_city) {
-        console.log('Geocoding address:', formData.private_address, formData.private_city);
-        
-        const coords = await getCoordinates(formData.private_address, formData.private_city, formData.private_postal_code || '');
-        
+        console.log("Geocoding address:", formData.private_address, formData.private_city);
+
+        const coords = await getCoordinates(
+          formData.private_address,
+          formData.private_city,
+          formData.private_postal_code || "",
+        );
+
         if (coords) {
           latitude = coords.lat;
           longitude = coords.lon;
-          console.log('Address geocoded successfully:', { latitude, longitude });
+          console.log("Address geocoded successfully:", { latitude, longitude });
         } else {
           // Address not found - warn user but still allow save
-          toast.error(t('toast.address_geocode_failed'), {
+          toast.error(t("toast.address_geocode_failed"), {
             duration: 5000,
           });
-          console.warn('Geocoding returned no results for address');
+          console.warn("Geocoding returned no results for address");
           // Keep existing coordinates if any, or set to null
           latitude = null;
           longitude = null;
         }
       }
-      
+
       // TASK 18: Generate address_id when address is complete
       let addressId = currentUser.profile?.address_id || null;
       if (formData.private_address && formData.private_city) {
         addressId = generateAddressId(
           formData.private_address,
           formData.private_city,
-          formData.private_postal_code || ''
+          formData.private_postal_code || "",
         );
-        console.log('[Profile] Generated address_id:', addressId);
+        console.log("[Profile] Generated address_id:", addressId);
       }
-      
+
       const updateData: any = {
         nickname: formData.nickname || null,
         age: formData.age || null,
         gender: formData.gender || null,
-        visibility_mode: formData.visibility_mode || 'all',
+        visibility_mode: formData.visibility_mode || "all",
         vacation_mode: formData.vacation_mode,
         is_couple: formData.is_couple,
         notification_radius: formData.notification_radius,
@@ -335,113 +362,105 @@ const Profile = () => {
       if (ibanUpdate !== undefined) {
         updateData.iban = ibanUpdate;
       }
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update(updateData)
-        .eq('id', currentUser.id);
+
+      const { error } = await supabase.from("profiles").update(updateData).eq("id", currentUser.id);
 
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(t('toast.profile_saved', '✅ Gespeichert'));
+      toast.success(t("toast.profile_saved", "✅ Gespeichert"));
       // Invalidate queries so Feed immediately sees updated data
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
-      queryClient.invalidateQueries({ queryKey: ['meals'] });
-      queryClient.invalidateQueries({ queryKey: ['addMealUser'] });
-      queryClient.invalidateQueries({ queryKey: ['chefWallet'] });
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      queryClient.invalidateQueries({ queryKey: ["meals"] });
+      queryClient.invalidateQueries({ queryKey: ["addMealUser"] });
+      queryClient.invalidateQueries({ queryKey: ["chefWallet"] });
     },
     onError: (error: any) => {
-      toast.error(error.message || t('toast.profile_update_failed'));
+      toast.error(error.message || t("toast.profile_update_failed"));
     },
   });
 
   // Request payout mutation
   const requestPayoutMutation = useMutation({
     mutationFn: async () => {
-      if (!currentUser?.id) throw new Error('Not authenticated');
-      
+      if (!currentUser?.id) throw new Error("Not authenticated");
+
       // First get all meal IDs for this chef
-      const { data: meals } = await supabase
-        .from('meals')
-        .select('id')
-        .eq('chef_id', currentUser.id);
-      
+      const { data: meals } = await supabase.from("meals").select("id").eq("chef_id", currentUser.id);
+
       if (!meals || meals.length === 0) return;
-      
-      const mealIds = meals.map(m => m.id);
-      
+
+      const mealIds = meals.map((m) => m.id);
+
       // Update all 'accumulating' bookings to 'requested'
       const { error } = await supabase
-        .from('bookings')
-        .update({ payout_status: 'requested' })
-        .eq('payout_status', 'accumulating')
-        .in('meal_id', mealIds);
+        .from("bookings")
+        .update({ payout_status: "requested" })
+        .eq("payout_status", "accumulating")
+        .in("meal_id", mealIds);
 
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Auszahlung beantragt! Wir überweisen innerhalb von 7 Tagen.');
-      queryClient.invalidateQueries({ queryKey: ['chefWallet'] });
+      toast.success("Auszahlung beantragt! Wir überweisen innerhalb von 7 Tagen.");
+      queryClient.invalidateQueries({ queryKey: ["chefWallet"] });
     },
     onError: (error: any) => {
-      toast.error('Fehler beim Beantragen der Auszahlung: ' + error.message);
+      toast.error("Fehler beim Beantragen der Auszahlung: " + error.message);
     },
   });
 
   const toggleLanguage = (languageCode: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       languages: prev.languages.includes(languageCode)
-        ? prev.languages.filter(l => l !== languageCode)
-        : [...prev.languages, languageCode]
+        ? prev.languages.filter((l) => l !== languageCode)
+        : [...prev.languages, languageCode],
     }));
-    
+
     // Set UI language to first selected language
-    const primaryLanguage = formData.languages.includes(languageCode) 
-      ? formData.languages.find(l => l !== languageCode) || 'de'
+    const primaryLanguage = formData.languages.includes(languageCode)
+      ? formData.languages.find((l) => l !== languageCode) || "de"
       : languageCode;
-    
-    localStorage.setItem('language', primaryLanguage);
+
+    localStorage.setItem("language", primaryLanguage);
     i18n.changeLanguage(primaryLanguage);
   };
 
   const toggleAllergen = (allergen: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       allergens: prev.allergens.includes(allergen)
-        ? prev.allergens.filter(a => a !== allergen)
-        : [...prev.allergens, allergen]
+        ? prev.allergens.filter((a) => a !== allergen)
+        : [...prev.allergens, allergen],
     }));
   };
 
   const toggleDislike = (dislike: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       dislikes: prev.dislikes.includes(dislike)
-        ? prev.dislikes.filter(d => d !== dislike)
-        : [...prev.dislikes, dislike]
+        ? prev.dislikes.filter((d) => d !== dislike)
+        : [...prev.dislikes, dislike],
     }));
   };
 
   const handleCustomLanguageRequest = async () => {
     if (!customLanguageInput.trim() || !currentUser?.id) return;
-    
+
     try {
-      const { error } = await supabase
-        .from('language_requests')
-        .insert({
-          language_name: customLanguageInput.trim(),
-          requested_by_user_id: currentUser.id
-        });
-      
+      const { error } = await supabase.from("language_requests").insert({
+        language_name: customLanguageInput.trim(),
+        requested_by_user_id: currentUser.id,
+      });
+
       if (error) throw error;
-      
-      toast.success(t('toast.language_request_submitted', { language: customLanguageInput }));
-      setCustomLanguageInput('');
+
+      toast.success(t("toast.language_request_submitted", { language: customLanguageInput }));
+      setCustomLanguageInput("");
     } catch (error) {
-      console.error('Error submitting language request:', error);
-      toast.error(t('toast.language_request_failed'));
+      console.error("Error submitting language request:", error);
+      toast.error(t("toast.language_request_failed"));
     }
   };
 
@@ -462,24 +481,24 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       <Header />
-      
+
       <main className="max-w-lg mx-auto px-4 py-6">
         {/* Welcome prompt for new users */}
         {showPhotoPrompt && (
           <Alert className="mb-6 border-green-500 bg-green-50 dark:bg-green-950/20">
             <AlertDescription className="text-sm text-green-800 dark:text-green-200">
-              <strong>🎉 {t('profile.welcome_new_user')}</strong>
+              <strong>🎉 {t("profile.welcome_new_user")}</strong>
               <br />
-              {t('profile.complete_profile_prompt')}
+              {t("profile.complete_profile_prompt")}
             </AlertDescription>
           </Alert>
         )}
-        
+
         {/* Admin Dashboard Access - moved up for admins */}
         {isAdmin && (
-          <Card 
+          <Card
             className="mb-6 border-blue-600 bg-blue-950/20 hover:bg-blue-950/30 cursor-pointer transition-colors"
-            onClick={() => navigate('/admin')}
+            onClick={() => navigate("/admin")}
           >
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -488,9 +507,7 @@ const Profile = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-blue-100">Admin Dashboard</h3>
-                  <p className="text-sm text-blue-300/80">
-                    Verifizierungen, Statistik & Meldungen
-                  </p>
+                  <p className="text-sm text-blue-300/80">Verifizierungen, Statistik & Meldungen</p>
                 </div>
                 <div className="text-blue-400">→</div>
               </div>
@@ -502,38 +519,34 @@ const Profile = () => {
         {profile?.avatar_url && (
           <Card className="mb-6 border-green-600/30 bg-gradient-to-br from-green-500/5 to-green-500/10">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                🎁 {t('profile.invite_neighbors')}
-              </CardTitle>
+              <CardTitle className="flex items-center gap-2">🎁 {t("profile.invite_neighbors")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                {t('profile.invite_desc')}
-              </p>
+              <p className="text-sm text-muted-foreground mb-4">{t("profile.invite_desc")}</p>
               <Button
                 variant="default"
                 className="w-full"
                 onClick={async () => {
                   const referralLink = `${window.location.origin}/signup?ref=${currentUser?.id}`;
-                  
+
                   try {
                     await navigator.clipboard.writeText(referralLink);
-                    // NOTE: Karma is now granted only when the invited user 
+                    // NOTE: Karma is now granted only when the invited user
                     // registers AND verifies their email
-                    toast.success(t('profile.link_copied_no_karma'));
+                    toast.success(t("profile.link_copied_no_karma"));
                   } catch (err) {
-                    toast.error('Error copying link');
+                    toast.error("Error copying link");
                   }
                 }}
               >
-                {t('profile.copy_link')}
+                {t("profile.copy_link")}
               </Button>
             </CardContent>
           </Card>
         )}
 
         {/* Profile Header continues below */}
-        
+
         {/* Profile Header */}
         <Card className="mb-6">
           <CardContent className="pt-6">
@@ -542,38 +555,43 @@ const Profile = () => {
               <Alert className="mb-4 border-orange-500 bg-orange-50 dark:bg-orange-950/20">
                 <AlertCircle className="h-4 w-4 text-orange-600" />
                 <AlertDescription className="text-sm text-orange-800 dark:text-orange-300">
-                  <strong>⚠️ {t('profile.no_photo_warning_short')}</strong> {t('profile.no_photo_builds_trust')}
+                  <strong>⚠️ {t("profile.no_photo_warning_short")}</strong> {t("profile.no_photo_builds_trust")}
                 </AlertDescription>
               </Alert>
             )}
-            
+
             <div className="flex items-center gap-4 mb-4">
               {/* Main User Avatar with Verified Badge */}
               <div className="relative">
-                <div 
+                <div
                   className="relative w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-3xl overflow-hidden group cursor-pointer"
-                  onClick={() => !profile?.avatar_url && !avatarPreview && document.getElementById('avatar-upload')?.click()}
+                  onClick={() =>
+                    !profile?.avatar_url && !avatarPreview && document.getElementById("avatar-upload")?.click()
+                  }
                 >
-                  {(avatarPreview || profile?.avatar_url) ? (
-                    <img 
-                      src={avatarPreview || profile?.avatar_url} 
-                      alt={t('profile.your_profile_photo')} 
-                      className="w-full h-full object-cover" 
+                  {avatarPreview || profile?.avatar_url ? (
+                    <img
+                      src={avatarPreview || profile?.avatar_url}
+                      alt={t("profile.your_profile_photo")}
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <span className="opacity-60 hover:opacity-100 transition-opacity">📷</span>
                   )}
-                  <label 
-                    htmlFor="avatar-upload" 
+                  <label
+                    htmlFor="avatar-upload"
                     className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                    title={t('profile.your_profile_photo')}
+                    title={t("profile.your_profile_photo")}
                   >
                     <Upload className="w-6 h-6 text-white" />
                   </label>
                 </div>
                 {/* Verified Badge positioned at bottom-right of avatar */}
                 {profile?.id_verified && (
-                  <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5" title={t('verification.verified')}>
+                  <div
+                    className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5"
+                    title={t("verification.verified")}
+                  >
                     <VerificationBadge isVerified={true} size="md" />
                   </div>
                 )}
@@ -589,13 +607,13 @@ const Profile = () => {
 
                     // Validate file size
                     if (file.size > MAX_FILE_SIZE) {
-                      toast.error(t('profile.file_too_large'));
+                      toast.error(t("profile.file_too_large"));
                       return;
                     }
 
                     // Validate file type (jpg/png/webp only)
                     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-                      toast.error(t('profile.images_only'));
+                      toast.error(t("profile.images_only"));
                       return;
                     }
 
@@ -604,19 +622,17 @@ const Profile = () => {
                     setAvatarPreview(previewUrl);
 
                     try {
-                      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+                      const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
                       // Use folder structure: userId/filename for RLS policy compliance
                       const fileName = `${currentUser.id}/avatar-${Date.now()}.${fileExt}`;
 
-                      const { error: uploadError } = await supabase.storage
-                        .from('avatars')
-                        .upload(fileName, file, { 
-                          upsert: true,
-                          contentType: file.type,
-                        });
+                      const { error: uploadError } = await supabase.storage.from("avatars").upload(fileName, file, {
+                        upsert: true,
+                        contentType: file.type,
+                      });
 
                       if (uploadError) {
-                        console.error('Avatar upload error:', uploadError);
+                        console.error("Avatar upload error:", uploadError);
                         toast.error(`Upload fehlgeschlagen: ${uploadError.message}`);
                         setAvatarPreview(null); // Clear preview on error
                         URL.revokeObjectURL(previewUrl);
@@ -624,15 +640,13 @@ const Profile = () => {
                       }
 
                       // Get public URL
-                      const { data } = supabase.storage
-                        .from('avatars')
-                        .getPublicUrl(fileName);
+                      const { data } = supabase.storage.from("avatars").getPublicUrl(fileName);
 
                       // CRITICAL: Store URL in database immediately
                       const { error: updateError } = await supabase
-                        .from('profiles')
+                        .from("profiles")
                         .update({ avatar_url: data.publicUrl })
-                        .eq('id', currentUser.id);
+                        .eq("id", currentUser.id);
 
                       if (updateError) {
                         toast.error(`Speicherfehler: ${updateError.message}`);
@@ -641,38 +655,38 @@ const Profile = () => {
                         return;
                       }
 
-                      toast.success(t('profile.profile_updated'));
-                      
+                      toast.success(t("profile.profile_updated"));
+
                       // Force refetch to ensure UI syncs with DB
                       await refetchUser();
-                      
+
                       // Clear preview AFTER refetch completes - the DB value will now show
                       setAvatarPreview(null);
                       URL.revokeObjectURL(previewUrl);
-                      console.log('[Profile] Avatar uploaded and refetched:', data.publicUrl);
+                      console.log("[Profile] Avatar uploaded and refetched:", data.publicUrl);
                     } catch (error: any) {
-                      console.error('Upload error:', error);
-                      toast.error(t('profile.upload_error') + ': ' + error.message);
+                      console.error("Upload error:", error);
+                      toast.error(t("profile.upload_error") + ": " + error.message);
                       setAvatarPreview(null);
                       URL.revokeObjectURL(previewUrl);
                     }
                   }}
                 />
               </div>
-              
+
               {/* Partner Avatar (if couple) - use formData for immediate toggle response */}
               {formData.is_couple && (
                 <div className="space-y-1">
-                  <div 
+                  <div
                     className="relative w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center text-3xl overflow-hidden border-2 border-dashed border-border cursor-pointer group"
-                    onClick={() => document.getElementById('partner-avatar-upload')?.click()}
-                    title={t('profile.partner_photo_title')}
+                    onClick={() => document.getElementById("partner-avatar-upload")?.click()}
+                    title={t("profile.partner_photo_title")}
                   >
-                    {(partnerPhotoPreview || profile?.partner_photo_url) ? (
-                      <img 
-                        src={partnerPhotoPreview || profile?.partner_photo_url} 
-                        alt={t('profile.partner_photo_title')} 
-                        className="w-full h-full object-cover" 
+                    {partnerPhotoPreview || profile?.partner_photo_url ? (
+                      <img
+                        src={partnerPhotoPreview || profile?.partner_photo_url}
+                        alt={t("profile.partner_photo_title")}
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <span className="opacity-60">👥</span>
@@ -693,13 +707,13 @@ const Profile = () => {
 
                       // Validate file size
                       if (file.size > MAX_FILE_SIZE) {
-                        toast.error(t('profile.file_too_large'));
+                        toast.error(t("profile.file_too_large"));
                         return;
                       }
 
                       // Validate file type (jpg/png/webp only)
                       if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-                        toast.error(t('profile.images_only'));
+                        toast.error(t("profile.images_only"));
                         return;
                       }
 
@@ -708,20 +722,18 @@ const Profile = () => {
                       setPartnerPhotoPreview(previewUrl);
 
                       try {
-                        const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+                        const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
                         const fileName = `${currentUser.id}/partner.${fileExt}`;
 
-                        console.log('[Profile] Uploading partner photo:', fileName);
+                        console.log("[Profile] Uploading partner photo:", fileName);
 
-                        const { error: uploadError } = await supabase.storage
-                          .from('avatars')
-                          .upload(fileName, file, { 
-                            upsert: true,
-                            contentType: file.type,
-                          });
+                        const { error: uploadError } = await supabase.storage.from("avatars").upload(fileName, file, {
+                          upsert: true,
+                          contentType: file.type,
+                        });
 
                         if (uploadError) {
-                          console.error('Partner photo upload error:', uploadError);
+                          console.error("Partner photo upload error:", uploadError);
                           toast.error(`Upload fehlgeschlagen: ${uploadError.message}`);
                           setPartnerPhotoPreview(null);
                           URL.revokeObjectURL(previewUrl);
@@ -729,76 +741,74 @@ const Profile = () => {
                         }
 
                         // Get public URL with cache buster
-                        const { data } = supabase.storage
-                          .from('avatars')
-                          .getPublicUrl(fileName);
-                        
+                        const { data } = supabase.storage.from("avatars").getPublicUrl(fileName);
+
                         const publicUrlWithCacheBuster = `${data.publicUrl}?t=${Date.now()}`;
-                        console.log('[Profile] Partner photo uploaded:', publicUrlWithCacheBuster);
+                        console.log("[Profile] Partner photo uploaded:", publicUrlWithCacheBuster);
 
                         // CRITICAL: Store URL in database immediately
                         const { error: updateError } = await supabase
-                          .from('profiles')
+                          .from("profiles")
                           .update({ partner_photo_url: publicUrlWithCacheBuster })
-                          .eq('id', currentUser.id);
+                          .eq("id", currentUser.id);
 
                         if (updateError) {
-                          console.error('Partner photo DB update error:', updateError);
+                          console.error("Partner photo DB update error:", updateError);
                           toast.error(`Speicherfehler: ${updateError.message}`);
                           setPartnerPhotoPreview(null);
                           URL.revokeObjectURL(previewUrl);
                           return;
                         }
 
-                        toast.success(t('profile.partner_photo_updated'));
-                        
+                        toast.success(t("profile.partner_photo_updated"));
+
                         // Force refetch to sync UI with DB
                         await refetchUser();
-                        
+
                         // Clear preview AFTER refetch - DB value will show
                         setPartnerPhotoPreview(null);
                         URL.revokeObjectURL(previewUrl);
-                        console.log('[Profile] Partner photo saved and refetched');
+                        console.log("[Profile] Partner photo saved and refetched");
                       } catch (error: any) {
-                        console.error('Upload error:', error);
-                        toast.error(t('profile.upload_error') + ': ' + error.message);
+                        console.error("Upload error:", error);
+                        toast.error(t("profile.upload_error") + ": " + error.message);
                         setPartnerPhotoPreview(null);
                         URL.revokeObjectURL(previewUrl);
                       }
                     }}
                   />
                   <p className="text-[10px] text-muted-foreground text-center max-w-[80px]">
-                    {t('profile.couple_photo_hint')}
+                    {t("profile.couple_photo_hint")}
                   </p>
                 </div>
               )}
             </div>
-            
+
             <div className="flex-1">
-                <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-                  {profile?.first_name} {profile?.last_name}
-                  {(profile?.id_verified || profile?.phone_verified) && (
-                    <span className="text-blue-500" title="Verified User">✓</span>
-                  )}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  @{formData.nickname || profile?.first_name || 'User'}
-                </p>
-                <div className="flex items-center gap-2 mt-1" data-tour="karma">
-                  <Star className="w-5 h-5 text-trust-gold fill-current" />
-                  <span className="text-lg font-semibold text-trust-gold">
-                    {profile?.karma || 0} {t('profile.karma')}
+              <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                {profile?.first_name} {profile?.last_name}
+                {(profile?.id_verified || profile?.phone_verified) && (
+                  <span className="text-blue-500" title="Verified User">
+                    ✓
                   </span>
-                </div>
-                <div className="mt-2">
-                  <KarmaLevel karma={profile?.karma || 0} size="md" showProgress />
-                </div>
+                )}
+              </h2>
+              <p className="text-sm text-muted-foreground">@{formData.nickname || profile?.first_name || "User"}</p>
+              <div className="flex items-center gap-2 mt-1" data-tour="karma">
+                <Star className="w-5 h-5 text-trust-gold fill-current" />
+                <span className="text-lg font-semibold text-trust-gold">
+                  {profile?.karma || 0} {t("profile.karma")}
+                </span>
+              </div>
+              <div className="mt-2">
+                <KarmaLevel karma={profile?.karma || 0} size="md" showProgress />
+              </div>
             </div>
 
-             <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
+            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
               <div className="text-center">
                 <p className="text-2xl font-bold text-primary">0</p>
-                <p className="text-xs text-muted-foreground">{t('profile.mealsShared')}</p>
+                <p className="text-xs text-muted-foreground">{t("profile.mealsShared")}</p>
                 {currentUser?.id && (
                   <div className="flex items-center gap-4 mt-2 text-xs">
                     <RatingSummary userId={currentUser.id} role="chef" size="sm" showLabel={false} />
@@ -809,17 +819,17 @@ const Profile = () => {
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-secondary">0</p>
-                <p className="text-xs text-muted-foreground">{t('profile.mealsReceived')}</p>
+                <p className="text-xs text-muted-foreground">{t("profile.mealsReceived")}</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-trust-badge">0</p>
-                <p className="text-xs text-muted-foreground">{t('profile.fairPayments')}</p>
+                <p className="text-xs text-muted-foreground">{t("profile.fairPayments")}</p>
               </div>
             </div>
-            
+
             {/* Reliability Display */}
             <div className="pt-4 border-t border-border">
-              <ReliabilityDisplay 
+              <ReliabilityDisplay
                 successfulPickups={profile?.successful_pickups || 0}
                 noShows={profile?.no_shows || 0}
               />
@@ -837,154 +847,148 @@ const Profile = () => {
         {/* Persönliche Angaben */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>{t('profile.personal_details')}</CardTitle>
+            <CardTitle>{t("profile.personal_details")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Real Name Fields - Read Only (requires re-verification to change) */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="first_name">{t('profile.first_name')}</Label>
+                <Label htmlFor="first_name">{t("profile.first_name")}</Label>
                 <Input
                   id="first_name"
                   type="text"
-                  value={profile?.first_name || ''}
+                  value={profile?.first_name || ""}
                   disabled
                   className="bg-muted/50 cursor-not-allowed"
                 />
               </div>
               <div>
-                <Label htmlFor="last_name">{t('profile.last_name')}</Label>
+                <Label htmlFor="last_name">{t("profile.last_name")}</Label>
                 <Input
                   id="last_name"
                   type="text"
-                  value={profile?.last_name || ''}
+                  value={profile?.last_name || ""}
                   disabled
                   className="bg-muted/50 cursor-not-allowed"
                 />
               </div>
             </div>
             <p className="text-xs text-muted-foreground -mt-2">
-              {t('profile.name_readonly_hint')}{' '}
-              <button 
-                type="button"
-                onClick={() => navigate('/contact')}
-                className="text-primary hover:underline"
-              >
-                {t('profile.request_name_change')}
+              {t("profile.name_readonly_hint")}{" "}
+              <button type="button" onClick={() => navigate("/contact")} className="text-primary hover:underline">
+                {t("profile.request_name_change")}
               </button>
             </p>
 
             <div>
-              <Label htmlFor="nickname">{t('profile.nickname')}</Label>
+              <Label htmlFor="nickname">{t("profile.nickname")}</Label>
               <Input
                 id="nickname"
                 type="text"
-                placeholder={t('profile.nickname_placeholder')}
+                placeholder={t("profile.nickname_placeholder")}
                 value={formData.nickname}
                 onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
               />
             </div>
-            
+
             <div>
-              <Label htmlFor="name-privacy">{t('profile.display_name_privacy')}</Label>
-              <Select
-                defaultValue="first_initial"
-              >
+              <Label htmlFor="name-privacy">{t("profile.display_name_privacy")}</Label>
+              <Select defaultValue="first_initial">
                 <SelectTrigger id="name-privacy">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-background border-border z-50">
-                  <SelectItem value="full_name">{t('profile.full_name_option')}</SelectItem>
-                  <SelectItem value="first_initial">{t('profile.first_initial_option')}</SelectItem>
-                  <SelectItem value="nickname_only">{t('profile.nickname_only_option', { nickname: formData.nickname || 'Max123' })}</SelectItem>
+                  <SelectItem value="full_name">{t("profile.full_name_option")}</SelectItem>
+                  <SelectItem value="first_initial">{t("profile.first_initial_option")}</SelectItem>
+                  <SelectItem value="nickname_only">
+                    {t("profile.nickname_only_option", { nickname: formData.nickname || "Max123" })}
+                  </SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground mt-1">
-                {t('profile.name_display_hint')}
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">{t("profile.name_display_hint")}</p>
             </div>
             <div>
-              <Label htmlFor="age">{t('profile.age_optional')}</Label>
+              <Label htmlFor="age">{t("profile.age_optional")}</Label>
               <Input
                 id="age"
                 type="number"
-                placeholder={t('profile.age_placeholder')}
-                value={formData.age || ''}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  age: e.target.value ? parseInt(e.target.value) : null 
-                })}
+                placeholder={t("profile.age_placeholder")}
+                value={formData.age || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    age: e.target.value ? parseInt(e.target.value) : null,
+                  })
+                }
               />
             </div>
-            
+
             <div>
-              <Label htmlFor="gender">{t('profile.gender_label')} <span className="text-destructive">*</span></Label>
+              <Label htmlFor="gender">
+                {t("profile.gender_label")} <span className="text-destructive">*</span>
+              </Label>
               <Select
                 value={formData.gender || undefined}
                 onValueChange={(value) => {
                   // Reset visibility_mode if it's no longer valid for the new gender
                   let newVisibility = formData.visibility_mode;
-                  
-                  if (value === 'man') {
+
+                  if (value === "man") {
                     // Men can only have 'all'
-                    newVisibility = 'all';
-                  } else if (value === 'diverse' || value === 'none') {
+                    newVisibility = "all";
+                  } else if (value === "diverse" || value === "none") {
                     // Diverse/None cannot have 'women_only'
-                    if (formData.visibility_mode === 'women_only') {
-                      newVisibility = 'all';
+                    if (formData.visibility_mode === "women_only") {
+                      newVisibility = "all";
                     }
                   }
                   // Women can have any visibility mode, no reset needed
-                  
+
                   setFormData({ ...formData, gender: value, visibility_mode: newVisibility });
                 }}
               >
                 <SelectTrigger id="gender">
-                  <SelectValue placeholder={t('profile.gender_placeholder')} />
+                  <SelectValue placeholder={t("profile.gender_placeholder")} />
                 </SelectTrigger>
                 <SelectContent className="bg-background border-border z-50">
-                  <SelectItem value="woman">{t('profile.gender_woman')}</SelectItem>
-                  <SelectItem value="man">{t('profile.gender_man')}</SelectItem>
-                  <SelectItem value="diverse">{t('profile.gender_diverse')}</SelectItem>
-                  <SelectItem value="none">{t('profile.gender_none')}</SelectItem>
+                  <SelectItem value="woman">{t("profile.gender_woman")}</SelectItem>
+                  <SelectItem value="man">{t("profile.gender_man")}</SelectItem>
+                  <SelectItem value="diverse">{t("profile.gender_diverse")}</SelectItem>
+                  <SelectItem value="none">{t("profile.gender_none")}</SelectItem>
                 </SelectContent>
               </Select>
-              {formData.gender === 'woman' && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  {t('profile.gender_woman_hint')}
-                </p>
+              {formData.gender === "woman" && (
+                <p className="text-xs text-muted-foreground mt-1">{t("profile.gender_woman_hint")}</p>
               )}
             </div>
 
             {/* Visibility Mode Selection - Dynamic based on gender */}
             {formData.gender && (
               <div>
-                <Label htmlFor="visibility-mode">{t('profile.visibility_label')}</Label>
+                <Label htmlFor="visibility-mode">{t("profile.visibility_label")}</Label>
                 <Select
                   value={formData.visibility_mode}
                   onValueChange={(value) => setFormData({ ...formData, visibility_mode: value })}
                 >
                   <SelectTrigger id="visibility-mode">
-                    <SelectValue placeholder={t('profile.visibility_placeholder')} />
+                    <SelectValue placeholder={t("profile.visibility_placeholder")} />
                   </SelectTrigger>
                   <SelectContent className="bg-background border-border z-50">
-                    {formData.gender === 'woman' && (
-                      <SelectItem value="women_only">{t('profile.visibility_women_only')}</SelectItem>
+                    {formData.gender === "woman" && (
+                      <SelectItem value="women_only">{t("profile.visibility_women_only")}</SelectItem>
                     )}
-                    {(formData.gender === 'woman' || formData.gender === 'diverse' || formData.gender === 'none') && (
-                      <SelectItem value="women_fli">{t('profile.visibility_women_fli')}</SelectItem>
+                    {(formData.gender === "woman" || formData.gender === "diverse" || formData.gender === "none") && (
+                      <SelectItem value="women_fli">{t("profile.visibility_women_fli")}</SelectItem>
                     )}
-                    <SelectItem value="all">{t('profile.visibility_all')}</SelectItem>
+                    <SelectItem value="all">{t("profile.visibility_all")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {formData.visibility_mode === 'women_only' && t('profile.visibility_women_only_hint')}
-                  {formData.visibility_mode === 'women_fli' && t('profile.visibility_women_fli_hint')}
-                  {formData.visibility_mode === 'all' && t('profile.visibility_all_hint')}
-                  {formData.gender === 'man' && (
-                    <span className="block mt-1 text-xs text-muted-foreground">
-                      {t('profile.visibility_man_hint')}
-                    </span>
+                  {formData.visibility_mode === "women_only" && t("profile.visibility_women_only_hint")}
+                  {formData.visibility_mode === "women_fli" && t("profile.visibility_women_fli_hint")}
+                  {formData.visibility_mode === "all" && t("profile.visibility_all_hint")}
+                  {formData.gender === "man" && (
+                    <span className="block mt-1 text-xs text-muted-foreground">{t("profile.visibility_man_hint")}</span>
                   )}
                 </p>
               </div>
@@ -995,11 +999,9 @@ const Profile = () => {
               <div className="space-y-0.5">
                 <Label htmlFor="is-couple" className="flex items-center gap-2">
                   <Heart className="w-4 h-4 text-primary" />
-                  {t('profile.couple_account')}
+                  {t("profile.couple_account")}
                 </Label>
-                <p className="text-xs text-muted-foreground">
-                  {t('profile.couple_account_hint')}
-                </p>
+                <p className="text-xs text-muted-foreground">{t("profile.couple_account_hint")}</p>
               </div>
               <Switch
                 id="is-couple"
@@ -1007,24 +1009,24 @@ const Profile = () => {
                 onCheckedChange={(checked) => setFormData({ ...formData, is_couple: checked })}
               />
             </div>
-            
+
             {/* Partner-Angaben (Nur für Paare) */}
             {formData.is_couple && (
               <div className="pt-4 border-t border-border space-y-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Heart className="w-5 h-5 text-primary" />
-                  <Label className="text-base font-semibold">{t('profile.partner_details')}</Label>
+                  <Label className="text-base font-semibold">{t("profile.partner_details")}</Label>
                 </div>
-                
+
                 {/* Partner Photo Display & Upload */}
                 <div>
-                  <Label>{t('profile.partner_photo_title')}</Label>
+                  <Label>{t("profile.partner_photo_title")}</Label>
                   <div className="flex items-center gap-4 mt-2">
                     {formData.partner_photo_url ? (
                       <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-secondary">
-                        <img 
-                          src={formData.partner_photo_url} 
-                          alt={t('profile.partner_photo_title')} 
+                        <img
+                          src={formData.partner_photo_url}
+                          alt={t("profile.partner_photo_title")}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -1035,36 +1037,34 @@ const Profile = () => {
                     )}
                     <div className="flex-1">
                       <p className="text-sm text-muted-foreground">
-                        {formData.partner_photo_url 
-                          ? '✅ ' + t('profile.partner_photo_uploaded')
-                          : t('profile.partner_photo_missing')}
+                        {formData.partner_photo_url
+                          ? "✅ " + t("profile.partner_photo_uploaded")
+                          : t("profile.partner_photo_missing")}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        💡 {t('profile.upload_via_avatar_section')}
-                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">💡 {t("profile.upload_via_avatar_section")}</p>
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
-                  <Label htmlFor="partner-name">{t('profile.partner_name')}</Label>
+                  <Label htmlFor="partner-name">{t("profile.partner_name")}</Label>
                   <Input
                     id="partner-name"
                     type="text"
-                    placeholder={t('profile.partner_name_placeholder')}
+                    placeholder={t("profile.partner_name_placeholder")}
                     value={formData.partner_name}
                     onChange={(e) => setFormData({ ...formData, partner_name: e.target.value })}
                   />
                 </div>
-                
+
                 <div>
-                  <Label htmlFor="partner-gender">{t('profile.partner_gender')}</Label>
+                  <Label htmlFor="partner-gender">{t("profile.partner_gender")}</Label>
                   <Select
                     value={formData.partner_gender || undefined}
                     onValueChange={(value) => setFormData({ ...formData, partner_gender: value })}
                   >
                     <SelectTrigger id="partner-gender">
-                      <SelectValue placeholder={t('profile.partner_gender_placeholder')} />
+                      <SelectValue placeholder={t("profile.partner_gender_placeholder")} />
                     </SelectTrigger>
                     <SelectContent className="bg-background border-border z-50">
                       {genderOptions.map((option) => (
@@ -1074,39 +1074,33 @@ const Profile = () => {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    💡 {t('profile.partner_gender_hint')}
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">💡 {t("profile.partner_gender_hint")}</p>
                 </div>
-                
+
                 {/* Photo Verification Status for Partner */}
                 <div className="pt-4 border-t border-border space-y-3">
-                  <Label className="font-semibold">{t('profile.photo_verification_title')}</Label>
-                  
+                  <Label className="font-semibold">{t("profile.photo_verification_title")}</Label>
+
                   {/* Partner Photo Verification Status */}
                   <div className="p-3 rounded-lg bg-muted/50 space-y-2">
                     {profile?.partner_photo_verified ? (
                       <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
                         <span>✅</span>
-                        <span className="text-sm font-medium">{t('profile.partner_photo_verified_badge')}</span>
+                        <span className="text-sm font-medium">{t("profile.partner_photo_verified_badge")}</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
                         <span>⏳</span>
-                        <span className="text-sm font-medium">{t('profile.partner_photo_not_verified')}</span>
+                        <span className="text-sm font-medium">{t("profile.partner_photo_not_verified")}</span>
                       </div>
                     )}
-                    <p className="text-xs text-muted-foreground">
-                      {t('profile.partner_photo_verification_hint')}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{t("profile.partner_photo_verification_hint")}</p>
                   </div>
-                  
+
                   {/* Optional Partner ID Upload */}
                   <div className="p-3 rounded-lg bg-muted/30 border border-dashed border-border">
-                    <Label className="text-sm font-medium">{t('profile.partner_id_optional_title')}</Label>
-                    <p className="text-xs text-muted-foreground mt-1 mb-2">
-                      {t('profile.partner_id_optional_hint')}
-                    </p>
+                    <Label className="text-sm font-medium">{t("profile.partner_id_optional_title")}</Label>
+                    <p className="text-xs text-muted-foreground mt-1 mb-2">{t("profile.partner_id_optional_hint")}</p>
                     <Input
                       type="file"
                       accept="image/*"
@@ -1114,42 +1108,42 @@ const Profile = () => {
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
-                        
+
                         if (file.size > MAX_FILE_SIZE) {
-                          toast.error(t('profile.file_too_large'));
+                          toast.error(t("profile.file_too_large"));
                           return;
                         }
-                        
+
                         if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-                          toast.error(t('profile.images_only'));
+                          toast.error(t("profile.images_only"));
                           return;
                         }
-                        
+
                         try {
-                          const fileExt = file.name.split('.').pop();
+                          const fileExt = file.name.split(".").pop();
                           const fileName = `${currentUser?.id}/partner-id-${Date.now()}.${fileExt}`;
-                          
+
                           const { error: uploadError } = await supabase.storage
-                            .from('id-documents')
-                            .upload(fileName, file, { cacheControl: '3600', upsert: false });
-                          
+                            .from("id-documents")
+                            .upload(fileName, file, { cacheControl: "3600", upsert: false });
+
                           if (uploadError) throw uploadError;
-                          
+
                           await supabase
-                            .from('profiles')
+                            .from("profiles")
                             .update({ partner_id_document_url: fileName })
-                            .eq('id', currentUser?.id);
-                          
-                          toast.success(t('profile.partner_id_uploaded'));
+                            .eq("id", currentUser?.id);
+
+                          toast.success(t("profile.partner_id_uploaded"));
                           refetchUser();
                         } catch (error: any) {
-                          console.error('Partner ID upload error:', error);
-                          toast.error(t('profile.upload_error'));
+                          console.error("Partner ID upload error:", error);
+                          toast.error(t("profile.upload_error"));
                         }
                       }}
                     />
                     {profile?.partner_id_document_url && (
-                      <p className="text-xs text-green-600 mt-2">✅ {t('profile.partner_id_uploaded')}</p>
+                      <p className="text-xs text-green-600 mt-2">✅ {t("profile.partner_id_uploaded")}</p>
                     )}
                   </div>
                 </div>
@@ -1163,12 +1157,14 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="w-5 h-5" />
-              {t('profile.verification_location')}
+              {t("profile.verification_location")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="phone">{t('profile.settings_mobile')} <span className="text-destructive">*</span></Label>
+              <Label htmlFor="phone">
+                {t("profile.settings_mobile")} <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="phone"
                 type="tel"
@@ -1178,7 +1174,7 @@ const Profile = () => {
               />
             </div>
             <div>
-              <Label htmlFor="address">{t('profile.settings_address')}</Label>
+              <Label htmlFor="address">{t("profile.settings_address")}</Label>
               <Input
                 id="address"
                 type="text"
@@ -1189,7 +1185,7 @@ const Profile = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="zip">{t('profile.settings_zip')}</Label>
+                <Label htmlFor="zip">{t("profile.settings_zip")}</Label>
                 <Input
                   id="zip"
                   type="text"
@@ -1199,7 +1195,7 @@ const Profile = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="city">{t('profile.settings_city')}</Label>
+                <Label htmlFor="city">{t("profile.settings_city")}</Label>
                 <Input
                   id="city"
                   type="text"
@@ -1209,24 +1205,22 @@ const Profile = () => {
                 />
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {t('profile.settings_address_hint')}
-            </p>
+            <p className="text-sm text-muted-foreground">{t("profile.settings_address_hint")}</p>
           </CardContent>
         </Card>
 
         {/* Preferences */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>{t('profile.settings_preferences')}</CardTitle>
+            <CardTitle>{t("profile.settings_preferences")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="vacation-mode" className="text-base">{t('profile.settings_vacation_mode')}</Label>
-                <p className="text-sm text-muted-foreground">
-                  {t('profile.settings_vacation_desc')}
-                </p>
+                <Label htmlFor="vacation-mode" className="text-base">
+                  {t("profile.settings_vacation_mode")}
+                </Label>
+                <p className="text-sm text-muted-foreground">{t("profile.settings_vacation_desc")}</p>
               </div>
               <Switch
                 id="vacation-mode"
@@ -1239,10 +1233,10 @@ const Profile = () => {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="notify-same-address" className="text-base">
-                  {t('profile.settings_notify_same_address', 'Nur Haus-Benachrichtigungen')}
+                  {t("profile.settings_notify_same_address", "Nur Haus-Benachrichtigungen")}
                 </Label>
                 <p className="text-sm text-muted-foreground">
-                  {t('profile.settings_notify_same_address_desc', 'Nur über Essen aus meinem Haus informiert werden')}
+                  {t("profile.settings_notify_same_address_desc", "Nur über Essen aus meinem Haus informiert werden")}
                 </p>
               </div>
               <Switch
@@ -1254,37 +1248,37 @@ const Profile = () => {
             </div>
             {!currentUser?.profile?.address_id && (
               <p className="text-xs text-muted-foreground">
-                {t('profile.settings_notify_same_address_hint', 'Zuerst eine Adresse oben eingeben')}
+                {t("profile.settings_notify_same_address_hint", "Zuerst eine Adresse oben eingeben")}
               </p>
             )}
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="notification-radius">{t('profile.settings_notification_radius')}</Label>
+                <Label htmlFor="notification-radius">{t("profile.settings_notification_radius")}</Label>
                 <span className="text-sm font-medium text-primary">
                   {(formData.notification_radius / 1000).toFixed(1)} km
                 </span>
               </div>
-              
+
               {currentUser?.profile?.latitude && currentUser?.profile?.longitude ? (
-                <RadiusSliderMap 
+                <RadiusSliderMap
                   lat={currentUser.profile.latitude}
                   lng={currentUser.profile.longitude}
                   radius={formData.notification_radius / 1000}
                 />
               ) : formData.private_address && formData.private_city ? (
                 <div className="w-full h-48 rounded-lg border border-border bg-muted flex flex-col items-center justify-center gap-2 p-4">
-                  <p className="text-sm text-muted-foreground text-center">{t('profile.save_to_see_map')}</p>
+                  <p className="text-sm text-muted-foreground text-center">{t("profile.save_to_see_map")}</p>
                   <p className="text-xs text-muted-foreground text-center">
                     {formData.private_address}, {formData.private_postal_code} {formData.private_city}
                   </p>
                 </div>
               ) : (
                 <div className="w-full h-48 rounded-lg border border-border bg-muted flex items-center justify-center">
-                  <p className="text-sm text-muted-foreground">{t('profile.add_address_for_map')}</p>
+                  <p className="text-sm text-muted-foreground">{t("profile.add_address_for_map")}</p>
                 </div>
               )}
-              
+
               <Slider
                 id="notification-radius"
                 min={100}
@@ -1294,9 +1288,7 @@ const Profile = () => {
                 onValueChange={([value]) => setFormData({ ...formData, notification_radius: value })}
                 className="w-full"
               />
-              <p className="text-xs text-muted-foreground">
-                {t('profile.notification_radius_hint')}
-              </p>
+              <p className="text-xs text-muted-foreground">{t("profile.notification_radius_hint")}</p>
             </div>
           </CardContent>
         </Card>
@@ -1308,18 +1300,16 @@ const Profile = () => {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="w-5 h-5 text-destructive" />
-                  {t('profile.settings_safety_title')}
+                  {t("profile.settings_safety_title")}
                 </CardTitle>
                 <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
               <CardContent className="space-y-4 pt-0">
-                <p className="text-sm text-muted-foreground">
-                  {t('profile.settings_safety_desc')}
-                </p>
+                <p className="text-sm text-muted-foreground">{t("profile.settings_safety_desc")}</p>
                 <div>
-                  <Label className="text-base font-semibold mb-3 block">{t('profile.settings_allergens')}</Label>
+                  <Label className="text-base font-semibold mb-3 block">{t("profile.settings_allergens")}</Label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {allergenOptions.map((option) => (
                       <div key={option.value} className="flex items-center space-x-2">
@@ -1328,24 +1318,22 @@ const Profile = () => {
                           checked={formData.allergens.includes(option.value)}
                           onCheckedChange={() => toggleAllergen(option.value)}
                         />
-                        <Label
-                          htmlFor={`allergen-${option.value}`}
-                          className="text-sm font-normal cursor-pointer"
-                        >
+                        <Label htmlFor={`allergen-${option.value}`} className="text-sm font-normal cursor-pointer">
                           {option.label}
                         </Label>
                       </div>
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="pt-4 border-t border-border">
-                  <Label className="text-base font-semibold mb-3 block">{t('profile.settings_dislikes')}</Label>
+                  <Label className="text-base font-semibold mb-3 block">{t("profile.settings_dislikes")}</Label>
                   <Accordion type="multiple" className="w-full">
                     {Object.entries(dislikeCategories).map(([category, items]) => (
                       <AccordionItem key={category} value={category}>
                         <AccordionTrigger className="text-sm capitalize">
-                          {category} ({items.filter(item => formData.dislikes.includes(item.value)).length}/{items.length})
+                          {category} ({items.filter((item) => formData.dislikes.includes(item.value)).length}/
+                          {items.length})
                         </AccordionTrigger>
                         <AccordionContent>
                           <div className="space-y-2 pt-2">
@@ -1382,7 +1370,7 @@ const Profile = () => {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <Globe className="w-5 h-5 text-primary" />
-                  {t('profile.languagePreference')}
+                  {t("profile.languagePreference")}
                 </CardTitle>
                 <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </CardHeader>
@@ -1390,7 +1378,7 @@ const Profile = () => {
             <CollapsibleContent>
               <CardContent className="pt-0">
                 <div className="space-y-3">
-                  <Label className="text-base font-semibold">{t('profile.languagePreference')}</Label>
+                  <Label className="text-base font-semibold">{t("profile.languagePreference")}</Label>
                   <div className="grid grid-cols-2 gap-3">
                     {languages.map((lang) => (
                       <div key={lang.code} className="flex items-center space-x-2">
@@ -1399,47 +1387,40 @@ const Profile = () => {
                           checked={formData.languages.includes(lang.code)}
                           onCheckedChange={() => toggleLanguage(lang.code)}
                         />
-                        <Label
-                          htmlFor={`language-${lang.code}`}
-                          className="text-sm font-normal cursor-pointer"
-                        >
+                        <Label htmlFor={`language-${lang.code}`} className="text-sm font-normal cursor-pointer">
                           {lang.name}
                         </Label>
                       </div>
                     ))}
                   </div>
-                  
+
                   <div className="pt-3 border-t border-border">
-                    <Label className="text-sm font-medium mb-2 block">{t('profile.settings_language_missing')}</Label>
+                    <Label className="text-sm font-medium mb-2 block">{t("profile.settings_language_missing")}</Label>
                     <div className="flex gap-2">
                       <Input
-                        placeholder={t('profile.settings_language_request_placeholder')}
+                        placeholder={t("profile.settings_language_request_placeholder")}
                         value={customLanguageInput}
                         onChange={(e) => setCustomLanguageInput(e.target.value)}
                         onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
+                          if (e.key === "Enter") {
                             e.preventDefault();
                             handleCustomLanguageRequest();
                           }
                         }}
                       />
-                      <Button 
-                        type="button" 
-                        onClick={handleCustomLanguageRequest} 
+                      <Button
+                        type="button"
+                        onClick={handleCustomLanguageRequest}
                         variant="outline"
                         disabled={!customLanguageInput.trim()}
                       >
-                        {t('profile.settings_language_request')}
+                        {t("profile.settings_language_request")}
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t('profile.settings_language_popular')}
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">{t("profile.settings_language_popular")}</p>
                   </div>
-                  
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {t('profile.settings_language_translation')}
-                  </p>
+
+                  <p className="text-xs text-muted-foreground mt-2">{t("profile.settings_language_translation")}</p>
                 </div>
               </CardContent>
             </CollapsibleContent>
@@ -1453,7 +1434,7 @@ const Profile = () => {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <Award className="w-5 h-5 text-trust-gold" />
-                  {t('profile.achievements_title')} & Karma
+                  {t("profile.achievements_title")} & Karma
                 </CardTitle>
                 <ChevronDown className="w-5 h-5 text-muted-foreground" />
               </CardHeader>
@@ -1463,22 +1444,22 @@ const Profile = () => {
                 {/* Achievements */}
                 <div className="text-center py-6 bg-muted/30 rounded-lg">
                   <Award className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
-                  <p className="font-medium text-foreground mb-2">{t('profile.achievements_empty_title')}</p>
+                  <p className="font-medium text-foreground mb-2">{t("profile.achievements_empty_title")}</p>
                   <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                    {t('profile.achievements_empty_desc')}
+                    {t("profile.achievements_empty_desc")}
                   </p>
                 </div>
 
                 {/* Karma Info */}
                 <div className="border-t border-border pt-4 space-y-3">
-                  <Label className="text-base font-semibold">{t('profile.karma_title')}</Label>
+                  <Label className="text-base font-semibold">{t("profile.karma_title")}</Label>
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
                       <ChefHat className="w-4 h-4 text-secondary" />
                     </div>
                     <div>
-                      <p className="font-medium text-sm text-foreground">{t('profile.karma_share')}</p>
-                      <p className="text-xs text-muted-foreground">{t('profile.karma_share_desc')}</p>
+                      <p className="font-medium text-sm text-foreground">{t("profile.karma_share")}</p>
+                      <p className="text-xs text-muted-foreground">{t("profile.karma_share_desc")}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -1486,8 +1467,8 @@ const Profile = () => {
                       <Heart className="w-4 h-4 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium text-sm text-foreground">{t('profile.karma_pay')}</p>
-                      <p className="text-xs text-muted-foreground">{t('profile.karma_pay_desc')}</p>
+                      <p className="font-medium text-sm text-foreground">{t("profile.karma_pay")}</p>
+                      <p className="text-xs text-muted-foreground">{t("profile.karma_pay_desc")}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -1495,8 +1476,8 @@ const Profile = () => {
                       <Star className="w-4 h-4 text-trust-gold" />
                     </div>
                     <div>
-                      <p className="font-medium text-sm text-foreground">{t('profile.karma_respect')}</p>
-                      <p className="text-xs text-muted-foreground">{t('profile.karma_respect_desc')}</p>
+                      <p className="font-medium text-sm text-foreground">{t("profile.karma_respect")}</p>
+                      <p className="text-xs text-muted-foreground">{t("profile.karma_respect_desc")}</p>
                     </div>
                   </div>
                 </div>
@@ -1512,16 +1493,14 @@ const Profile = () => {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <ChefHat className="w-5 h-5 text-primary" />
-                  {t('profile.gallery_title')}
+                  {t("profile.gallery_title")}
                 </CardTitle>
                 <ChevronDown className="w-5 h-5 text-muted-foreground" />
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
               <CardContent className="space-y-4 pt-0">
-                <p className="text-sm text-muted-foreground">
-                  {t('profile.gallery_desc')}
-                </p>
+                <p className="text-sm text-muted-foreground">{t("profile.gallery_desc")}</p>
                 <GalleryUpload userId={currentUser.id} />
                 <GalleryGrid userId={currentUser.id} isOwnProfile={true} />
               </CardContent>
@@ -1534,7 +1513,7 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ChefHat className="w-5 h-5 text-primary" />
-              {t('profile.chef_bookings_title')}
+              {t("profile.chef_bookings_title")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -1543,7 +1522,7 @@ const Profile = () => {
         </Card>
 
         {/* Household Linking */}
-        <HouseholdLinking userId={currentUser.id} userEmail={currentUser.email || ''} />
+        <HouseholdLinking userId={currentUser.id} userEmail={currentUser.email || ""} />
 
         {/* Blocked Users Management */}
         <BlockedUsersList currentUserId={currentUser.id} />
@@ -1551,7 +1530,7 @@ const Profile = () => {
         {/* App-Feedback / Fehlerberichte */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>{t('profile.help_us_improve')}</CardTitle>
+            <CardTitle>{t("profile.help_us_improve")}</CardTitle>
           </CardHeader>
           <CardContent>
             <FeedbackDialog userId={currentUser.id} />
@@ -1561,41 +1540,39 @@ const Profile = () => {
         {/* Community Guidelines */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('profile.communityGuidelines')}</CardTitle>
+            <CardTitle>{t("profile.communityGuidelines")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>{t('guidelines.bringContainer')}</span>
+                <span>{t("guidelines.bringContainer")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>{t('guidelines.bePunctual')}</span>
+                <span>{t("guidelines.bePunctual")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>{t('guidelines.payFairly')}</span>
+                <span>{t("guidelines.payFairly")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>{t('guidelines.respectPrivacy')}</span>
+                <span>{t("guidelines.respectPrivacy")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>{t('guidelines.communicate')}</span>
+                <span>{t("guidelines.communicate")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">✓</span>
-                <span>{t('guidelines.leaveFeedback')}</span>
+                <span>{t("guidelines.leaveFeedback")}</span>
               </li>
             </ul>
-            
+
             {/* Disclaimer */}
             <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-              <p className="text-sm text-foreground leading-relaxed">
-                {t('guidelines.disclaimer')}
-              </p>
+              <p className="text-sm text-foreground leading-relaxed">{t("guidelines.disclaimer")}</p>
             </div>
           </CardContent>
         </Card>
@@ -1606,7 +1583,7 @@ const Profile = () => {
             <CollapsibleTrigger className="w-full">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
-                  💰 {t('profile.your_wallet')}
+                  💰 {t("profile.your_wallet")}
                   {walletData && walletData.balance > 0 && (
                     <Badge variant="secondary" className="ml-2">
                       CHF {walletData.balance.toFixed(0)}
@@ -1625,25 +1602,23 @@ const Profile = () => {
                 ) : (
                   <>
                     <div className="text-center py-6 bg-background/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-2">{t('profile.available_balance')}</p>
-                      <p className="text-4xl font-bold text-primary">
-                        CHF {walletData?.balance.toFixed(2) || '0.00'}
-                      </p>
+                      <p className="text-sm text-muted-foreground mb-2">{t("profile.available_balance")}</p>
+                      <p className="text-4xl font-bold text-primary">CHF {walletData?.balance.toFixed(2) || "0.00"}</p>
                       {walletData && walletData.requestedAmount > 0 && (
                         <p className="text-xs text-muted-foreground mt-2">
-                          🕐 CHF {walletData.requestedAmount.toFixed(2)} {t('profile.in_processing')}
+                          🕐 CHF {walletData.requestedAmount.toFixed(2)} {t("profile.in_processing")}
                         </p>
                       )}
                     </div>
 
                     <div className="space-y-3">
                       <div>
-                        <Label htmlFor="iban">{t('profile.iban_for_payout')}</Label>
+                        <Label htmlFor="iban">{t("profile.iban_for_payout")}</Label>
                         <Input
                           id="iban"
                           type="text"
                           placeholder="CH00 0000 0000 0000 0000 0"
-                          defaultValue={profile?.iban || ''}
+                          defaultValue={profile?.iban || ""}
                           onBlur={(e) => {
                             if (e.target.value !== profile?.iban) {
                               updateProfileMutation.mutate(e.target.value);
@@ -1655,26 +1630,23 @@ const Profile = () => {
                       <Button
                         onClick={() => requestPayoutMutation.mutate()}
                         disabled={
-                          !walletData || 
-                          walletData.balance < 10 || 
-                          !profile?.iban || 
-                          requestPayoutMutation.isPending
+                          !walletData || walletData.balance < 10 || !profile?.iban || requestPayoutMutation.isPending
                         }
                         className="w-full"
                       >
                         {requestPayoutMutation.isPending ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            {t('profile.requesting_payout')}
+                            {t("profile.requesting_payout")}
                           </>
                         ) : (
-                          t('profile.request_payout')
+                          t("profile.request_payout")
                         )}
                       </Button>
 
                       <Alert>
                         <AlertDescription className="text-xs">
-                          💡 <strong>Info:</strong> {t('profile.payout_min_info')}
+                          💡 <strong>Info:</strong> {t("profile.payout_min_info")}
                         </AlertDescription>
                       </Alert>
                     </div>
@@ -1693,23 +1665,19 @@ const Profile = () => {
                 <Heart className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground">{t('profile.support_app_title')}</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {t('profile.support_app_desc')}
-                </p>
+                <h3 className="font-semibold text-foreground">{t("profile.support_app_title")}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{t("profile.support_app_desc")}</p>
               </div>
               <Button
                 variant="outline"
                 className="w-full border-green-500/50 text-green-700 dark:text-green-400 hover:bg-green-500/10"
                 onClick={() => {
-                  toast.info(t('profile.support_coming_soon'), { duration: 3000 });
+                  toast.info(t("profile.support_coming_soon"), { duration: 3000 });
                 }}
               >
-                💚 {t('profile.support_app_button')}
+                💚 {t("profile.support_app_button")}
               </Button>
-              <p className="text-xs text-muted-foreground">
-                {t('profile.support_app_hint')}
-              </p>
+              <p className="text-xs text-muted-foreground">{t("profile.support_app_hint")}</p>
             </div>
           </CardContent>
         </Card>
@@ -1719,7 +1687,7 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-primary" />
-              {t('profile.trust_security')} ({t('profile.optional_badge')})
+              {t("profile.trust_security")} ({t("profile.optional_badge")})
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -1728,89 +1696,98 @@ const Profile = () => {
               <Alert className="border-primary bg-primary/10">
                 <Shield className="h-4 w-4 text-primary" />
                 <AlertDescription className="text-sm">
-                  <strong>{t('profile.verification_banner')}</strong> {t('profile.verification_banner_desc')}
+                  <strong>{t("profile.verification_banner")}</strong> {t("profile.verification_banner_desc")}
                 </AlertDescription>
               </Alert>
             )}
-            
-            <p className="text-sm text-muted-foreground">
-              {t('profile.verification_optional_desc')}
-            </p>
-            
+
+            <p className="text-sm text-muted-foreground">{t("profile.verification_optional_desc")}</p>
+
             {/* Primary User Verification */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">{t('profile.your_verification')}</Label>
-              {profile?.verification_status === 'approved' || profile?.id_verified ? (
+              <Label className="text-sm font-medium">{t("profile.your_verification")}</Label>
+              {profile?.verification_status === "approved" || profile?.id_verified ? (
                 <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
                   <div className="text-2xl">✅</div>
                   <div>
-                    <p className="font-semibold text-green-600 dark:text-green-400">{t('profile.verified_profile')}</p>
-                    <p className="text-xs text-muted-foreground">{t('profile.blue_tick_received')}</p>
+                    <p className="font-semibold text-green-600 dark:text-green-400">{t("profile.verified_profile")}</p>
+                    <p className="text-xs text-muted-foreground">{t("profile.blue_tick_received")}</p>
                   </div>
                 </div>
-              ) : profile?.verification_status === 'pending' ? (
+              ) : profile?.verification_status === "pending" ? (
                 <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                   <div className="text-2xl">⏳</div>
                   <div>
-                    <p className="font-semibold text-yellow-600 dark:text-yellow-400">{t('profile.verification_pending')}</p>
-                    <p className="text-xs text-muted-foreground">{t('profile.checking_verification')}</p>
+                    <p className="font-semibold text-yellow-600 dark:text-yellow-400">
+                      {t("profile.verification_pending")}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{t("profile.checking_verification")}</p>
                   </div>
                 </div>
               ) : (
                 <VerificationDialog
                   userId={currentUser.id}
-                  verificationStatus={profile?.verification_status || 'pending'}
+                  verificationStatus={profile?.verification_status || "pending"}
                   rejectionReason={profile?.rejection_reason}
                   rejectionDetails={profile?.rejection_details}
-                  onSuccess={() => queryClient.invalidateQueries({ queryKey: ['currentUser'] })}
+                  onSuccess={() => queryClient.invalidateQueries({ queryKey: ["currentUser"] })}
                 />
               )}
             </div>
-            
+
             {/* Photo Verification Status - Separate from ID verification */}
             <div className="space-y-2 pt-4 border-t border-border">
-              <Label className="text-sm font-medium">{t('profile.photo_verification_title')}</Label>
+              <Label className="text-sm font-medium">{t("profile.photo_verification_title")}</Label>
               {profile?.photo_verified ? (
                 <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
                   <div className="text-xl">📸</div>
                   <div>
-                    <p className="font-semibold text-green-600 dark:text-green-400">{t('profile.photo_verified_badge')}</p>
-                    <p className="text-xs text-muted-foreground">{t('profile.photo_verification_hint')}</p>
+                    <p className="font-semibold text-green-600 dark:text-green-400">
+                      {t("profile.photo_verified_badge")}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{t("profile.photo_verification_hint")}</p>
                   </div>
                 </div>
               ) : (
                 <div className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                   <div className="text-xl">📸</div>
                   <div>
-                    <p className="font-semibold text-amber-600 dark:text-amber-400">{t('profile.photo_not_verified')}</p>
-                    <p className="text-xs text-muted-foreground">{t('profile.photo_verification_hint')}</p>
+                    <p className="font-semibold text-amber-600 dark:text-amber-400">
+                      {t("profile.photo_not_verified")}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{t("profile.photo_verification_hint")}</p>
                   </div>
                 </div>
               )}
             </div>
-            
+
             {/* Partner Verification - Only shown for couples */}
             {formData.is_couple && (
               <div className="space-y-2 pt-4 border-t border-border">
                 <Label className="text-sm font-medium flex items-center gap-2">
                   <Heart className="w-4 h-4 text-primary" />
-                  {t('profile.partner_verification')}
+                  {t("profile.partner_verification")}
                 </Label>
-                
-                {(profile as any)?.partner_verification_status === 'approved' ? (
+
+                {(profile as any)?.partner_verification_status === "approved" ? (
                   <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
                     <div className="text-2xl">✅</div>
                     <div>
-                      <p className="font-semibold text-green-600 dark:text-green-400">{t('profile.partner_verified')}</p>
-                      <p className="text-xs text-muted-foreground">{t('profile.partner_blue_tick')}</p>
+                      <p className="font-semibold text-green-600 dark:text-green-400">
+                        {t("profile.partner_verified")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t("profile.partner_blue_tick")}</p>
                     </div>
                   </div>
-                ) : (profile as any)?.partner_verification_status === 'pending' && (profile as any)?.partner_id_document_url ? (
+                ) : (profile as any)?.partner_verification_status === "pending" &&
+                  (profile as any)?.partner_id_document_url ? (
                   <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                     <div className="text-2xl">⏳</div>
                     <div>
-                      <p className="font-semibold text-yellow-600 dark:text-yellow-400">{t('profile.partner_verification_pending')}</p>
-                      <p className="text-xs text-muted-foreground">{t('profile.partner_checking_verification')}</p>
+                      <p className="font-semibold text-yellow-600 dark:text-yellow-400">
+                        {t("profile.partner_verification_pending")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t("profile.partner_checking_verification")}</p>
                     </div>
                   </div>
                 ) : (
@@ -1818,14 +1795,16 @@ const Profile = () => {
                     <Alert className="border-orange-500/50 bg-orange-500/10">
                       <AlertCircle className="h-4 w-4 text-orange-500" />
                       <AlertDescription className="text-sm">
-                        <strong>{t('profile.partner_verification_required')}</strong>
+                        <strong>{t("profile.partner_verification_required")}</strong>
                         <br />
-                        {t('profile.partner_verification_required_desc')}
+                        {t("profile.partner_verification_required_desc")}
                       </AlertDescription>
                     </Alert>
-                    
+
                     <div className="space-y-2">
-                      <Label htmlFor="partner-id-upload" className="text-sm">{t('profile.upload_partner_id')}</Label>
+                      <Label htmlFor="partner-id-upload" className="text-sm">
+                        {t("profile.upload_partner_id")}
+                      </Label>
                       <div className="flex items-center gap-2">
                         <Input
                           id="partner-id-upload"
@@ -1835,72 +1814,70 @@ const Profile = () => {
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (!file || !currentUser?.id) return;
-                            
+
                             if (file.size > 5 * 1024 * 1024) {
-                              toast.error(t('toast.file_too_large'));
+                              toast.error(t("toast.file_too_large"));
                               return;
                             }
-                            
+
                             try {
-                              const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+                              const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
                               const fileName = `${currentUser.id}/partner-id.${fileExt}`;
-                              
+
                               const { error: uploadError } = await supabase.storage
-                                .from('id-documents')
+                                .from("id-documents")
                                 .upload(fileName, file, { upsert: true });
-                              
+
                               if (uploadError) throw uploadError;
-                              
-                              const { data } = supabase.storage
-                                .from('id-documents')
-                                .getPublicUrl(fileName);
-                              
+
+                              const { data } = supabase.storage.from("id-documents").getPublicUrl(fileName);
+
                               // Update profile with partner document URL and set status to pending
                               await supabase
-                                .from('profiles')
-                                .update({ 
+                                .from("profiles")
+                                .update({
                                   partner_id_document_url: data.publicUrl,
-                                  partner_verification_status: 'pending' as any
+                                  partner_verification_status: "pending" as any,
                                 })
-                                .eq('id', currentUser.id);
-                              
-                              toast.success(t('profile.partner_id_uploaded'));
-                              queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                                .eq("id", currentUser.id);
+
+                              toast.success(t("profile.partner_id_uploaded"));
+                              queryClient.invalidateQueries({ queryKey: ["currentUser"] });
                             } catch (error: any) {
-                              toast.error(t('toast.upload_failed') + ': ' + error.message);
+                              toast.error(t("toast.upload_failed") + ": " + error.message);
                             }
                           }}
                         />
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {t('profile.partner_id_hint')}
-                      </p>
+                      <p className="text-xs text-muted-foreground">{t("profile.partner_id_hint")}</p>
                     </div>
                   </div>
                 )}
               </div>
             )}
-            
+
             {/* Couple Verification Warning */}
-            {formData.is_couple && (
-              (profile?.verification_status !== 'approved' || (profile as any)?.partner_verification_status !== 'approved') && (
+            {formData.is_couple &&
+              (profile?.verification_status !== "approved" ||
+                (profile as any)?.partner_verification_status !== "approved") && (
                 <Alert className="border-yellow-500/50 bg-yellow-500/10">
                   <Shield className="h-4 w-4 text-yellow-600" />
                   <AlertDescription className="text-sm">
-                    <strong>{t('profile.couple_verification_warning')}</strong>
+                    <strong>{t("profile.couple_verification_warning")}</strong>
                     <br />
-                    {t('profile.couple_verification_warning_desc')}
+                    {t("profile.couple_verification_warning_desc")}
                   </AlertDescription>
                 </Alert>
-              )
-            )}
+              )}
           </CardContent>
         </Card>
 
         {/* Change Password */}
         <ChangePasswordSection
-          userEmail={currentUser.email || ''}
-          isOAuthUser={currentUser.app_metadata?.provider === 'google' || currentUser.app_metadata?.providers?.includes('google')}
+          userEmail={currentUser.email || ""}
+          isOAuthUser={
+            currentUser.app_metadata?.provider === "google" || currentUser.app_metadata?.providers?.includes("google")
+          }
         />
 
         {/* Optional: 2FA Settings */}
@@ -1913,17 +1890,15 @@ const Profile = () => {
               variant="outline"
               className="w-full gap-2"
               onClick={() => {
-                localStorage.removeItem('tour_completed');
-                localStorage.setItem('force_show_tour', 'true');
-                toast.success(t('profile.tour_restarting'));
-                navigate('/feed');
+                localStorage.removeItem("tour_completed");
+                localStorage.setItem("force_show_tour", "true");
+                toast.success(t("profile.tour_restarting"));
+                navigate("/feed");
               }}
             >
-              🎓 {t('profile.restart_tour')}
+              🎓 {t("profile.restart_tour")}
             </Button>
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              {t('profile.restart_tour_hint')}
-            </p>
+            <p className="text-xs text-muted-foreground mt-2 text-center">{t("profile.restart_tour_hint")}</p>
           </CardContent>
         </Card>
 
@@ -1937,11 +1912,11 @@ const Profile = () => {
                 // CRITICAL: Clear all cached queries to prevent data leakage between users
                 queryClient.clear();
                 await supabase.auth.signOut();
-                toast.success(t('auth.logout') + '!');
-                navigate('/');
+                toast.success(t("auth.logout") + "!");
+                navigate("/");
               }}
             >
-              {t('auth.logout')}
+              {t("auth.logout")}
             </Button>
           </CardContent>
         </Card>
@@ -1951,13 +1926,13 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="w-5 h-5" />
-              {t('profile.compliance_and_legal')}
+              {t("profile.compliance_and_legal")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <ComplianceLinks variant="settings" />
             <div className="pt-2 border-t border-border flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">{t('profile.app_version')}</span>
+              <span className="text-xs text-muted-foreground">{t("profile.app_version")}</span>
               <AppVersionBadge />
             </div>
           </CardContent>
@@ -1968,7 +1943,7 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
               <AlertCircle className="w-5 h-5" />
-              {t('profile.danger_zone')}
+              {t("profile.danger_zone")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -1977,26 +1952,21 @@ const Profile = () => {
                 variant="outline"
                 className="w-full border-destructive/50 hover:bg-destructive/10"
                 onClick={async () => {
-                  if (!confirm(t('profile.deactivate_confirm_prompt'))) return;
-                  
+                  if (!confirm(t("profile.deactivate_confirm_prompt"))) return;
+
                   try {
-                    await supabase
-                      .from('profiles')
-                      .update({ vacation_mode: true })
-                      .eq('id', currentUser.id);
-                    
-                    toast.success(t('profile.account_deactivated'));
-                    queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+                    await supabase.from("profiles").update({ vacation_mode: true }).eq("id", currentUser.id);
+
+                    toast.success(t("profile.account_deactivated"));
+                    queryClient.invalidateQueries({ queryKey: ["currentUser"] });
                   } catch (error: any) {
-                    toast.error(t('profile.account_delete_error') + error.message);
+                    toast.error(t("profile.account_delete_error") + error.message);
                   }
                 }}
               >
-                {t('profile.deactivate_button')}
+                {t("profile.deactivate_button")}
               </Button>
-              <p className="text-xs text-muted-foreground mt-1">
-                {t('profile.deactivate_hint')}
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">{t("profile.deactivate_hint")}</p>
             </div>
 
             <div>
@@ -2004,42 +1974,36 @@ const Profile = () => {
                 variant="destructive"
                 className="w-full"
                 onClick={async () => {
-                  const confirmation = prompt(t('profile.account_delete_confirm'));
-                  if (confirmation !== 'DELETE') {
-                    toast.error(t('profile.account_delete_cancelled'));
+                  const confirmation = prompt(t("profile.account_delete_confirm"));
+                  if (confirmation !== "DELETE") {
+                    toast.error(t("profile.account_delete_cancelled"));
                     return;
                   }
-                  
+
                   try {
                     // Delete user data from profiles table
-                    const { error: profileError } = await supabase
-                      .from('profiles')
-                      .delete()
-                      .eq('id', currentUser.id);
-                    
+                    const { error: profileError } = await supabase.from("profiles").delete().eq("id", currentUser.id);
+
                     if (profileError) throw profileError;
-                    
+
                     // CRITICAL: Clear all cached queries before signout
                     queryClient.clear();
-                    
+
                     // Sign out and redirect
                     await supabase.auth.signOut();
-                    toast.success(t('profile.account_deleted'));
-                    navigate('/');
+                    toast.success(t("profile.account_deleted"));
+                    navigate("/");
                   } catch (error: any) {
-                    toast.error(t('profile.account_delete_error') + error.message);
+                    toast.error(t("profile.account_delete_error") + error.message);
                   }
                 }}
               >
-                {t('profile.delete_button')}
+                {t("profile.delete_button")}
               </Button>
-              <p className="text-xs text-destructive mt-1">
-                {t('profile.delete_warning')}
-              </p>
+              <p className="text-xs text-destructive mt-1">{t("profile.delete_warning")}</p>
             </div>
           </CardContent>
         </Card>
-
       </main>
 
       {/* Sticky Save Button - Always visible on all devices */}
@@ -2051,11 +2015,11 @@ const Profile = () => {
               ⚠️ Bitte wähle dein Geschlecht aus, um das Profil zu speichern.
             </p>
           )}
-          <Button 
+          <Button
             onClick={() => {
               // Gender validation
               if (!formData.gender) {
-                toast.error('Bitte wähle dein Geschlecht aus (Pflichtfeld).');
+                toast.error("Bitte wähle dein Geschlecht aus (Pflichtfeld).");
                 return;
               }
               updateProfileMutation.mutate(undefined);
@@ -2064,10 +2028,8 @@ const Profile = () => {
             className="w-full"
             size="lg"
           >
-            {updateProfileMutation.isPending && (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            )}
-            {updateProfileMutation.isPending ? t('profile.saving') : t('profile.save_changes')}
+            {updateProfileMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            {updateProfileMutation.isPending ? t("profile.saving") : t("profile.save_changes")}
           </Button>
         </div>
       </div>
