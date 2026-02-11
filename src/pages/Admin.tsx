@@ -585,21 +585,21 @@ const Admin = () => {
       if (auditError) console.error('Audit log failed:', auditError);
     },
     onSuccess: () => {
-      toast.success('Auszahlung als bezahlt markiert');
+      toast.success(t('admin.payout_marked_paid'));
       queryClient.invalidateQueries({ queryKey: ['pendingPayouts'] });
       setPayoutDialogOpen(false);
       setPayoutNote('');
       setSelectedPayout(null);
     },
     onError: () => {
-      toast.error('Fehler beim Aktualisieren der Auszahlung');
+      toast.error(t('admin.payout_update_failed'));
     },
   });
 
   // CSV Export function for payouts
   const exportPayoutsCSV = () => {
     if (!pendingPayouts || pendingPayouts.length === 0) {
-      toast.error('Keine Auszahlungen zum Exportieren');
+      toast.error(t('admin.no_payouts_to_export'));
       return;
     }
 
@@ -626,7 +626,7 @@ const Admin = () => {
     link.download = `payouts_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     URL.revokeObjectURL(url);
-    toast.success('CSV exportiert');
+    toast.success(t('admin.csv_exported'));
   };
 
   // FAQ request mutations
