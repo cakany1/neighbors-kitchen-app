@@ -37,6 +37,7 @@ import GalleryUpload from '@/components/GalleryUpload';
 import GalleryGrid from '@/components/GalleryGrid';
 import { AppVersionBadge } from '@/components/AppVersionBadge';
 import { ComplianceLinks } from '@/components/ComplianceLinks';
+import { TagPicker, ALLERGEN_OPTIONS, DISLIKE_OPTIONS } from '@/components/TagPicker';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 import {
@@ -70,8 +71,6 @@ const Profile = () => {
   const [languages, setLanguages] = useState<string[]>([]);
   const [allergens, setAllergens] = useState<string[]>([]);
   const [dislikes, setDislikes] = useState<string[]>([]);
-  const [newAllergen, setNewAllergen] = useState('');
-  const [newDislike, setNewDislike] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [isCoupleToggle, setIsCoupleToggle] = useState(false);
   const [partnerName, setPartnerName] = useState('');
@@ -603,93 +602,35 @@ const Profile = () => {
                 {/* Allergens */}
                 <div>
                   <Label>{t('profile.allergens', 'Allergene')}</Label>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {allergens.map((a) => (
-                      <Badge key={a} variant="destructive" className="text-xs gap-1">
-                        {a}
-                        {editingProfile && (
-                          <X className="w-3 h-3 cursor-pointer" onClick={() => setAllergens(allergens.filter(x => x !== a))} />
-                        )}
-                      </Badge>
-                    ))}
-                    {allergens.length === 0 && <p className="text-sm text-muted-foreground">{t('profile.none', 'Keine')}</p>}
+                  <div className="mt-1">
+                    <TagPicker
+                      predefinedOptions={ALLERGEN_OPTIONS}
+                      selected={allergens}
+                      onChange={setAllergens}
+                      allowCustom
+                      placeholder={t('profile.add_allergen', 'z.B. Gluten, Nüsse...')}
+                      badgeVariant="destructive"
+                      readOnly={!editingProfile}
+                      emptyText={t('profile.none', 'Keine')}
+                    />
                   </div>
-                  {editingProfile && (
-                    <div className="flex gap-2 mt-2">
-                      <Input
-                        value={newAllergen}
-                        onChange={(e) => setNewAllergen(e.target.value)}
-                        placeholder={t('profile.add_allergen', 'z.B. Gluten, Nüsse...')}
-                        className="text-sm"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && newAllergen.trim()) {
-                            e.preventDefault();
-                            if (!allergens.includes(newAllergen.trim())) {
-                              setAllergens([...allergens, newAllergen.trim()]);
-                            }
-                            setNewAllergen('');
-                          }
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          if (newAllergen.trim() && !allergens.includes(newAllergen.trim())) {
-                            setAllergens([...allergens, newAllergen.trim()]);
-                            setNewAllergen('');
-                          }
-                        }}
-                      >+</Button>
-                    </div>
-                  )}
                 </div>
 
                 {/* Dislikes */}
                 <div>
                   <Label>{t('profile.dislikes', 'Abneigungen')}</Label>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {dislikes.map((d) => (
-                      <Badge key={d} variant="secondary" className="text-xs gap-1">
-                        {d}
-                        {editingProfile && (
-                          <X className="w-3 h-3 cursor-pointer" onClick={() => setDislikes(dislikes.filter(x => x !== d))} />
-                        )}
-                      </Badge>
-                    ))}
-                    {dislikes.length === 0 && <p className="text-sm text-muted-foreground">{t('profile.none', 'Keine')}</p>}
+                  <div className="mt-1">
+                    <TagPicker
+                      predefinedOptions={DISLIKE_OPTIONS}
+                      selected={dislikes}
+                      onChange={setDislikes}
+                      allowCustom
+                      placeholder={t('profile.add_dislike', 'z.B. Koriander, Rosinen...')}
+                      badgeVariant="secondary"
+                      readOnly={!editingProfile}
+                      emptyText={t('profile.none', 'Keine')}
+                    />
                   </div>
-                  {editingProfile && (
-                    <div className="flex gap-2 mt-2">
-                      <Input
-                        value={newDislike}
-                        onChange={(e) => setNewDislike(e.target.value)}
-                        placeholder={t('profile.add_dislike', 'z.B. Koriander, Rosinen...')}
-                        className="text-sm"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && newDislike.trim()) {
-                            e.preventDefault();
-                            if (!dislikes.includes(newDislike.trim())) {
-                              setDislikes([...dislikes, newDislike.trim()]);
-                            }
-                            setNewDislike('');
-                          }
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          if (newDislike.trim() && !dislikes.includes(newDislike.trim())) {
-                            setDislikes([...dislikes, newDislike.trim()]);
-                            setNewDislike('');
-                          }
-                        }}
-                      >+</Button>
-                    </div>
-                  )}
                 </div>
 
                 <Separator />
