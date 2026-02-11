@@ -8,6 +8,8 @@
  * Phase 2 (future):    embedding-based fuzzy matching for unknown terms
  */
 
+import i18next from 'i18next';
+
 // ─── Synonym → Canonical Key ──────────────────────────────────
 // Keys are lowercased. Values are the canonical DB key.
 const SYNONYM_MAP: Record<string, string> = {
@@ -183,53 +185,12 @@ export function matchDislikes(
 }
 
 /**
- * Canonical label lookup for display purposes.
- * Maps canonical key → German display label.
- */
-const DISPLAY_LABELS: Record<string, string> = {
-  // Allergens
-  gluten: 'Gluten 🌾',
-  dairy: 'Milch/Laktose 🥛',
-  nuts: 'Nüsse 🥜',
-  peanuts: 'Erdnüsse 🥜',
-  eggs: 'Eier 🥚',
-  fish: 'Fisch 🐟',
-  crustaceans: 'Krebstiere 🦐',
-  molluscs: 'Weichtiere 🦑',
-  soy: 'Soja',
-  celery: 'Sellerie',
-  mustard: 'Senf',
-  sesame: 'Sesam',
-  sulphites: 'Sulfite',
-  lupin: 'Lupinen',
-  // Tags
-  vegetarian: 'Vegetarisch 🥬',
-  vegan: 'Vegan 🌱',
-  halal: 'Halal',
-  kosher: 'Koscher',
-  spicy: 'Scharf 🌶️',
-  gluten_free: 'Glutenfrei',
-  lactose_free: 'Laktosefrei',
-  organic: 'Bio 🌿',
-  homemade: 'Hausgemacht 🏠',
-  kid_friendly: 'Kinderfreundlich 👶',
-  pescatarian: 'Pescetarisch 🐟',
-  low_carb: 'Low Carb',
-  mild: 'Mild',
-  // Dislikes
-  coriander: 'Koriander',
-  mushrooms: 'Pilze 🍄',
-  olives: 'Oliven',
-  onions: 'Zwiebeln',
-  garlic: 'Knoblauch',
-  pork: 'Schweinefleisch',
-  lamb: 'Lamm',
-  blue_cheese: 'Blauschimmelkäse',
-};
-
-/**
- * Get a human-readable label for a canonical key.
+ * Get a human-readable, locale-aware label for a canonical key.
+ * Looks up `canonical_labels.<key>` in i18n; falls back to the raw key.
  */
 export function getDisplayLabel(canonicalKey: string): string {
-  return DISPLAY_LABELS[canonicalKey] ?? canonicalKey;
+  const i18nKey = `canonical_labels.${canonicalKey}`;
+  const translated = i18next.t(i18nKey);
+  // i18next returns the key itself when no translation is found
+  return translated !== i18nKey ? translated : canonicalKey;
 }
