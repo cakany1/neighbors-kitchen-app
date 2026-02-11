@@ -44,38 +44,38 @@ export type Database = {
       admin_reads: {
         Row: {
           action: string
-          admin_id: string
+          admin_id: string | null
           context: string | null
           created_at: string
           fields_accessed: string[]
           id: string
           ip_address: string | null
           notes: string | null
-          target_user_id: string
+          target_user_id: string | null
           user_agent: string | null
         }
         Insert: {
           action?: string
-          admin_id: string
+          admin_id?: string | null
           context?: string | null
           created_at?: string
           fields_accessed?: string[]
           id?: string
           ip_address?: string | null
           notes?: string | null
-          target_user_id: string
+          target_user_id?: string | null
           user_agent?: string | null
         }
         Update: {
           action?: string
-          admin_id?: string
+          admin_id?: string | null
           context?: string | null
           created_at?: string
           fields_accessed?: string[]
           id?: string
           ip_address?: string | null
           notes?: string | null
-          target_user_id?: string
+          target_user_id?: string | null
           user_agent?: string | null
         }
         Relationships: []
