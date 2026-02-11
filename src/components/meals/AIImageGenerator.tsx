@@ -29,14 +29,13 @@ export const AIImageGenerator = ({
   currentImageUrl,
   isAIImage,
 }: AIImageGeneratorProps) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
-  const isGerman = i18n.language === 'de';
 
   const generateAIImage = async () => {
     if (!title.trim()) {
-      toast.error(isGerman ? 'Bitte gib zuerst einen Titel ein' : 'Please enter a title first');
+      toast.error(t('ai.title_required'));
       return;
     }
 
@@ -54,13 +53,9 @@ export const AIImageGenerator = ({
       if (error) {
         console.error('AI image generation error:', error);
         if (error.message?.includes('429') || error.message?.includes('rate limit')) {
-          toast.error(isGerman 
-            ? 'Zu viele Anfragen. Bitte versuche es später erneut.' 
-            : 'Too many requests. Please try again later.');
+          toast.error(t('ai.rate_limit'));
         } else if (error.message?.includes('402')) {
-          toast.error(isGerman 
-            ? 'AI-Kontingent erschöpft. Bitte kontaktiere den Support.' 
-            : 'AI quota exhausted. Please contact support.');
+          toast.error(t('ai.quota_exhausted'));
         } else {
           throw error;
         }
@@ -70,15 +65,11 @@ export const AIImageGenerator = ({
       if (data?.imageUrl) {
         setGeneratedImageUrl(data.imageUrl);
         onImageGenerated(data.imageUrl);
-        toast.success(isGerman 
-          ? '🎨 Vorschaubild erstellt!' 
-          : '🎨 Preview image generated!');
+        toast.success(t('ai.preview_generated'));
       }
     } catch (error) {
       console.error('Failed to generate AI image:', error);
-      toast.error(isGerman 
-        ? 'Bildgenerierung fehlgeschlagen. Bitte versuche es erneut.' 
-        : 'Image generation failed. Please try again.');
+      toast.error(t('ai.generation_failed'));
     } finally {
       setIsGenerating(false);
     }
@@ -102,9 +93,7 @@ export const AIImageGenerator = ({
             <div className="flex items-center gap-2 text-white">
               <AlertTriangle className="w-4 h-4 text-yellow-400" />
               <span className="text-xs font-medium">
-                {isGerman 
-                  ? 'Beispielbild – tatsächliches Gericht kann abweichen' 
-                  : 'Preview image – actual dish may vary'}
+                {t('ai.preview_disclaimer')}
               </span>
             </div>
           </div>
@@ -127,12 +116,12 @@ export const AIImageGenerator = ({
         {isGenerating ? (
           <>
             <Loader2 className="w-5 h-5 animate-spin" />
-            <span>{isGerman ? 'Wird generiert...' : 'Generating...'}</span>
+            <span>{t('ai.generating')}</span>
           </>
         ) : (
           <>
             <Sparkles className="w-5 h-5" />
-            <span>{isGerman ? 'Vorschaubild generieren (KI)' : 'Generate preview image (AI)'}</span>
+            <span>{t('ai.generate_button')}</span>
           </>
         )}
       </Button>
@@ -141,9 +130,7 @@ export const AIImageGenerator = ({
       <Alert className="border-amber-500/50 bg-amber-500/10">
         <AlertTriangle className="h-4 w-4 text-amber-500" />
         <AlertDescription className="text-sm">
-          {isGerman 
-            ? 'Das KI-Bild zeigt eine Vorschau. Gäste sehen einen Hinweis, dass das echte Gericht abweichen kann.'
-            : 'The AI image shows a preview. Guests will see a notice that the actual dish may differ.'}
+          {t('ai.info_alert')}
         </AlertDescription>
       </Alert>
 
@@ -157,9 +144,7 @@ export const AIImageGenerator = ({
             className="mt-0.5"
           />
           <Label htmlFor="ai-confirm" className="text-sm cursor-pointer leading-relaxed">
-            {isGerman 
-              ? 'Dieses Bild zeigt ungefähr, wie mein Gericht aussehen wird.'
-              : 'This image approximately shows what my dish will look like.'}
+            {t('ai.confirm_label')}
           </Label>
         </div>
       )}
@@ -174,7 +159,7 @@ export const AIImageGenerator = ({
             className="text-muted-foreground hover:text-foreground"
           >
             <Camera className="w-4 h-4 mr-2" />
-            {isGerman ? 'Später durch echtes Foto ersetzen' : 'Replace with real photo later'}
+            {t('ai.replace_with_photo')}
           </Button>
         </div>
       )}

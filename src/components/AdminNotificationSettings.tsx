@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -17,6 +18,7 @@ interface NotificationSettings {
 }
 
 export const AdminNotificationSettings = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [localSettings, setLocalSettings] = useState<NotificationSettings | null>(null);
 
@@ -57,11 +59,11 @@ export const AdminNotificationSettings = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Einstellungen gespeichert');
+      toast.success(t('admin.notification_settings_saved'));
       queryClient.invalidateQueries({ queryKey: ['adminNotificationSettings'] });
     },
     onError: (error: Error) => {
-      toast.error('Fehler beim Speichern: ' + error.message);
+      toast.error(t('admin.notification_settings_save_failed') + ': ' + error.message);
     },
   });
 
@@ -91,7 +93,7 @@ export const AdminNotificationSettings = () => {
       <Card>
         <CardContent className="py-8 text-center">
           <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
-          <p className="text-sm text-muted-foreground mt-2">Lade Einstellungen...</p>
+          <p className="text-sm text-muted-foreground mt-2">{t('admin.notification_settings_loading')}</p>
         </CardContent>
       </Card>
     );

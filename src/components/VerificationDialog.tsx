@@ -75,10 +75,10 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
 
       // Store the file path (NOT public URL since bucket is private)
       setFilePath(fileName);
-      toast.success('Dokument sicher hochgeladen!');
+      toast.success(t('toast.verification_doc_uploaded'));
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Fehler beim Hochladen. Bitte erneut versuchen.');
+      toast.error(t('toast.verification_upload_failed'));
     } finally {
       setUploading(false);
     }
@@ -87,7 +87,7 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
   const handleSubmit = async () => {
     // ID document is optional - only require confirmation if a document was uploaded
     if (filePath && !confirmed) {
-      toast.error('Bitte bestätige, dass dies dein eigener Ausweis ist');
+      toast.error(t('toast.verification_confirm_id'));
       return;
     }
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -10,6 +11,7 @@ interface GalleryUploadProps {
 
 const GalleryUpload = ({ userId }: GalleryUploadProps) => {
   const [uploading, setUploading] = useState(false);
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const uploadImageMutation = useMutation({
@@ -26,12 +28,12 @@ const GalleryUpload = ({ userId }: GalleryUploadProps) => {
       return fileName;
     },
     onSuccess: () => {
-      toast.success('Foto hochgeladen!');
+      toast.success(t('toast.photo_uploaded'));
       queryClient.invalidateQueries({ queryKey: ['gallery', userId] });
     },
     onError: (error) => {
       console.error('Upload error:', error);
-      toast.error('Fehler beim Hochladen');
+      toast.error(t('toast.upload_failed'));
     },
   });
 

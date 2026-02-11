@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ interface GalleryGridProps {
 }
 
 const GalleryGrid = ({ userId, isOwnProfile }: GalleryGridProps) => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   // Fetch gallery images
@@ -55,12 +57,12 @@ const GalleryGrid = ({ userId, isOwnProfile }: GalleryGridProps) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Foto gelöscht');
+      toast.success(t('toast.photo_deleted'));
       queryClient.invalidateQueries({ queryKey: ['gallery', userId] });
     },
     onError: (error) => {
       console.error('Delete error:', error);
-      toast.error('Fehler beim Löschen');
+      toast.error(t('toast.delete_failed'));
     },
   });
 

@@ -338,7 +338,7 @@ const Feed = () => {
                 disabled={!currentUser?.profile?.address_id}
                 onCheckedChange={(checked) => {
                   if (!currentUser?.profile?.address_id) {
-                    toast.info(t("feed.no_address_set", "Bitte zuerst eine Adresse im Profil setzen"));
+                    toast.info(t("feed_fallback.no_address_set"));
                     return;
                   }
                   setFilterSameAddress(checked);
@@ -346,7 +346,7 @@ const Feed = () => {
               />
               {!currentUser?.profile?.address_id && (
                 <span className="text-xs text-muted-foreground">
-                  ({t("feed.no_address_hint", "keine Adresse")})
+                  ({t("feed_fallback.no_address_hint")})
                 </span>
               )}
             </div>

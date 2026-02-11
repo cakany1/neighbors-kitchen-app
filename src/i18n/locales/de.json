@@ -183,7 +183,14 @@
     "faq_published": "Frage veröffentlicht!",
     "faq_rejected": "Frage abgelehnt",
     "faq_update_failed": "Aktualisierung fehlgeschlagen",
-    "faq_times_asked": "mal gefragt"
+    "faq_times_asked": "mal gefragt",
+    "payout_marked_paid": "Auszahlung als bezahlt markiert",
+    "payout_update_failed": "Fehler beim Aktualisieren der Auszahlung",
+    "no_payouts_to_export": "Keine Auszahlungen zum Exportieren",
+    "csv_exported": "CSV exportiert",
+    "notification_settings_saved": "Einstellungen gespeichert",
+    "notification_settings_save_failed": "Fehler beim Speichern",
+    "notification_settings_loading": "Lade Einstellungen..."
   },
   "toast": {
     "profile_incomplete": "Bitte vervollständige dein Profil (Geschlecht, Telefon & Adresse), um Gerichte zu buchen.",
@@ -222,7 +229,27 @@
     "profile_update_failed": "Profilaktualisierung fehlgeschlagen",
     "language_request_submitted": "Sprachwunsch \"{language}\" eingereicht! Wir fügen sie hinzu, falls Nachfrage besteht.",
     "language_request_failed": "Sprachwunsch konnte nicht eingereicht werden",
-    "translated_successfully": "Erfolgreich übersetzt"
+    "translated_successfully": "Erfolgreich übersetzt",
+    "verification_doc_uploaded": "Dokument sicher hochgeladen!",
+    "verification_upload_failed": "Fehler beim Hochladen. Bitte erneut versuchen.",
+    "verification_confirm_id": "Bitte bestätige, dass dies dein eigener Ausweis ist"
+  },
+  "feed_fallback": {
+    "no_address_set": "Bitte zuerst eine Adresse im Profil setzen",
+    "no_address_hint": "keine Adresse"
+  },
+  "ai": {
+    "title_required": "Bitte gib zuerst einen Titel ein",
+    "rate_limit": "Zu viele Anfragen. Bitte versuche es später erneut.",
+    "quota_exhausted": "AI-Kontingent erschöpft. Bitte kontaktiere den Support.",
+    "preview_generated": "🎨 Vorschaubild erstellt!",
+    "generation_failed": "Bildgenerierung fehlgeschlagen. Bitte versuche es erneut.",
+    "preview_disclaimer": "Beispielbild – tatsächliches Gericht kann abweichen",
+    "generating": "Wird generiert...",
+    "generate_button": "Vorschaubild generieren (KI)",
+    "info_alert": "Das KI-Bild zeigt eine Vorschau. Gäste sehen einen Hinweis, dass das echte Gericht abweichen kann.",
+    "confirm_label": "Dieses Bild zeigt ungefähr, wie mein Gericht aussehen wird.",
+    "replace_with_photo": "Später durch echtes Foto ersetzen"
   },
   "profile": {
     "compliance_and_legal": "Datenschutz & Rechtliches",
