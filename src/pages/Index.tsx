@@ -10,10 +10,24 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
+  const [authChecked, setAuthChecked] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
+
+  // Redirect authenticated users to /feed so they don't see the unauthenticated landing
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        navigate('/feed', { replace: true });
+        return;
+      }
+      setAuthChecked(true);
+    };
+    checkAuth();
+  }, [navigate]);
   
   // Handle OAuth callback tokens that land on root (custom domain BYOK flow)
   useEffect(() => {
@@ -60,6 +74,11 @@ const Index = () => {
     
     return () => window.removeEventListener('resize', checkDevice);
   }, []);
+
+  // Don't render landing page until auth check completes (prevents flash)
+  if (!authChecked) {
+    return null;
+  }
 
   const changeLanguage = async (lang: string) => {
     await i18n.changeLanguage(lang);
