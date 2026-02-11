@@ -86,9 +86,29 @@ jobs:
       - name: Install
         run: bun install
 
-      - name: Run security audit
+      - name: Bun audit (non-blocking, report only)
         run: |
-          echo "Running security checks..."
-          # Check for known vulnerabilities in dependencies
-          bun audit 2>&1 || echo "Audit completed with findings"
-        continue-on-error: true
+          echo "Running bun audit..."
+          bun audit 2>&1 | tee bun-audit.txt || true
+
+      # Add Node/npm only for audit evidence quality
+      - name: Setup Node (LTS) for npm audit
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: npm audit (prod only) -> JSON evidence
+        run: |
+          echo "Running npm audit (prod only)..."
+          npm audit --omit=dev --json > npm-audit.json || true
+          npm audit --omit=dev 2>&1 | tee npm-audit.txt || true
+
+      - name: Upload audit artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit
+          path: |
+            bun-audit.txt
+            npm-audit.txt
+            npm-audit.json
+
