@@ -7,7 +7,7 @@
  * - Admin-only access
  */
 
-import { Resend } from "npm:resend@2.0.0";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 import { 
   getCorsHeaders, 
   handleCors,
