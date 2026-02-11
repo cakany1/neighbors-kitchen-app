@@ -107,24 +107,33 @@ const SYNONYM_MAP: Record<string, string> = {
 /**
  * Normalize any user-entered text to a canonical key.
  * 1. Lowercase + trim
- * 2. Check synonym map
- * 3. If unknown → return `custom:<slugified>` to keep it distinct
+ * 2. Check synonym map (direct match)
+ * 3. Partial / compound check — collect ALL matches, return longest synonym match
+ *    to avoid false positives (e.g. "Hafermilch" → "dairy" not "gluten")
+ * 4. If unknown → return as-is
  */
 export function normalize(raw: string): string {
   const key = raw.toLowerCase().trim();
   if (!key) return key;
 
-  // Direct match
+  // Direct match — highest confidence
   if (SYNONYM_MAP[key]) return SYNONYM_MAP[key];
 
-  // Partial / compound check (e.g. "Gluten (Getreide)" → gluten)
+  // Partial / compound check: find the LONGEST matching synonym
+  // to prefer specific matches over short generic ones
+  let bestMatch: string | null = null;
+  let bestLength = 0;
+
   for (const [synonym, canonical] of Object.entries(SYNONYM_MAP)) {
-    if (key.includes(synonym) && synonym.length >= 3) {
-      return canonical;
+    if (synonym.length >= 3 && key.includes(synonym) && synonym.length > bestLength) {
+      bestMatch = canonical;
+      bestLength = synonym.length;
     }
   }
 
-  // Unknown term → keep as-is (no custom: prefix to stay backward-compatible)
+  if (bestMatch) return bestMatch;
+
+  // Unknown term → keep as-is (backward-compatible)
   return key;
 }
 
