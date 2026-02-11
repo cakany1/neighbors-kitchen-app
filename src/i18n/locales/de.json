@@ -47,31 +47,6 @@
   "actions": {
     "view_details": "Details ansehen"
   },
-   "signup": {
-     "account_type": "Kontotyp",
-     "account_type_help_title": "Kontotyp-Hilfe",
-     "account_type_single_desc": "Du alleine - teile und buche Gerichte allein",
-     "account_type_couple_desc": "Ihr teilt Gerichte zusammen - braucht 2 Portionen mind.",
-     "single": "Single",
-     "couple": "Paar",
-     "password_hint": "Min. 8 Zeichen, mit Zahl und Sonderzeichen für maximale Sicherheit",
-     "password_too_short": "Passwort muss mindestens 8 Zeichen lang sein",
-     "password_weak": "Schwaches Passwort",
-     "password_medium": "Mittleres Passwort",
-     "password_strong": "Starkes Passwort",
-     "first_name_required": "Vorname erforderlich",
-     "last_name_required": "Nachname erforderlich",
-     "account_exists_wrong_password": "Konto existiert bereits. Falsches Passwort?",
-     "profile_creation_failed": "Profilerstellung fehlgeschlagen",
-     "verification_title": "Bestätige deine E-Mail",
-     "verification_message": "Wir haben dir eine Bestätigungs-E-Mail gesendet. Überprüfe deinen Posteingang und klicke auf den Link, um dein Konto zu aktivieren.",
-     "email_sent_to": "E-Mail gesendet an",
-     "go_to_login": "Zur Anmeldung gehen",
-     "check_spam_hint": "Überprüfe auch deinen Spam-Ordner, falls du die E-Mail nicht siehst.",
-     "leaked_password_title": "Passwort in Datenpanne gefunden?",
-     "leaked_password_hint": "Wir überprüfen dein Passwort gegen die größte Datenbank von gehackten Passwörtern. Falls es dort auftaucht, solltest du ein anderes wählen.",
-     "complete_profile_later": "Du kannst dein Profil nach der Registrierung vervollständigen."
-   },
    "auth": {
      "welcome_back": "Willkommen zurück!",
     "sign_in_desc": "Melde dich bei Neighbors Kitchen an",
