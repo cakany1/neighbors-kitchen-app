@@ -79,23 +79,8 @@ export const ingredientDB: Record<string, string[]> = {
   "tempeh": ["soy"],
 };
 
-// The Official 14 EU Allergens - German Labels
-export const allergenOptions = [
-  { value: "gluten", label: "Gluten (Getreide)" },
-  { value: "crustaceans", label: "Krebstiere" },
-  { value: "eggs", label: "Eier" },
-  { value: "fish", label: "Fisch" },
-  { value: "peanuts", label: "Erdnüsse" },
-  { value: "soy", label: "Soja" },
-  { value: "dairy", label: "Milch / Laktose" },
-  { value: "nuts", label: "Schalenfrüchte (Nüsse)" },
-  { value: "celery", label: "Sellerie" },
-  { value: "mustard", label: "Senf" },
-  { value: "sesame", label: "Sesam" },
-  { value: "sulphites", label: "Sulfite" },
-  { value: "lupin", label: "Lupinen" },
-  { value: "molluscs", label: "Weichtiere" },
-];
+// NOTE: allergenOptions removed – use ALLERGEN_OPTIONS from '@/components/TagPicker' instead.
+// This was a duplicate definition that risked label drift.
 
 // Categorized Dislikes (Accordion UI)
 export const dislikeCategories = {
