@@ -17,6 +17,7 @@ import { ProfileWizard } from "@/components/ProfileWizard";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { RatingSummary, type ProfileRatingsData } from "@/components/RatingSummary";
 import { checkAllergenMatch } from "@/utils/ingredientDatabase";
+import { getDisplayLabel } from "@/utils/canonical_map";
 import FuzzyLocationMap from "@/components/maps/FuzzyLocationMap";
 import ChatModal from "@/components/ChatModal";
 import {
@@ -617,7 +618,7 @@ const MealDetail = () => {
           <div className="flex flex-wrap gap-2">
             {meal.tags?.map((tag: string) => (
               <Badge key={tag} variant="secondary">
-                {tag}
+                {getDisplayLabel(tag)}
               </Badge>
             ))}
           </div>
@@ -644,7 +645,7 @@ const MealDetail = () => {
                 <Alert className="mt-4 border-destructive/50 bg-destructive/5">
                   <AlertTriangle className="h-4 w-4 text-destructive" />
                   <AlertDescription className="text-sm">
-                    <strong>{t("meal_detail.allergens_label")}:</strong> {meal.allergens.join(", ")}
+                    <strong>{t("meal_detail.allergens_label")}:</strong> {meal.allergens.map(getDisplayLabel).join(", ")}
                   </AlertDescription>
                 </Alert>
               )}

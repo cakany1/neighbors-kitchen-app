@@ -178,6 +178,7 @@ export function matchDislikes(
  * Maps canonical key → German display label.
  */
 const DISPLAY_LABELS: Record<string, string> = {
+  // Allergens
   gluten: 'Gluten 🌾',
   dairy: 'Milch/Laktose 🥛',
   nuts: 'Nüsse 🥜',
@@ -192,6 +193,29 @@ const DISPLAY_LABELS: Record<string, string> = {
   sesame: 'Sesam',
   sulphites: 'Sulfite',
   lupin: 'Lupinen',
+  // Tags
+  vegetarian: 'Vegetarisch 🥬',
+  vegan: 'Vegan 🌱',
+  halal: 'Halal',
+  kosher: 'Koscher',
+  spicy: 'Scharf 🌶️',
+  gluten_free: 'Glutenfrei',
+  lactose_free: 'Laktosefrei',
+  organic: 'Bio 🌿',
+  homemade: 'Hausgemacht 🏠',
+  kid_friendly: 'Kinderfreundlich 👶',
+  pescatarian: 'Pescetarisch 🐟',
+  low_carb: 'Low Carb',
+  mild: 'Mild',
+  // Dislikes
+  coriander: 'Koriander',
+  mushrooms: 'Pilze 🍄',
+  olives: 'Oliven',
+  onions: 'Zwiebeln',
+  garlic: 'Knoblauch',
+  pork: 'Schweinefleisch',
+  lamb: 'Lamm',
+  blue_cheese: 'Blauschimmelkäse',
 };
 
 /**

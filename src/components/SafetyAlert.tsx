@@ -1,5 +1,6 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, ShieldCheck } from 'lucide-react';
+import { getDisplayLabel } from '@/utils/canonical_map';
 
 interface SafetyAlertProps {
   matchingAllergens: string[];
@@ -24,7 +25,7 @@ export const SafetyAlert = ({ matchingAllergens, className = '' }: SafetyAlertPr
       <AlertDescription>
         <strong className="text-alert-danger text-base">⚠️ ALLERGEN WARNING</strong>
         <p className="text-sm mt-1">
-          This dish contains <strong>{matchingAllergens.join(', ')}</strong>, which matches your allergen profile!
+          This dish contains <strong>{matchingAllergens.map(getDisplayLabel).join(', ')}</strong>, which matches your allergen profile!
         </p>
         <p className="text-xs mt-2 text-muted-foreground">
           Please verify ingredients with the chef before booking.
