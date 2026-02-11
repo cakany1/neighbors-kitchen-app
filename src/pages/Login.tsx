@@ -99,7 +99,7 @@ const Login = () => {
 
       if (!data.user) {
         setLoading(false);
-        toast.error('Anmeldung fehlgeschlagen', {
+        toast.error(t('auth.login_failed'), {
           duration: 10000,
         });
         return;
@@ -160,13 +160,13 @@ const Login = () => {
         if (repairError) {
           setLoading(false);
           console.error('Profile repair failed:', repairError);
-          toast.error('Profil-Reparatur fehlgeschlagen. Bitte kontaktiere den Support.', {
+          toast.error(t('auth.profile_repair_failed'), {
             duration: 10000,
           });
           return;
         }
 
-        toast.success('Profil wiederhergestellt! Willkommen zurück.');
+        toast.success(t('auth.profile_restored'));
       } else {
         toast.success(t('auth.welcome_toast'));
       }
