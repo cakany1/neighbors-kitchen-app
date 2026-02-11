@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { normalizeAll } from '@/utils/canonical_map';
 
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -126,8 +127,8 @@ const Profile = () => {
       setDisplayRealName(profile.display_real_name || false);
       setNotificationRadius(profile.notification_radius || 5);
       setLanguages(profile.languages || []);
-      setAllergens(profile.allergens || []);
-      setDislikes(profile.dislikes || []);
+      setAllergens(normalizeAll(profile.allergens || []));
+      setDislikes(normalizeAll(profile.dislikes || []));
       setIsCoupleToggle(profile.is_couple || false);
       setPartnerName(profile.partner_name || '');
       setPartnerGender(profile.partner_gender || '');
