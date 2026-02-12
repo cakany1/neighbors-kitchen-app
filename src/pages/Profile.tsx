@@ -194,7 +194,7 @@ const Profile = () => {
       .upload(fileName, file, { upsert: true });
 
     if (uploadError) {
-      toast.error(`Upload fehlgeschlagen: ${uploadError.message}`);
+      toast.error(`${t('toast.upload_failed')}: ${uploadError.message}`);
       return;
     }
 
@@ -204,7 +204,7 @@ const Profile = () => {
       .update({ avatar_url: data.publicUrl })
       .eq('id', userId);
 
-    toast.success(t('profile.photo_updated', '📷 Foto aktualisiert'));
+    toast.success(t('toast.photo_updated'));
     queryClient.invalidateQueries({ queryKey: ['currentUser', userId] });
   };
 
@@ -218,7 +218,7 @@ const Profile = () => {
       .upload(fileName, file, { upsert: true });
 
     if (uploadError) {
-      toast.error(`Upload fehlgeschlagen: ${uploadError.message}`);
+      toast.error(`${t('toast.upload_failed')}: ${uploadError.message}`);
       return;
     }
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +35,7 @@ export function AdminMessageDialog({
   users,
   preselectedUser 
 }: AdminMessageDialogProps) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<'all' | 'selected'>(preselectedUser ? 'selected' : 'all');
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(
     preselectedUser ? new Set([preselectedUser.id]) : new Set()
@@ -62,12 +64,12 @@ export function AdminMessageDialog({
 
   const handleSend = async () => {
     if (!subject.trim() || !message.trim()) {
-      toast.error('Betreff und Nachricht sind erforderlich');
+      toast.error(t('admin.subject_required'));
       return;
     }
 
     if (mode === 'selected' && selectedUserIds.size === 0) {
-      toast.error('Bitte wähle mindestens einen Empfänger');
+      toast.error(t('admin.select_recipient'));
       return;
     }
 
@@ -89,7 +91,7 @@ export function AdminMessageDialog({
       if (error) throw error;
 
       const successCount = data?.successCount || targetUserIds.length;
-      toast.success(`Nachricht an ${successCount} User gesendet`);
+      toast.success(t('admin.message_sent_count', { count: successCount }));
       
       // Reset form
       setSubject('');
@@ -98,7 +100,7 @@ export function AdminMessageDialog({
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error sending message:', error);
-      toast.error(error.message || 'Fehler beim Senden der Nachricht');
+      toast.error(error.message || t('admin.message_send_failed'));
     } finally {
       setIsSending(false);
     }

@@ -47,7 +47,7 @@ const Payment = () => {
   const handlePayment = async () => {
     // Validate minimum total amount
     if (totalAmount < minTotal) {
-      toast.error(`Minimumbetrag ist CHF ${minTotal.toFixed(2)} (inkl. Gebühr).`);
+      toast.error(t('toast.minimum_amount', { amount: minTotal.toFixed(2) }));
       return;
     }
 

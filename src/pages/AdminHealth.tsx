@@ -28,6 +28,7 @@ import {
   Server
 } from 'lucide-react';
 import { detectEnvironment, type AppEnvironment } from '@/utils/environment';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -144,6 +145,7 @@ const ReleaseChecklistSummary = ({ navigate }: { navigate: (path: string) => voi
 const AdminHealth = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [lastTestResult, setLastTestResult] = useState<SelfTestResponse | null>(null);
 
   // Live DB connection check
@@ -329,7 +331,7 @@ const AdminHealth = () => {
       }
     },
     onError: (error: Error) => {
-      toast.error(`Test-Fehler: ${error.message}`);
+      toast.error(t('admin.test_error', { message: error.message }));
     },
   });
 
@@ -698,7 +700,7 @@ const AdminHealth = () => {
                 size="sm"
                 onClick={() => {
                   queryClient.invalidateQueries({ queryKey: ['stripeStatus'] });
-                  toast.success('Stripe-Daten aktualisiert');
+                  toast.success(t('admin.stripe_refreshed'));
                 }}
                 className="gap-1"
               >
@@ -808,7 +810,7 @@ const AdminHealth = () => {
                 size="sm"
                 onClick={() => {
                   queryClient.invalidateQueries({ queryKey: ['pushStatus'] });
-                  toast.success('Push-Daten aktualisiert');
+                  toast.success(t('admin.push_refreshed'));
                 }}
                 className="gap-1"
               >

@@ -91,7 +91,7 @@ export function ProfileWizard({
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
-      toast.error(`Upload fehlgeschlagen: ${uploadError.message}`);
+      toast.error(`${t('toast.upload_failed')}: ${uploadError.message}`);
       return null;
     }
 
