@@ -73,7 +73,7 @@ export function TagSelector({
             const option = MEAL_TAG_OPTIONS.find(t => t.value === tag);
             return option?.label || tag;
           }).join(', ');
-          toast.success(`Tags erkannt: ${tagLabels}`, {
+          toast.success(t('toast.tags_detected', { tags: tagLabels }), {
             icon: <Sparkles className="w-4 h-4" />,
             duration: 3000,
           });
@@ -100,7 +100,7 @@ export function TagSelector({
           const opt = ALLERGEN_OPTIONS.find(o => o.value === a);
           return opt?.label || a;
         }).join(', ');
-        toast.success(`Allergene erkannt: ${labels}`, { duration: 4000 });
+        toast.success(t('toast.allergens_detected', { allergens: labels }), { duration: 4000 });
       }
     }
   }, [ingredientText]);

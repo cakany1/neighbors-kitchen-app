@@ -158,11 +158,11 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
     onSuccess: () => {
       setInputMessage('');
       queryClient.invalidateQueries({ queryKey: ['messages', booking?.id] });
-      toast.success('Nachricht gesendet');
+      toast.success(t('chat.message_sent'));
     },
     onError: (error) => {
       console.error('Error sending message:', error);
-      toast.error('Nachricht konnte nicht gesendet werden');
+      toast.error(t('chat.send_failed'));
     },
   });
 

@@ -481,8 +481,8 @@ const Admin = () => {
       setUserToReject(null);
       toast.success(t('admin.rejection_success'), {
         description: result.emailSent 
-          ? 'E-Mail-Benachrichtigung wurde gesendet' 
-          : 'Achtung: E-Mail konnte nicht gesendet werden'
+          ? t('admin.rejection_email_sent')
+          : t('admin.rejection_email_failed')
       });
       queryClient.invalidateQueries({ queryKey: ['pendingVerifications'] });
       queryClient.invalidateQueries({ queryKey: ['rejectedVerifications'] });
@@ -689,7 +689,7 @@ const Admin = () => {
       return result;
     },
     onSuccess: (_, userId) => {
-      toast.success('Benutzer erfolgreich gelöscht');
+      toast.success(t('admin.user_deleted'));
       
       // Optimistic UI: immediately remove deleted user from cached list
       const previousUsers = queryClient.getQueryData<any[]>(['allUsersAdmin']);
@@ -705,7 +705,7 @@ const Admin = () => {
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
     },
     onError: (error: Error) => {
-      toast.error('Fehler beim Löschen: ' + error.message);
+      toast.error(t('admin.delete_error') + error.message);
     },
   });
 
@@ -721,11 +721,11 @@ const Admin = () => {
       return { userId, isDisabled };
     },
     onSuccess: ({ isDisabled }) => {
-      toast.success(isDisabled ? 'Benutzer deaktiviert' : 'Benutzer reaktiviert');
+      toast.success(isDisabled ? t('admin.user_deactivated') : t('admin.user_reactivated'));
       queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
     },
     onError: (error: Error) => {
-      toast.error('Fehler: ' + error.message);
+      toast.error(t('admin.error_prefix') + error.message);
     },
   });
 
@@ -770,13 +770,13 @@ const Admin = () => {
       return { userId, makeAdmin };
     },
     onSuccess: ({ makeAdmin }) => {
-      toast.success(makeAdmin ? 'Admin-Rolle hinzugefügt' : 'Admin-Rolle entfernt');
+      toast.success(makeAdmin ? t('admin.admin_role_added') : t('admin.admin_role_removed'));
       queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
       setRoleChangeDialogOpen(false);
       setPendingRoleChange(null);
     },
     onError: (error: Error) => {
-      toast.error('Fehler: ' + error.message);
+      toast.error(t('admin.error_prefix') + error.message);
       setRoleChangeDialogOpen(false);
       setPendingRoleChange(null);
     },
@@ -811,12 +811,12 @@ const Admin = () => {
       return { userId, verified };
     },
     onSuccess: ({ verified }) => {
-      toast.success(verified ? 'Nutzer verifiziert ✓' : 'Verifizierung entfernt');
+      toast.success(verified ? t('admin.user_verified') : t('admin.user_unverified'));
       queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
       queryClient.invalidateQueries({ queryKey: ['pendingVerifications'] });
     },
     onError: (error: Error) => {
-      toast.error('Fehler: ' + error.message);
+      toast.error(t('admin.error_prefix') + error.message);
     },
   });
 
@@ -860,16 +860,16 @@ const Admin = () => {
       
       if (data.sent > 0) {
         const emailList = data.sentTo?.join('\n• ') || '';
-        toast.success(`${data.sent} Erinnerungs-E-Mail(s) versendet!`, {
+        toast.success(t('admin.reminders_sent', { count: data.sent }), {
           description: emailList ? `An:\n• ${emailList}` : undefined,
           duration: 8000
         });
       } else {
-        toast.info('Keine E-Mails zu versenden. Alle User sind aktuell oder haben bereits 3 Erinnerungen erhalten.');
+        toast.info(t('admin.no_reminders_needed'));
       }
       
       if (data.errors && data.errors.length > 0) {
-        toast.warning(`${data.errors.length} Fehler aufgetreten`, {
+        toast.warning(t('admin.reminders_errors', { count: data.errors.length }), {
           description: data.errors.slice(0, 3).join('\n')
         });
       }
@@ -890,7 +890,7 @@ const Admin = () => {
       }
       
       // Show detailed toast with retry option
-      toast.error('Erinnerungen senden fehlgeschlagen', {
+      toast.error(t('admin.reminders_failed'), {
         description: `
           Funktion: ${errorInfo.functionName || 'send-profile-reminders'}
           Status: ${errorInfo.statusCode || 'unbekannt'}
