@@ -201,7 +201,6 @@
     "nickname": "Nickname",
     "nickname_placeholder": "What neighbors should call you",
     "display_name_privacy": "Display Name / Privacy",
-    "display_name_privacy": "Display Name / Privacy",
     "show_real_name": "Show Real Name",
     "show_real_name_hint": "When disabled, only your nickname will be shown",
     "no_photo_warning": "You cannot order or offer meals without a photo.",
@@ -214,7 +213,6 @@
     "couple": "Couple",
     "deactivate_account": "Deactivate Account",
     "deactivate_confirm": "Are you sure you want to deactivate your account? This action cannot be undone.",
-    "account_deactivated": "Account deactivated",
     "save_changes": "Save Changes",
     "saving": "Saving...",
     "gender_woman": "👩 Woman",
@@ -683,12 +681,6 @@
     "captcha_error": "Verification failed. Please try again.",
     "captcha_hint": "Please solve the CAPTCHA to continue.",
     "captcha_not_configured": "Security check not configured."
-  },
-  "modal": {
-    "almost_done": "Almost done!",
-    "registration_required": "For the safety of the neighborhood, we need a short registration. Only registered neighbors can pick up food.",
-    "register_now": "Register now",
-    "cancel": "Cancel"
   },
   "meal_card": {
     "symbolic_image": "Symbolic Image",

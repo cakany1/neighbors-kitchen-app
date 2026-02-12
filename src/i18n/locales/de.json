@@ -370,7 +370,6 @@
     "nickname": "Spitzname",
     "nickname_placeholder": "Wie Nachbarn dich nennen sollen",
     "display_name_privacy": "Anzeigename / Privatsphäre",
-    "display_name_privacy": "Anzeigename / Privatsphäre",
     "show_real_name": "Echten Namen anzeigen",
     "show_real_name_hint": "Wenn deaktiviert, wird nur dein Spitzname angezeigt",
     "no_photo_warning": "Ohne Profilbild kannst du nicht bestellen oder anbieten.",
@@ -383,7 +382,6 @@
     "couple": "Paar",
     "deactivate_account": "Konto deaktivieren",
     "deactivate_confirm": "Bist du sicher, dass du dein Konto deaktivieren möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
-    "account_deactivated": "Konto deaktiviert",
     "save_changes": "Änderungen speichern",
     "saving": "Speichert...",
     "gender_woman": "👩 Frau",
@@ -672,7 +670,7 @@
   },
   "modal": {
     "almost_done": "Fast geschafft!",
-    "registration_required": "Für die Sicherheit der Nachbarschaft benötigen wir eine kurze Registrierung. Nur registrierte Nachbarn können Essen abholen.",
+    "registration_required": "Du browsst gerade als Gast. Um Gerichte zu buchen und mit Köchen zu chatten, musst du dich bei unserer Community von registrierten Nachbarn registrieren.",
     "register_now": "Jetzt registrieren",
     "cancel": "Abbrechen"
   },
@@ -950,19 +948,6 @@
     "guest_modal_desc": "Du browsst gerade als Gast. Um Mahlzeiten zu buchen und mit Köchen zu chatten, musst du dich registrieren.",
     "register_now": "Jetzt registrieren",
     "already_have_account": "Ich habe bereits einen Account"
-  },
-  "toast": {
-    "booking_sent": "Buchungsanfrage an {name} gesendet!",
-    "booking_failed": "Buchung fehlgeschlagen",
-    "booking_cancelled": "Buchung storniert",
-    "cancel_failed": "Stornierung fehlgeschlagen",
-    "profile_incomplete": "Bitte vervollständige dein Profil (Geschlecht, Telefon & Adresse), um Mahlzeiten zu buchen"
-  },
-  "modal": {
-    "almost_done": "Fast geschafft!",
-    "registration_required": "Du browsst gerade als Gast. Um Gerichte zu buchen und mit Köchen zu chatten, musst du dich bei unserer Community von registrierten Nachbarn registrieren.",
-    "register_now": "Jetzt registrieren",
-    "cancel": "Abbrechen"
   },
   "legal": {
     "back_home": "Zurück zur Startseite",
