@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 const Privacy = () => {
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     document.title = 'Privacy Policy – Neighbors Kitchen';
@@ -28,7 +28,7 @@ const Privacy = () => {
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Zurück
+          {t('legal.back_home')}
         </Button>
 
         <h1 className="text-3xl font-bold text-foreground mb-2">Datenschutzerklärung</h1>

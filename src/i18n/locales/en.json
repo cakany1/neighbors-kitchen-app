@@ -1095,6 +1095,12 @@
     "reject_reason_mismatch_desc": "Name/photo on document does not match the profile",
     "reject_reason_other": "📝 Other reason",
     "reject_reason_other_desc": "Please explain in the text field",
+    "rejection_reason_blurred_photo": "📷 Blurred Photo",
+    "rejection_reason_missing_document": "📄 Document Missing",
+    "rejection_reason_incomplete_profile": "👤 Incomplete",
+    "rejection_reason_duplicate_account": "👥 Duplicate",
+    "rejection_reason_document_mismatch": "❌ Mismatch",
+    "rejection_reason_other": "📝 Other Reason",
     "id_document_label": "ID Document",
     "id_document_available": "📄 Available",
     "karma_stats_title": "Karma & Statistics",
@@ -1244,5 +1250,12 @@
     "warning_title": "⚠️ ALLERGEN WARNING",
     "warning_contains": "This dish contains <strong>{{allergens}}</strong>, which matches your allergen profile!",
     "warning_verify": "Please verify ingredients with the chef before booking."
+  },
+  "error_boundary": {
+    "title": "Something went wrong",
+    "description": "The application encountered an unexpected error. Please reload the page or go back to the home page.",
+    "technical_details": "Technical Details",
+    "reload_page": "Reload Page",
+    "back_to_home": "Back to Home"
   }
 }

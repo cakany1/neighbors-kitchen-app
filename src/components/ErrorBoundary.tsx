@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import i18next from 'i18next';
 
 interface Props {
   children: ReactNode;
@@ -13,24 +14,13 @@ interface State {
 
 // Simple translation helper for error boundary (class component can't use hooks)
 const getErrorTranslations = () => {
-  const lang = localStorage.getItem('language') || 'de';
-  
-  if (lang === 'en') {
-    return {
-      title: 'Something went wrong',
-      description: 'The application encountered an unexpected error. Please reload the page or go back to the home page.',
-      technicalDetails: 'Technical Details',
-      reloadPage: 'Reload Page',
-      backToHome: 'Back to Home'
-    };
-  }
-  
+  // Use i18next directly instead of localStorage
   return {
-    title: 'Etwas ist schiefgelaufen',
-    description: 'Die Anwendung ist auf einen unerwarteten Fehler gestossen. Bitte lade die Seite neu oder kehre zur Startseite zurück.',
-    technicalDetails: 'Technische Details',
-    reloadPage: 'Seite neu laden',
-    backToHome: 'Zur Startseite'
+    title: i18next.t('error_boundary.title'),
+    description: i18next.t('error_boundary.description'),
+    technicalDetails: i18next.t('error_boundary.technical_details'),
+    reloadPage: i18next.t('error_boundary.reload_page'),
+    backToHome: i18next.t('error_boundary.back_to_home')
   };
 };
 
