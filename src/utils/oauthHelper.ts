@@ -22,6 +22,7 @@ export function isCustomDomain(): boolean {
 const ALLOWED_OAUTH_HOSTS = [
   'accounts.google.com',
   'appleid.apple.com',
+  'ziyocgrzijovpfhzutzs.supabase.co',
 ];
 
 /**
