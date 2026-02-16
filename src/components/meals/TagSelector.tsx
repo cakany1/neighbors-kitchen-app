@@ -6,6 +6,7 @@ import { Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { TagPicker, ALLERGEN_OPTIONS, MEAL_TAG_OPTIONS, normalizeTag } from '@/components/TagPicker';
 import { detectAllergens } from '@/utils/ingredientDatabase';
+import { getDisplayLabel } from '@/utils/canonical_map';
 
 interface TagSelectorProps {
   selectedAllergens: string[];
@@ -69,10 +70,7 @@ export function TagSelector({
         const newTags = detected.filter(tag => !selectedTags.includes(tag));
         if (newTags.length > 0) {
           onTagsChange([...selectedTags, ...newTags]);
-          const tagLabels = newTags.map(tag => {
-            const option = MEAL_TAG_OPTIONS.find(t => t.value === tag);
-            return option?.label || tag;
-          }).join(', ');
+          const tagLabels = newTags.map(tag => getDisplayLabel(tag)).join(', ');
           toast.success(t('toast.tags_detected', { tags: tagLabels }), {
             icon: <Sparkles className="w-4 h-4" />,
             duration: 3000,
@@ -96,10 +94,7 @@ export function TagSelector({
       const newAllergens = detectedAllergens.filter(a => !selectedAllergens.includes(a));
       if (newAllergens.length > 0) {
         onAllergensChange([...selectedAllergens, ...newAllergens]);
-        const labels = newAllergens.map(a => {
-          const opt = ALLERGEN_OPTIONS.find(o => o.value === a);
-          return opt?.label || a;
-        }).join(', ');
+        const labels = newAllergens.map(a => getDisplayLabel(a)).join(', ');
         toast.success(t('toast.allergens_detected', { allergens: labels }), { duration: 4000 });
       }
     }
