@@ -13,7 +13,7 @@ interface State {
 
 // Simple translation helper for error boundary (class component can't use hooks)
 const getErrorTranslations = () => {
-  const lang = localStorage.getItem('language') || 'de';
+  const lang = localStorage.getItem('i18nextLng') || 'de';
   
   if (lang === 'en') {
     return {

@@ -80,11 +80,6 @@ const Index = () => {
     return null;
   }
 
-  const changeLanguage = async (lang: string) => {
-    await i18n.changeLanguage(lang);
-    localStorage.setItem('language', lang);
-  };
-
   // Desktop Marketing View
   if (!isMobile) {
     return (
@@ -130,14 +125,14 @@ const Index = () => {
           <Button
             variant={i18n.language === 'de' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => changeLanguage('de')}
+            onClick={() => i18n.changeLanguage('de')}
           >
             DE
           </Button>
           <Button
             variant={i18n.language === 'en' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => changeLanguage('en')}
+            onClick={() => i18n.changeLanguage('en')}
           >
             EN
           </Button>
