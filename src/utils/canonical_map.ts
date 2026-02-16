@@ -104,6 +104,7 @@ const SYNONYM_MAP: Record<string, string> = {
   schweinefleisch: 'pork', pork: 'pork',
   lamm: 'lamb', lamb: 'lamb',
   blauschimmelkäse: 'blue_cheese', 'blue cheese': 'blue_cheese',
+  'sehr süss': 'very_sweet', 'very sweet': 'very_sweet',
 };
 
 /**

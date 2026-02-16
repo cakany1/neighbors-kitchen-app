@@ -278,57 +278,51 @@ const FAQ = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building2 className="w-5 h-5 text-primary" />
-              Für Gemeinden & Organisationen
+              {t('faq.org_title')}
             </CardTitle>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Neighbors Kitchen eignet sich neben der privaten Nutzung auch als digitale Quartier-Infrastruktur – 
-              z. B. zur Förderung von Begegnung, zur Reduktion von Lebensmittelverschwendung oder als 
-              niedrigschwellige Präventionsmassnahme gegen soziale Isolation.
+              {t('faq.org_desc')}
             </p>
           </CardHeader>
           <CardContent>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="org-1">
                 <AccordionTrigger className="text-left text-sm">
-                  Ist Neighbors Kitchen ein kommerzieller Anbieter?
+                  {t('faq.org_q1')}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Nein. Neighbors Kitchen ist eine Vermittlungsplattform. Mahlzeiten werden privat geteilt. 
-                  Freiwillige Kostenbeiträge dienen lediglich der Deckung von Zutaten oder Energie.
+                  {t('faq.org_a1')}
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="org-2">
                 <AccordionTrigger className="text-left text-sm">
-                  Welche Rolle hat eine Gemeinde oder Organisation?
+                  {t('faq.org_q2')}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Gemeinden können Neighbors Kitchen ideell oder organisatorisch unterstützen (z. B. Einführung 
-                  auf Quartiersebene). Die Community bleibt dabei selbstorganisiert – Institutionen wirken 
-                  ermöglichend, nicht steuernd.
+                  {t('faq.org_a2')}
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="org-3">
                 <AccordionTrigger className="text-left text-sm">
-                  Welche Daten erhalten Gemeinden?
+                  {t('faq.org_q3')}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
-                  Auf Wunsch stellen wir anonymisierte Wirkungsdaten zur Verfügung (z. B. Anzahl geteilter 
-                  Mahlzeiten oder aktive Haushalte). Es werden keine personenbezogenen Daten weitergegeben.
+                  {t('faq.org_a3')}
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
 
             <div className="mt-4 pt-4 border-t border-border">
               <p className="text-sm text-muted-foreground mb-2">
-                Kontakt für Partnerschaften:
+                {t('faq.org_contact')}
               </p>
               <a 
-                href="mailto:hello@neighbors-kitchen.ch" 
+                href={`mailto:${t('faq.org_email')}`}
                 className="text-primary hover:underline font-medium"
               >
-                hello@neighbors-kitchen.ch
+                {t('faq.org_email')}
               </a>
             </div>
           </CardContent>

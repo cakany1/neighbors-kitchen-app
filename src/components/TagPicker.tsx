@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X, Plus } from 'lucide-react';
-import { normalize } from '@/utils/canonical_map';
+import { normalize, getDisplayLabel } from '@/utils/canonical_map';
 
 /** Re-export normalize as normalizeTag for backward compatibility */
 export const normalizeTag = normalize;
@@ -70,10 +70,9 @@ export function TagPicker({
     onChange(selected.filter((v) => v !== value));
   };
 
-  // Find label for a value (from predefined or use raw value)
+  // Find label for a value (use i18n canonical labels)
   const getLabel = (value: string) => {
-    const opt = predefinedOptions.find((o) => o.value === value);
-    return opt?.label ?? value;
+    return getDisplayLabel(value);
   };
 
   // Split selected into predefined vs custom
@@ -100,7 +99,7 @@ export function TagPicker({
                   }
                 `}
               >
-                {opt.label}
+                {getDisplayLabel(opt.value)}
                 {isSelected && <X className="w-3 h-3 ml-0.5" />}
               </button>
             );
@@ -167,47 +166,47 @@ export function TagPicker({
 // ─── Canonical predefined lists ───────────────────────────────
 
 export const ALLERGEN_OPTIONS: PredefinedOption[] = [
-  { value: 'gluten', label: 'Gluten 🌾' },
-  { value: 'dairy', label: 'Milch / Laktose 🥛' },
-  { value: 'nuts', label: 'Nüsse 🥜' },
-  { value: 'peanuts', label: 'Erdnüsse 🥜' },
-  { value: 'eggs', label: 'Eier 🥚' },
-  { value: 'fish', label: 'Fisch 🐟' },
-  { value: 'crustaceans', label: 'Krebstiere 🦐' },
-  { value: 'molluscs', label: 'Weichtiere 🦑' },
-  { value: 'soy', label: 'Soja' },
-  { value: 'celery', label: 'Sellerie' },
-  { value: 'mustard', label: 'Senf' },
-  { value: 'sesame', label: 'Sesam' },
-  { value: 'sulphites', label: 'Sulfite' },
-  { value: 'lupin', label: 'Lupinen' },
+  { value: 'gluten', label: 'gluten' },
+  { value: 'dairy', label: 'dairy' },
+  { value: 'nuts', label: 'nuts' },
+  { value: 'peanuts', label: 'peanuts' },
+  { value: 'eggs', label: 'eggs' },
+  { value: 'fish', label: 'fish' },
+  { value: 'crustaceans', label: 'crustaceans' },
+  { value: 'molluscs', label: 'molluscs' },
+  { value: 'soy', label: 'soy' },
+  { value: 'celery', label: 'celery' },
+  { value: 'mustard', label: 'mustard' },
+  { value: 'sesame', label: 'sesame' },
+  { value: 'sulphites', label: 'sulphites' },
+  { value: 'lupin', label: 'lupin' },
 ];
 
 export const MEAL_TAG_OPTIONS: PredefinedOption[] = [
-  { value: 'vegan', label: 'Vegan 🌱' },
-  { value: 'vegetarian', label: 'Vegetarisch 🥗' },
-  { value: 'halal', label: 'Halal ☪️' },
-  { value: 'kosher', label: 'Koscher ✡️' },
-  { value: 'pescatarian', label: 'Pescatarisch 🐟' },
-  { value: 'spicy', label: 'Scharf 🌶️' },
-  { value: 'mild', label: 'Mild 😊' },
-  { value: 'gluten_free', label: 'Glutenfrei 🌾' },
-  { value: 'lactose_free', label: 'Laktosefrei 🥛' },
-  { value: 'organic', label: 'Bio 🌿' },
-  { value: 'homemade', label: 'Hausgemacht 🏠' },
-  { value: 'kid_friendly', label: 'Kindgerecht 🧸' },
-  { value: 'low_carb', label: 'Low Carb 💪' },
+  { value: 'vegan', label: 'vegan' },
+  { value: 'vegetarian', label: 'vegetarian' },
+  { value: 'halal', label: 'halal' },
+  { value: 'kosher', label: 'kosher' },
+  { value: 'pescatarian', label: 'pescatarian' },
+  { value: 'spicy', label: 'spicy' },
+  { value: 'mild', label: 'mild' },
+  { value: 'gluten_free', label: 'gluten_free' },
+  { value: 'lactose_free', label: 'lactose_free' },
+  { value: 'organic', label: 'organic' },
+  { value: 'homemade', label: 'homemade' },
+  { value: 'kid_friendly', label: 'kid_friendly' },
+  { value: 'low_carb', label: 'low_carb' },
 ];
 
 export const DISLIKE_OPTIONS: PredefinedOption[] = [
-  { value: 'coriander', label: 'Koriander' },
-  { value: 'mushrooms', label: 'Pilze 🍄' },
-  { value: 'olives', label: 'Oliven' },
-  { value: 'onions', label: 'Zwiebeln 🧅' },
-  { value: 'garlic', label: 'Knoblauch 🧄' },
-  { value: 'pork', label: 'Schweinefleisch 🐷' },
-  { value: 'lamb', label: 'Lamm 🐑' },
-  { value: 'blue_cheese', label: 'Blauschimmelkäse' },
-  { value: 'spicy', label: 'Scharf 🌶️' },
-  { value: 'very_sweet', label: 'Sehr süss 🍬' },
+  { value: 'coriander', label: 'coriander' },
+  { value: 'mushrooms', label: 'mushrooms' },
+  { value: 'olives', label: 'olives' },
+  { value: 'onions', label: 'onions' },
+  { value: 'garlic', label: 'garlic' },
+  { value: 'pork', label: 'pork' },
+  { value: 'lamb', label: 'lamb' },
+  { value: 'blue_cheese', label: 'blue_cheese' },
+  { value: 'spicy', label: 'spicy' },
+  { value: 'very_sweet', label: 'very_sweet' },
 ];
