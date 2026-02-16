@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -97,6 +98,7 @@ const StatusBadge = ({ filled, label }: { filled: boolean; label: string }) => (
 );
 
 export function AdminUserProfileDialog({ user, open, onOpenChange, onSendMessage }: AdminUserProfileDialogProps) {
+  const { t } = useTranslation();
   const hasLoggedRef = useRef<string | null>(null);
 
   // Log admin read when dialog opens with a user
@@ -417,8 +419,8 @@ export function AdminUserProfileDialog({ user, open, onOpenChange, onSendMessage
               status={user.id_verified ? 'filled' : 'missing'} 
             />
             <FieldRow 
-              label="ID-Dokument" 
-              value={user.id_document_url ? '📄 Vorhanden' : null} 
+              label={t('admin.id_document_label')}
+              value={user.id_document_url ? t('admin.id_document_available') : null} 
               status="neutral" 
             />
           </div>
@@ -428,16 +430,16 @@ export function AdminUserProfileDialog({ user, open, onOpenChange, onSendMessage
           {/* Karma & Stats */}
           <div className="space-y-1">
             <h3 className="font-semibold text-sm text-muted-foreground mb-2 flex items-center gap-2">
-              <Star className="w-4 h-4" /> Karma & Statistiken
+              <Star className="w-4 h-4" /> {t('admin.karma_stats_title')}
             </h3>
             <FieldRow 
               label="Karma" 
-              value={user.karma !== null ? `⭐ ${user.karma} Punkte` : null} 
+              value={user.karma !== null ? `${t('admin.karma_points')} ${user.karma}` : null} 
               status="neutral" 
             />
             <FieldRow 
-              label="Erfolgreiche Abholungen" 
-              value={user.successful_pickups !== null ? `✅ ${user.successful_pickups}` : null} 
+              label={t('admin.successful_pickups')}
+              value={user.successful_pickups !== null ? `${t('admin.successful_pickup_prefix')} ${user.successful_pickups}` : null} 
               status="neutral" 
             />
             <FieldRow 

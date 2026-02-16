@@ -471,7 +471,15 @@
   "verification": {
     "phoneVerified": "Phone Verified",
     "idVerified": "ID Verified",
-    "verified": "Verified"
+    "verified": "Verified",
+    "reject_reason_blurred_photo": "Blurred or unreadable photo",
+    "reject_reason_missing_document": "Missing ID document",
+    "reject_reason_incomplete_profile": "Incomplete profile",
+    "reject_reason_duplicate_account": "Duplicate account detected",
+    "reject_reason_document_mismatch": "Data doesn't match document",
+    "reject_reason_other": "Other reason",
+    "file_too_large": "File too large (max 5MB)",
+    "images_only": "Only images allowed"
   },
   "guestComposition": {
     "title": "Who will be visiting?",
@@ -1074,7 +1082,13 @@
     "reject_reason_mismatch": "❌ Data mismatch",
     "reject_reason_mismatch_desc": "Name/photo on document does not match the profile",
     "reject_reason_other": "📝 Other reason",
-    "reject_reason_other_desc": "Please explain in the text field"
+    "reject_reason_other_desc": "Please explain in the text field",
+    "id_document_label": "ID Document",
+    "id_document_available": "📄 Available",
+    "karma_stats_title": "Karma & Statistics",
+    "karma_points": "⭐ Points",
+    "successful_pickups": "Successful Pickups",
+    "successful_pickup_prefix": "✅"
   },
   "wizard": {
     "step_counter": "Step {{current}} of {{total}}",

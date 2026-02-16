@@ -25,15 +25,6 @@ interface VerificationDialogProps {
   onSuccess: () => void;
 }
 
-const REASON_LABELS: Record<string, string> = {
-  blurred_photo: 'Unscharfes oder unlesbares Foto',
-  missing_document: 'Fehlendes Ausweisdokument',
-  incomplete_profile: 'Unvollständiges Profil',
-  duplicate_account: 'Duplikat-Konto erkannt',
-  document_mismatch: 'Daten stimmen nicht mit Dokument überein',
-  other: 'Anderer Grund',
-};
-
 export const VerificationDialog = ({ userId, verificationStatus, rejectionReason, rejectionDetails, onSuccess }: VerificationDialogProps) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -42,19 +33,24 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
   const [submitting, setSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
+  const getReasonLabel = (reason: string): string => {
+    const reasonKey = `verification.reject_reason_${reason}`;
+    return t(reasonKey);
+  };
+
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Datei zu gross (max 5MB)');
+      toast.error(t('verification.file_too_large'));
       return;
     }
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error('Nur Bilder sind erlaubt');
+      toast.error(t('verification.images_only'));
       return;
     }
 
@@ -215,7 +211,7 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
                 <p className="font-semibold">Deine vorherige Verifizierung wurde abgelehnt.</p>
                 {rejectionReason && (
                   <p>
-                    <span className="font-medium">Grund:</span> {REASON_LABELS[rejectionReason] || rejectionReason}
+                    <span className="font-medium">Grund:</span> {getReasonLabel(rejectionReason)}
                   </p>
                 )}
                 {rejectionDetails && (

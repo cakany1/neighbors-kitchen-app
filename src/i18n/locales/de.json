@@ -229,7 +229,13 @@
     "reject_reason_mismatch": "❌ Daten stimmen nicht überein",
     "reject_reason_mismatch_desc": "Name/Foto auf Dokument passt nicht zum Profil",
     "reject_reason_other": "📝 Anderer Grund",
-    "reject_reason_other_desc": "Bitte im Freitext erläutern"
+    "reject_reason_other_desc": "Bitte im Freitext erläutern",
+    "id_document_label": "ID-Dokument",
+    "id_document_available": "📄 Vorhanden",
+    "karma_stats_title": "Karma & Statistiken",
+    "karma_points": "⭐ Punkte",
+    "successful_pickups": "Erfolgreiche Abholungen",
+    "successful_pickup_prefix": "✅"
   },
   "toast": {
     "profile_incomplete": "Bitte vervollständige dein Profil (Geschlecht, Telefon & Adresse), um Gerichte zu buchen.",
@@ -572,7 +578,15 @@
   "verification": {
     "phoneVerified": "Telefon verifiziert",
     "idVerified": "ID verifiziert",
-    "verified": "Verifiziert"
+    "verified": "Verifiziert",
+    "reject_reason_blurred_photo": "Unscharfes oder unlesbares Foto",
+    "reject_reason_missing_document": "Fehlendes Ausweisdokument",
+    "reject_reason_incomplete_profile": "Unvollständiges Profil",
+    "reject_reason_duplicate_account": "Duplikat-Konto erkannt",
+    "reject_reason_document_mismatch": "Daten stimmen nicht mit Dokument überein",
+    "reject_reason_other": "Anderer Grund",
+    "file_too_large": "Datei zu gross (max 5MB)",
+    "images_only": "Nur Bilder sind erlaubt"
   },
   "guestComposition": {
     "title": "Wer wird zu Besuch kommen?",
