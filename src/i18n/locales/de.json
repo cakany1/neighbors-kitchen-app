@@ -48,8 +48,8 @@
   "actions": {
     "view_details": "Details ansehen"
   },
-   "auth": {
-     "welcome_back": "Willkommen zurück!",
+  "auth": {
+    "welcome_back": "Willkommen zurück!",
     "sign_in_desc": "Melde dich bei Neighbors Kitchen an",
     "email": "E-Mail",
     "email_placeholder": "deine@email.com",
@@ -292,7 +292,8 @@
     "tags_detected": "Tags erkannt: {{tags}}",
     "allergens_detected": "Allergene erkannt: {{allergens}}",
     "minimum_amount": "Minimumbetrag ist CHF {{amount}} (inkl. Gebühr).",
-    "photo_updated": "📷 Foto aktualisiert"
+    "photo_updated": "📷 Foto aktualisiert",
+    "self_booking_error": "Du kannst dein eigenes Angebot nicht buchen."
   },
   "feed_fallback": {
     "no_address_set": "Bitte zuerst eine Adresse im Profil setzen",
