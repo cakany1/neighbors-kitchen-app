@@ -1240,7 +1240,7 @@
   },
   "error_boundary": {
     "title": "Etwas ist schiefgelaufen",
-    "description": "Die Anwendung ist auf einen unerwarteten Fehler gestossen. Bitte lade die Seite neu oder kehre zur Startseite zurück.",
+    "description": "Die Anwendung ist auf einen unerwarteten Fehler gestoßen. Bitte lade die Seite neu oder kehre zur Startseite zurück.",
     "technical_details": "Technische Details",
     "reload_page": "Seite neu laden",
     "back_to_home": "Zur Startseite"
