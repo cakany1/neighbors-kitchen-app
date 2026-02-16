@@ -434,7 +434,7 @@ export function AdminUserProfileDialog({ user, open, onOpenChange, onSendMessage
             </h3>
             <FieldRow 
               label="Karma" 
-              value={user.karma !== null ? `${t('admin.karma_points')} ${user.karma}` : null} 
+              value={user.karma !== null ? `⭐ ${user.karma} ${t('admin.karma_points')}` : null} 
               status="neutral" 
             />
             <FieldRow 
