@@ -228,7 +228,8 @@ const AppRoutes = () => {
             }
           />
 
-          {/* OAuth callback routes - handles both with and without tilde */}
+          {/* OAuth callback routes */}
+          <Route path="/auth/callback" element={<OAuthCallback />} />
           <Route path="/~oauth/callback" element={<OAuthCallback />} />
           <Route path="/%7Eoauth/callback" element={<OAuthCallback />} />
 
