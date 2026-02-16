@@ -16,12 +16,8 @@ const languages = [
 export const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
 
-  const changeLanguage = async (lng: string) => {
-    await i18n.changeLanguage(lng);
-    localStorage.setItem('language', lng);
-    window.dispatchEvent(new Event('languageChanged'));
-    // Force reload to ensure 100% translation coverage
-    window.location.reload();
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
   };
 
   const toggleToOtherLanguage = () => {
