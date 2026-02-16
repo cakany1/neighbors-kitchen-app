@@ -21,4 +21,9 @@ i18n
     },
   });
 
+// Save language changes to localStorage
+i18n.on('languageChanged', (lng) => {
+  localStorage.setItem('i18nextLng', lng);
+});
+
 export default i18n;
