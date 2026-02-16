@@ -4,8 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Heart, Users, Leaf, Home, Building2 } from "lucide-react";
 
 const StoryPage = () => {
-  const { t, i18n } = useTranslation();
-  const isEn = i18n.language === "en";
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -18,10 +17,10 @@ const StoryPage = () => {
               Made with <Heart className="w-4 h-4 fill-current" /> in Basel
             </span>
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              {isEn ? "Our Story" : "Unsere Geschichte"}
+              {t('story.our_story')}
             </h1>
             <p className="text-xl text-muted-foreground">
-              {isEn ? "An Idea Born from Daily Life" : "Eine Idee aus dem Alltag"}
+              {t('story.idea_born')}
             </p>
           </div>
         </section>
@@ -40,17 +39,13 @@ const StoryPage = () => {
 
               <div className="order-1 md:order-2 space-y-6">
                 <p className="text-lg leading-relaxed text-muted-foreground">
-                  {isEn
-                    ? "The idea for Neighbors Kitchen grew out of very personal moments: When I was once cleaning out my fridge and had to throw away perfectly good food, I asked myself if I couldn't find a better way to share it."
-                    : "Die Idee zu Neighbors Kitchen entstand aus ganz persönlichen Momenten: Als ich einmal meinen Kühlschrank ausmistete und gutes Essen wegwerfen musste, fragte ich mich, ob ich es nicht besser teilen könnte."}
+                  {t('story.paragraph1')}
                 </p>
                 <p className="text-lg leading-relaxed text-muted-foreground">
                   <strong className="text-foreground">
-                    {isEn ? "My girlfriend" : "Meine Freundin"}
+                    {t('story.my_girlfriend')}
                   </strong>{" "}
-                  {isEn
-                    ? "loves to cook for many people—but our friends don't live just around the corner."
-                    : "liebt es, für viele Menschen zu kochen – doch unsere Freunde wohnen oft nicht gleich um die Ecke."}
+                  {t('story.paragraph2')}
                 </p>
               </div>
             </div>
@@ -59,9 +54,7 @@ const StoryPage = () => {
             <div className="bg-secondary/30 rounded-3xl p-8 md:p-12 mb-20">
               <div className="max-w-3xl mx-auto text-center">
                 <p className="text-lg md:text-xl leading-relaxed text-muted-foreground italic">
-                  {isEn
-                    ? "Or do you know that feeling when a wonderful aroma drifts over from the neighbors because they're preparing something delicious? It's such a shame when someone cooks too much—which happens often—and the food then gets thrown away or overeaten, neither of which is ideal."
-                    : "Oder kennst du das Gefühl, wenn ein wunderbarer Duft vom Nachbarn kommt, weil er gerade etwas Leckeres zubereitet? Es ist so schade, wenn jemand zu viel kocht – was ja öfter vorkommt – und das Essen dann weggeworfen oder zu viel gegessen wird, was beides nicht ideal ist."}
+                  {t('story.paragraph3')}
                 </p>
               </div>
             </div>
@@ -69,12 +62,10 @@ const StoryPage = () => {
             {/* Vision Section */}
             <div className="text-center max-w-3xl mx-auto mb-20">
               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-foreground">
-                {isEn ? "So Neighbors Kitchen was born" : "So entstand Neighbors Kitchen"}
+                {t('story.vision_title')}
               </h2>
               <p className="text-lg leading-relaxed text-muted-foreground">
-                {isEn
-                  ? "The neighbor's kitchen. In Switzerland, we are often distant from our neighbors. Perhaps by sharing food, we can move a little closer together again, strengthen the community, and at the same time do something good for the environment by cooking more sustainably and producing less waste."
-                  : "Die Nachbars Küche. In der Schweiz sind wir oft distanziert zu unseren Nachbarn. Vielleicht können wir durch das Teilen von Essen wieder ein wenig näher zusammenrücken, die Gemeinschaft stärken und gleichzeitig etwas Gutes für die Umwelt tun, indem wir nachhaltiger kochen und weniger Abfall produzieren."}
+                {t('story.vision_text')}
               </p>
             </div>
 
@@ -85,12 +76,10 @@ const StoryPage = () => {
                    <Users className="w-8 h-8 text-primary" />
                  </div>
                  <h3 className="font-semibold text-lg mb-2">
-                   {isEn ? "Community" : "Gemeinschaft"}
+                   {t('story.community')}
                  </h3>
                  <p className="text-muted-foreground text-sm">
-                   {isEn
-                     ? "Connect with neighbors through the joy of sharing food"
-                     : "Verbinde dich mit Nachbarn durch die Freude am Teilen"}
+                   {t('story.community_desc')}
                  </p>
                </div>
 
@@ -99,12 +88,10 @@ const StoryPage = () => {
                    <Leaf className="w-8 h-8 text-primary" />
                  </div>
                  <h3 className="font-semibold text-lg mb-2">
-                   {isEn ? "Sustainability" : "Nachhaltigkeit"}
+                   {t('story.sustainability')}
                  </h3>
                  <p className="text-muted-foreground text-sm">
-                   {isEn
-                     ? "Reduce food waste and cook more consciously"
-                     : "Reduziere Lebensmittelverschwendung und koche bewusster"}
+                   {t('story.sustainability_desc')}
                  </p>
                </div>
 
@@ -113,12 +100,10 @@ const StoryPage = () => {
                    <Home className="w-8 h-8 text-primary" />
                  </div>
                  <h3 className="font-semibold text-lg mb-2">
-                   {isEn ? "Home Cooking" : "Hausgemacht"}
+                   {t('story.home_cooking')}
                  </h3>
                  <p className="text-muted-foreground text-sm">
-                   {isEn
-                     ? "Enjoy authentic, homemade meals from your neighborhood"
-                     : "Geniesse authentische, hausgemachte Gerichte aus der Nachbarschaft"}
+                   {t('story.home_cooking_desc')}
                  </p>
                </div>
 
@@ -127,15 +112,13 @@ const StoryPage = () => {
                    <Building2 className="w-8 h-8 text-primary" />
                  </div>
                  <h3 className="font-semibold text-lg mb-2">
-                   {isEn ? "For Institutions" : "Für Institutionen"}
+                   {t('story.for_institutions')}
                  </h3>
                  <p className="text-muted-foreground text-sm">
-                   {isEn
-                     ? "Partnerships for districts, municipalities & organizations"
-                     : "Partnerschaften für Quartiere, Gemeinden & Organisationen"}
+                   {t('story.for_institutions_desc')}
                  </p>
                  <p className="text-primary text-sm mt-2 group-hover:underline">
-                   {isEn ? "Click here to learn more →" : "Klicken Sie hier um mehr zu erfahren →"}
+                   {t('story.learn_more')}
                  </p>
                </a>
              </div>

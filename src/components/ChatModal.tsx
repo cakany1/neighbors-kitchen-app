@@ -205,9 +205,9 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Frage an {chefName}</DialogTitle>
+          <DialogTitle>{t('chat.question_to_chef', { chefName })}</DialogTitle>
           <DialogDescription>
-            Stelle Fragen zum Gericht "{mealTitle}" bevor du buchst
+            {t('chat.ask_about_meal', { mealTitle })}
           </DialogDescription>
         </DialogHeader>
 
@@ -215,7 +215,7 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
           <div className="space-y-4">
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground py-8">
-                <p className="text-sm">Starte die Konversation mit {chefName}</p>
+                <p className="text-sm">{t('chat.start_conversation', { chefName })}</p>
               </div>
             )}
             {messages.map((message) => (
@@ -247,7 +247,7 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
 
         <div className="flex gap-2 mt-4">
           <Textarea
-            placeholder="Deine Nachricht..."
+            placeholder={t('chat.your_message')}
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={(e) => {

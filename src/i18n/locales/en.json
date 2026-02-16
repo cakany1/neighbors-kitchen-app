@@ -20,6 +20,7 @@
     "status_confirmed": "Confirmed",
     "status_completed": "Completed",
     "status_cancelled": "Cancelled",
+    "status_inquiry": "Inquiry",
     "booked_on": "Booked on",
     "no_bookings_yet": "No bookings for your meals yet"
   },
@@ -60,7 +61,11 @@
     "message_sent": "Message sent",
     "demo_title": "Demo Mode",
     "demo_description": "This is a demo meal. Chat with the chef is not available.",
-    "demo_hint": "Sign up and book a real meal to chat with chefs!"
+    "demo_hint": "Sign up and book a real meal to chat with chefs!",
+    "question_to_chef": "Question for {{chefName}}",
+    "ask_about_meal": "Ask questions about \"{{mealTitle}}\" before you book",
+    "your_message": "Your message...",
+    "start_conversation": "Start the conversation with {{chefName}}"
   },
   "feed": {
     "available_meals": "Available Meals",
@@ -1210,6 +1215,25 @@
     "pork": "Pork",
     "lamb": "Lamb",
     "blue_cheese": "Blue Cheese"
+  },
+  "story": {
+    "our_story": "Our Story",
+    "idea_born": "An Idea Born from Daily Life",
+    "paragraph1": "The idea for Neighbors Kitchen grew out of very personal moments: When I was once cleaning out my fridge and had to throw away perfectly good food, I asked myself if I couldn't find a better way to share it.",
+    "my_girlfriend": "My girlfriend",
+    "paragraph2": "loves to cook for many people—but our friends don't live just around the corner.",
+    "paragraph3": "Or do you know that feeling when a wonderful aroma drifts over from the neighbors because they're preparing something delicious? It's such a shame when someone cooks too much—which happens often—and the food then gets thrown away or overeaten, neither of which is ideal.",
+    "vision_title": "So Neighbors Kitchen was born",
+    "vision_text": "The neighbor's kitchen. In Switzerland, we are often distant from our neighbors. Perhaps by sharing food, we can move a little closer together again, strengthen the community, and at the same time do something good for the environment by cooking more sustainably and producing less waste.",
+    "community": "Community",
+    "community_desc": "Connect with neighbors through the joy of sharing food",
+    "sustainability": "Sustainability",
+    "sustainability_desc": "Reduce food waste and cook more consciously",
+    "home_cooking": "Home Cooking",
+    "home_cooking_desc": "Enjoy authentic, homemade meals from your neighborhood",
+    "for_institutions": "For Institutions",
+    "for_institutions_desc": "Partnerships for districts, municipalities & organizations",
+    "learn_more": "Click here to learn more →"
   },
   "safety_alert": {
     "safe_title": "✓ Safe for you!",
