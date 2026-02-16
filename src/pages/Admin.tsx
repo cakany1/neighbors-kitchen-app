@@ -1524,13 +1524,12 @@ const Admin = () => {
                       </thead>
                       <tbody>
                         {rejectedVerifications.map((user) => {
-                          const reasonLabels: Record<string, string> = {
-                            blurred_photo: '📷 Unscharfes Foto',
-                            missing_document: '📄 Dokument fehlt',
-                            incomplete_profile: '👤 Unvollständig',
-                            duplicate_account: '👥 Duplikat',
-                            document_mismatch: '❌ Keine Übereinstimmung',
-                            other: '📝 Anderer Grund',
+                          const getReasonLabel = (reason: string | null) => {
+                            if (!reason) return '-';
+                            const key = `admin.rejection_reason_${reason}`;
+                            const translated = t(key);
+                            // If translation key not found, return the raw reason
+                            return translated === key ? reason : translated;
                           };
                           
                           return (
@@ -1551,7 +1550,7 @@ const Admin = () => {
                               </td>
                               <td className="p-2">
                                 <Badge variant="destructive" className="text-xs">
-                                  {reasonLabels[user.rejection_reason || ''] || user.rejection_reason || '-'}
+                                  {getReasonLabel(user.rejection_reason)}
                                 </Badge>
                               </td>
                               <td className="p-2 max-w-[200px]">

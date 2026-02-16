@@ -147,32 +147,33 @@ const AddMeal = () => {
     );
   };
 
-  // Smart Allergen Auto-Detection
+  // Smart Allergen Auto-Detection using canonical IDs
   const detectAllergens = (text: string) => {
     const lowerText = text.toLowerCase();
     const detectedAllergens: string[] = [];
     
+    // Map German keywords to canonical allergen IDs
     const allergenKeywords: Record<string, string[]> = {
-      'Milch/Laktose': ['milch', 'sahne', 'käse', 'butter', 'joghurt', 'rahm', 'quark', 'schmand'],
-      'Eier': ['ei', 'eier', 'spätzle'],
-      'Schalenfrüchte (Nüsse)': ['nuss', 'nüsse', 'mandel', 'walnuss', 'haselnuss', 'cashew', 'pistazie'],
-      'Erdnüsse': ['erdnuss', 'erdnüsse'],
-      'Gluten (Getreide)': ['mehl', 'weizen', 'brot', 'pasta', 'lasagne', 'teig', 'nudel', 'spaghetti'],
-      'Fisch': ['fisch', 'thunfisch', 'lachs', 'forelle', 'sardine'],
-      'Soja': ['soja', 'tofu'],
-      'Senf': ['senf'],
-      'Sellerie': ['sellerie'],
-      'Sesam': ['sesam'],
-      'Lupinen': ['lupine', 'lupinen'],
-      'Weichtiere': ['muschel', 'muscheln', 'schnecke', 'schnecken', 'tintenfisch'],
-      'Sulfite': ['sulfit', 'sulfite', 'schwefeldioxid'],
-      'Krebstiere': ['garnele', 'garnelen', 'krebs', 'hummer', 'shrimp', 'krabbe'],
+      'dairy': ['milch', 'sahne', 'käse', 'butter', 'joghurt', 'rahm', 'quark', 'schmand'],
+      'eggs': ['ei', 'eier', 'spätzle'],
+      'nuts': ['nuss', 'nüsse', 'mandel', 'walnuss', 'haselnuss', 'cashew', 'pistazie'],
+      'peanuts': ['erdnuss', 'erdnüsse'],
+      'gluten': ['mehl', 'weizen', 'brot', 'pasta', 'lasagne', 'teig', 'nudel', 'spaghetti'],
+      'fish': ['fisch', 'thunfisch', 'lachs', 'forelle', 'sardine'],
+      'soy': ['soja', 'tofu'],
+      'mustard': ['senf'],
+      'celery': ['sellerie'],
+      'sesame': ['sesam'],
+      'lupin': ['lupine', 'lupinen'],
+      'molluscs': ['muschel', 'muscheln', 'schnecke', 'schnecken', 'tintenfisch'],
+      'sulphites': ['sulfit', 'sulfite', 'schwefeldioxid'],
+      'crustaceans': ['garnele', 'garnelen', 'krebs', 'hummer', 'shrimp', 'krabbe'],
     };
 
-    Object.entries(allergenKeywords).forEach(([allergen, keywords]) => {
+    Object.entries(allergenKeywords).forEach(([canonicalId, keywords]) => {
       if (keywords.some(keyword => lowerText.includes(keyword))) {
-        if (!detectedAllergens.includes(allergen)) {
-          detectedAllergens.push(allergen);
+        if (!detectedAllergens.includes(canonicalId)) {
+          detectedAllergens.push(canonicalId);
         }
       }
     });
@@ -182,7 +183,9 @@ const AddMeal = () => {
         const newAllergens = [...new Set([...prev, ...detectedAllergens])];
         return newAllergens;
       });
-      toast.success(`⚡ Allergene automatisch erkannt: ${detectedAllergens.join(', ')}`, {
+      // Translate detected allergens to display labels
+      const allergenLabels = detectedAllergens.map(id => t(`canonical_labels.${id}`)).join(', ');
+      toast.success(t('toast.allergens_detected', { allergens: allergenLabels }), {
         duration: 4000,
       });
     }
