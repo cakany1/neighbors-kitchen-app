@@ -20,6 +20,7 @@
     "status_confirmed": "Bestätigt",
     "status_completed": "Abgeschlossen",
     "status_cancelled": "Storniert",
+    "status_inquiry": "Anfrage",
     "booked_on": "Gebucht am",
     "no_bookings_yet": "Noch keine Buchungen für deine Gerichte"
   },
@@ -126,7 +127,11 @@
     "message_sent": "Nachricht gesendet",
     "demo_title": "Demo-Modus",
     "demo_description": "Dies ist ein Demo-Gericht. Der Chat mit dem Koch ist nicht verfügbar.",
-    "demo_hint": "Registriere dich und buche ein echtes Gericht, um mit Köchen zu chatten!"
+    "demo_hint": "Registriere dich und buche ein echtes Gericht, um mit Köchen zu chatten!",
+    "question_to_chef": "Frage an {{chefName}}",
+    "ask_about_meal": "Stelle Fragen zum Gericht \"{{mealTitle}}\" bevor du buchst",
+    "your_message": "Deine Nachricht...",
+    "start_conversation": "Starte die Konversation mit {{chefName}}"
   },
   "feed": {
     "available_meals": "Verfügbare Gerichte",
@@ -1224,6 +1229,25 @@
     "lamb": "Lamm",
     "blue_cheese": "Blauschimmelkäse",
     "very_sweet": "Sehr süss 🍬"
+  },
+  "story": {
+    "our_story": "Unsere Geschichte",
+    "idea_born": "Eine Idee aus dem Alltag",
+    "paragraph1": "Die Idee zu Neighbors Kitchen entstand aus ganz persönlichen Momenten: Als ich einmal meinen Kühlschrank ausmistete und gutes Essen wegwerfen musste, fragte ich mich, ob ich es nicht besser teilen könnte.",
+    "my_girlfriend": "Meine Freundin",
+    "paragraph2": "liebt es, für viele Menschen zu kochen – doch unsere Freunde wohnen oft nicht gleich um die Ecke.",
+    "paragraph3": "Oder kennst du das Gefühl, wenn ein wunderbarer Duft vom Nachbarn kommt, weil er gerade etwas Leckeres zubereitet? Es ist so schade, wenn jemand zu viel kocht – was ja öfter vorkommt – und das Essen dann weggeworfen oder zu viel gegessen wird, was beides nicht ideal ist.",
+    "vision_title": "So entstand Neighbors Kitchen",
+    "vision_text": "Die Nachbars Küche. In der Schweiz sind wir oft distanziert zu unseren Nachbarn. Vielleicht können wir durch das Teilen von Essen wieder ein wenig näher zusammenrücken, die Gemeinschaft stärken und gleichzeitig etwas Gutes für die Umwelt tun, indem wir nachhaltiger kochen und weniger Abfall produzieren.",
+    "community": "Gemeinschaft",
+    "community_desc": "Verbinde dich mit Nachbarn durch die Freude am Teilen",
+    "sustainability": "Nachhaltigkeit",
+    "sustainability_desc": "Reduziere Lebensmittelverschwendung und koche bewusster",
+    "home_cooking": "Hausgemacht",
+    "home_cooking_desc": "Geniesse authentische, hausgemachte Gerichte aus der Nachbarschaft",
+    "for_institutions": "Für Institutionen",
+    "for_institutions_desc": "Partnerschaften für Quartiere, Gemeinden & Organisationen",
+    "learn_more": "Klicken Sie hier um mehr zu erfahren →"
   },
   "safety_alert": {
     "safe_title": "✓ Sicher für dich!",
