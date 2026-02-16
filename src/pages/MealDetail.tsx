@@ -817,7 +817,7 @@ const MealDetail = () => {
           {/* Self-chat/booking block for own meal */}
           {isOwnMeal ? (
             <Button disabled variant="outline" className="flex-1">
-              Dein eigenes Angebot
+              {t('meal_detail.own_meal')}
             </Button>
           ) : (
             <>

@@ -530,7 +530,8 @@
   },
   "install": {
     "back_to_app": "Back to App",
-    "feels_like_app": "Feels like a real app"
+    "feels_like_app": "Feels like a real app",
+    "download_app": "Download app"
   },
   "payment": {
     "back_to_feed": "Back to Feed",
@@ -661,7 +662,17 @@
     "ask_question_success": "Thank you for your question! We will review it.",
     "ask_question_error": "Could not submit question. Please try again.",
     "community_questions_title": "Community Questions",
-    "community_questions_desc": "Frequently asked questions from the community"
+    "community_questions_desc": "Frequently asked questions from the community",
+    "org_title": "For Municipalities & Organizations",
+    "org_desc": "In addition to private use, Neighbors Kitchen is also suitable as digital neighborhood infrastructure – for example, to promote community engagement, reduce food waste, or as a low-threshold prevention measure against social isolation.",
+    "org_q1": "Is Neighbors Kitchen a commercial provider?",
+    "org_a1": "No. Neighbors Kitchen is a facilitation platform. Meals are shared privately. Voluntary contributions are solely to cover ingredients or energy costs.",
+    "org_q2": "What role does a municipality or organization have?",
+    "org_a2": "Municipalities can support Neighbors Kitchen ideologically or organizationally (e.g., introduction at the neighborhood level). The community remains self-organized – institutions act as enablers, not controllers.",
+    "org_q3": "What data do municipalities receive?",
+    "org_a3": "Upon request, we provide anonymized impact data (e.g., number of shared meals or active households). No personal data is shared.",
+    "org_contact": "Contact for partnerships:",
+    "org_email": "hello@neighbors-kitchen.ch"
   },
   "contact": {
     "title": "Contact Us",
@@ -821,7 +832,8 @@
     "translate_to_english": "Translate to English",
     "delete_karma_warning": "This meal is older than 5 minutes. Deleting it will cost you 10 Karma points. Continue?",
     "delete_free_hint": "Delete is free (within 5 minutes)",
-    "karma_penalty_applied": "Meal deleted. -10 Karma"
+    "karma_penalty_applied": "Meal deleted. -10 Karma",
+    "own_meal": "Your own offer"
   },
   "postPickup": {
     "title_barter": "How much was the meal worth to you?",

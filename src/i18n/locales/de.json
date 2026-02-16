@@ -637,7 +637,8 @@
   },
   "install": {
     "back_to_app": "Zurück zur App",
-    "feels_like_app": "Fühlt sich an wie eine echte App"
+    "feels_like_app": "Fühlt sich an wie eine echte App",
+    "download_app": "App herunterladen"
   },
   "payment": {
     "back_to_feed": "Zurück zum Feed",
@@ -892,7 +893,8 @@
     "translate_to_english": "Translate to English",
     "delete_karma_warning": "Diese Mahlzeit ist älter als 5 Minuten. Beim Löschen verlierst du 10 Karma Punkte. Fortfahren?",
     "delete_free_hint": "Löschen ist kostenlos (innerhalb 5 Minuten)",
-    "karma_penalty_applied": "Gericht gelöscht. -10 Karma"
+    "karma_penalty_applied": "Gericht gelöscht. -10 Karma",
+    "own_meal": "Dein eigenes Angebot"
   },
   "postPickup": {
     "title_barter": "Wie viel war dir das Essen wert?",
@@ -1075,7 +1077,17 @@
     "ask_question_success": "Danke für deine Frage! Wir werden sie prüfen.",
     "ask_question_error": "Frage konnte nicht gesendet werden. Bitte versuche es erneut.",
     "community_questions_title": "Community-Fragen",
-    "community_questions_desc": "Häufig gestellte Fragen aus der Community"
+    "community_questions_desc": "Häufig gestellte Fragen aus der Community",
+    "org_title": "Für Gemeinden & Organisationen",
+    "org_desc": "Neighbors Kitchen eignet sich neben der privaten Nutzung auch als digitale Quartier-Infrastruktur – z. B. zur Förderung von Begegnung, zur Reduktion von Lebensmittelverschwendung oder als niedrigschwellige Präventionsmassnahme gegen soziale Isolation.",
+    "org_q1": "Ist Neighbors Kitchen ein kommerzieller Anbieter?",
+    "org_a1": "Nein. Neighbors Kitchen ist eine Vermittlungsplattform. Mahlzeiten werden privat geteilt. Freiwillige Kostenbeiträge dienen lediglich der Deckung von Zutaten oder Energie.",
+    "org_q2": "Welche Rolle hat eine Gemeinde oder Organisation?",
+    "org_a2": "Gemeinden können Neighbors Kitchen ideell oder organisatorisch unterstützen (z. B. Einführung auf Quartiersebene). Die Community bleibt dabei selbstorganisiert – Institutionen wirken ermöglichend, nicht steuernd.",
+    "org_q3": "Welche Daten erhalten Gemeinden?",
+    "org_a3": "Auf Wunsch stellen wir anonymisierte Wirkungsdaten zur Verfügung (z. B. Anzahl geteilter Mahlzeiten oder aktive Haushalte). Es werden keine personenbezogenen Daten weitergegeben.",
+    "org_contact": "Kontakt für Partnerschaften:",
+    "org_email": "hello@neighbors-kitchen.ch"
   },
   "wizard": {
     "step_counter": "Schritt {{current}} von {{total}}",
