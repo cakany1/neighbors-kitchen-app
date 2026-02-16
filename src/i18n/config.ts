@@ -10,7 +10,7 @@ i18n
       en: { translation: en },
       de: { translation: de },
     },
-    lng: localStorage.getItem('language') || 'de',
+    lng: localStorage.getItem('i18nextLng') || 'de',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
@@ -19,16 +19,11 @@ i18n
     react: {
       useSuspense: false,
     },
-    // Ensure component re-renders on language change
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-    },
   });
 
-// Listen to language changes and trigger storage update
+// Save language changes to localStorage
 i18n.on('languageChanged', (lng) => {
-  localStorage.setItem('language', lng);
+  localStorage.setItem('i18nextLng', lng);
 });
 
 export default i18n;
