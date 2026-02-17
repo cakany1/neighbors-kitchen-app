@@ -97,6 +97,11 @@ const handler = async (req: Request): Promise<Response> => {
         throw new Error('Booking not found');
       }
 
+      // Safely handle the meal object from the nested query
+      if (!booking.meal || typeof booking.meal !== 'object' || Array.isArray(booking.meal)) {
+        throw new Error(`Invalid booking meal data: expected object, received ${typeof booking.meal}${Array.isArray(booking.meal) ? ' (array)' : ''}`);
+      }
+
       const meal = booking.meal as { id: string; title: string; chef_id: string; scheduled_date: string };
       
       // Determine who to notify

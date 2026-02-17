@@ -126,14 +126,14 @@ serve(async (req) => {
       logStep('ERROR: No webhook secret configured', { mode: stripeMode });
       
       // Record the failed event
-      await supabase.from('stripe_webhook_events').insert({
+      await supabase.from('stripe_webhook_events').upsert({
         event_id: preliminaryEvent?.id || `unknown_${Date.now()}`,
         event_type: preliminaryEvent?.type || 'unknown',
         stripe_mode: stripeMode,
         success: false,
         error_message: `No webhook secret configured for ${stripeMode} mode`,
         payload_summary: { attempted_mode: stripeMode, error: 'missing_secret' }
-      }).onConflict('event_id').ignore();
+      }, { onConflict: 'event_id', ignoreDuplicates: true });
       
       return new Response(`Server configuration error: No secret for ${stripeMode} mode`, { status: 500 });
     }
@@ -161,14 +161,14 @@ serve(async (req) => {
       logStep('ERROR: Signature verification FAILED - invalid_signature', { attemptedMode: stripeMode });
       
       // Record the failed verification attempt (idempotent)
-      await supabase.from('stripe_webhook_events').insert({
+      await supabase.from('stripe_webhook_events').upsert({
         event_id: preliminaryEvent?.id || `invalid_${Date.now()}`,
         event_type: preliminaryEvent?.type || 'unknown',
         stripe_mode: stripeMode,
         success: false,
         error_message: `Signature verification failed: invalid_signature`,
         payload_summary: { error: 'invalid_signature' }
-      }).onConflict('event_id').ignore();
+      }, { onConflict: 'event_id', ignoreDuplicates: true });
       
       return new Response(`Webhook signature verification failed`, { status: 400 });
     }
