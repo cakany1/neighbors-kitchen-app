@@ -75,8 +75,10 @@ async function createServiceAccountJWT(): Promise<string> {
     scope: 'https://www.googleapis.com/auth/firebase.messaging',
   };
 
-  const encodedHeader = base64url(new TextEncoder().encode(JSON.stringify(header)));
-  const encodedPayload = base64url(new TextEncoder().encode(JSON.stringify(payload)));
+  const headerData = new TextEncoder().encode(JSON.stringify(header));
+  const payloadData = new TextEncoder().encode(JSON.stringify(payload));
+  const encodedHeader = base64url(headerData);
+  const encodedPayload = base64url(payloadData);
   const unsignedToken = `${encodedHeader}.${encodedPayload}`;
 
   // Import the private key and sign
@@ -89,7 +91,7 @@ async function createServiceAccountJWT(): Promise<string> {
   
   const cryptoKey = await crypto.subtle.importKey(
     'pkcs8',
-    binaryKey,
+    binaryKey.buffer,
     { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
     false,
     ['sign']
