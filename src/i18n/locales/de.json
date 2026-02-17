@@ -293,7 +293,8 @@
     "allergens_detected": "Allergene erkannt: {{allergens}}",
     "minimum_amount": "Minimumbetrag ist CHF {{amount}} (inkl. Gebühr).",
     "photo_updated": "📷 Foto aktualisiert",
-    "self_booking_error": "Du kannst dein eigenes Angebot nicht buchen."
+    "self_booking_error": "Du kannst dein eigenes Angebot nicht buchen.",
+    "profile_delete_error": "Fehler beim Löschen"
   },
   "feed_fallback": {
     "no_address_set": "Bitte zuerst eine Adresse im Profil setzen",
@@ -540,7 +541,10 @@
     "partner_id_optional_title": "Partner-Ausweis (Optional)",
     "partner_id_optional_hint": "Optional: Lade den Ausweis deiner Partnerin hoch für ein erweitertes Vertrauenslevel. Blockiert keine Funktionen.",
     "women_only_photo_verification_required": "Für Women-Only Gerichte muss auch das Profilfoto deiner Partnerin verifiziert sein.",
-    "your_photo_not_verified": "Dein Profilfoto muss verifiziert sein, bevor du Women-Only Gerichte anbieten kannst."
+    "your_photo_not_verified": "Dein Profilfoto muss verifiziert sein, bevor du Women-Only Gerichte anbieten kannst.",
+    "confirm_delete": "DELETE",
+    "preview": "Vorschau",
+    "partner_preview": "Partner-Vorschau"
   },
   "guidelines": {
     "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (ausser beim Vor-Ort-Essen)",
@@ -1269,5 +1273,14 @@
     "technical_details": "Technische Details",
     "reload_page": "Seite neu laden",
     "back_to_home": "Zur Startseite"
+  },
+  "units": {
+    "km": "km"
+  },
+  "placeholders": {
+    "phone_ch": "+41 79 123 45 67",
+    "iban": "CH93 0076 2011 6238 5295 7",
+    "postcode": "4051",
+    "city": "Basel"
   }
 }

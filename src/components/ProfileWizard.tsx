@@ -230,7 +230,7 @@ export function ProfileWizard({
               {photoPreview ? (
                 <img
                   src={photoPreview}
-                  alt="Preview"
+                  alt={t('profile.preview')}
                   className="w-32 h-32 rounded-full object-cover border-4 border-primary"
                 />
               ) : (
@@ -259,7 +259,7 @@ export function ProfileWizard({
               {partnerPhotoPreview ? (
                 <img
                   src={partnerPhotoPreview}
-                  alt="Partner Preview"
+                  alt={t('profile.partner_preview')}
                   className="w-32 h-32 rounded-full object-cover border-4 border-secondary"
                 />
               ) : (
@@ -300,7 +300,7 @@ export function ProfileWizard({
                   id="postalCode"
                   value={postalCode}
                   onChange={(e) => setPostalCode(e.target.value)}
-                  placeholder="4051"
+                  placeholder={t('placeholders.postcode')}
                 />
               </div>
               <div className="space-y-2">
@@ -309,7 +309,7 @@ export function ProfileWizard({
                   id="city"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  placeholder="Basel"
+                  placeholder={t('placeholders.city')}
                 />
               </div>
             </div>
@@ -332,7 +332,7 @@ export function ProfileWizard({
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+41 79 123 45 67"
+                placeholder={t('placeholders.phone_ch')}
               />
             </div>
             <Alert>
