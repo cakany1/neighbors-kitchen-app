@@ -234,17 +234,17 @@ const Profile = () => {
 
   // Visibility mode options filtered by gender
   const getVisibilityOptions = () => {
-    if (gender === 'male') return [{ value: 'all', label: t('profile.visibility_all', 'Alle') }];
+    if (gender === 'male') return [{ value: 'all', label: t('profile.visibility_all') }];
     if (gender === 'female' || gender === 'woman')
       return [
-        { value: 'all', label: t('profile.visibility_all', 'Alle') },
-        { value: 'women_fli', label: t('profile.visibility_women_fli', 'Women + FLI') },
-        { value: 'women_only', label: t('profile.visibility_women_only', 'Nur Frauen') },
+        { value: 'all', label: t('profile.visibility_all') },
+        { value: 'women_fli', label: t('profile.visibility_women_fli') },
+        { value: 'women_only', label: t('profile.visibility_women_only') },
       ];
     // diverse / other / non-binary
     return [
-      { value: 'all', label: t('profile.visibility_all', 'Alle') },
-      { value: 'women_fli', label: t('profile.visibility_women_fli', 'Women + FLI') },
+      { value: 'all', label: t('profile.visibility_all') },
+      { value: 'women_fli', label: t('profile.visibility_women_fli') },
     ];
   };
 
