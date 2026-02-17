@@ -36,7 +36,9 @@
     "error": "Error",
     "success": "Success",
     "understood": "Got it",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "logged_out": "Successfully logged out",
+    "logout_error": "Error logging out"
   },
   "photo_picker": {
     "upload_photo": "Upload Photo",
@@ -1432,5 +1434,9 @@
   "language_switcher": {
     "show_original_en": "🔄 Show Original (EN)",
     "show_original_de": "🔄 Original anzeigen (DE)"
+  },
+  "nav": {
+    "profile": "My Profile",
+    "logout": "Log Out"
   }
 }

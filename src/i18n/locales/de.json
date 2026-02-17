@@ -36,7 +36,9 @@
     "error": "Fehler",
     "success": "Erfolg",
     "understood": "Verstanden",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "logged_out": "Erfolgreich abgemeldet",
+    "logout_error": "Fehler beim Abmelden"
   },
   "photo_picker": {
     "upload_photo": "Foto hochladen",
@@ -1419,5 +1421,9 @@
   "language_switcher": {
     "show_original_en": "🔄 Show Original (EN)",
     "show_original_de": "🔄 Original anzeigen (DE)"
+  },
+  "nav": {
+    "profile": "Mein Profil",
+    "logout": "Abmelden"
   }
 }
