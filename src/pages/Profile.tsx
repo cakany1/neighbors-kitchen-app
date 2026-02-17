@@ -878,7 +878,7 @@ const Profile = () => {
           <CardHeader className="pb-2">
             <CardTitle className="text-base text-destructive flex items-center gap-2">
               <AlertTriangle className="w-4 h-4" />
-              {t('profile.danger_zone', 'Gefahrenzone')}
+              {t('profile.danger_zone')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
