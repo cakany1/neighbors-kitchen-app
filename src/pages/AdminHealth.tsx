@@ -59,6 +59,7 @@ interface SelfTestResponse {
 
 // Release Checklist Summary Component
 const ReleaseChecklistSummary = ({ navigate }: { navigate: (path: string) => void }) => {
+  const { t } = useTranslation();
   const today = new Date();
   const releaseVersion = `v${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, "0")}.${String(today.getDate()).padStart(2, "0")}`;
 
