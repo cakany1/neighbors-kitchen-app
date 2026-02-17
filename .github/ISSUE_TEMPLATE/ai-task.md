@@ -38,9 +38,9 @@ Lint must pass: `bun run lint`
 
 ## Parallel Execution Rules
 
-- If the task requires modifying translation JSON files, add label `touches:i18n-json` and DO NOT run in parallel with any other task labeled `touches:i18n-json`.
+- If the task modifies translation JSON files, add label `touches:i18n-json` and DO NOT run in parallel with any other issue labeled `touches:i18n-json`.
 - If more than 2 additional files would be modified, STOP and report instead of implementing.
-- If a required change exceeds the Allowed Files list, STOP and report instead of implementing.
+- If any required change exceeds the Allowed Files list, STOP and report instead of implementing.
 
 ---
 

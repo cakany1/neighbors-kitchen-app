@@ -26,6 +26,6 @@
 - touches:stripe
 
 ## Rules
-- Never run two issues in parallel if both have touches:i18n-json
+- Never run two issues in parallel if both have `touches:i18n-json`
 - Prefer parallel lanes by Area (frontend vs backend vs infra/docs)
 - Keep 1 PR = 1 Issue
