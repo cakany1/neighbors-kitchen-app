@@ -269,6 +269,12 @@
     "delete_button": "⚠️ Permanently Delete Account",
     "deactivate_hint": "Your profile will be hidden, data remains stored",
     "delete_warning": "⚠️ Warning: Your account will be permanently deleted. ALL data will be permanently removed! If you return later, you will need to verify again (ID/Photo). This action cannot be undone.",
+    "delete_account": {
+      "button": "Delete Account",
+      "title": "Really delete account?",
+      "description": "All your meals, bookings, messages and ratings will be permanently deleted. Type DELETE to confirm.",
+      "confirm_button": "Delete Permanently"
+    },
     "restart_tour": "Restart Tutorial",
     "restart_tour_hint": "Show the introduction to Neighbors Kitchen again",
     "tour_restarting": "Starting tutorial...",
