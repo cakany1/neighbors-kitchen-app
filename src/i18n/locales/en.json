@@ -321,8 +321,8 @@
     "women_only_photo_verification_required": "For Women-Only meals, your partner's profile photo must also be verified.",
     "your_photo_not_verified": "Your profile photo must be verified before you can offer Women-Only meals."
   },
-   "auth": {
-     "welcome_back": "Welcome back!",
+  "auth": {
+    "welcome_back": "Welcome back!",
     "sign_in_desc": "Sign in to Neighbors Kitchen",
     "email": "Email",
     "email_placeholder": "your@email.com",
@@ -994,7 +994,8 @@
     "tags_detected": "Tags detected: {{tags}}",
     "allergens_detected": "Allergens detected: {{allergens}}",
     "minimum_amount": "Minimum amount is CHF {{amount}} (incl. fee).",
-    "photo_updated": "📷 Photo updated"
+    "photo_updated": "📷 Photo updated",
+    "self_booking_error": "You can't book your own offer."
   },
   "feed_fallback": {
     "no_address_set": "Please set an address in your profile first",

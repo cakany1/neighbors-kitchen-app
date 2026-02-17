@@ -296,7 +296,7 @@ const MealDetail = () => {
 
     // SELF-BOOKING BLOCK
     if (isOwnMeal) {
-      toast.error("Du kannst dein eigenes Angebot nicht buchen.");
+      toast.error(t("toast.self_booking_error"));
       return;
     }
 
