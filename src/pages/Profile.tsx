@@ -283,7 +283,7 @@ const Profile = () => {
       }
       
       await supabase.auth.signOut();
-      toast.success(t('profile.account_deleted', 'Account wurde gelöscht'));
+      toast.success(t('profile.account_deleted'));
       navigate('/');
     } catch (err: any) {
       toast.error(err.message || t('toast.profile_delete_error'));
@@ -883,20 +883,20 @@ const Profile = () => {
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              {t('profile.delete_warning', 'Das Löschen deines Accounts entfernt alle deine Daten unwiderruflich.')}
+              {t('profile.delete_warning')}
             </p>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" className="w-full">
                   <Trash2 className="w-4 h-4 mr-2" />
-                  {t('profile.delete_account', 'Account löschen')}
+                  {t('profile.delete_account.button')}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>{t('profile.delete_confirm_title', 'Account wirklich löschen?')}</AlertDialogTitle>
+                  <AlertDialogTitle>{t('profile.delete_account.title')}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    {t('profile.delete_confirm_desc', 'Alle deine Gerichte, Buchungen, Nachrichten und Bewertungen werden unwiderruflich gelöscht. Tippe DELETE um zu bestätigen.')}
+                    {t('profile.delete_account.description')}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <Input
@@ -906,13 +906,13 @@ const Profile = () => {
                   className="mt-2"
                 />
                 <AlertDialogFooter>
-                  <AlertDialogCancel onClick={() => setDeleteConfirm('')}>{t('common.cancel', 'Abbrechen')}</AlertDialogCancel>
+                  <AlertDialogCancel onClick={() => setDeleteConfirm('')}>{t('common.cancel')}</AlertDialogCancel>
                   <AlertDialogAction
                     disabled={deleteConfirm !== 'DELETE'}
                     onClick={handleDeleteAccount}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    {t('profile.delete_permanently', 'Endgültig löschen')}
+                    {t('profile.delete_account.confirm_button')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

@@ -521,6 +521,12 @@
     "delete_button": "⚠️ Konto unwiderruflich löschen",
     "deactivate_hint": "Dein Profil wird versteckt, Daten bleiben erhalten",
     "delete_warning": "⚠️ Achtung: Dein Konto wird unwiderruflich gelöscht. ALLE Daten werden permanent entfernt! Wenn du später zurückkommst, musst du dich erneut verifizieren (Ausweis/Foto). Diese Aktion kann nicht rückgängig gemacht werden.",
+    "delete_account": {
+      "button": "Account löschen",
+      "title": "Account wirklich löschen?",
+      "description": "Alle deine Gerichte, Buchungen, Nachrichten und Bewertungen werden unwiderruflich gelöscht. Tippe DELETE um zu bestätigen.",
+      "confirm_button": "Endgültig löschen"
+    },
     "restart_tour": "Tutorial erneut ansehen",
     "restart_tour_hint": "Zeige die Einführung in Neighbors Kitchen nochmal an",
     "tour_restarting": "Tutorial wird gestartet...",
