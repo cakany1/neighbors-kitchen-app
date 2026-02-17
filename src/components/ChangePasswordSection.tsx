@@ -56,7 +56,7 @@ export const ChangePasswordSection = ({ userEmail, isOAuthUser }: ChangePassword
       setResetSent(true);
       toast.success(t('profile.reset_email_sent', '📧 E-Mail zum Passwort setzen wurde gesendet'));
     } catch (error: any) {
-      toast.error(error.message || 'Fehler');
+      toast.error(error.message || t('toast.change_password_error_fallback', 'Fehler'));
     } finally {
       setLoading(false);
     }

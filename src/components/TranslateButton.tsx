@@ -33,18 +33,16 @@ export const TranslateButton = ({
 
     // Validate input length
     if (originalText.length === 0) {
-      const errorMsg = i18n.language === 'de' 
-        ? 'Bitte geben Sie Text zum Übersetzen ein' 
-        : 'Please provide text to translate';
-      toast.error(errorMsg);
+      toast.error(t('toast.translate_empty_text', 'Bitte geben Sie Text zum Übersetzen ein'));
       return;
     }
 
     if (originalText.length > MAX_TRANSLATION_LENGTH) {
-      const errorMsg = i18n.language === 'de'
-        ? `Text zu lang (max. ${MAX_TRANSLATION_LENGTH} Zeichen, Sie haben ${originalText.length})`
-        : `Text too long (max. ${MAX_TRANSLATION_LENGTH} characters, you have ${originalText.length})`;
-      toast.error(errorMsg);
+      toast.error(t('toast.translate_text_too_long', {
+        max: MAX_TRANSLATION_LENGTH,
+        current: originalText.length,
+        defaultValue: `Text zu lang (max. ${MAX_TRANSLATION_LENGTH} Zeichen, Sie haben ${originalText.length})`
+      }));
       return;
     }
 
@@ -74,13 +72,10 @@ export const TranslateButton = ({
       const data = await response.json();
       onTranslate(data.translatedText);
       setIsTranslated(true);
-      toast.success(t('toast.translated_successfully') || 'Übersetzt');
+      toast.success(t('toast.translated_successfully', 'Übersetzt'));
     } catch (error) {
       console.error('Translation error:', error);
-      const errorMsg = i18n.language === 'de'
-        ? 'Fehler beim Übersetzen. Bitte versuchen Sie es später erneut.'
-        : 'Translation error. Please try again later.';
-      toast.error(errorMsg);
+      toast.error(t('toast.translate_error', 'Fehler beim Übersetzen. Bitte versuchen Sie es später erneut.'));
     } finally {
       setIsTranslating(false);
     }
