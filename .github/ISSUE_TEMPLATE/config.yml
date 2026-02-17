@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Community Discussion
+    url: https://github.com/cakany1/neighbors-kitchen-app/discussions
+    about: Please use discussions for questions and general discussions
+  - name: Report a Security Issue
+    url: https://github.com/cakany1/neighbors-kitchen-app/security/advisories/new
+    about: Please report security vulnerabilities through GitHub Security Advisories
