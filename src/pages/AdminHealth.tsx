@@ -325,9 +325,9 @@ const AdminHealth = () => {
       refetchRuns();
       
       if (data.status === 'passed') {
-        toast.success(t('admin_health.self_test_passed', { passed: data.summary.passed, total: data.summary.total, defaultValue: `✅ Self-Test bestanden! ${data.summary.passed}/${data.summary.total} Tests erfolgreich.` }));
+        toast.success(t('admin_health.self_test_passed', '✅ Self-Test bestanden! {{passed}}/{{total}} Tests erfolgreich.', { passed: data.summary.passed, total: data.summary.total }));
       } else {
-        toast.error(t('admin_health.self_test_failed', { failed: data.summary.failed, defaultValue: `❌ Self-Test fehlgeschlagen! ${data.summary.failed} Tests nicht bestanden.` }));
+        toast.error(t('admin_health.self_test_failed', '❌ Self-Test fehlgeschlagen! {{failed}} Tests nicht bestanden.', { failed: data.summary.failed }));
       }
     },
     onError: (error: Error) => {
@@ -1084,7 +1084,7 @@ const AdminHealth = () => {
               <Alert className="border-green-500 bg-green-50 dark:bg-green-950/30">
                 <CheckCircle className="h-5 w-5 text-green-600" />
                 <AlertDescription className="text-green-800 dark:text-green-200 font-medium">
-                  {t('admin_health.status_ready', { passed: latestRun?.summary?.passed, total: latestRun?.summary?.total, defaultValue: `✅ GO – Alle Checks bestanden. DB ✓ • Self-Test ${latestRun?.summary?.passed}/${latestRun?.summary?.total} ✓` })}
+                  {t('admin_health.status_ready', '✅ GO – Alle Checks bestanden. DB ✓ • Self-Test {{passed}}/{{total}} ✓', { passed: latestRun?.summary?.passed, total: latestRun?.summary?.total })}
                 </AlertDescription>
               </Alert>
             ) : !testRun ? (

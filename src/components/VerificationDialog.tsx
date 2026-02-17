@@ -129,7 +129,8 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
             <Shield className="w-5 h-5 text-primary" />
             {t('verification.dialog_title', 'ID-Verifizierung')}
           </DialogTitle>
-          <DialogDescription dangerouslySetInnerHTML={{ __html: t('verification.dialog_desc', 'Beantrage dein ✓ Verifiziert-Badge. Ein Ausweisfoto ist <strong>optional</strong>, beschleunigt aber die Prüfung.') }}>
+          <DialogDescription>
+            <span dangerouslySetInnerHTML={{ __html: t('verification.dialog_desc', 'Beantrage dein ✓ Verifiziert-Badge. Ein Ausweisfoto ist <strong>optional</strong>, beschleunigt aber die Prüfung.') }} />
           </DialogDescription>
         </DialogHeader>
 

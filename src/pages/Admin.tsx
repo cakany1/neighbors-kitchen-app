@@ -37,7 +37,7 @@ const getProfileWarnings = (user: {
   is_couple?: boolean | null;
   partner_name?: string | null;
   partner_photo_url?: string | null;
-}, t: any) => {
+}, t: (key: string, defaultValue?: string) => string) => {
   const warnings: string[] = [];
   
   if (!user.first_name?.trim()) warnings.push(t('admin.warning_first_name_missing', 'Vorname fehlt'));

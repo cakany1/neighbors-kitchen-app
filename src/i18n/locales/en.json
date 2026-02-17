@@ -989,12 +989,12 @@
     "upload_photo": "Upload real photo",
     "remove_ai_image": "Remove AI image",
     "stock_photo_notice": "A stock image will be shown with a 'Stock image' badge",
-    "hour_suffix": "o clock",
+    "hour_suffix": "o'clock",
     "respectful_language_error": "Please use respectful language.",
     "past_timeslot_error": "This timeslot is in the past. Please choose a later time.",
     "creating_meal_toast": "Creating and translating meal...",
     "bring_container_option": "📦 Please bring tupperware",
-    "time_suffix": "o clock"
+    "time_suffix": "o'clock"
   },
   "feed_page": {
     "welcome_message": "Welcome to Neighbors Kitchen! This is a private food-sharing community. Please bring your own containers, respect the chefs' homes and pay fairly. Tap to close.",
