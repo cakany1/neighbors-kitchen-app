@@ -44,17 +44,21 @@ const InteractiveMap = ({ meals, userLat = 47.5596, userLng = 7.5886 }: Interact
         weight: 2,
       }).addTo(map);
 
+      // Pre-translate strings outside of template
+      const byLabel = t('common.by');
+      const viewDetailsLabel = t('actions.view_details');
+
       // Create popup content with translations
       const popupContent = `
         <div class="p-2">
           <h3 class="font-semibold text-sm mb-1">${meal.title}</h3>
-          <p class="text-xs text-muted-foreground mb-1">${t('common.by')} ${meal.chef.firstName}</p>
+          <p class="text-xs text-muted-foreground mb-1">${byLabel} ${meal.chef.firstName}</p>
           <p class="text-xs text-muted-foreground">${meal.location.neighborhood}</p>
           <button 
             onclick="window.location.href='/meal/${meal.id}'" 
             class="mt-2 w-full bg-primary text-primary-foreground text-xs py-1 px-2 rounded hover:bg-primary/90"
           >
-            ${t('actions.view_details')}
+            ${viewDetailsLabel}
           </button>
         </div>
       `;
