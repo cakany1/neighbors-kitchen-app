@@ -77,10 +77,10 @@ export const Header = () => {
     try {
       await supabase.auth.signOut();
       queryClient.clear();
-      toast.success(t('common.logged_out', 'Erfolgreich abgemeldet'));
+      toast.success(t('common.logged_out'));
       navigate('/');
     } catch (error) {
-      toast.error(t('common.logout_error', 'Fehler beim Abmelden'));
+      toast.error(t('common.logout_error'));
     }
   };
 
@@ -106,15 +106,15 @@ export const Header = () => {
             onClick={() => navigate('/install')}
             className="hidden md:flex"
           >
-            {t('install.download_app', 'App herunterladen')}
+            {t('install.download_app')}
           </Button>
           <LanguageSwitcher />
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/faq')}
-            title={t('header.help_faq_title', 'Hilfe & FAQ')}
-            aria-label={t('header.help_faq_aria', 'Hilfe & FAQ öffnen')}
+            title={t('header.help_faq_title')}
+            aria-label={t('header.help_faq_aria')}
           >
             <HelpCircle className="w-5 h-5" />
           </Button>
@@ -123,9 +123,9 @@ export const Header = () => {
               variant="ghost"
               size="icon"
               onClick={() => navigate('/admin')}
-              title={t('header.admin_dashboard_title', 'Admin Dashboard')}
+              title={t('header.admin_dashboard_title')}
               className="relative"
-              aria-label={t('header.admin_dashboard_aria', 'Admin Dashboard öffnen')}
+              aria-label={t('header.admin_dashboard_aria')}
             >
               <Shield className="w-5 h-5" />
               {pendingCount && pendingCount > 0 && (
@@ -145,7 +145,7 @@ export const Header = () => {
                   variant="ghost"
                   size="icon"
                   className="rounded-full p-0 w-8 h-8"
-                  aria-label={t('header.user_menu_aria', 'Benutzermenü')}
+                  aria-label={t('header.user_menu_aria')}
                 >
                   <Avatar className="w-8 h-8">
                     <AvatarImage src={currentUser.profile?.avatar_url || undefined} alt="Profile" />
@@ -158,11 +158,11 @@ export const Header = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => navigate('/profile')}>
                   <User className="w-4 h-4 mr-2" />
-                  {t('nav.profile', 'Mein Profil')}
+                  {t('nav.profile')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="w-4 h-4 mr-2" />
-                  {t('nav.logout', 'Abmelden')}
+                  {t('nav.logout')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
