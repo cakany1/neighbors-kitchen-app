@@ -300,7 +300,7 @@ const Login = () => {
                 <Input
                   id="new-password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={t('auth.password_placeholder')}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
@@ -313,7 +313,7 @@ const Login = () => {
                 <Input
                   id="confirm-password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={t('auth.password_placeholder')}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
