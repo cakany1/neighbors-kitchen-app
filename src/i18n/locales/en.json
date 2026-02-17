@@ -324,7 +324,9 @@
     "preview": "Preview",
     "partner_preview": "Partner Preview",
     "vacation_mode_on": "🏖️ Vacation mode activated",
-    "vacation_mode_off": "Vacation mode deactivated"
+    "vacation_mode_off": "Vacation mode deactivated",
+    "vacation_on": "🏖️ Vacation mode activated",
+    "vacation_off": "Vacation mode deactivated"
   },
   "auth": {
     "welcome_back": "Welcome back!",

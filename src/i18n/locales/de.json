@@ -576,7 +576,9 @@
     "preview": "Vorschau",
     "partner_preview": "Partner-Vorschau",
     "vacation_mode_on": "🏖️ Urlaubsmodus aktiviert",
-    "vacation_mode_off": "Urlaubsmodus deaktiviert"
+    "vacation_mode_off": "Urlaubsmodus deaktiviert",
+    "vacation_on": "🏖️ Urlaubsmodus aktiviert",
+    "vacation_off": "Urlaubsmodus deaktiviert"
   },
   "guidelines": {
     "bringContainer": "Eigenen Behälter oder Teller für Abholung mitbringen (ausser beim Vor-Ort-Essen)",

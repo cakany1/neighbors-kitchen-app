@@ -97,7 +97,7 @@ const ReleaseChecklistSummary = ({ navigate }: { navigate: (path: string) => voi
           </Badge>
         </div>
         <CardDescription>
-          Manuelle QA-Prüfpunkte vor Go-Live
+          {t('admin_health.manual_qa_title', 'Manuelle QA-Prüfpunkte vor Go-Live')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -325,9 +325,9 @@ const AdminHealth = () => {
       refetchRuns();
       
       if (data.status === 'passed') {
-        toast.success(`✅ Self-Test bestanden! ${data.summary.passed}/${data.summary.total} Tests erfolgreich.`);
+        toast.success(t('admin_health.self_test_passed', { passed: data.summary.passed, total: data.summary.total, defaultValue: `✅ Self-Test bestanden! ${data.summary.passed}/${data.summary.total} Tests erfolgreich.` }));
       } else {
-        toast.error(`❌ Self-Test fehlgeschlagen! ${data.summary.failed} Tests nicht bestanden.`);
+        toast.error(t('admin_health.self_test_failed', { failed: data.summary.failed, defaultValue: `❌ Self-Test fehlgeschlagen! ${data.summary.failed} Tests nicht bestanden.` }));
       }
     },
     onError: (error: Error) => {
@@ -351,16 +351,16 @@ const AdminHealth = () => {
           <Alert variant="destructive">
             <Lock className="h-4 w-4" />
             <AlertDescription>
-              Zugang verweigert. Admin-Berechtigung erforderlich.
+              {t('admin_health.access_denied_title', 'Zugang verweigert.')} {t('admin_health.access_denied_desc', 'Admin-Berechtigung erforderlich.')}
               {adminError && <span className="block mt-2 text-xs">Fehler: {adminError.message}</span>}
             </AlertDescription>
           </Alert>
           <div className="mt-4 space-y-2">
             <Button onClick={() => navigate('/admin')}>
-              Zurück zum Admin Dashboard
+              {t('admin_health.back_to_admin', 'Zurück zum Admin Dashboard')}
             </Button>
             <Button variant="outline" onClick={() => navigate('/login')}>
-              Zur Anmeldung
+              {t('admin_health.back_to_login', 'Zur Anmeldung')}
             </Button>
           </div>
         </main>
@@ -458,13 +458,13 @@ const AdminHealth = () => {
               <Shield className="w-6 h-6 text-primary" />
               System Healthcheck
             </h1>
-            <p className="text-muted-foreground">Go-Live Bereitschaftstest & QA Dashboard</p>
+            <p className="text-muted-foreground">{t('admin_health.go_live_title', 'Go-Live Bereitschaftstest & QA Dashboard')}</p>
           </div>
           <Button 
             onClick={() => navigate('/admin')}
             variant="outline"
           >
-            Zurück zum Admin
+            {t('admin_health.back_to_admin', 'Zurück zum Admin')}
           </Button>
         </div>
 
@@ -977,7 +977,7 @@ const AdminHealth = () => {
               ) : (
                 <>
                   <Play className="w-4 h-4 mr-2" />
-                  Self-Test starten
+                  {t('admin_health.start_test', 'Self-Test starten')}
                 </>
               )}
             </Button>
@@ -1084,14 +1084,14 @@ const AdminHealth = () => {
               <Alert className="border-green-500 bg-green-50 dark:bg-green-950/30">
                 <CheckCircle className="h-5 w-5 text-green-600" />
                 <AlertDescription className="text-green-800 dark:text-green-200 font-medium">
-                  ✅ GO – Alle Checks bestanden. DB ✓ • Self-Test {latestRun?.summary?.passed}/{latestRun?.summary?.total} ✓
+                  {t('admin_health.status_ready', { passed: latestRun?.summary?.passed, total: latestRun?.summary?.total, defaultValue: `✅ GO – Alle Checks bestanden. DB ✓ • Self-Test ${latestRun?.summary?.passed}/${latestRun?.summary?.total} ✓` })}
                 </AlertDescription>
               </Alert>
             ) : !testRun ? (
               <Alert>
                 <AlertTriangle className="h-5 w-5" />
                 <AlertDescription>
-                  ⏳ Self-Test noch nicht ausgeführt. Bitte Tests starten.
+                  {t('admin_health.status_pending', '⏳ Self-Test noch nicht ausgeführt. Bitte Tests starten.')}
                 </AlertDescription>
               </Alert>
             ) : (
