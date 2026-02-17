@@ -319,7 +319,10 @@
     "partner_id_optional_title": "Partner ID (Optional)",
     "partner_id_optional_hint": "Optional: Upload your partner's ID for an enhanced trust level. Does not block any features.",
     "women_only_photo_verification_required": "For Women-Only meals, your partner's profile photo must also be verified.",
-    "your_photo_not_verified": "Your profile photo must be verified before you can offer Women-Only meals."
+    "your_photo_not_verified": "Your profile photo must be verified before you can offer Women-Only meals.",
+    "confirm_delete": "DELETE",
+    "preview": "Preview",
+    "partner_preview": "Partner Preview"
   },
   "auth": {
     "welcome_back": "Welcome back!",
@@ -995,7 +998,8 @@
     "allergens_detected": "Allergens detected: {{allergens}}",
     "minimum_amount": "Minimum amount is CHF {{amount}} (incl. fee).",
     "photo_updated": "📷 Photo updated",
-    "self_booking_error": "You can't book your own offer."
+    "self_booking_error": "You can't book your own offer.",
+    "profile_delete_error": "Error while deleting profile"
   },
   "feed_fallback": {
     "no_address_set": "Please set an address in your profile first",
@@ -1282,5 +1286,14 @@
     "technical_details": "Technical Details",
     "reload_page": "Reload Page",
     "back_to_home": "Back to Home"
+  },
+  "units": {
+    "km": "km"
+  },
+  "placeholders": {
+    "phone_ch": "+41 79 123 45 67",
+    "iban": "CH93 0076 2011 6238 5295 7",
+    "postcode": "4051",
+    "city": "Basel"
   }
 }

@@ -286,7 +286,7 @@ const Profile = () => {
       toast.success(t('profile.account_deleted', 'Account wurde gelöscht'));
       navigate('/');
     } catch (err: any) {
-      toast.error(err.message || 'Fehler beim Löschen');
+      toast.error(err.message || t('toast.profile_delete_error'));
     }
   };
 
@@ -478,7 +478,7 @@ const Profile = () => {
                       type="tel"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
-                      placeholder="+41 79 123 45 67"
+                      placeholder={t('placeholders.phone_ch')}
                     />
                   ) : (
                     <p className="text-sm">{profile.phone_number || '-'}</p>
@@ -572,7 +572,7 @@ const Profile = () => {
                         onChange={(e) => setNotificationRadius(parseInt(e.target.value) || 5)}
                         className="w-20"
                       />
-                      <span className="text-sm text-muted-foreground">km</span>
+                      <span className="text-sm text-muted-foreground">{t('units.km')}</span>
                     </div>
                   ) : (
                     <p className="text-sm">{profile.notification_radius || 5} km</p>
@@ -756,7 +756,7 @@ const Profile = () => {
                         <Input
                           value={iban}
                           onChange={(e) => setIban(e.target.value.toUpperCase())}
-                          placeholder="CH93 0076 2011 6238 5295 7"
+                          placeholder={t('placeholders.iban')}
                           className="font-mono text-sm"
                         />
                       ) : (
@@ -902,7 +902,7 @@ const Profile = () => {
                 <Input
                   value={deleteConfirm}
                   onChange={(e) => setDeleteConfirm(e.target.value)}
-                  placeholder="DELETE"
+                  placeholder={t('profile.confirm_delete')}
                   className="mt-2"
                 />
                 <AlertDialogFooter>
