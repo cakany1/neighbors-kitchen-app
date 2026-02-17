@@ -88,8 +88,7 @@ export const AdminReadAuditLog = () => {
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Alle Zugriffe auf sensible Benutzerdaten werden automatisch protokolliert.
-          Dies ist ein Audit-Trail für Compliance und Sicherheit.
+          {t('audit_log.info_alert', 'Alle Zugriffe auf sensible Benutzerdaten werden automatisch protokolliert. Dies ist ein Audit-Trail für Compliance und Sicherheit.')}
         </AlertDescription>
       </Alert>
 
@@ -98,13 +97,13 @@ export const AdminReadAuditLog = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Filter className="w-4 h-4" />
-            Filter
+            {t('audit_log.filter_title', 'Filter')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="text-sm font-medium">Zielbenutzer-ID</label>
+              <label className="text-sm font-medium">{t('audit_log.target_user_id_label', 'Zielbenutzer-ID')}</label>
               <Input
                 placeholder="User ID..."
                 value={filterUserId}
@@ -113,7 +112,7 @@ export const AdminReadAuditLog = () => {
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Admin-ID</label>
+              <label className="text-sm font-medium">{t('audit_log.admin_id_label', 'Admin-ID')}</label>
               <Input
                 placeholder="Admin ID..."
                 value={filterAdminId}
@@ -133,7 +132,7 @@ export const AdminReadAuditLog = () => {
                 }}
               >
                 <X className="w-4 h-4 mr-1" />
-                Filter zurücksetzen
+                {t('audit_log.reset_filters', 'Filter zurücksetzen')}
               </Button>
             )}
           </div>
@@ -144,13 +143,13 @@ export const AdminReadAuditLog = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Audit-Log: Admin Datenzugriffe</span>
+            <span>{t('audit_log.title', 'Audit-Log: Admin Datenzugriffe')}</span>
             <Badge variant="outline">
-              {reads?.length || 0} Einträge
+              {reads?.length || 0} {t('audit_log.entries_badge', 'Einträge')}
             </Badge>
           </CardTitle>
           <CardDescription>
-            Zeigt alle Zugriffe auf sensible Benutzerdaten durch Admins
+            {t('audit_log.description', 'Zeigt alle Zugriffe auf sensible Benutzerdaten durch Admins')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -158,7 +157,7 @@ export const AdminReadAuditLog = () => {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Fehler beim Laden des Audit-Logs: {(error as Error).message}
+                {t('audit_log.error_loading', 'Fehler beim Laden des Audit-Logs:')} {(error as Error).message}
               </AlertDescription>
             </Alert>
           ) : isLoading ? (
@@ -174,13 +173,13 @@ export const AdminReadAuditLog = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Datum/Zeit</TableHead>
-                    <TableHead>Admin</TableHead>
-                    <TableHead>Zielbenutzer</TableHead>
-                    <TableHead>Aktion</TableHead>
-                    <TableHead>Felder</TableHead>
-                    <TableHead>Kontext</TableHead>
-                    <TableHead className="text-right">Notizen</TableHead>
+                    <TableHead>{t('audit_log.table_header_datetime', 'Datum/Zeit')}</TableHead>
+                    <TableHead>{t('audit_log.table_header_admin', 'Admin')}</TableHead>
+                    <TableHead>{t('audit_log.table_header_target_user', 'Zielbenutzer')}</TableHead>
+                    <TableHead>{t('audit_log.table_header_action', 'Aktion')}</TableHead>
+                    <TableHead>{t('audit_log.table_header_fields', 'Felder')}</TableHead>
+                    <TableHead>{t('audit_log.table_header_context', 'Kontext')}</TableHead>
+                    <TableHead className="text-right">{t('audit_log.table_header_notes', 'Notizen')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -213,7 +212,7 @@ export const AdminReadAuditLog = () => {
                       <TableCell>{getActionBadge(read.action)}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className="text-xs">
-                          {read.fields_count} Felder
+                          {read.fields_count} {t('audit_log.fields_badge', 'Felder')}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
@@ -231,7 +230,7 @@ export const AdminReadAuditLog = () => {
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Eye className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
               <p className="text-muted-foreground">
-                Keine Admin-Datenzugriffe protokolliert
+                {t('audit_log.no_data_accesses', 'Keine Admin-Datenzugriffe protokolliert')}
               </p>
             </div>
           )}
@@ -242,19 +241,19 @@ export const AdminReadAuditLog = () => {
       {reads && reads.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Statistiken</CardTitle>
+            <CardTitle>{t('audit_log.statistics_title', 'Statistiken')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3">
               <div className="p-4 border rounded-lg">
-                <p className="text-sm text-muted-foreground">Eindeutige Admins</p>
+                <p className="text-sm text-muted-foreground">{t('audit_log.stat_unique_admins', 'Eindeutige Admins')}</p>
                 <p className="text-2xl font-bold">
                   {new Set(reads.map((r) => r.admin_id)).size}
                 </p>
               </div>
               <div className="p-4 border rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                  Benutzer mit Zugriff
+                  {t('audit_log.stat_users_accessed', 'Benutzer mit Zugriff')}
                 </p>
                 <p className="text-2xl font-bold">
                   {new Set(reads.map((r) => r.target_user_id)).size}
@@ -262,7 +261,7 @@ export const AdminReadAuditLog = () => {
               </div>
               <div className="p-4 border rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                  Durchschn. Felder/Zugriff
+                  {t('audit_log.stat_avg_fields', 'Durchschn. Felder/Zugriff')}
                 </p>
                 <p className="text-2xl font-bold">
                   {(

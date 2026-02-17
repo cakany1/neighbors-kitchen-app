@@ -54,7 +54,7 @@ export const LanguageSwitcher = () => {
           className="cursor-pointer border-t mt-1 pt-2 text-muted-foreground"
         >
           <span className="text-xs">
-            {i18n.language === 'de' ? '🔄 Show Original (EN)' : '🔄 Original anzeigen (DE)'}
+            {t(i18n.language === 'de' ? 'language_switcher.show_original_en' : 'language_switcher.show_original_de', i18n.language === 'de' ? '🔄 Show Original (EN)' : '🔄 Original anzeigen (DE)')}
           </span>
         </DropdownMenuItem>
       </DropdownMenuContent>

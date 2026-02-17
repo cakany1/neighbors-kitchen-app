@@ -99,12 +99,12 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
 
       if (error) throw error;
 
-      toast.success('Verifizierungsanfrage gesendet! ✓');
+      toast.success(t('toast.verification_request_sent', 'Verifizierungsanfrage gesendet! ✓'));
       setOpen(false);
       onSuccess();
     } catch (error) {
       console.error('Verification request error:', error);
-      toast.error('Anfrage fehlgeschlagen. Bitte erneut versuchen.');
+      toast.error(t('toast.verification_request_failed', 'Anfrage fehlgeschlagen. Bitte erneut versuchen.'));
     } finally {
       setSubmitting(false);
     }
@@ -120,17 +120,17 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
       <DialogTrigger asChild>
         <Button className="w-full gap-2" variant={verificationStatus === 'pending' ? 'secondary' : 'default'}>
           <Shield className="w-4 h-4" />
-          {verificationStatus === 'pending' ? '⏳ Verifizierung ausstehend' : '🪪 Jetzt verifizieren'}
+          {verificationStatus === 'pending' ? t('verification.status_pending', '⏳ Verifizierung ausstehend') : t('verification.request_verification', '🪪 Jetzt verifizieren')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-primary" />
-            ID-Verifizierung
+            {t('verification.dialog_title', 'ID-Verifizierung')}
           </DialogTitle>
           <DialogDescription>
-            Beantrage dein ✓ Verifiziert-Badge. Ein Ausweisfoto ist <strong>optional</strong>, beschleunigt aber die Prüfung.
+            <span dangerouslySetInnerHTML={{ __html: t('verification.dialog_desc', 'Beantrage dein ✓ Verifiziert-Badge. Ein Ausweisfoto ist <strong>optional</strong>, beschleunigt aber die Prüfung.') }} />
           </DialogDescription>
         </DialogHeader>
 
@@ -139,11 +139,11 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
           <Alert className="bg-primary/5 border-primary/20">
             <Lock className="h-4 w-4 text-primary" />
             <AlertDescription className="text-xs">
-              <strong>🔒 Sicher & Privat</strong>
+              <strong>{t('verification.privacy_title', '🔒 Sicher & Privat')}</strong>
               <ul className="mt-2 ml-4 space-y-1 list-disc">
-                <li>Dein Dokument wird verschlüsselt gespeichert</li>
-                <li>Nur Admins können es zur Prüfung einsehen</li>
-                <li>Nach Genehmigung wird es automatisch gelöscht</li>
+                <li>{t('verification.privacy_encrypted', 'Dein Dokument wird verschlüsselt gespeichert')}</li>
+                <li>{t('verification.privacy_admin_only', 'Nur Admins können es zur Prüfung einsehen')}</li>
+                <li>{t('verification.privacy_auto_delete', 'Nach Genehmigung wird es automatisch gelöscht')}</li>
               </ul>
             </AlertDescription>
           </Alert>
@@ -151,11 +151,11 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
           {/* Benefits */}
           <Alert>
             <AlertDescription className="text-xs">
-              <strong>Warum verifizieren?</strong>
+              <strong>{t('verification.why_verify_title', 'Warum verifizieren?')}</strong>
               <ul className="mt-2 ml-4 space-y-1 list-disc">
-                <li>Erhalte das ✓ Verifiziert-Badge</li>
-                <li>Erhöhe deine Buchungschancen</li>
-                <li>Baue Vertrauen in der Nachbarschaft auf</li>
+                <li>{t('verification.why_verify_badge', 'Erhalte das ✓ Verifiziert-Badge')}</li>
+                <li>{t('verification.why_verify_bookings', 'Erhöhe deine Buchungschancen')}</li>
+                <li>{t('verification.why_verify_trust', 'Baue Vertrauen in der Nachbarschaft auf')}</li>
               </ul>
             </AlertDescription>
           </Alert>
@@ -163,10 +163,10 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
           {/* Upload Section - Optional */}
           <div className="space-y-2">
             <Label htmlFor="verification-photo" className="font-medium">
-              Ausweis-Foto hochladen <span className="text-muted-foreground font-normal">(optional)</span>
+              {t('verification.upload_label', 'Ausweis-Foto hochladen')} <span className="text-muted-foreground font-normal">{t('verification.upload_optional', '(optional)')}</span>
             </Label>
             <p className="text-xs text-muted-foreground mb-2">
-              Pass, ID-Karte oder Führerschein – beschleunigt die Prüfung, ist aber nicht zwingend erforderlich
+              {t('verification.upload_hint', 'Pass, ID-Karte oder Führerschein – beschleunigt die Prüfung, ist aber nicht zwingend erforderlich')}
             </p>
             <Input
               id="verification-photo"
@@ -179,13 +179,13 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
             {uploading && (
               <p className="text-xs text-muted-foreground flex items-center gap-2">
                 <Loader2 className="w-3 h-3 animate-spin" />
-                Hochladen...
+                {t('verification.uploading', 'Hochladen...')}
               </p>
             )}
             {filePath && (
               <div className="mt-2 flex items-center gap-2 text-xs text-green-600 dark:text-green-400">
                 <CheckCircle2 className="w-4 h-4" />
-                Dokument hochgeladen! Bereit zum Absenden.
+                {t('verification.upload_success', 'Dokument hochgeladen! Bereit zum Absenden.')}
               </div>
             )}
           </div>
@@ -200,7 +200,7 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
                 disabled={submitting}
               />
               <Label htmlFor="confirm-ownership" className="text-xs leading-relaxed cursor-pointer">
-                Ich bestätige, dass dies mein eigener Ausweis ist und dass meine Angaben korrekt sind.
+                {t('verification.confirm_ownership', 'Ich bestätige, dass dies mein eigener Ausweis ist und dass meine Angaben korrekt sind.')}
               </Label>
             </div>
           )}
@@ -208,16 +208,16 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
           {verificationStatus === 'rejected' && (
             <Alert variant="destructive">
               <AlertDescription className="text-xs space-y-2">
-                <p className="font-semibold">Deine vorherige Verifizierung wurde abgelehnt.</p>
+                <p className="font-semibold">{t('verification.rejection_title', 'Deine vorherige Verifizierung wurde abgelehnt.')}</p>
                 {rejectionReason && (
                   <p>
-                    <span className="font-medium">Grund:</span> {getReasonLabel(rejectionReason)}
+                    <span className="font-medium">{t('verification.rejection_reason_label', 'Grund:')}</span> {getReasonLabel(rejectionReason)}
                   </p>
                 )}
                 {rejectionDetails && (
                   <p className="italic">"{rejectionDetails}"</p>
                 )}
-                <p className="mt-2">Bitte beachte die Hinweise oben und reiche erneut ein.</p>
+                <p className="mt-2">{t('verification.rejection_retry', 'Bitte beachte die Hinweise oben und reiche erneut ein.')}</p>
               </AlertDescription>
             </Alert>
           )}
@@ -226,14 +226,14 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
           {filePath && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Trash2 className="w-3 h-3" />
-              Dokument wird nach erfolgreicher Prüfung automatisch gelöscht
+              {t('verification.auto_delete_note', 'Dokument wird nach erfolgreicher Prüfung automatisch gelöscht')}
             </div>
           )}
         </div>
 
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setOpen(false)} className="flex-1" disabled={submitting}>
-            Abbrechen
+            {t('verification.cancel', 'Abbrechen')}
           </Button>
           <Button 
             onClick={handleSubmit} 
@@ -243,10 +243,10 @@ export const VerificationDialog = ({ userId, verificationStatus, rejectionReason
             {submitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                Sende...
+                {t('verification.sending', 'Sende...')}
               </>
             ) : (
-              '📤 Verifizierung beantragen'
+              t('verification.submit_request', '📤 Verifizierung beantragen')
             )}
           </Button>
         </div>

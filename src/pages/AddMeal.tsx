@@ -59,7 +59,7 @@ const AddMeal = () => {
   // Time dropdown options (24h format)
   const hourOptions = Array.from({ length: 18 }, (_, i) => {
     const hour = (i + 6).toString().padStart(2, '0');
-    return { value: hour, label: `${hour} Uhr` };
+    return { value: hour, label: `${hour} ${t('add_meal.hour_suffix', 'Uhr')}` };
   }); // 06:00 - 23:00
   
   const minuteOptions = [
@@ -238,7 +238,7 @@ const AddMeal = () => {
     // CONTENT FILTER: Use centralized filter with normalization
     const contentCheck = validateMealContent(formData.title, formData.description);
     if (!contentCheck.isValid) {
-      toast.error(contentCheck.error || 'Bitte respektvolle Sprache verwenden.');
+      toast.error(contentCheck.error || t('add_meal.respectful_language_error', 'Bitte respektvolle Sprache verwenden.'));
       return;
     }
     
@@ -267,7 +267,7 @@ const AddMeal = () => {
       const graceTime = new Date(now.getTime() + 15 * 60 * 1000);
       
       if (pickupTime < graceTime) {
-        toast.error('Dieser Zeitslot liegt in der Vergangenheit. Bitte wähle einen späteren Zeitpunkt.');
+        toast.error(t('add_meal.past_timeslot_error', 'Dieser Zeitslot liegt in der Vergangenheit. Bitte wähle einen späteren Zeitpunkt.'));
         return;
       }
     }
@@ -306,7 +306,7 @@ const AddMeal = () => {
       }
 
       // Show loading state
-      const loadingToastId = toast.loading('Gericht wird erstellt und übersetzt...');
+      const loadingToastId = toast.loading(t('add_meal.creating_meal_toast', 'Gericht wird erstellt und übersetzt...'));
 
       // Save address to profile if it's new or changed
       const addressId = generateAddressId(addressData.street, addressData.city, addressData.postalCode);
@@ -827,7 +827,7 @@ const AddMeal = () => {
                       }}
                       className="h-12"
                     >
-                      {`${time} - ${(parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0')}:00 Uhr`}
+                      {`${time} - ${(parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0')}:00 ${t('add_meal.time_suffix', 'Uhr')}`}
                     </Button>
                   ))}
                 </div>
@@ -877,7 +877,7 @@ const AddMeal = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                      <span className="ml-1 text-sm text-muted-foreground">Uhr</span>
+                      <span className="ml-1 text-sm text-muted-foreground">{t('add_meal.time_suffix', 'Uhr')}</span>
                     </div>
                   </div>
 
@@ -922,7 +922,7 @@ const AddMeal = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                      <span className="ml-1 text-sm text-muted-foreground">Uhr</span>
+                      <span className="ml-1 text-sm text-muted-foreground">{t('add_meal.time_suffix', 'Uhr')}</span>
                     </div>
                   </div>
                 </div>
@@ -1156,7 +1156,7 @@ const AddMeal = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="bring_container">📦 Bitte Tupperware mitbringen</SelectItem>
+                  <SelectItem value="bring_container">{t('add_meal.bring_container_option', '📦 Bitte Tupperware mitbringen')}</SelectItem>
                   <SelectItem value="plate_ok">🍽️ Teller genügt</SelectItem>
                   <SelectItem value="either_ok">🤷 Egal / Alles OK</SelectItem>
                 </SelectContent>

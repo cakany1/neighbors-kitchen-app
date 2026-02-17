@@ -113,8 +113,8 @@ export const Header = () => {
             variant="ghost"
             size="icon"
             onClick={() => navigate('/faq')}
-            title="Hilfe & FAQ"
-            aria-label="Hilfe & FAQ öffnen"
+            title={t('header.help_faq_title', 'Hilfe & FAQ')}
+            aria-label={t('header.help_faq_aria', 'Hilfe & FAQ öffnen')}
           >
             <HelpCircle className="w-5 h-5" />
           </Button>
@@ -123,9 +123,9 @@ export const Header = () => {
               variant="ghost"
               size="icon"
               onClick={() => navigate('/admin')}
-              title="Admin Dashboard"
+              title={t('header.admin_dashboard_title', 'Admin Dashboard')}
               className="relative"
-              aria-label="Admin Dashboard öffnen"
+              aria-label={t('header.admin_dashboard_aria', 'Admin Dashboard öffnen')}
             >
               <Shield className="w-5 h-5" />
               {pendingCount && pendingCount > 0 && (
@@ -145,7 +145,7 @@ export const Header = () => {
                   variant="ghost"
                   size="icon"
                   className="rounded-full p-0 w-8 h-8"
-                  aria-label="Benutzermenü"
+                  aria-label={t('header.user_menu_aria', 'Benutzermenü')}
                 >
                   <Avatar className="w-8 h-8">
                     <AvatarImage src={currentUser.profile?.avatar_url || undefined} alt="Profile" />

@@ -37,19 +37,19 @@ const getProfileWarnings = (user: {
   is_couple?: boolean | null;
   partner_name?: string | null;
   partner_photo_url?: string | null;
-}) => {
+}, t: (key: string, defaultValue?: string) => string) => {
   const warnings: string[] = [];
   
-  if (!user.first_name?.trim()) warnings.push('Vorname fehlt');
-  if (!user.last_name?.trim()) warnings.push('Nachname fehlt');
-  if (!user.avatar_url) warnings.push('Profilfoto fehlt');
-  if (!user.phone_number) warnings.push('Telefonnummer fehlt');
-  if (!user.gender) warnings.push('Geschlecht fehlt');
+  if (!user.first_name?.trim()) warnings.push(t('admin.warning_first_name_missing', 'Vorname fehlt'));
+  if (!user.last_name?.trim()) warnings.push(t('admin.warning_last_name_missing', 'Nachname fehlt'));
+  if (!user.avatar_url) warnings.push(t('admin.warning_avatar_missing', 'Profilfoto fehlt'));
+  if (!user.phone_number) warnings.push(t('admin.warning_phone_missing', 'Telefonnummer fehlt'));
+  if (!user.gender) warnings.push(t('admin.warning_gender_missing', 'Geschlecht fehlt'));
   
   // Couple-specific checks
   if (user.is_couple) {
-    if (!user.partner_name?.trim()) warnings.push('Partnername fehlt');
-    if (!user.partner_photo_url) warnings.push('Partnerfoto fehlt');
+    if (!user.partner_name?.trim()) warnings.push(t('admin.warning_partner_name_missing', 'Partnername fehlt'));
+    if (!user.partner_photo_url) warnings.push(t('admin.warning_partner_photo_missing', 'Partnerfoto fehlt'));
   }
   
   return warnings;
@@ -603,7 +603,7 @@ const Admin = () => {
       return;
     }
 
-    const headers = ['Vorname', 'Nachname', 'Email', 'IBAN', 'Betrag (CHF)', 'Letzte Auszahlung', 'Bookings'];
+    const headers = t('admin.payout_csv_headers', { returnObjects: true }) as string[];
     const rows = pendingPayouts.map((payout: any) => [
       payout.chef.first_name || '',
       payout.chef.last_name || '',
@@ -899,7 +899,7 @@ const Admin = () => {
         `.trim(),
         duration: 10000,
         action: {
-          label: 'Erneut versuchen',
+          label: t('admin.retry_action', 'Erneut versuchen'),
           onClick: () => sendProfileRemindersMutation.mutate()
         }
       });
@@ -1064,7 +1064,7 @@ const Admin = () => {
                           )}
                           {/* Profile Warnings Badge */}
                           {(() => {
-                            const warnings = getProfileWarnings(user);
+                            const warnings = getProfileWarnings(user, t);
                             if (warnings.length > 0) {
                               return (
                                 <TooltipProvider>
@@ -1278,7 +1278,7 @@ const Admin = () => {
                                 )}
                                 {/* Profile Warnings Badge */}
                                 {(() => {
-                                  const warnings = getProfileWarnings(user);
+                                  const warnings = getProfileWarnings(user, t);
                                   if (warnings.length > 0) {
                                     return (
                                       <TooltipProvider>
@@ -1662,7 +1662,7 @@ const Admin = () => {
                                     )}
                                     {/* Inline warning icon for incomplete profiles */}
                                     {(() => {
-                                      const warnings = getProfileWarnings(user);
+                                      const warnings = getProfileWarnings(user, t);
                                       if (warnings.length > 0) {
                                         return (
                                           <TooltipProvider>
@@ -1913,7 +1913,7 @@ const Admin = () => {
                     {isSendingReminders ? 'Sende E-Mails...' : 'Jetzt Erinnerungen senden'}
                   </Button>
                   <p className="text-sm text-muted-foreground">
-                    Automatischer Cron: Jeden Montag um 10:00 Uhr (UTC)
+                    {t('admin.cron_schedule_info', 'Automatischer Cron: Jeden Montag um 10:00 Uhr (UTC)')}
                   </p>
                 </div>
               </CardContent>
@@ -2081,7 +2081,7 @@ const Admin = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle>Auszahlungen / Payouts</CardTitle>
+                  <CardTitle>{t('admin.payouts_title', 'Auszahlungen / Payouts')}</CardTitle>
                   <CardDescription>
                     Manage chef payout requests
                   </CardDescription>
@@ -2173,11 +2173,11 @@ const Admin = () => {
             <Dialog open={payoutDialogOpen} onOpenChange={setPayoutDialogOpen}>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Auszahlung bestätigen</DialogTitle>
+                  <DialogTitle>{t('admin.confirm_payout_title', 'Auszahlung bestätigen')}</DialogTitle>
                   <DialogDescription>
                     {selectedPayout && (
                       <>
-                        Auszahlung an <strong>{selectedPayout.chef.first_name} {selectedPayout.chef.last_name}</strong> über <strong>CHF {selectedPayout.totalAmount.toFixed(2)}</strong> bestätigen?
+                        {t('admin.confirm_payout_desc', 'Auszahlung an')} <strong>{selectedPayout.chef.first_name} {selectedPayout.chef.last_name}</strong> über <strong>CHF {selectedPayout.totalAmount.toFixed(2)}</strong> bestätigen?
                       </>
                     )}
                   </DialogDescription>
@@ -2226,10 +2226,10 @@ const Admin = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <History className="w-5 h-5" />
-                  Auszahlungs-Historie
+                  {t('admin.payout_history_title', 'Auszahlungs-Historie')}
                 </CardTitle>
                 <CardDescription>
-                  Audit-Trail aller bestätigten Auszahlungen
+                  {t('admin.payout_history_desc', 'Audit-Trail aller bestätigten Auszahlungen')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -2239,7 +2239,7 @@ const Admin = () => {
                   <Alert>
                     <Clock className="h-4 w-4" />
                     <AlertDescription>
-                      Noch keine Auszahlungen bestätigt.
+                      {t('admin.no_payouts_confirmed', 'Noch keine Auszahlungen bestätigt.')}
                     </AlertDescription>
                   </Alert>
                 ) : (
