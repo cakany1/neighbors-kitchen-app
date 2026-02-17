@@ -28,6 +28,15 @@ export const LanguageSwitcher = () => {
   const currentLang = languages.find(lang => lang.code === i18n.language) || languages[0];
   const otherLang = languages.find(lang => lang.code !== i18n.language) || languages[1];
 
+  const isGerman = i18n.language === 'de';
+  const toggleKey = isGerman
+    ? 'language_switcher.show_original_en'
+    : 'language_switcher.show_original_de';
+  const toggleFallback = isGerman
+    ? '🔄 Show Original (EN)'
+    : '🔄 Original anzeigen (DE)';
+  const toggleLabel = t(toggleKey, toggleFallback);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -54,7 +63,7 @@ export const LanguageSwitcher = () => {
           className="cursor-pointer border-t mt-1 pt-2 text-muted-foreground"
         >
           <span className="text-xs">
-            {t(i18n.language === 'de' ? 'language_switcher.show_original_en' : 'language_switcher.show_original_de', i18n.language === 'de' ? '🔄 Show Original (EN)' : '🔄 Original anzeigen (DE)')}
+            {toggleLabel}
           </span>
         </DropdownMenuItem>
       </DropdownMenuContent>
