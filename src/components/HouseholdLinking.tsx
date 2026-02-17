@@ -85,6 +85,20 @@ export const HouseholdLinking = ({ userId, userEmail }: HouseholdLinkingProps) =
     enabled: !!householdLinks?.length,
   });
 
+  // Pre-translate all messages to avoid scope issues in async functions
+  const messages = {
+    alreadyInvited: t('household.already_invited'),
+    cannotInviteSelf: t('household.cannot_invite_self'),
+    inviteSent: t('household.invite_sent'),
+    inviteFailed: t('household.invite_failed'),
+    linkConfirmed: t('household.link_confirmed'),
+    confirmFailed: t('household.confirm_failed'),
+    linkDeclined: t('household.link_declined'),
+    declineFailed: t('household.decline_failed'),
+    linkCancelled: t('household.link_cancelled'),
+    cancelFailed: t('household.cancel_failed'),
+  };
+
   // Create invitation mutation
   const createInviteMutation = useMutation({
     mutationFn: async (email: string) => {
@@ -97,12 +111,12 @@ export const HouseholdLinking = ({ userId, userEmail }: HouseholdLinkingProps) =
         .maybeSingle();
 
       if (existing) {
-        throw new Error(t('household.already_invited'));
+        throw new Error(messages.alreadyInvited);
       }
 
       // Check if the email is not the user's own
       if (email.toLowerCase() === userEmail.toLowerCase()) {
-        throw new Error(t('household.cannot_invite_self'));
+        throw new Error(messages.cannotInviteSelf);
       }
 
       const { error } = await supabase
@@ -116,13 +130,13 @@ export const HouseholdLinking = ({ userId, userEmail }: HouseholdLinkingProps) =
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(t('household.invite_sent'));
+      toast.success(messages.inviteSent);
       setInviteEmail('');
       setConfirmationChecked(false);
       queryClient.invalidateQueries({ queryKey: ['householdLinks'] });
     },
     onError: (error: any) => {
-      toast.error(error.message || t('household.invite_failed'));
+      toast.error(error.message || messages.inviteFailed);
     },
   });
 
@@ -155,12 +169,12 @@ export const HouseholdLinking = ({ userId, userEmail }: HouseholdLinkingProps) =
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(t('household.link_confirmed'));
+      toast.success(messages.linkConfirmed);
       setPendingConfirmId(null);
       queryClient.invalidateQueries({ queryKey: ['householdLinks'] });
     },
     onError: (error: any) => {
-      toast.error(error.message || t('household.confirm_failed'));
+      toast.error(error.message || messages.confirmFailed);
     },
   });
 
@@ -175,11 +189,11 @@ export const HouseholdLinking = ({ userId, userEmail }: HouseholdLinkingProps) =
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(t('household.link_declined'));
+      toast.success(messages.linkDeclined);
       queryClient.invalidateQueries({ queryKey: ['householdLinks'] });
     },
     onError: (error: any) => {
-      toast.error(error.message || t('household.decline_failed'));
+      toast.error(error.message || messages.declineFailed);
     },
   });
 
@@ -194,11 +208,11 @@ export const HouseholdLinking = ({ userId, userEmail }: HouseholdLinkingProps) =
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(t('household.link_cancelled'));
+      toast.success(messages.linkCancelled);
       queryClient.invalidateQueries({ queryKey: ['householdLinks'] });
     },
     onError: (error: any) => {
-      toast.error(error.message || t('household.cancel_failed'));
+      toast.error(error.message || messages.cancelFailed);
     },
   });
 
