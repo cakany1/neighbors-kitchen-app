@@ -328,7 +328,8 @@
     "grant_admin_title": "Admin-Rechte vergeben",
     "revoke_admin_title": "Admin-Rechte entziehen",
     "grant_admin_confirm": "Möchtest du \"{{name}}\" wirklich Admin-Rechte geben? Diese Person erhält vollen Zugriff auf das Admin-Dashboard.",
-    "revoke_admin_confirm": "Möchtest du \"{{name}}\" wirklich die Admin-Rechte entziehen? Diese Person verliert den Zugriff auf das Admin-Dashboard."
+    "revoke_admin_confirm": "Möchtest du \"{{name}}\" wirklich die Admin-Rechte entziehen? Diese Person verliert den Zugriff auf das Admin-Dashboard.",
+    "no_more_emails": "Keine weiteren E-Mails"
   },
   "toast": {
     "profile_incomplete": "Bitte vervollständige dein Profil (Geschlecht, Telefon & Adresse), um Gerichte zu buchen.",
@@ -1175,7 +1176,9 @@
     "bring_container_option": "📦 Bitte Tupperware mitbringen",
     "time_suffix": "Uhr",
     "create_meal_button": "Mahlzeit erstellen",
-    "login_to_publish": "Einloggen zum Veröffentlichen"
+    "login_to_publish": "Einloggen zum Veröffentlichen",
+    "verified_only_desc": "Nur Gäste mit Verifikation dürfen buchen",
+    "ladies_only_desc": "Nur weibliche Gäste dürfen buchen"
   },
   "feed_page": {
     "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schliessen.",

@@ -1009,7 +1009,9 @@
     "bring_container_option": "📦 Please bring tupperware",
     "time_suffix": "o'clock",
     "create_meal_button": "Create Meal",
-    "login_to_publish": "Login to Publish"
+    "login_to_publish": "Login to Publish",
+    "verified_only_desc": "Only verified guests can book",
+    "ladies_only_desc": "Only female guests can book"
   },
   "feed_page": {
     "welcome_message": "Welcome to Neighbors Kitchen! This is a private food-sharing community. Please bring your own containers, respect the chefs' homes and pay fairly. Tap to close.",
@@ -1280,7 +1282,8 @@
     "grant_admin_title": "Grant Admin Rights",
     "revoke_admin_title": "Revoke Admin Rights",
     "grant_admin_confirm": "Do you really want to give \"{{name}}\" admin rights? This person will get full access to the admin dashboard.",
-    "revoke_admin_confirm": "Do you really want to revoke admin rights from \"{{name}}\"? This person will lose access to the admin dashboard."
+    "revoke_admin_confirm": "Do you really want to revoke admin rights from \"{{name}}\"? This person will lose access to the admin dashboard.",
+    "no_more_emails": "No more emails"
   },
   "wizard": {
     "step_counter": "Step {{current}} of {{total}}",

@@ -1206,10 +1206,10 @@ const AddMeal = () => {
                   <Shield className="w-5 h-5 text-primary" />
                   <div>
                     <Label htmlFor="verified-only" className="text-sm font-medium cursor-pointer">
-                      ✓ Nur Verifizierte Nutzer
+                      ✓ {t('add_meal.verified_only')}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Nur Gäste mit Verifikation dürfen buchen
+                      {t('add_meal.verified_only_desc')}
                     </p>
                   </div>
                 </div>
@@ -1227,10 +1227,10 @@ const AddMeal = () => {
                     <Shield className="w-5 h-5 text-destructive" />
                     <div>
                       <Label htmlFor="women-only" className="text-sm font-medium cursor-pointer">
-                        👩 Ladies Only
+                        👩 {t('add_meal.ladies_only')}
                       </Label>
                       <p className="text-xs text-muted-foreground">
-                        Nur weibliche Gäste dürfen buchen
+                        {t('add_meal.ladies_only_desc')}
                       </p>
                     </div>
                   </div>

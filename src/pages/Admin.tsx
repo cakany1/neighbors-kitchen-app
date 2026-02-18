@@ -1076,7 +1076,7 @@ const Admin = () => {
                                       </Badge>
                                     </TooltipTrigger>
                                     <TooltipContent side="bottom" className="max-w-xs">
-                                      <p className="font-medium mb-1">Fehlende Angaben:</p>
+                                      <p className="font-medium mb-1">{t('admin.missing_info_header')}</p>
                                       <ul className="text-xs list-disc ml-3">
                                         {warnings.map((w, i) => <li key={i}>{w}</li>)}
                                       </ul>
@@ -1886,7 +1886,7 @@ const Admin = () => {
                   <div className="text-2xl font-bold">
                     {remindersLoading ? '...' : profileReminders?.filter(r => r.reminder_count >= 3).length || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">Keine weiteren E-Mails</p>
+                  <p className="text-xs text-muted-foreground">{t('admin.no_more_emails')}</p>
                 </CardContent>
               </Card>
             </div>
