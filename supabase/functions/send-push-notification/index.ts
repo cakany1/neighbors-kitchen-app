@@ -10,17 +10,17 @@ function generateRequestId(): string {
 // Structured logger with request ID
 function logWithId(requestId: string, level: 'info' | 'warn' | 'error', message: string, data?: Record<string, unknown>): void {
   const logMessage = `[${requestId}] ${message}`;
-  const logData = data ? JSON.stringify(data) : '';
+  const logArgs = data ? [logMessage, JSON.stringify(data)] : [logMessage];
   
   switch (level) {
     case 'info':
-      console.log(logMessage, logData || '');
+      console.log(...logArgs);
       break;
     case 'warn':
-      console.warn(logMessage, logData || '');
+      console.warn(...logArgs);
       break;
     case 'error':
-      console.error(logMessage, logData || '');
+      console.error(...logArgs);
       break;
   }
 }
@@ -67,6 +67,10 @@ interface FCMv1Message {
       };
     };
   };
+}
+
+interface FCMErrorDetail {
+  errorCode?: string;
 }
 
 // Generate JWT for Firebase service account authentication
@@ -326,7 +330,7 @@ const handler = async (req: Request): Promise<Response> => {
 
         // Handle invalid tokens (UNREGISTERED, INVALID_ARGUMENT for bad token)
         const hasInvalidToken = result.error?.code === 404 || 
-          (Array.isArray(result.error?.details) && result.error.details.some((d: { errorCode?: string }) => 
+          (Array.isArray(result.error?.details) && result.error.details.some((d: FCMErrorDetail) => 
             d.errorCode === 'UNREGISTERED' || d.errorCode === 'INVALID_ARGUMENT'
           ));
         
