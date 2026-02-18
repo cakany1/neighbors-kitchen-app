@@ -926,11 +926,11 @@ const Admin = () => {
       if (error) throw error;
       
       toast.dismiss();
-      toast.success('Image generated and updated successfully!');
+      toast.success(t('toast.image_generated'));
       queryClient.invalidateQueries({ queryKey: ['meals'] });
     } catch (error) {
       toast.dismiss();
-      toast.error('Failed to generate image: ' + (error as Error).message);
+      toast.error(t('toast.image_generation_failed') + ': ' + (error as Error).message);
       console.error('Image generation error:', error);
     } finally {
       setIsGeneratingImage(false);
@@ -1419,8 +1419,8 @@ const Admin = () => {
                                               .from('profiles')
                                               .update({ partner_verification_status: 'approved' as any })
                                               .eq('id', user.id);
-                                            if (error) { toast.error('Fehler: ' + error.message); return; }
-                                            toast.success('Partner-ID verifiziert ✓');
+                                            if (error) { toast.error(t('common.error') + ': ' + error.message); return; }
+                                            toast.success(t('toast.partner_id_verified'));
                                             queryClient.invalidateQueries({ queryKey: ['pendingVerifications'] });
                                             queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
                                           }}
@@ -1439,8 +1439,8 @@ const Admin = () => {
                                               .from('profiles')
                                               .update({ partner_photo_verified: true })
                                               .eq('id', user.id);
-                                            if (error) { toast.error('Fehler: ' + error.message); return; }
-                                            toast.success('Partner-Foto verifiziert ✓');
+                                            if (error) { toast.error(t('common.error') + ': ' + error.message); return; }
+                                            toast.success(t('toast.partner_photo_verified'));
                                             queryClient.invalidateQueries({ queryKey: ['pendingVerifications'] });
                                             queryClient.invalidateQueries({ queryKey: ['allUsersAdmin'] });
                                           }}
@@ -1772,7 +1772,7 @@ const Admin = () => {
                                     // Guard: prevent deleting own user
                                     const { data: { user: currentUser } } = await supabase.auth.getUser();
                                     if (currentUser?.id === user.id) {
-                                      toast.error('Sie können Ihr eigenes Konto nicht löschen');
+                                      toast.error(t('toast.cannot_delete_own_account'));
                                       return;
                                     }
                                     

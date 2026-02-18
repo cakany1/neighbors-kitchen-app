@@ -54,7 +54,7 @@ export const ReportDialog = ({
       setReason('safety_concern');
     } catch (error) {
       console.error('Report error:', error);
-      toast.error('Failed to submit report');
+      toast.error(t('toast.report_failed'));
     } finally {
       setIsSubmitting(false);
     }
