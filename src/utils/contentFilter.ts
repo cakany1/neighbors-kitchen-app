@@ -8,9 +8,13 @@
 const BLACKLIST = [
   // English profanity
   'fuck', 'shit', 'bitch', 'cunt', 'nigger', 'faggot', 'retard',
+  // English insults
+  'asshole', 'damn', 'idiot', 'stupid', 'moron', 'loser', 'dumbass',
   // German profanity
   'fotze', 'wichser', 'hurensohn', 'schlampe', 'schwuchtel', 'spast',
   'arschloch', 'missgeburt', 'behindert',
+  // German insults
+  'dumm', 'blöd', 'idiot', 'trottel', 'depp', 'vollidiot', 'loser',
   // Hate speech
   'nazi', 'hitler', 'heil hitler', 'sieg heil',
   // Sexual content

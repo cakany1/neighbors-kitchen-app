@@ -12,8 +12,10 @@ DECLARE
   combined_text text;
   blacklist text[] := ARRAY[
     'fuck','shit','bitch','cunt','nigger','faggot','retard',
+    'asshole','damn','idiot','stupid','moron','loser','dumbass',
     'fotze','wichser','hurensohn','schlampe','schwuchtel','spast',
     'arschloch','missgeburt','behindert',
+    'dumm','blöd','idiot','trottel','depp','vollidiot','loser',
     'nazi','hitler','heil hitler','sieg heil',
     'porno','porn','sex video','nackt'
   ];
@@ -58,8 +60,10 @@ DECLARE
   combined_text text;
   blacklist text[] := ARRAY[
     'fuck','shit','bitch','cunt','nigger','faggot','retard',
+    'asshole','damn','idiot','stupid','moron','loser','dumbass',
     'fotze','wichser','hurensohn','schlampe','schwuchtel','spast',
     'arschloch','missgeburt','behindert',
+    'dumm','blöd','idiot','trottel','depp','vollidiot','loser',
     'nazi','hitler','heil hitler','sieg heil',
     'porno','porn','sex video','nackt'
   ];
@@ -100,8 +104,10 @@ DECLARE
   combined_text text;
   blacklist text[] := ARRAY[
     'fuck','shit','bitch','cunt','nigger','faggot','retard',
+    'asshole','damn','idiot','stupid','moron','loser','dumbass',
     'fotze','wichser','hurensohn','schlampe','schwuchtel','spast',
     'arschloch','missgeburt','behindert',
+    'dumm','blöd','idiot','trottel','depp','vollidiot','loser',
     'nazi','hitler','heil hitler','sieg heil',
     'porno','porn','sex video','nackt'
   ];
