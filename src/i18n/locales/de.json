@@ -467,16 +467,20 @@
   },
   "ai": {
     "title_required": "Bitte gib zuerst einen Titel ein",
-    "rate_limit": "Zu viele Anfragen. Bitte versuche es später erneut.",
-    "quota_exhausted": "AI-Kontingent erschöpft. Bitte kontaktiere den Support.",
+    "rate_limit": "Zu viele Anfragen. Bitte warte einen Moment und versuche es erneut.",
+    "quota_exhausted": "KI-Bildkontingent aufgebraucht. Bitte versuche es später erneut oder kontaktiere den Support.",
     "preview_generated": "🎨 Vorschaubild erstellt!",
     "generation_failed": "Bildgenerierung fehlgeschlagen. Bitte versuche es erneut.",
     "preview_disclaimer": "Beispielbild – tatsächliches Gericht kann abweichen",
-    "generating": "Wird generiert...",
+    "generating": "Wird generiert…",
     "generate_button": "Vorschaubild generieren (KI)",
     "info_alert": "Das KI-Bild zeigt eine Vorschau. Gäste sehen einen Hinweis, dass das echte Gericht abweichen kann.",
     "confirm_label": "Dieses Bild zeigt ungefähr, wie mein Gericht aussehen wird.",
-    "replace_with_photo": "Später durch echtes Foto ersetzen"
+    "replace_with_photo": "Später durch echtes Foto ersetzen",
+    "auth_error": "Bitte melde dich erneut an, um Bilder zu generieren.",
+    "timeout": "Bildgenerierung hat zu lange gedauert. Bitte versuche es erneut.",
+    "no_image": "Es wurde kein Bild erstellt. Versuche, Titel oder Beschreibung anzupassen.",
+    "network_error": "Netzwerkfehler. Bitte prüfe deine Verbindung und versuche es erneut."
   },
   "profile": {
     "compliance_and_legal": "Datenschutz & Rechtliches",

@@ -50,14 +50,38 @@ export const AIImageGenerator = ({
         body: { prompt }
       });
 
+      // supabase.functions.invoke returns non-2xx bodies in `data` with error set
       if (error) {
         console.error('AI image generation error:', error);
-        if (error.message?.includes('429') || error.message?.includes('rate limit')) {
+        
+        // Check the error context for HTTP status or message hints
+        const errorMsg = error.message || '';
+        const errorContext = (error as any)?.context;
+        const status = errorContext?.status || 0;
+        
+        if (status === 429 || errorMsg.includes('429') || errorMsg.includes('rate limit')) {
           toast.error(t('ai.rate_limit'));
-        } else if (error.message?.includes('402')) {
+        } else if (status === 402 || errorMsg.includes('402') || errorMsg.includes('quota')) {
+          toast.error(t('ai.quota_exhausted'));
+        } else if (status === 401 || status === 403 || errorMsg.includes('401')) {
+          toast.error(t('ai.auth_error'));
+        } else if (errorMsg.includes('timeout') || errorMsg.includes('Timeout')) {
+          toast.error(t('ai.timeout'));
+        } else {
+          toast.error(t('ai.generation_failed'));
+        }
+        return;
+      }
+
+      // Edge function may return error in JSON body (non-throw path)
+      if (data?.error) {
+        console.error('AI image generation returned error:', data.error);
+        if (data.error === 'rate_limit') {
+          toast.error(t('ai.rate_limit'));
+        } else if (data.error === 'quota_exhausted') {
           toast.error(t('ai.quota_exhausted'));
         } else {
-          throw error;
+          toast.error(data.message || t('ai.generation_failed'));
         }
         return;
       }
@@ -66,10 +90,17 @@ export const AIImageGenerator = ({
         setGeneratedImageUrl(data.imageUrl);
         onImageGenerated(data.imageUrl);
         toast.success(t('ai.preview_generated'));
+      } else {
+        toast.error(t('ai.no_image'));
       }
     } catch (error) {
       console.error('Failed to generate AI image:', error);
-      toast.error(t('ai.generation_failed'));
+      // Network errors, timeouts
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        toast.error(t('ai.network_error'));
+      } else {
+        toast.error(t('ai.generation_failed'));
+      }
     } finally {
       setIsGenerating(false);
     }

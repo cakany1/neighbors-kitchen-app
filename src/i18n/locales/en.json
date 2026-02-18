@@ -1094,16 +1094,20 @@
   },
   "ai": {
     "title_required": "Please enter a title first",
-    "rate_limit": "Too many requests. Please try again later.",
-    "quota_exhausted": "AI quota exhausted. Please contact support.",
+    "rate_limit": "Too many requests. Please wait a moment and try again.",
+    "quota_exhausted": "AI image credits are used up. Please try again later or contact support.",
     "preview_generated": "🎨 Preview image generated!",
     "generation_failed": "Image generation failed. Please try again.",
     "preview_disclaimer": "Preview image – actual dish may vary",
-    "generating": "Generating...",
+    "generating": "Generating preview…",
     "generate_button": "Generate preview image (AI)",
     "info_alert": "The AI image shows a preview. Guests will see a notice that the actual dish may differ.",
     "confirm_label": "This image approximately shows what my dish will look like.",
-    "replace_with_photo": "Replace with real photo later"
+    "replace_with_photo": "Replace with real photo later",
+    "auth_error": "Please log in again to generate images.",
+    "timeout": "Image generation timed out. Please try again.",
+    "no_image": "No image was created. Try adjusting your title or description.",
+    "network_error": "Network error. Please check your connection and try again."
   },
   "modal": {
     "almost_done": "Almost there!",
