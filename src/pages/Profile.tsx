@@ -30,6 +30,7 @@ import { HouseholdLinking } from '@/components/HouseholdLinking';
 import { BlockedUsersList } from '@/components/BlockedUsersList';
 import { TwoFactorSettings } from '@/components/TwoFactorSettings';
 import { VerificationDialog } from '@/components/VerificationDialog';
+import { VerificationBadge } from '@/components/VerificationBadge';
 import { VerificationBadges } from '@/components/VerificationBadges';
 import { ReliabilityDisplay } from '@/components/ReliabilityDisplay';
 import { KarmaLevel } from '@/components/KarmaLevel';
@@ -345,6 +346,9 @@ const Profile = () => {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h1 className="text-2xl font-bold">{displayName}</h1>
+                  <VerificationBadge 
+                    isVerified={profile.id_verified || profile.phone_verified || false}
+                  />
                 </div>
 
                 <VerificationBadges
