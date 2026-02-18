@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format, parse } from 'date-fns';
 import { Header } from '@/components/Header';
@@ -29,10 +29,10 @@ import { useQuery } from '@tanstack/react-query';
 const AddMeal = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   // Edit mode detection
-  const urlParams = new URLSearchParams(window.location.search);
-  const editMealId = urlParams.get('edit');
+  const editMealId = searchParams.get('edit');
   const isEditMode = !!editMealId;
   
   const [womenOnly, setWomenOnly] = useState(false);
@@ -153,7 +153,7 @@ const AddMeal = () => {
       // Check if within 5-minute edit window
       const ageMinutes = (Date.now() - new Date(meal.created_at).getTime()) / (1000 * 60);
       if (ageMinutes > 5) {
-        toast.error(t('add_meal.edit_window_expired', 'Bearbeitungsfenster abgelaufen (5 Minuten)'));
+        toast.error(t('add_meal.edit_window_expired'));
         navigate(`/meal/${editMealId}`);
         return null;
       }
