@@ -37,3 +37,15 @@ export function formatDistance(meters: number): string {
   }
   return `${(meters / 1000).toFixed(1)} km`;
 }
+
+/**
+ * Format radius for display with dynamic units
+ * @param meters Radius in meters
+ * @returns Formatted string like "500 m" or "1.2 km"
+ */
+export function formatRadius(meters: number): string {
+  if (meters < 1000) {
+    return `${Math.round(meters)} m`;
+  }
+  return `${(meters / 1000).toFixed(1)} km`;
+}
