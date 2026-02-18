@@ -482,7 +482,8 @@
     "no_image": "Es wurde kein Bild erstellt. Versuche, Titel oder Beschreibung anzupassen.",
     "network_error": "Netzwerkfehler. Bitte prüfe deine Verbindung und versuche es erneut.",
     "retry_button": "Bildgenerierung erneut versuchen",
-    "retry_in": "Erneuter Versuch in {{seconds}}s…"
+    "retry_in": "Erneuter Versuch in {{seconds}}s…",
+    "max_retries_reached": "Bildgenerierung nach mehreren Versuchen fehlgeschlagen. Bitte versuche es später erneut oder lade ein eigenes Foto hoch."
   },
   "profile": {
     "compliance_and_legal": "Datenschutz & Rechtliches",

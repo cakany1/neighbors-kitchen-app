@@ -1109,7 +1109,8 @@
     "no_image": "No image was created. Try adjusting your title or description.",
     "network_error": "Network error. Please check your connection and try again.",
     "retry_button": "Retry image generation",
-    "retry_in": "Retrying in {{seconds}}s…"
+    "retry_in": "Retrying in {{seconds}}s…",
+    "max_retries_reached": "Image generation failed after multiple attempts. Please try again later or upload your own photo instead."
   },
   "modal": {
     "almost_done": "Almost there!",

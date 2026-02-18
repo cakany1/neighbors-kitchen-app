@@ -37,6 +37,8 @@ export const AIImageGenerator = ({
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [retryCountdown, setRetryCountdown] = useState(0);
 
+  const MAX_RETRIES = 3;
+
   const getRetryDelay = (attempt: number) => Math.min(2000 * Math.pow(2, attempt), 30000);
 
   const generateAIImage = useCallback(async () => {
@@ -188,7 +190,7 @@ export const AIImageGenerator = ({
       </Button>
 
       {/* Retry Button - shown after failure */}
-      {lastError && !isGenerating && (
+      {lastError && !isGenerating && retryCountRef.current < MAX_RETRIES && (
         <Button
           type="button"
           variant="outline"
@@ -201,6 +203,16 @@ export const AIImageGenerator = ({
             ? t('ai.retry_in', { seconds: retryCountdown })
             : t('ai.retry_button')}
         </Button>
+      )}
+
+      {/* Max retries exhausted */}
+      {lastError && !isGenerating && retryCountRef.current >= MAX_RETRIES && (
+        <Alert className="border-destructive/50 bg-destructive/10">
+          <AlertTriangle className="h-4 w-4 text-destructive" />
+          <AlertDescription className="text-sm">
+            {t('ai.max_retries_reached')}
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Info Alert */}
