@@ -105,9 +105,9 @@ export function TagSelector({
       {/* Allergens */}
       <Card>
         <CardHeader>
-          <CardTitle>Allergene</CardTitle>
+          <CardTitle>{t("meal.allergens_title")}</CardTitle>
           <CardDescription>
-            Wähle alle Allergene, die in deinem Gericht enthalten sind
+            {t("meal.allergens_description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -125,9 +125,9 @@ export function TagSelector({
       {/* Tags */}
       <Card>
         <CardHeader>
-          <CardTitle>Tags / Kategorien</CardTitle>
+          <CardTitle>{t("meal.tags_title")}</CardTitle>
           <CardDescription>
-            Hilf Menschen, dein Gericht zu finden (z.B. Vegan, Halal)
+            {t("meal.tags_description")}
           </CardDescription>
         </CardHeader>
         <CardContent>

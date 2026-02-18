@@ -31,7 +31,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
   const handoverMode = (meal as any).handoverMode || (meal as any).handover_mode || "pickup_box";
 
   const chef = meal.chef || {};
-  const chefNickname = getProp(chef, "nickname", "nickname") || getProp(chef, "firstName", "first_name") || "Chef";
+  const chefNickname = getProp(chef, "nickname", "nickname") || getProp(chef, "firstName", "first_name") || t("meal.chef_fallback");
   const chefIsVerified = getProp(chef, "isVerified", "id_verified") || false;
   const chefKarma = getProp(chef, "karma", "karma") || 0;
 
@@ -56,7 +56,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
 
   const location = meal.location || {};
   const neighborhood =
-    getProp(location, "neighborhood", "neighborhood") || getProp(meal, "neighborhood", "neighborhood") || "Basel";
+    getProp(location, "neighborhood", "neighborhood") || getProp(meal, "neighborhood", "neighborhood") || t("meal.location_fallback");
 
   const handoverIcons = {
     pickup_box: Package,
@@ -86,7 +86,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
         <div className="absolute top-3 right-3 flex flex-col gap-2">
           {availablePortions > 0 && (
             <Badge className="bg-primary/90 backdrop-blur text-primary-foreground font-bold shadow-sm">
-              {availablePortions} {t("meal.portionsAvailable", "left")}
+              {availablePortions} {t("meal.portions_left")}
             </Badge>
           )}
         </div>
@@ -217,7 +217,7 @@ export const MealCard = ({ meal, onClick, userAllergens = [] }: MealCardProps) =
             <div className="font-semibold text-right">
               {exchangeMode === "money" && Number(minPrice) > 0 ? (
                 <span className="flex flex-col items-end leading-tight">
-                  <span className="text-xs text-muted-foreground font-normal">Online Payment</span>
+                  <span className="text-xs text-muted-foreground font-normal">{t("meal.online_payment")}</span>
                   <span className="text-primary">CHF {minPrice}</span>
                 </span>
               ) : estimatedValueCHF > 0 ? (

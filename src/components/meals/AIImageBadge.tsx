@@ -16,8 +16,7 @@ interface AIImageBadgeProps {
  * - corner: Small corner badge (minimal)
  */
 export const AIImageBadge = ({ variant = 'inline', showRealPhotoBadge = false }: AIImageBadgeProps) => {
-  const { i18n } = useTranslation();
-  const isGerman = i18n.language === 'de';
+  const { t } = useTranslation();
 
   if (showRealPhotoBadge) {
     // Real photo badge - higher trust indicator
@@ -27,7 +26,7 @@ export const AIImageBadge = ({ variant = 'inline', showRealPhotoBadge = false }:
         className="bg-green-500/90 text-white border-0 flex items-center gap-1"
       >
         <Camera className="w-3 h-3" />
-        {isGerman ? 'Echtes Foto' : 'Real photo'}
+        {t('meal.real_photo_badge')}
       </Badge>
     );
   }
@@ -38,9 +37,7 @@ export const AIImageBadge = ({ variant = 'inline', showRealPhotoBadge = false }:
         <div className="flex items-center gap-2 text-white">
           <AlertTriangle className="w-4 h-4 text-yellow-400 shrink-0" />
           <span className="text-xs font-medium">
-            {isGerman 
-              ? 'Beispielbild – tatsächliches Gericht kann abweichen' 
-              : 'Preview image – actual dish may vary'}
+            {t('meal.ai_disclaimer')}
           </span>
         </div>
       </div>
@@ -51,7 +48,7 @@ export const AIImageBadge = ({ variant = 'inline', showRealPhotoBadge = false }:
     return (
       <div className="absolute top-2 left-2 bg-amber-500/90 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
         <Sparkles className="w-3 h-3" />
-        KI
+        {t('meal.ai_badge_short')}
       </div>
     );
   }
@@ -63,7 +60,7 @@ export const AIImageBadge = ({ variant = 'inline', showRealPhotoBadge = false }:
       className="bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30 flex items-center gap-1"
     >
       <Sparkles className="w-3 h-3" />
-      {isGerman ? 'KI-Vorschau' : 'AI Preview'}
+      {t('meal.ai_preview_badge')}
     </Badge>
   );
 };
