@@ -83,7 +83,11 @@ const ReleaseChecklistSummary = ({ navigate }: { navigate: (path: string) => voi
   const progress = Math.round((checkedCount / total) * 100);
 
   const statusEmoji = progress === 100 ? "🟢" : progress > 0 ? "🟡" : "🔴";
-  const statusText = progress === 100 ? "Ready" : progress > 0 ? "In Progress" : "Not Started";
+  const statusText = progress === 100 
+    ? t('admin_health.ready') 
+    : progress > 0 
+      ? t('admin_health.in_progress') 
+      : t('admin_health.not_started');
 
   return (
     <Card className="border-2 border-primary/30">
@@ -91,7 +95,7 @@ const ReleaseChecklistSummary = ({ navigate }: { navigate: (path: string) => voi
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <ClipboardCheck className="w-5 h-5 text-primary" />
-            Release Checklist
+            {t('admin_health.release_checklist')}
           </CardTitle>
           <Badge variant="outline" className="text-lg px-3 py-1">
             {statusEmoji} {checkedCount} / {total}
@@ -105,7 +109,7 @@ const ReleaseChecklistSummary = ({ navigate }: { navigate: (path: string) => voi
         {isLoading ? (
           <div className="flex items-center gap-2 text-muted-foreground">
             <RefreshCw className="w-4 h-4 animate-spin" />
-            Lädt...
+            {t('admin_health.loading')}
           </div>
         ) : (
           <>
@@ -133,7 +137,7 @@ const ReleaseChecklistSummary = ({ navigate }: { navigate: (path: string) => voi
                 className="gap-1"
               >
                 <ExternalLink className="w-4 h-4" />
-                Zur Checklist
+                {t('admin_health.to_checklist')}
               </Button>
             </div>
           </>
@@ -390,12 +394,12 @@ const AdminHealth = () => {
     switch (status) {
       case 'PASS':
       case 'passed':
-        return <Badge className="bg-green-100 text-green-800">PASS</Badge>;
+        return <Badge className="bg-green-100 text-green-800">{t('admin_health.pass')}</Badge>;
       case 'FAIL':
       case 'failed':
-        return <Badge className="bg-red-100 text-red-800">FAIL</Badge>;
+        return <Badge className="bg-red-100 text-red-800">{t('admin_health.fail')}</Badge>;
       case 'SKIP':
-        return <Badge className="bg-yellow-100 text-yellow-800">SKIP</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">{t('admin_health.skip')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -428,7 +432,7 @@ const AdminHealth = () => {
                   Hostname: {envInfo.hostname} • Supabase: {envInfo.supabaseProjectId || 'N/A'}
                 </p>
                 <p className="text-xs text-muted-foreground/70 mt-0.5">
-                  Preview nutzt dasselbe Backend wie dieses Projekt. Echte Isolierung erst mit Remix.
+                  {t('admin_health.preview_info')}
                 </p>
               </div>
             </div>
@@ -457,7 +461,7 @@ const AdminHealth = () => {
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <Shield className="w-6 h-6 text-primary" />
-              System Healthcheck
+              {t('admin_health.system_healthcheck')}
             </h1>
             <p className="text-muted-foreground">{t('admin_health.go_live_title', 'Go-Live Bereitschaftstest & QA Dashboard')}</p>
           </div>
@@ -512,9 +516,9 @@ const AdminHealth = () => {
               size="sm"
             >
               {runTestMutation.isPending ? (
-                <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> Läuft...</>
+                <><RefreshCw className="w-4 h-4 mr-1 animate-spin" /> {t('admin_health.test_running')}</>
               ) : (
-                <><Play className="w-4 h-4 mr-1" /> Test starten</>
+                <><Play className="w-4 h-4 mr-1" /> {t('admin_health.test_button')}</>
               )}
             </Button>
           )}
@@ -528,7 +532,7 @@ const AdminHealth = () => {
                 <Database className="w-8 h-8 text-primary" />
                 <div>
                   <p className="text-2xl font-bold">{previousRuns?.length || 0}</p>
-                  <p className="text-sm text-muted-foreground">QA Runs</p>
+                  <p className="text-sm text-muted-foreground">{t('admin_health.qa_runs')}</p>
                 </div>
               </div>
             </CardContent>
@@ -542,7 +546,7 @@ const AdminHealth = () => {
                   <p className="text-2xl font-bold">
                     {previousRuns?.filter(r => r.status === 'passed').length || 0}
                   </p>
-                  <p className="text-sm text-muted-foreground">Bestanden</p>
+                  <p className="text-sm text-muted-foreground">{t('admin_health.passed')}</p>
                 </div>
               </div>
             </CardContent>
@@ -556,7 +560,7 @@ const AdminHealth = () => {
                   <p className="text-2xl font-bold">
                     {previousRuns?.filter(r => r.status === 'failed').length || 0}
                   </p>
-                  <p className="text-sm text-muted-foreground">Fehlgeschlagen</p>
+                  <p className="text-sm text-muted-foreground">{t('admin_health.failed')}</p>
                 </div>
               </div>
             </CardContent>
@@ -572,7 +576,7 @@ const AdminHealth = () => {
                       ? `${(lastTestResult.summary.duration_ms / 1000).toFixed(1)}s`
                       : '-'}
                   </p>
-                  <p className="text-sm text-muted-foreground">Letzte Laufzeit</p>
+                  <p className="text-sm text-muted-foreground">{t('admin_health.last_run_time')}</p>
                 </div>
               </div>
             </CardContent>
@@ -583,8 +587,8 @@ const AdminHealth = () => {
               <div className="flex items-center gap-3">
                 <Globe className="w-8 h-8 text-primary" />
                 <div>
-                  <p className="text-xs font-bold">🇨🇭 Schweiz</p>
-                  <p className="text-xs text-muted-foreground">Zürich (eu-central-2)</p>
+                  <p className="text-xs font-bold">🇨🇭 {t('admin_health.switzerland')}</p>
+                  <p className="text-xs text-muted-foreground">{t('admin_health.zurich_region')}</p>
                 </div>
               </div>
             </CardContent>
@@ -598,19 +602,19 @@ const AdminHealth = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Database className="w-5 h-5 text-primary" />
-                Datenbank Verbindung
+                {t('admin_health.database_connection')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {dbCheckLoading ? (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <RefreshCw className="w-4 h-4 animate-spin" /> Prüfe...
+                  <RefreshCw className="w-4 h-4 animate-spin" /> {t('admin_health.checking')}
                 </div>
               ) : dbCheck?.connected ? (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span className="font-medium text-green-700">Verbunden</span>
+                    <span className="font-medium text-green-700">{t('admin_health.connected')}</span>
                   </div>
                   <Badge variant="outline">{dbCheck.latency} ms Latenz</Badge>
                 </div>
@@ -618,7 +622,7 @@ const AdminHealth = () => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <XCircle className="w-5 h-5 text-red-500" />
-                    <span className="font-medium text-red-700">Fehler</span>
+                    <span className="font-medium text-red-700">{t('admin_health.error')}</span>
                   </div>
                   <p className="text-xs text-muted-foreground">{dbCheck?.error}</p>
                 </div>
@@ -631,13 +635,13 @@ const AdminHealth = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Globe className="w-5 h-5 text-primary" />
-                GitHub System Status
+                {t('admin_health.github_status')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {githubLoading ? (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <RefreshCw className="w-4 h-4 animate-spin" /> Prüfe...
+                  <RefreshCw className="w-4 h-4 animate-spin" /> {t('admin_health.checking')}
                 </div>
               ) : githubStatus ? (
                 <div className="space-y-2">
@@ -654,7 +658,7 @@ const AdminHealth = () => {
               ) : (
                 <div className="flex items-center gap-2">
                   <XCircle className="w-5 h-5 text-red-500" />
-                  <span className="text-sm">Nicht erreichbar</span>
+                  <span className="text-sm">{t('admin_health.not_reachable')}</span>
                 </div>
               )}
             </CardContent>
@@ -665,7 +669,7 @@ const AdminHealth = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Server className="w-5 h-5 text-primary" />
-                Aktuelle Umgebung
+                {t('admin_health.environment_info')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -690,10 +694,10 @@ const AdminHealth = () => {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Zap className="w-5 h-5 text-primary" />
-                  Stripe Zahlungssystem
+                  {t('admin_health.stripe_payment')}
                 </CardTitle>
                 <CardDescription>
-                  Webhook-Status und Transaktionsübersicht
+                  {t('admin_health.webhook_status')}
                 </CardDescription>
               </div>
               <Button
@@ -706,7 +710,7 @@ const AdminHealth = () => {
                 className="gap-1"
               >
                 <RefreshCw className="w-4 h-4" />
-                Aktualisieren
+                {t('admin_health.refresh')}
               </Button>
             </div>
           </CardHeader>
@@ -715,25 +719,25 @@ const AdminHealth = () => {
               {/* Current Mode */}
               <div className="p-4 rounded-lg bg-muted/50">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Aktueller Modus</span>
+                  <span className="text-sm font-medium">{t('admin_health.current_mode')}</span>
                   <Badge 
                     variant={stripeStatus?.currentMode === 'live' ? 'default' : 'secondary'}
                     className={stripeStatus?.currentMode === 'live' ? 'bg-green-600' : 'bg-yellow-600'}
                   >
-                    {stripeStatus?.currentMode === 'live' ? '🔴 LIVE' : '🟡 TEST'}
+                    {stripeStatus?.currentMode === 'live' ? `🔴 ${t('admin_health.live')}` : `🟡 ${t('admin_health.test')}`}
                   </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   {stripeStatus?.currentMode === 'live' 
-                    ? 'Echte Transaktionen aktiv' 
-                    : 'Sandbox-Modus für Tests'}
+                    ? t('admin_health.real_transactions', 'Echte Transaktionen aktiv')
+                    : t('admin_health.sandbox_mode', 'Sandbox-Modus für Tests')}
                 </p>
               </div>
 
               {/* Last Webhook */}
               <div className="p-4 rounded-lg bg-muted/50">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Letzter Webhook</span>
+                  <span className="text-sm font-medium">{t('admin_health.last_webhook')}</span>
                   {stripeStatus?.lastWebhook?.success ? (
                     <CheckCircle className="w-4 h-4 text-green-500" />
                   ) : stripeStatus?.lastWebhook ? (
@@ -756,26 +760,26 @@ const AdminHealth = () => {
                   </>
                 ) : (
                   <p className="text-xs text-muted-foreground mt-1">
-                    Noch keine Webhooks empfangen
+                    {t('admin_health.no_webhooks')}
                   </p>
                 )}
               </div>
 
               {/* 24h Stats */}
               <div className="p-4 rounded-lg bg-muted/50">
-                <span className="text-sm font-medium">Letzte 24h</span>
+                <span className="text-sm font-medium">{t('admin_health.last_24h')}</span>
                 <div className="flex gap-4 mt-2">
                   <div className="text-center">
                     <p className="text-lg font-bold">{stripeStatus?.stats24h?.test || 0}</p>
-                    <p className="text-xs text-muted-foreground">Test</p>
+                    <p className="text-xs text-muted-foreground">{t('admin_health.test')}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-lg font-bold">{stripeStatus?.stats24h?.live || 0}</p>
-                    <p className="text-xs text-muted-foreground">Live</p>
+                    <p className="text-xs text-muted-foreground">{t('admin_health.live')}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-lg font-bold text-destructive">{stripeStatus?.stats24h?.failed || 0}</p>
-                    <p className="text-xs text-muted-foreground">Fehler</p>
+                    <p className="text-xs text-muted-foreground">{t('admin_health.error')}</p>
                   </div>
                 </div>
               </div>
@@ -786,7 +790,7 @@ const AdminHealth = () => {
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  Noch keine Stripe-Webhooks empfangen. Stellen Sie sicher, dass der Webhook in Stripe Dashboard konfiguriert ist.
+                  {t('admin_health.no_webhooks')}. {t('admin_health.no_webhooks_info')}
                 </AlertDescription>
               </Alert>
             )}
@@ -800,10 +804,10 @@ const AdminHealth = () => {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Bell className="w-5 h-5 text-primary" />
-                  Push Notifications
+                  {t('admin_health.push_notifications')}
                 </CardTitle>
                 <CardDescription>
-                  Registrierte Geräte und Benachrichtigungsstatus
+                  {t('admin_health.registered_devices')}
                 </CardDescription>
               </div>
               <Button
@@ -816,7 +820,7 @@ const AdminHealth = () => {
                 className="gap-1"
               >
                 <RefreshCw className="w-4 h-4" />
-                Aktualisieren
+                {t('admin_health.refresh')}
               </Button>
             </div>
           </CardHeader>
@@ -824,38 +828,38 @@ const AdminHealth = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Token Stats by Platform */}
               <div className="p-4 rounded-lg bg-muted/50">
-                <span className="text-sm font-medium">Aktive Geräte</span>
+                <span className="text-sm font-medium">{t('admin_health.active_devices')}</span>
                 <div className="flex gap-4 mt-2">
                   <div className="text-center">
                     <p className="text-lg font-bold">{pushStatus?.tokens?.ios || 0}</p>
-                    <p className="text-xs text-muted-foreground">iOS</p>
+                    <p className="text-xs text-muted-foreground">{t('admin_health.ios')}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-lg font-bold">{pushStatus?.tokens?.android || 0}</p>
-                    <p className="text-xs text-muted-foreground">Android</p>
+                    <p className="text-xs text-muted-foreground">{t('admin_health.android')}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-lg font-bold">{pushStatus?.tokens?.web || 0}</p>
-                    <p className="text-xs text-muted-foreground">Web</p>
+                    <p className="text-xs text-muted-foreground">{t('admin_health.web')}</p>
                   </div>
                 </div>
               </div>
 
               {/* Environment Stats */}
               <div className="p-4 rounded-lg bg-muted/50">
-                <span className="text-sm font-medium">Nach Umgebung</span>
+                <span className="text-sm font-medium">{t('admin_health.by_environment')}</span>
                 <div className="flex gap-4 mt-2">
                   <div className="text-center">
                     <p className="text-lg font-bold">{pushStatus?.tokens?.production || 0}</p>
-                    <p className="text-xs text-muted-foreground">Prod</p>
+                    <p className="text-xs text-muted-foreground">{t('admin_health.prod')}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-lg font-bold">{pushStatus?.tokens?.development || 0}</p>
-                    <p className="text-xs text-muted-foreground">Dev</p>
+                    <p className="text-xs text-muted-foreground">{t('admin_health.dev')}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-lg font-bold">{pushStatus?.tokens?.total || 0}</p>
-                    <p className="text-xs text-muted-foreground">Total</p>
+                    <p className="text-xs text-muted-foreground">{t('admin_health.total')}</p>
                   </div>
                 </div>
               </div>
@@ -863,7 +867,7 @@ const AdminHealth = () => {
               {/* Last Token Registered */}
               <div className="p-4 rounded-lg bg-muted/50">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Letztes Token</span>
+                  <span className="text-sm font-medium">{t('admin_health.last_token')}</span>
                   {pushStatus?.lastToken ? (
                     <CheckCircle className="w-4 h-4 text-green-500" />
                   ) : (
@@ -881,7 +885,7 @@ const AdminHealth = () => {
                   </>
                 ) : (
                   <p className="text-xs text-muted-foreground mt-1">
-                    Noch keine Tokens registriert
+                    {t('admin_health.no_tokens')}
                   </p>
                 )}
               </div>
@@ -889,19 +893,19 @@ const AdminHealth = () => {
 
             {/* Push Stats (last 24h) */}
             <div className="p-4 rounded-lg bg-muted/50">
-              <span className="text-sm font-medium">Letzte 24h Benachrichtigungen</span>
+              <span className="text-sm font-medium">{t('admin_health.last_24h_notifications')}</span>
               <div className="flex gap-6 mt-2">
                 <div className="text-center">
                   <p className="text-lg font-bold">{pushStatus?.pushStats?.sent || 0}</p>
-                  <p className="text-xs text-muted-foreground">Gesendet</p>
+                  <p className="text-xs text-muted-foreground">{t('admin_health.sent')}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-lg font-bold text-destructive">{pushStatus?.pushStats?.failed || 0}</p>
-                  <p className="text-xs text-muted-foreground">Fehlgeschlagen</p>
+                  <p className="text-xs text-muted-foreground">{t('admin_health.failed')}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-lg font-bold">{pushStatus?.pushStats?.total || 0}</p>
-                  <p className="text-xs text-muted-foreground">Total</p>
+                  <p className="text-xs text-muted-foreground">{t('admin_health.total')}</p>
                 </div>
               </div>
             </div>
@@ -911,7 +915,7 @@ const AdminHealth = () => {
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  Noch keine Push-Tokens registriert. Stellen Sie sicher, dass die App auf einem Gerät installiert ist und Push-Berechtigungen erteilt wurden.
+                  {t('admin_health.no_tokens')}. {t('admin_health.no_tokens_info')}
                 </AlertDescription>
               </Alert>
             )}
@@ -923,30 +927,29 @@ const AdminHealth = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ExternalLink className="w-5 h-5" />
-              Logs & Debugging
+              {t('admin_health.logs_debugging')}
             </CardTitle>
             <CardDescription>
-              Wo du Logs für Webhooks und Edge Functions findest
+              {t('admin_health.logs_info')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="p-3 rounded-lg bg-muted/50 space-y-1">
-              <p className="font-medium text-sm">📋 Stripe Webhook Logs</p>
+              <p className="font-medium text-sm">📋 {t('admin_health.stripe_webhook_logs')}</p>
               <p className="text-xs text-muted-foreground">
-                Lovable Cloud → Cloud Tab → Edge Functions → <code className="bg-muted px-1 rounded">stripe-webhook</code> → Logs einsehen.
-                Alternativ: Stripe Dashboard → Developers → Webhooks → Events.
+                {t('admin_health.lovable_stripe_logs', 'Lovable Cloud → Cloud Tab → Edge Functions → <code className="bg-muted px-1 rounded">stripe-webhook</code> → Logs einsehen. Alternativ: Stripe Dashboard → Developers → Webhooks → Events.')}
               </p>
             </div>
             <div className="p-3 rounded-lg bg-muted/50 space-y-1">
-              <p className="font-medium text-sm">🔔 Push Notification Logs</p>
+              <p className="font-medium text-sm">🔔 {t('admin_health.push_notification_logs')}</p>
               <p className="text-xs text-muted-foreground">
-                Lovable Cloud → Cloud Tab → Edge Functions → <code className="bg-muted px-1 rounded">send-push-notification</code> / <code className="bg-muted px-1 rounded">trigger-push-notification</code> → Logs.
+                {t('admin_health.lovable_push_logs', 'Lovable Cloud → Cloud Tab → Edge Functions → <code className="bg-muted px-1 rounded">send-push-notification</code> / <code className="bg-muted px-1 rounded">trigger-push-notification</code> → Logs.')}
               </p>
             </div>
             <div className="p-3 rounded-lg bg-muted/50 space-y-1">
-              <p className="font-medium text-sm">🗃️ Datenbank-Logs</p>
+              <p className="font-medium text-sm">🗃️ {t('admin_health.database_logs')}</p>
               <p className="text-xs text-muted-foreground">
-                Lovable Cloud → Cloud Tab → Database → Tabellen <code className="bg-muted px-1 rounded">stripe_webhook_events</code> und <code className="bg-muted px-1 rounded">push_notification_logs</code> direkt einsehen.
+                Lovable Cloud → Cloud Tab → Database → Tabellen <code className="bg-muted px-1 rounded">stripe_webhook_events</code> und <code className="bg-muted px-1 rounded">push_notification_logs</code> {t('admin_health.view_directly')}.
               </p>
             </div>
           </CardContent>
@@ -957,10 +960,10 @@ const AdminHealth = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Play className="w-5 h-5" />
-              End-to-End Self-Test
+              {t('admin_health.end_to_end_test', 'End-to-End Self-Test')}
             </CardTitle>
             <CardDescription>
-              26 automatisierte Tests: Infrastruktur, Profile, Meals, Pricing, Content Filter, Privacy, Stripe, Admin, Map, Partner Verification
+              {t('admin_health.test_description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -973,7 +976,7 @@ const AdminHealth = () => {
               {runTestMutation.isPending ? (
                 <>
                   <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Tests laufen...
+                  {t('admin_health.tests_running', 'Tests laufen...')}
                 </>
               ) : (
                 <>
@@ -992,7 +995,7 @@ const AdminHealth = () => {
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   {getStatusIcon(lastTestResult.status)}
-                  Aktuelles Testergebnis
+                  {t('admin_health.current_test_result', 'Aktuelles Testergebnis')}
                 </CardTitle>
                 <div className="flex items-center gap-2">
                   {getStatusBadge(lastTestResult.status)}
@@ -1002,7 +1005,7 @@ const AdminHealth = () => {
                 </div>
               </div>
               <CardDescription>
-                {lastTestResult.summary.passed}/{lastTestResult.summary.total} Tests bestanden 
+                {lastTestResult.summary.passed}/{lastTestResult.summary.total} {t('admin_health.tests_passed', 'Tests bestanden')}
                 ({lastTestResult.summary.duration_ms}ms)
               </CardDescription>
             </CardHeader>
@@ -1010,10 +1013,10 @@ const AdminHealth = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Test</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="hidden md:table-cell">Details</TableHead>
-                    <TableHead className="text-right">Zeit</TableHead>
+                    <TableHead>{t('admin_health.test')}</TableHead>
+                    <TableHead>{t('admin_health.status')}</TableHead>
+                    <TableHead className="hidden md:table-cell">{t('admin_health.details')}</TableHead>
+                    <TableHead className="text-right">{t('admin_health.time')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -1039,16 +1042,16 @@ const AdminHealth = () => {
         {previousRuns && previousRuns.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Vorherige QA-Läufe</CardTitle>
+              <CardTitle>{t('admin_health.previous_qa_runs')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Datum</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Tests</TableHead>
-                    <TableHead className="text-right">Dauer</TableHead>
+                    <TableHead>{t('admin_health.date')}</TableHead>
+                    <TableHead>{t('admin_health.status')}</TableHead>
+                    <TableHead>{t('admin_health.tests')}</TableHead>
+                    <TableHead className="text-right">{t('admin_health.duration')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -1078,7 +1081,7 @@ const AdminHealth = () => {
         {/* GO/NO-GO Decision */}
         <Card className="border-2 border-primary">
           <CardHeader>
-            <CardTitle className="text-xl">🚦 GO/NO-GO Entscheidung</CardTitle>
+            <CardTitle className="text-xl">🚦 {t('admin_health.go_no_go')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {isGoLiveReady ? (
@@ -1099,13 +1102,13 @@ const AdminHealth = () => {
               <Alert variant="destructive">
                 <XCircle className="h-5 w-5" />
                 <AlertDescription className="font-medium">
-                  ❌ NO-GO – {!dbOk ? 'DB nicht erreichbar. ' : ''}{!testPassed ? `${latestRun?.summary?.failed} Test(s) fehlgeschlagen.` : ''} Bitte Fehler beheben.
+                  ❌ NO-GO – {!dbOk ? t('admin_health.db_unreachable', 'DB nicht erreichbar. ') : ''}{!testPassed ? t('admin_health.tests_failed_count', '{{count}} Test(s) fehlgeschlagen.', { count: latestRun?.summary?.failed }) : ''} {t('admin_health.fix_errors', 'Bitte Fehler beheben.')}
                 </AlertDescription>
               </Alert>
             )}
             {latestRun?.timestamp && (
               <p className="text-xs text-muted-foreground">
-                Letzter Test: {new Date(latestRun.timestamp).toLocaleString('de-DE')}
+                {t('admin_health.last_test_time', 'Letzter Test')}: {new Date(latestRun.timestamp).toLocaleString('de-DE')}
               </p>
             )}
           </CardContent>

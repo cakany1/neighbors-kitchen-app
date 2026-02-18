@@ -1636,7 +1636,19 @@
     "no_tokens": "Noch keine Tokens registriert",
     "no_tokens_info": "Stellen Sie sicher, dass die App auf einem Gerät installiert ist und Push-Berechtigungen erteilt wurden.",
     "refresh": "Aktualisieren",
-    "error": "Fehler"
+    "error": "Fehler",
+    "current_test_result": "Aktuelles Testergebnis",
+    "tests_running": "Tests laufen...",
+    "end_to_end_test": "End-to-End Self-Test",
+    "tests_passed": "Tests bestanden",
+    "real_transactions": "Echte Transaktionen aktiv",
+    "sandbox_mode": "Sandbox-Modus für Tests",
+    "lovable_stripe_logs": "Lovable Cloud → Cloud Tab → Edge Functions → stripe-webhook → Logs einsehen. Alternativ: Stripe Dashboard → Developers → Webhooks → Events.",
+    "lovable_push_logs": "Lovable Cloud → Cloud Tab → Edge Functions → send-push-notification / trigger-push-notification → Logs.",
+    "db_unreachable": "DB nicht erreichbar. ",
+    "tests_failed_count": "{{count}} Test(s) fehlgeschlagen.",
+    "fix_errors": "Bitte Fehler beheben.",
+    "last_test_time": "Letzter Test"
   },
   "language_switcher": {
     "show_original_en": "🔄 Show Original (EN)",
