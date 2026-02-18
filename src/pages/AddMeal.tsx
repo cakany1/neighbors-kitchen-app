@@ -900,7 +900,8 @@ const AddMeal = () => {
                         </SelectTrigger>
                         <SelectContent className="max-h-60">
                           {hourOptions.map((opt) => {
-                            const isPastHour = isTimeInPast(`${opt.value}:00`);
+                            // Only disable if all minute options (including :45) would be in the past
+                            const isPastHour = isTimeInPast(`${opt.value}:45`);
                             return (
                               <SelectItem key={opt.value} value={opt.value} disabled={isPastHour}>
                                 {opt.value}
@@ -962,7 +963,8 @@ const AddMeal = () => {
                         </SelectTrigger>
                         <SelectContent className="max-h-60">
                           {hourOptions.map((opt) => {
-                            const isPastHour = isTimeInPast(`${opt.value}:00`);
+                            // Only disable if all minute options (including :45) would be in the past
+                            const isPastHour = isTimeInPast(`${opt.value}:45`);
                             return (
                               <SelectItem key={opt.value} value={opt.value} disabled={isPastHour}>
                                 {opt.value}
