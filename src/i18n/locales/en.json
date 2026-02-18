@@ -64,6 +64,7 @@
     "send_blocked": "Cannot send message. There is a block between you and this user.",
     "send_failed": "Could not send message",
     "message_sent": "Message sent",
+    "self_chat_error": "You cannot chat with yourself.",
     "demo_title": "Demo Mode",
     "demo_description": "This is a demo meal. Chat with the chef is not available.",
     "demo_hint": "Sign up and book a real meal to chat with chefs!",

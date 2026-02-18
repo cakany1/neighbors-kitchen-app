@@ -42,8 +42,11 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
     },
   });
 
+  // SELF-CHAT BLOCK: Prevent users from chatting with themselves
+  const isSelfChat = currentUser?.id === chefId;
+  
   // Create or get existing booking for this meal (for message threading)
-  // Skip for demo meals
+  // Skip for demo meals and self-chat
   const { data: booking } = useQuery({
     queryKey: ['prebooking', mealId, currentUser?.id],
     queryFn: async () => {
@@ -79,7 +82,7 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
       
       return data;
     },
-    enabled: !!currentUser?.id && open && !isDemo,
+    enabled: !!currentUser?.id && open && !isDemo && !isSelfChat,
   });
 
   // Fetch messages for this booking
@@ -173,6 +176,26 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
 
   if (!currentUser) {
     return null;
+  }
+
+  // Self-chat prevention
+  if (isSelfChat) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              💬 {t('chat.self_chat_error')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4 text-center">
+            <Button onClick={() => onOpenChange(false)}>
+              {t('common.understood')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   // Demo meal chat prevention
