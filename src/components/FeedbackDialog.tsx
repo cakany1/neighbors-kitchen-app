@@ -32,7 +32,7 @@ export const FeedbackDialog = ({ userId }: FeedbackDialogProps) => {
   const submitFeedback = useMutation({
     mutationFn: async () => {
       if (!formData.subject.trim() || !formData.message.trim()) {
-        throw new Error('Please fill in all fields');
+        throw new Error(t('validation.all_fields_required'));
       }
 
       const { error } = await supabase.from('app_feedback').insert({

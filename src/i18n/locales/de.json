@@ -1263,7 +1263,11 @@
   },
   "validation": {
     "invalid_number": "Bitte gib eine gültige Zahl ein.",
-    "content_rejected": "Bitte respektvolle Sprache verwenden. Beleidigende Inhalte sind nicht erlaubt."
+    "content_rejected": "Bitte respektvolle Sprache verwenden. Beleidigende Inhalte sind nicht erlaubt.",
+    "all_fields_required": "Bitte alle Felder ausfüllen",
+    "password_min_length": "Passwort muss mindestens 8 Zeichen lang sein",
+    "passwords_dont_match": "Passwörter stimmen nicht überein",
+    "phone_too_short": "Telefonnummer muss mindestens 8 Zeichen lang sein"
   },
   "ratings": {
     "title": "Bewertungen",

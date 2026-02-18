@@ -24,11 +24,11 @@ export const ChangePasswordSection = ({ userEmail, isOAuthUser }: ChangePassword
 
   const handleChangePassword = async () => {
     if (newPassword.length < 8) {
-      toast.error(t('profile.password_min_length', 'Passwort muss mindestens 8 Zeichen lang sein'));
+      toast.error(t('validation.password_min_length'));
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error(t('profile.passwords_dont_match', 'Passwörter stimmen nicht überein'));
+      toast.error(t('validation.passwords_dont_match'));
       return;
     }
 

@@ -1276,7 +1276,11 @@
   },
   "validation": {
     "invalid_number": "Please enter a valid number.",
-    "content_rejected": "Please use respectful language. Offensive content is not allowed."
+    "content_rejected": "Please use respectful language. Offensive content is not allowed.",
+    "all_fields_required": "Please fill in all fields",
+    "password_min_length": "Password must be at least 8 characters long",
+    "passwords_dont_match": "Passwords do not match",
+    "phone_too_short": "Phone number must be at least 8 characters long"
   },
   "ratings": {
     "title": "Ratings",
