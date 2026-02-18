@@ -87,14 +87,30 @@ Deno.serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       safeLog(requestId, 'error', 'AI gateway error', { status: response.status, error: errorText });
-      throw new Error(`AI gateway error: ${response.status}`);
+      
+      // Surface specific error codes to client
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'rate_limit', message: 'Rate limit exceeded', requestId }),
+          { status: 429, headers: { ...getCorsHeaders(origin), "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'quota_exhausted', message: 'AI credits exhausted', requestId }),
+          { status: 402, headers: { ...getCorsHeaders(origin), "Content-Type": "application/json" } }
+        );
+      }
+      
+      return jsonError(`AI gateway error: ${response.status}`, response.status >= 500 ? 502 : response.status, requestId, undefined, origin);
     }
 
     const data = await response.json();
     const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
     if (!imageUrl) {
-      throw new Error("No image generated");
+      safeLog(requestId, 'error', 'No image in response', { choices: JSON.stringify(data.choices?.length) });
+      return jsonError('No image was generated. Please try a different description.', 422, requestId, undefined, origin);
     }
 
     safeLog(requestId, 'info', 'Image generated successfully');
