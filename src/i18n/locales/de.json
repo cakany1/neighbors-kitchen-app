@@ -145,7 +145,7 @@
     "available_date": "Verfügbar",
     "loading_meals": "Lade Gerichte...",
     "no_meals_yet": "Noch keine Gerichte verfügbar. Sei der Erste, der teilt!",
-    "no_meals_radius": "Keine Gerichte in deinem {radius}km Radius verfügbar. Versuche, deinen Benachrichtigungs-Radius in den Profil-Einstellungen zu erhöhen.",
+    "no_meals_radius": "Keine Gerichte in deinem {radius} Radius verfügbar. Versuche, deinen Benachrichtigungs-Radius in den Profil-Einstellungen zu erhöhen.",
     "set_location": "Standort festlegen",
     "set_location_desc": "Setze deinen Standort in den Profil-Einstellungen, um Gerichte nach Entfernung gefiltert zu sehen.",
     "guest_login_required": "Registriere dich, um dieses Essen zu retten!",
@@ -158,7 +158,7 @@
     "empty_address_title": "An deiner Adresse gibt es gerade keine Angebote.",
     "empty_address_text": "Schalte den Filter aus, um alle Angebote zu sehen.",
     "empty_address_button": "Filter ausschalten",
-    "within_radius": "(innerhalb {{radius}}km)"
+    "within_radius": "(innerhalb {{radius}})"
   },
   "admin": {
     "title": "Admin Dashboard",

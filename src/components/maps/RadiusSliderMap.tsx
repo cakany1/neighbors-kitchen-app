@@ -36,7 +36,7 @@ const RadiusSliderMap = ({ lat, lng, radius }: RadiusSliderMapProps) => {
 
     // Add initial circle
     circleRef.current = L.circle([lat, lng], {
-      radius: radius * 1000,
+      radius: radius,
       fillColor: '#FF6B35',
       fillOpacity: 0.2,
       color: '#FF6B35',
@@ -58,7 +58,7 @@ const RadiusSliderMap = ({ lat, lng, radius }: RadiusSliderMapProps) => {
   // Update circle radius when it changes and adjust view
   useEffect(() => {
     if (circleRef.current && mapInstanceRef.current) {
-      circleRef.current.setRadius(radius * 1000);
+      circleRef.current.setRadius(radius);
       // Fit bounds to show the updated circle
       const bounds = circleRef.current.getBounds();
       mapInstanceRef.current.fitBounds(bounds, { padding: [20, 20], animate: true });

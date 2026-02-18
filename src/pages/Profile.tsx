@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { normalizeAll } from '@/utils/canonical_map';
+import { formatDistance } from '@/utils/distance';
 
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -68,7 +69,7 @@ const Profile = () => {
   const [privatePostalCode, setPrivatePostalCode] = useState('');
   const [vacationMode, setVacationMode] = useState(false);
   const [displayRealName, setDisplayRealName] = useState(false);
-  const [notificationRadius, setNotificationRadius] = useState<number>(5);
+  const [notificationRadius, setNotificationRadius] = useState<number>(5000);
   const [languages, setLanguages] = useState<string[]>([]);
   const [allergens, setAllergens] = useState<string[]>([]);
   const [dislikes, setDislikes] = useState<string[]>([]);
@@ -125,7 +126,7 @@ const Profile = () => {
       setPrivatePostalCode(profile.private_postal_code || '');
       setVacationMode(profile.vacation_mode || false);
       setDisplayRealName(profile.display_real_name || false);
-      setNotificationRadius(profile.notification_radius || 5);
+      setNotificationRadius(profile.notification_radius || 5000);
       setLanguages(profile.languages || []);
       setAllergens(normalizeAll(profile.allergens || []));
       setDislikes(normalizeAll(profile.dislikes || []));
@@ -566,16 +567,17 @@ const Profile = () => {
                     <div className="flex items-center gap-2">
                       <Input
                         type="number"
-                        min={1}
-                        max={50}
+                        min={100}
+                        max={50000}
+                        step={100}
                         value={notificationRadius}
-                        onChange={(e) => setNotificationRadius(parseInt(e.target.value) || 5)}
-                        className="w-20"
+                        onChange={(e) => setNotificationRadius(parseInt(e.target.value) || 5000)}
+                        className="w-24"
                       />
-                      <span className="text-sm text-muted-foreground">{t('units.km')}</span>
+                      <span className="text-sm text-muted-foreground">m</span>
                     </div>
                   ) : (
-                    <p className="text-sm">{profile.notification_radius || 5} km</p>
+                    <p className="text-sm">{formatDistance(profile.notification_radius || 5000)}</p>
                   )}
                 </div>
 
