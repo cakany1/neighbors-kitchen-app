@@ -1045,7 +1045,7 @@ const AddMeal = () => {
                             className="text-sm font-normal cursor-pointer flex items-center gap-2"
                           >
                             {option.icon && <span className="text-lg">{option.icon}</span>}
-                            <span>{isBarter ? 'Tausch / Zutaten (Barter)' : option.label}</span>
+                            <span>{option.label}</span>
                           </Label>
                           {option.note && (
                             <p className="text-xs text-muted-foreground mt-1 ml-6">{option.note}</p>
@@ -1206,10 +1206,10 @@ const AddMeal = () => {
                   <Shield className="w-5 h-5 text-primary" />
                   <div>
                     <Label htmlFor="verified-only" className="text-sm font-medium cursor-pointer">
-                      ✓ Nur Verifizierte Nutzer
+                      ✓ {t('add_meal.verified_only')}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Nur Gäste mit Verifikation dürfen buchen
+                      {t('add_meal.verified_only_desc')}
                     </p>
                   </div>
                 </div>
@@ -1227,10 +1227,10 @@ const AddMeal = () => {
                     <Shield className="w-5 h-5 text-destructive" />
                     <div>
                       <Label htmlFor="women-only" className="text-sm font-medium cursor-pointer">
-                        👩 Ladies Only
+                        👩 {t('add_meal.ladies_only')}
                       </Label>
                       <p className="text-xs text-muted-foreground">
-                        Nur weibliche Gäste dürfen buchen
+                        {t('add_meal.ladies_only_desc')}
                       </p>
                     </div>
                   </div>
@@ -1388,7 +1388,7 @@ const AddMeal = () => {
             className="w-full" 
             size="lg"
           >
-            {currentUser ? 'Mahlzeit erstellen' : 'Einloggen zum Veröffentlichen'}
+            {currentUser ? t('add_meal.create_meal_button') : t('add_meal.login_to_publish')}
           </Button>
         </form>
       </main>

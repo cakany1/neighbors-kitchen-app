@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -39,13 +40,17 @@ export function TagPicker({
   selected,
   onChange,
   allowCustom = true,
-  placeholder = 'Hinzufügen...',
+  placeholder,
   normalizeFn = normalizeTag,
   badgeVariant = 'secondary',
   readOnly = false,
   emptyText = 'Keine',
 }: TagPickerProps) {
+  const { t } = useTranslation();
   const [customInput, setCustomInput] = useState('');
+  
+  // Use translation if no placeholder is provided
+  const effectivePlaceholder = placeholder || t('common.add_placeholder');
 
   const toggle = (value: string) => {
     if (readOnly) return;
@@ -139,7 +144,7 @@ export function TagPicker({
           <Input
             value={customInput}
             onChange={(e) => setCustomInput(e.target.value)}
-            placeholder={placeholder}
+            placeholder={effectivePlaceholder}
             className="text-sm"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {

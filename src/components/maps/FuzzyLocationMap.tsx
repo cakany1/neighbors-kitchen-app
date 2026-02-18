@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -10,6 +11,7 @@ interface FuzzyLocationMapProps {
 }
 
 const FuzzyLocationMap = ({ lat, lng, radius = 200, neighborhood }: FuzzyLocationMapProps) => {
+  const { t } = useTranslation();
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
 
@@ -32,14 +34,14 @@ const FuzzyLocationMap = ({ lat, lng, radius = 200, neighborhood }: FuzzyLocatio
       fillOpacity: 0.2,
       color: '#FF6B35',
       weight: 2,
-    }).addTo(map).bindPopup(neighborhood || 'Ungefähre Umgebung / Neighborhood');
+    }).addTo(map).bindPopup(neighborhood || t('common.approximate_location'));
 
     // Cleanup
     return () => {
       map.remove();
       mapInstanceRef.current = null;
     };
-  }, [lat, lng, radius, neighborhood]);
+  }, [lat, lng, radius, neighborhood, t]);
 
   return (
     <div 
