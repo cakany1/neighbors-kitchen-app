@@ -12,7 +12,7 @@ DECLARE
     'asshole', 'damn', 'idiot', 'stupid', 'moron', 'loser', 'dumbass',
     'fotze', 'wichser', 'hurensohn', 'schlampe', 'schwuchtel', 'spast',
     'arschloch', 'missgeburt', 'behindert',
-    'dumm', 'blöd', 'idiot', 'trottel', 'depp', 'vollidiot', 'loser',
+    'dumm', 'blöd', 'trottel', 'depp', 'vollidiot',
     'nazi', 'hitler', 'heil hitler', 'sieg heil',
     'porno', 'porn', 'sex video', 'nackt'
   ];

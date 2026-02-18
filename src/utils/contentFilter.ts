@@ -14,7 +14,7 @@ const BLACKLIST = [
   'fotze', 'wichser', 'hurensohn', 'schlampe', 'schwuchtel', 'spast',
   'arschloch', 'missgeburt', 'behindert',
   // German insults
-  'dumm', 'blöd', 'idiot', 'trottel', 'depp', 'vollidiot', 'loser',
+  'dumm', 'blöd', 'trottel', 'depp', 'vollidiot',
   // Hate speech
   'nazi', 'hitler', 'heil hitler', 'sieg heil',
   // Sexual content
