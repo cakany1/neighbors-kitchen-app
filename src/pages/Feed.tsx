@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { getDistance, formatRadius } from "@/utils/distance";
+import { getDistance, formatDistance } from "@/utils/distance";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { toast } from "sonner";
 import { DEMO_MEALS } from "@/data/demoMeals";
@@ -246,7 +246,7 @@ const Feed = () => {
 
       return {
         filteredMeals: fallbackMeals,
-        noResultsInfo: noResultsReason ? { reason: noResultsReason, radiusMeters: userRadius } : null,
+        noResultsInfo: noResultsReason ? { reason: noResultsReason, radius: userRadius } : null,
       };
     }
 
@@ -307,7 +307,7 @@ const Feed = () => {
           <h2 className="text-2xl font-bold text-foreground mb-2">{t("feed.available_meals")}</h2>
           <p className="text-muted-foreground">
             {t("feed.fresh_meals_subtitle")}
-            {userLat && userLon && ` ${t("feed.within_radius", { radius: formatRadius(userRadius) })}`}
+            {userLat && userLon && ` ${t("feed.within_radius", { radius: formatDistance(userRadius) })}`}
           </p>
         </div>
 
@@ -380,7 +380,7 @@ const Feed = () => {
                 </Button>
               </>
             ) : (
-              <p className="text-muted-foreground">{t("feed.no_meals_radius", { radius: formatRadius(userRadius) })}</p>
+              <p className="text-muted-foreground">{t("feed.no_meals_radius", { radius: formatDistance(userRadius) })}</p>
             )}
           </div>
         ) : (

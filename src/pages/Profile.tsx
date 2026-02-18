@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { normalizeAll } from '@/utils/canonical_map';
-import { formatRadius } from '@/utils/distance';
+import { formatDistance } from '@/utils/distance';
 
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
@@ -577,7 +577,7 @@ const Profile = () => {
                       <span className="text-sm text-muted-foreground">m</span>
                     </div>
                   ) : (
-                    <p className="text-sm">{formatRadius(profile.notification_radius || 5000)}</p>
+                    <p className="text-sm">{formatDistance(profile.notification_radius || 5000)}</p>
                   )}
                 </div>
 
