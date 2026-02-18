@@ -48,7 +48,7 @@ export function BlockUserDialog({
       if (error) {
         // Handle duplicate block (user already blocked)
         if (error.code === '23505') {
-          toast.info('User is already blocked');
+          toast.info(t('toast.user_already_blocked'));
         } else {
           throw error;
         }

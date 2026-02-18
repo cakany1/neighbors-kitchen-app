@@ -54,7 +54,7 @@ export const BookingActions = ({
       queryClient.invalidateQueries({ queryKey: ['meal', mealId] });
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to mark no-show');
+      toast.error(error.message || t('toast.mark_noshow_failed'));
     },
   });
 
@@ -92,7 +92,7 @@ export const BookingActions = ({
       queryClient.invalidateQueries({ queryKey: ['meal', mealId] });
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to cancel booking');
+      toast.error(error.message || t('toast.cancel_booking_failed'));
     },
   });
 

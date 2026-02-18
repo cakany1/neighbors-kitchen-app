@@ -312,7 +312,7 @@ const MealDetail = () => {
 
     // PORTIONS OVERFLOW CHECK
     if (bookingQuantity > (meal?.available_portions || 0)) {
-      toast.error("Nicht genügend Portionen verfügbar.");
+      toast.error(t("toast.insufficient_portions"));
       return;
     }
 

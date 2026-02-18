@@ -324,7 +324,7 @@ const AddMeal = () => {
       if (profileUpdateError) {
         console.error('Profile update error:', profileUpdateError);
         toast.dismiss(loadingToastId);
-        toast.error('Adresse konnte nicht gespeichert werden.');
+        toast.error(t('toast.address_save_failed'));
         return;
       }
 
@@ -493,7 +493,7 @@ const AddMeal = () => {
       }
 
       toast.dismiss(loadingToastId);
-      toast.success('✅ Gericht ist live! Dein Essen ist jetzt sichtbar.');
+      toast.success(t('toast.meal_live'));
       
       // Navigate to the new meal detail page
       setTimeout(() => {
@@ -503,7 +503,7 @@ const AddMeal = () => {
     } catch (error) {
       console.error('Error creating meal:', error);
       toast.dismiss();
-      toast.error('Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
+      toast.error(t('toast.general_error'));
     }
   };
 

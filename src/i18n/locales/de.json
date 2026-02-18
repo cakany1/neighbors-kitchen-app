@@ -326,7 +326,21 @@
     "translate_empty_text": "Bitte geben Sie Text zum Übersetzen ein",
     "translate_text_too_long": "Text zu lang (max. {{max}} Zeichen, Sie haben {{current}})",
     "translate_error": "Fehler beim Übersetzen. Bitte versuchen Sie es später erneut.",
-    "change_password_error_fallback": "Fehler"
+    "change_password_error_fallback": "Fehler",
+    "insufficient_portions": "Nicht genügend Portionen verfügbar.",
+    "address_save_failed": "Adresse konnte nicht gespeichert werden.",
+    "meal_live": "✅ Gericht ist live! Dein Essen ist jetzt sichtbar.",
+    "general_error": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
+    "image_generated": "Bild erfolgreich generiert und aktualisiert!",
+    "image_generation_failed": "Fehler beim Generieren des Bildes",
+    "partner_id_verified": "Partner-ID verifiziert ✓",
+    "partner_photo_verified": "Partner-Foto verifiziert ✓",
+    "cannot_delete_own_account": "Sie können Ihr eigenes Konto nicht löschen",
+    "karma_bonus": "💚 +5 Karma für deine Grosszügigkeit!",
+    "report_failed": "Meldung konnte nicht eingereicht werden",
+    "user_already_blocked": "Nutzer ist bereits blockiert",
+    "mark_noshow_failed": "No-Show konnte nicht markiert werden",
+    "cancel_booking_failed": "Buchung konnte nicht storniert werden"
   },
   "feed_fallback": {
     "no_address_set": "Bitte zuerst eine Adresse im Profil setzen",
