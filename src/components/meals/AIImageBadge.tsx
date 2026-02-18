@@ -37,7 +37,7 @@ export const AIImageBadge = ({ variant = 'inline', showRealPhotoBadge = false }:
         <div className="flex items-center gap-2 text-white">
           <AlertTriangle className="w-4 h-4 text-yellow-400 shrink-0" />
           <span className="text-xs font-medium">
-            {t('meal.ai_disclaimer')}
+            {t('meal.aiImageDisclaimer')}
           </span>
         </div>
       </div>
@@ -60,7 +60,7 @@ export const AIImageBadge = ({ variant = 'inline', showRealPhotoBadge = false }:
       className="bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30 flex items-center gap-1"
     >
       <Sparkles className="w-3 h-3" />
-      {t('meal.ai_preview_badge')}
+      {t('meal.aiPreviewBadge')}
     </Badge>
   );
 };
