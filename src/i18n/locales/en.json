@@ -1107,7 +1107,9 @@
     "auth_error": "Please log in again to generate images.",
     "timeout": "Image generation timed out. Please try again.",
     "no_image": "No image was created. Try adjusting your title or description.",
-    "network_error": "Network error. Please check your connection and try again."
+    "network_error": "Network error. Please check your connection and try again.",
+    "retry_button": "Retry image generation",
+    "retry_in": "Retrying in {{seconds}}s…"
   },
   "modal": {
     "almost_done": "Almost there!",
