@@ -1283,7 +1283,10 @@
     "revoke_admin_title": "Revoke Admin Rights",
     "grant_admin_confirm": "Do you really want to give \"{{name}}\" admin rights? This person will get full access to the admin dashboard.",
     "revoke_admin_confirm": "Do you really want to revoke admin rights from \"{{name}}\"? This person will lose access to the admin dashboard.",
-    "no_more_emails": "No more emails"
+    "no_more_emails": "No more emails",
+    "waiting_for_review": "Waiting for Review",
+    "users_waiting_singular": "user waiting for verification",
+    "users_waiting_plural": "users waiting for verification"
   },
   "wizard": {
     "step_counter": "Step {{current}} of {{total}}",

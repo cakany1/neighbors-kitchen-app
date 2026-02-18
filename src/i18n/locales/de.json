@@ -329,7 +329,10 @@
     "revoke_admin_title": "Admin-Rechte entziehen",
     "grant_admin_confirm": "Möchtest du \"{{name}}\" wirklich Admin-Rechte geben? Diese Person erhält vollen Zugriff auf das Admin-Dashboard.",
     "revoke_admin_confirm": "Möchtest du \"{{name}}\" wirklich die Admin-Rechte entziehen? Diese Person verliert den Zugriff auf das Admin-Dashboard.",
-    "no_more_emails": "Keine weiteren E-Mails"
+    "no_more_emails": "Keine weiteren E-Mails",
+    "waiting_for_review": "Wartet auf Überprüfung",
+    "users_waiting_singular": "Nutzer wartet auf Verifizierung",
+    "users_waiting_plural": "Nutzer warten auf Verifizierung"
   },
   "toast": {
     "profile_incomplete": "Bitte vervollständige dein Profil (Geschlecht, Telefon & Adresse), um Gerichte zu buchen.",

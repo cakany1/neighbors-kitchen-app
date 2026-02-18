@@ -1019,10 +1019,13 @@ const Admin = () => {
                 <div>
                   <CardTitle className="text-xl flex items-center gap-2">
                     <AlertCircle className="w-5 h-5 text-primary" />
-                    Wartet auf Überprüfung
+                    {t('admin.waiting_for_review')}
                   </CardTitle>
                   <CardDescription>
-                    {pendingVerifications.length} {pendingVerifications.length === 1 ? 'Nutzer wartet' : 'Nutzer warten'} auf Verifizierung
+                    {pendingVerifications.length} {pendingVerifications.length === 1 
+                      ? t('admin.users_waiting_singular') 
+                      : t('admin.users_waiting_plural')
+                    }
                   </CardDescription>
                 </div>
                 <Badge variant="destructive" className="text-lg px-3 py-1">
