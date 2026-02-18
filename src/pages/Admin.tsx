@@ -940,7 +940,7 @@ const Admin = () => {
   if (adminCheckLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t('admin.loading')}</p>
       </div>
     );
   }
@@ -953,14 +953,14 @@ const Admin = () => {
             <div className="flex items-center justify-center mb-4">
               <Shield className="w-12 h-12 text-destructive" />
             </div>
-            <CardTitle className="text-center text-2xl">Access Denied</CardTitle>
+            <CardTitle className="text-center text-2xl">{t('admin.access_denied_title')}</CardTitle>
             <CardDescription className="text-center">
-              You don't have permission to access the admin dashboard.
+              {t('admin.access_denied_desc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => navigate('/feed')} className="w-full">
-              Back to Feed
+              {t('admin.back_to_feed')}
             </Button>
           </CardContent>
         </Card>
@@ -977,9 +977,9 @@ const Admin = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Shield className="w-6 h-6 text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+              <h1 className="text-2xl font-bold text-foreground">{t('admin.title')}</h1>
             </div>
-            <p className="text-muted-foreground">Manage verifications, analytics, and feedback</p>
+            <p className="text-muted-foreground">{t('admin.description')}</p>
           </div>
           <div className="flex gap-2 flex-wrap">
             <Button 
@@ -988,7 +988,7 @@ const Admin = () => {
               className="gap-2"
             >
               <Zap className="w-4 h-4" />
-              System Health
+              {t('admin.system_health')}
             </Button>
             <Button 
               variant="outline"
@@ -996,7 +996,7 @@ const Admin = () => {
               className="gap-2"
             >
               <ClipboardCheck className="w-4 h-4" />
-              Release QA
+              {t('admin.release_qa')}
             </Button>
             <Button 
               onClick={() => {
@@ -1006,7 +1006,7 @@ const Admin = () => {
               className="gap-2"
             >
               <MessageSquare className="w-4 h-4" />
-              Nachricht senden
+              {t('admin.send_message')}
             </Button>
           </div>
         </div>
@@ -1060,7 +1060,7 @@ const Admin = () => {
                         )}
                         <div className="flex flex-wrap gap-2 mt-1">
                           <Badge variant="outline" className="text-xs">
-                            {user.gender === 'female' ? '👩' : user.gender === 'male' ? '👨' : '🌈'} {user.gender || 'Unbekannt'}
+                            {user.gender === 'female' ? '👩' : user.gender === 'male' ? '👨' : '🌈'} {user.gender || t('admin.unknown')}
                           </Badge>
                           {user.phone_number && (
                             <Badge variant="secondary" className="text-xs">📱 {user.phone_number}</Badge>
@@ -1075,7 +1075,7 @@ const Admin = () => {
                                     <TooltipTrigger asChild>
                                       <Badge variant="destructive" className="text-xs gap-1">
                                         <AlertTriangle className="w-3 h-3" />
-                                        {warnings.length} unvollständig
+                                        {warnings.length} {t('admin.incomplete')}
                                       </Badge>
                                     </TooltipTrigger>
                                     <TooltipContent side="bottom" className="max-w-xs">
@@ -1099,7 +1099,7 @@ const Admin = () => {
                                         )}
                                         {user.partner_name && (
                                           <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
-                                            <span className="font-medium">👫 Couple:</span> Partner {user.partner_name} ({user.partner_gender})
+                                            <span className="font-medium">👫 {t('admin.couple_label')}</span> Partner {user.partner_name} ({user.partner_gender})
                                             {user.partner_photo_url && (
                                               <Avatar className="w-8 h-8 inline-block ml-2 cursor-pointer" onClick={(e) => {
                                                 e.stopPropagation();
@@ -1138,7 +1138,7 @@ const Admin = () => {
               ))}
               {pendingVerifications.length > 3 && (
                 <p className="text-sm text-muted-foreground text-center pt-2">
-                  + {pendingVerifications.length - 3} weitere Anfragen im Verifications Tab
+                  + {pendingVerifications.length - 3} {t('admin.more_requests')}
                 </p>
               )}
             </CardContent>
@@ -1149,18 +1149,18 @@ const Admin = () => {
           <div className="overflow-x-auto -mx-4 px-4 pb-2">
             <TabsList className="inline-flex w-auto min-w-full md:grid md:w-full md:grid-cols-9 gap-1">
               <TabsTrigger value="verifications" className="whitespace-nowrap">
-                Verifications
+                {t('admin.tab_verifications')}
                 {pendingVerifications && pendingVerifications.length > 0 && (
                   <Badge variant="destructive" className="ml-2">
                     {pendingVerifications.length}
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="users" className="whitespace-nowrap">Users</TabsTrigger>
-              <TabsTrigger value="analytics" className="whitespace-nowrap">Analytics</TabsTrigger>
+              <TabsTrigger value="users" className="whitespace-nowrap">{t('admin.tab_users')}</TabsTrigger>
+              <TabsTrigger value="analytics" className="whitespace-nowrap">{t('admin.tab_analytics')}</TabsTrigger>
               <TabsTrigger value="reminders" className="whitespace-nowrap">
                 <Mail className="w-4 h-4 mr-1" />
-                Reminders
+                {t('admin.tab_reminders')}
                 {incompleteProfiles && incompleteProfiles.length > 0 && (
                   <Badge variant="secondary" className="ml-2">
                     {incompleteProfiles.length}
@@ -1168,7 +1168,7 @@ const Admin = () => {
                 )}
               </TabsTrigger>
               <TabsTrigger value="feedback" className="whitespace-nowrap">
-                Feedback
+                {t('admin.tab_feedback')}
                 {feedbackList?.filter(f => f.status === 'pending').length > 0 && (
                   <Badge variant="secondary" className="ml-2">
                     {feedbackList?.filter(f => f.status === 'pending').length}
@@ -1176,25 +1176,25 @@ const Admin = () => {
                 )}
               </TabsTrigger>
               <TabsTrigger value="faq" className="whitespace-nowrap">
-                FAQ
+                {t('admin.tab_faq')}
                 {faqRequests && faqRequests.length > 0 && (
                   <Badge variant="secondary" className="ml-2">
                     {faqRequests.length}
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="payouts" className="whitespace-nowrap">Payouts</TabsTrigger>
+              <TabsTrigger value="payouts" className="whitespace-nowrap">{t('admin.tab_payouts')}</TabsTrigger>
               <TabsTrigger value="audit" className="whitespace-nowrap">
                 <Eye className="w-4 h-4 mr-1" />
-                Audit Log
+                {t('admin.tab_audit_log')}
               </TabsTrigger>
               <TabsTrigger value="health" className="whitespace-nowrap" onClick={() => navigate('/admin/health')}>
                 <Activity className="w-4 h-4 mr-1" />
-                Health
+                {t('admin.tab_health')}
               </TabsTrigger>
               <TabsTrigger value="settings" className="whitespace-nowrap">
                 <Settings className="w-4 h-4 mr-1" />
-                Settings
+                {t('admin.tab_settings')}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -1203,19 +1203,19 @@ const Admin = () => {
           <TabsContent value="verifications" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Pending Verifications</CardTitle>
+                <CardTitle>{t('admin.pending_verifications')}</CardTitle>
                 <CardDescription>
-                  Review user verification requests (ID/Phone verification)
+                  {t('admin.verifications_desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {verificationsLoading ? (
-                  <p className="text-muted-foreground text-center py-8">Loading verifications...</p>
+                  <p className="text-muted-foreground text-center py-8">{t('admin.loading_verifications')}</p>
                 ) : !pendingVerifications || pendingVerifications.length === 0 ? (
                   <Alert>
                     <CheckCircle className="h-4 w-4 text-primary" />
                     <AlertDescription>
-                      No pending verifications. All users are up to date!
+                      {t('admin.no_pending_full')}
                     </AlertDescription>
                   </Alert>
                 ) : (
@@ -1402,7 +1402,7 @@ const Admin = () => {
                                   {/* Partner ID Document */}
                                   {(user as any).partner_id_document_url && (
                                     <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded">
-                                      <p className="text-xs font-medium mb-1">🪪 Partner-ID-Dokument</p>
+                                      <p className="text-xs font-medium mb-1">🪪 {t('admin.partner_id_document')}</p>
                                       <IdDocumentViewer 
                                         filePath={(user as any).partner_id_document_url} 
                                         userId={user.id}
@@ -1429,7 +1429,7 @@ const Admin = () => {
                                           }}
                                         >
                                           <CheckCircle className="w-3 h-3 mr-1" />
-                                          Partner-ID genehmigen
+                                          {t('admin.partner_id_approve')}
                                         </Button>
                                       )}
                                       {!(user as any).partner_photo_verified && (user as any).partner_photo_url && (
@@ -1449,7 +1449,7 @@ const Admin = () => {
                                           }}
                                         >
                                           <ImagePlus className="w-3 h-3 mr-1" />
-                                          Partner-Foto verifizieren
+                                          {t('admin.partner_photo_verify')}
                                         </Button>
                                       )}
                                     </div>
@@ -1457,7 +1457,7 @@ const Admin = () => {
                                 </div>
                               )}
                               <p className="text-xs text-muted-foreground">
-                                Requested: {new Date(user.created_at).toLocaleDateString()}
+                                {t('admin.requested_label')} {new Date(user.created_at).toLocaleDateString()}
                               </p>
                             </div>
                           </div>
@@ -1593,9 +1593,9 @@ const Admin = () => {
           <TabsContent value="users" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Benutzerverwaltung</CardTitle>
+                <CardTitle>{t('admin.user_management')}</CardTitle>
                 <CardDescription>
-                  Alle registrierten Benutzer anzeigen und verwalten
+                  {t('admin.user_management_desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1611,12 +1611,12 @@ const Admin = () => {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-border">
-                          <th className="text-left p-3 text-sm font-semibold">Name</th>
-                          <th className="text-left p-3 text-sm font-semibold">E-Mail</th>
-                          <th className="text-left p-3 text-sm font-semibold">Role</th>
+                          <th className="text-left p-3 text-sm font-semibold">{t('admin.table_name')}</th>
+                          <th className="text-left p-3 text-sm font-semibold">{t('admin.table_email')}</th>
+                          <th className="text-left p-3 text-sm font-semibold">{t('admin.table_role')}</th>
                           <th className="text-left p-3 text-sm font-semibold">{t('admin.verified_badge')}</th>
-                          <th className="text-left p-3 text-sm font-semibold">Registriert</th>
-                          <th className="text-left p-3 text-sm font-semibold">Status</th>
+                          <th className="text-left p-3 text-sm font-semibold">{t('admin.table_registered')}</th>
+                          <th className="text-left p-3 text-sm font-semibold">{t('admin.table_status')}</th>
                           <th className="text-right p-3 text-sm font-semibold">{t('admin.table_actions')}</th>
                         </tr>
                       </thead>
@@ -1714,8 +1714,8 @@ const Admin = () => {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="user">user</SelectItem>
-                                  <SelectItem value="admin">admin</SelectItem>
+                                  <SelectItem value="user">{t('admin.role_user')}</SelectItem>
+                                  <SelectItem value="admin">{t('admin.role_admin')}</SelectItem>
                                 </SelectContent>
                               </Select>
                             </td>
@@ -1812,33 +1812,33 @@ const Admin = () => {
                   <div className="text-2xl font-bold">
                     {analyticsLoading ? '...' : analytics?.totalUsers || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">Registered community members</p>
+                  <p className="text-xs text-muted-foreground">{t('admin.stats_desc_users')}</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Meals</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('admin.total_meals')}</CardTitle>
                   <ChefHat className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
                     {analyticsLoading ? '...' : analytics?.totalMeals || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">Meals shared in community</p>
+                  <p className="text-xs text-muted-foreground">{t('admin.stats_desc_meals')}</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Bookings</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('admin.active_bookings')}</CardTitle>
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
                     {analyticsLoading ? '...' : analytics?.activeBookings || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">Pending or confirmed</p>
+                  <p className="text-xs text-muted-foreground">{t('admin.stats_desc_bookings')}</p>
                 </CardContent>
               </Card>
             </div>
@@ -1882,7 +1882,7 @@ const Admin = () => {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Max. erreicht (3/3)</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('admin.max_reached')}</CardTitle>
                   <CheckCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -2016,16 +2016,16 @@ const Admin = () => {
           <TabsContent value="feedback" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>User Feedback</CardTitle>
-                <CardDescription>Bug reports and feature suggestions</CardDescription>
+                <CardTitle>{t('admin.user_feedback')}</CardTitle>
+                <CardDescription>{t('admin.feedback_desc')}</CardDescription>
               </CardHeader>
               <CardContent>
                 {feedbackLoading ? (
-                  <p className="text-muted-foreground text-center py-8">Loading feedback...</p>
+                  <p className="text-muted-foreground text-center py-8">{t('admin.loading_feedback')}</p>
                 ) : !feedbackList || feedbackList.length === 0 ? (
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>No feedback submitted yet.</AlertDescription>
+                    <AlertDescription>{t('admin.no_feedback_submitted')}</AlertDescription>
                   </Alert>
                 ) : (
                   <div className="space-y-4">
@@ -2054,14 +2054,14 @@ const Admin = () => {
                                 variant="outline"
                                 onClick={() => updateFeedbackMutation.mutate({ id: feedback.id, status: 'reviewing' })}
                               >
-                                Mark as Reviewing
+                                {t('admin.mark_as_reviewing')}
                               </Button>
                               <Button
                                 size="sm"
                                 variant="secondary"
                                 onClick={() => updateFeedbackMutation.mutate({ id: feedback.id, status: 'resolved' })}
                               >
-                                Mark as Resolved
+                                {t('admin.mark_as_resolved')}
                               </Button>
                             </div>
                           )}
@@ -2086,24 +2086,24 @@ const Admin = () => {
                 <div>
                   <CardTitle>{t('admin.payouts_title', 'Auszahlungen / Payouts')}</CardTitle>
                   <CardDescription>
-                    Manage chef payout requests
+                    {t('admin.manage_payouts')}
                   </CardDescription>
                 </div>
                 {pendingPayouts && pendingPayouts.length > 0 && (
                   <Button variant="outline" size="sm" onClick={exportPayoutsCSV}>
                     <Download className="w-4 h-4 mr-2" />
-                    CSV Export
+                    {t('admin.csv_export')}
                   </Button>
                 )}
               </CardHeader>
               <CardContent>
                 {payoutsLoading ? (
-                  <p className="text-muted-foreground text-center py-8">Loading payouts...</p>
+                  <p className="text-muted-foreground text-center py-8">{t('admin.loading_payouts')}</p>
                 ) : !pendingPayouts || pendingPayouts.length === 0 ? (
                   <Alert>
                     <CheckCircle className="h-4 w-4 text-primary" />
                     <AlertDescription>
-                      No pending payout requests. All chefs are up to date!
+                      {t('admin.no_pending_payouts')}
                     </AlertDescription>
                   </Alert>
                 ) : (
@@ -2180,14 +2180,14 @@ const Admin = () => {
                   <DialogDescription>
                     {selectedPayout && (
                       <>
-                        {t('admin.confirm_payout_desc', 'Auszahlung an')} <strong>{selectedPayout.chef.first_name} {selectedPayout.chef.last_name}</strong> über <strong>CHF {selectedPayout.totalAmount.toFixed(2)}</strong> bestätigen?
+                        {t('admin.confirm_payout_desc', 'Auszahlung an')} <strong>{selectedPayout.chef.first_name} {selectedPayout.chef.last_name}</strong> {t('admin.confirm_payout_over')} <strong>CHF {selectedPayout.totalAmount.toFixed(2)}</strong> {t('admin.confirm_payout_confirm')}
                       </>
                     )}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="payout-note">Notiz (optional)</Label>
+                    <Label htmlFor="payout-note">{t('admin.payout_note_label')}</Label>
                     <Textarea
                       id="payout-note"
                       placeholder="z.B. Überweisung am 06.02.2026, Ref: XYZ..."
@@ -2427,24 +2427,24 @@ const Admin = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ImagePlus className="w-5 h-5" />
-                  AI Image Generation
+                  {t('admin.ai_image_generation')}
                 </CardTitle>
                 <CardDescription>
-                  Generate authentic meal images using AI for demo content
+                  {t('admin.ai_image_desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    This utility uses Lovable AI to generate photorealistic food images for the Kürbis-Lasagne demo meal.
+                    {t('admin.pumpkin_ai_info')}
                   </AlertDescription>
                 </Alert>
                 
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium">Generate Pumpkin Lasagna Image</h4>
+                  <h4 className="text-sm font-medium">{t('admin.generate_pumpkin_image')}</h4>
                   <p className="text-sm text-muted-foreground">
-                    Creates an authentic, rustic homemade pumpkin lasagna photo to replace the stock image.
+                    {t('admin.generate_pumpkin_desc')}
                   </p>
                   <Button
                     onClick={generatePumpkinLasagnaImage}
