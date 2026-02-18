@@ -187,9 +187,6 @@ const ChatModal = ({ open, onOpenChange, chefId, chefName, mealId, mealTitle }: 
             <DialogTitle className="flex items-center gap-2">
               💬 {t('chat.self_chat_error')}
             </DialogTitle>
-            <DialogDescription>
-              {t('chat.self_chat_error')}
-            </DialogDescription>
           </DialogHeader>
           <div className="py-4 text-center">
             <Button onClick={() => onOpenChange(false)}>
