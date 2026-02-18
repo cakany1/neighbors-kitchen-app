@@ -2,6 +2,29 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { encode as base64url } from "https://deno.land/std@0.190.0/encoding/base64url.ts";
 
+// Generate request ID for tracing
+function generateRequestId(): string {
+  return crypto.randomUUID().slice(0, 8);
+}
+
+// Structured logger with request ID
+function logWithId(requestId: string, level: 'info' | 'warn' | 'error', message: string, data?: Record<string, unknown>): void {
+  const logMessage = `[${requestId}] ${message}`;
+  const logArgs = data ? [logMessage, JSON.stringify(data)] : [logMessage];
+  
+  switch (level) {
+    case 'info':
+      console.log(...logArgs);
+      break;
+    case 'warn':
+      console.warn(...logArgs);
+      break;
+    case 'error':
+      console.error(...logArgs);
+      break;
+  }
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -46,6 +69,10 @@ interface FCMv1Message {
   };
 }
 
+interface FCMErrorDetail {
+  errorCode?: string;
+}
+
 // Generate JWT for Firebase service account authentication
 async function createServiceAccountJWT(): Promise<string> {
   const clientEmail = Deno.env.get('FIREBASE_CLIENT_EMAIL');
@@ -77,8 +104,8 @@ async function createServiceAccountJWT(): Promise<string> {
 
   const headerData = new TextEncoder().encode(JSON.stringify(header));
   const payloadData = new TextEncoder().encode(JSON.stringify(payload));
-  const encodedHeader = base64url(headerData.buffer as ArrayBuffer);
-  const encodedPayload = base64url(payloadData.buffer as ArrayBuffer);
+  const encodedHeader = base64url(headerData);
+  const encodedPayload = base64url(payloadData);
   const unsignedToken = `${encodedHeader}.${encodedPayload}`;
 
   // Import the private key and sign
@@ -103,7 +130,7 @@ async function createServiceAccountJWT(): Promise<string> {
     new TextEncoder().encode(unsignedToken)
   );
 
-  const encodedSignature = base64url(signature as ArrayBuffer);
+  const encodedSignature = base64url(new Uint8Array(signature));
   return `${unsignedToken}.${encodedSignature}`;
 }
 
@@ -130,14 +157,19 @@ async function getAccessToken(): Promise<string> {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  const requestId = generateRequestId();
+  
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    logWithId(requestId, 'info', 'Push notification request received');
+    
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      logWithId(requestId, 'warn', 'Missing or invalid authorization header');
+      return new Response(JSON.stringify({ error: 'Unauthorized', requestId }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -157,7 +189,8 @@ const handler = async (req: Request): Promise<Response> => {
       });
       const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
       if (authError || !user) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        logWithId(requestId, 'warn', 'Authentication failed', { error: authError?.message });
+        return new Response(JSON.stringify({ error: 'Unauthorized', requestId }), {
           status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
@@ -172,8 +205,8 @@ const handler = async (req: Request): Promise<Response> => {
         .maybeSingle();
 
       if (!roleData) {
-        console.warn(`[Push] Non-admin user ${user.id} attempted to call send-push-notification`);
-        return new Response(JSON.stringify({ error: 'Forbidden: Admin access required' }), {
+        logWithId(requestId, 'warn', 'Non-admin user attempted to call send-push-notification', { userId: user.id });
+        return new Response(JSON.stringify({ error: 'Forbidden: Admin access required', requestId }), {
           status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
@@ -181,8 +214,8 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (!projectId) {
-      console.error('FIREBASE_PROJECT_ID not configured');
-      return new Response(JSON.stringify({ error: 'Push notifications not configured' }), {
+      logWithId(requestId, 'error', 'FIREBASE_PROJECT_ID not configured');
+      return new Response(JSON.stringify({ error: 'Push notifications not configured', requestId }), {
         status: 503,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -192,7 +225,7 @@ const handler = async (req: Request): Promise<Response> => {
     const payload: PushPayload = await req.json();
     const { type, user_ids, radius_km, center_lat, center_lng, title, body, data, environment = 'production' } = payload;
 
-    console.log('[Push] Sending notification:', { type, userCount: user_ids?.length, environment });
+    logWithId(requestId, 'info', 'Sending notification', { type, userCount: user_ids?.length, environment });
 
     // Get target tokens
     let tokens: { id: string; token: string; user_id: string; platform: string }[] = [];
@@ -239,14 +272,14 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (tokens.length === 0) {
-      console.log('[Push] No tokens found for notification');
-      return new Response(JSON.stringify({ success: true, sent: 0, message: 'No active tokens found' }), {
+      logWithId(requestId, 'info', 'No tokens found for notification');
+      return new Response(JSON.stringify({ success: true, sent: 0, message: 'No active tokens found', requestId }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    console.log(`[Push] Found ${tokens.length} tokens to notify`);
+    logWithId(requestId, 'info', 'Found tokens to notify', { tokenCount: tokens.length });
 
     // Get OAuth2 access token for FCM v1 API
     const accessToken = await getAccessToken();
@@ -296,14 +329,17 @@ const handler = async (req: Request): Promise<Response> => {
         });
 
         // Handle invalid tokens (UNREGISTERED, INVALID_ARGUMENT for bad token)
-        if (result.error?.code === 404 || result.error?.details?.some((d: any) => 
-          d.errorCode === 'UNREGISTERED' || d.errorCode === 'INVALID_ARGUMENT'
-        )) {
+        const hasInvalidToken = result.error?.code === 404 || 
+          (Array.isArray(result.error?.details) && result.error.details.some((d: FCMErrorDetail) => 
+            d.errorCode === 'UNREGISTERED' || d.errorCode === 'INVALID_ARGUMENT'
+          ));
+        
+        if (hasInvalidToken) {
           await supabase
             .from('device_push_tokens')
             .update({ is_active: false })
             .eq('id', tokenRecord.id);
-          console.log(`[Push] Deactivated invalid token: ${tokenRecord.id}`);
+          logWithId(requestId, 'info', 'Deactivated invalid token', { tokenId: tokenRecord.id });
         }
 
         return { tokenId: tokenRecord.id, success, result };
@@ -313,22 +349,25 @@ const handler = async (req: Request): Promise<Response> => {
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
     const failCount = results.length - successCount;
 
-    console.log(`[Push] Sent: ${successCount}, Failed: ${failCount}`);
+    logWithId(requestId, 'info', 'Notification sending complete', { sent: successCount, failed: failCount });
 
     return new Response(JSON.stringify({
       success: true,
       sent: successCount,
       failed: failCount,
       total: tokens.length,
+      requestId,
     }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
-    console.error('[Push] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logWithId(requestId, 'error', 'Push notification error', { error: errorMessage });
     return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+      error: errorMessage,
+      requestId
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
