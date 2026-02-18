@@ -307,7 +307,7 @@ const Feed = () => {
           <h2 className="text-2xl font-bold text-foreground mb-2">{t("feed.available_meals")}</h2>
           <p className="text-muted-foreground">
             {t("feed.fresh_meals_subtitle")}
-            {userLat && userLon && ` (within ${userRadius / 1000}km)`}
+            {userLat && userLon && ` ${t("feed.within_radius", { radius: userRadius / 1000 })}`}
           </p>
         </div>
 

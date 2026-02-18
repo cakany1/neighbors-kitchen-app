@@ -91,7 +91,8 @@
     "no_results_radius": "No results in selected radius. Increase radius or turn off filter.",
     "empty_address_title": "No meals at your address right now.",
     "empty_address_text": "Turn off the filter to see all meals.",
-    "empty_address_button": "Show all meals"
+    "empty_address_button": "Show all meals",
+    "within_radius": "(within {{radius}}km)"
   },
   "actions": {
     "view_details": "View Details"
@@ -461,7 +462,17 @@
     "aiPreviewBadge": "AI Preview",
     "demoBadge": "Example",
     "demoTooltip": "Example meal – this is what offers could look like.",
-    "aiImageDisclaimer": "Preview image – actual dish may vary"
+    "aiImageDisclaimer": "Preview image – actual dish may vary",
+    "chef_fallback": "Chef",
+    "location_fallback": "Basel",
+    "portions_left": "left",
+    "online_payment": "Online Payment",
+    "real_photo_badge": "Real photo",
+    "ai_badge_short": "AI",
+    "allergens_title": "Allergens",
+    "allergens_description": "Select all allergens contained in your dish",
+    "tags_title": "Tags / Categories",
+    "tags_description": "Help people find your dish (e.g. Vegan, Halal)"
   },
   "form": {
     "title": "Title",

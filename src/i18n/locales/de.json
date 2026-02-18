@@ -157,7 +157,8 @@
     "no_results_radius": "Keine Treffer im gewählten Radius. Radius erhöhen oder Filter ausschalten.",
     "empty_address_title": "An deiner Adresse gibt es gerade keine Angebote.",
     "empty_address_text": "Schalte den Filter aus, um alle Angebote zu sehen.",
-    "empty_address_button": "Filter ausschalten"
+    "empty_address_button": "Filter ausschalten",
+    "within_radius": "(innerhalb {{radius}}km)"
   },
   "admin": {
     "title": "Admin Dashboard",
@@ -931,7 +932,17 @@
     "aiPreviewBadge": "KI Vorschau",
     "demoBadge": "Beispiel",
     "demoTooltip": "Beispielgericht – so könnten Angebote aussehen.",
-    "aiImageDisclaimer": "Beispielbild – tatsächliches Gericht kann abweichen"
+    "aiImageDisclaimer": "Beispielbild – tatsächliches Gericht kann abweichen",
+    "chef_fallback": "Koch",
+    "location_fallback": "Basel",
+    "portions_left": "übrig",
+    "online_payment": "Online-Zahlung",
+    "real_photo_badge": "Echtes Foto",
+    "ai_badge_short": "KI",
+    "allergens_title": "Allergene",
+    "allergens_description": "Wähle alle Allergene, die in deinem Gericht enthalten sind",
+    "tags_title": "Tags / Kategorien",
+    "tags_description": "Hilf Menschen, dein Gericht zu finden (z.B. Vegan, Halal)"
   },
   "signup": {
     "phoneNumber": "Telefonnummer",
