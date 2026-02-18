@@ -1045,7 +1045,7 @@ const AddMeal = () => {
                             className="text-sm font-normal cursor-pointer flex items-center gap-2"
                           >
                             {option.icon && <span className="text-lg">{option.icon}</span>}
-                            <span>{isBarter ? 'Tausch / Zutaten (Barter)' : option.label}</span>
+                            <span>{option.label}</span>
                           </Label>
                           {option.note && (
                             <p className="text-xs text-muted-foreground mt-1 ml-6">{option.note}</p>
@@ -1388,7 +1388,7 @@ const AddMeal = () => {
             className="w-full" 
             size="lg"
           >
-            {currentUser ? 'Mahlzeit erstellen' : 'Einloggen zum Veröffentlichen'}
+            {currentUser ? t('add_meal.create_meal_button') : t('add_meal.login_to_publish')}
           </Button>
         </form>
       </main>

@@ -1290,7 +1290,7 @@ const Admin = () => {
                                             </Badge>
                                           </TooltipTrigger>
                                           <TooltipContent side="bottom" className="max-w-xs">
-                                            <p className="font-medium mb-1">Fehlende Angaben:</p>
+                                            <p className="font-medium mb-1">{t('admin.missing_info_header')}</p>
                                             <ul className="text-xs list-disc ml-3">
                                               {warnings.map((w, i) => <li key={i}>{w}</li>)}
                                             </ul>
@@ -1316,10 +1316,10 @@ const Admin = () => {
                                   return (
                                     <div className="mt-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
                                       <p className="text-sm font-medium flex items-center gap-2 text-destructive mb-1">
-                                        ⚠️ Mögliche Duplikate gefunden!
+                                        {t('admin.duplicates_found')}
                                       </p>
                                       <p className="text-xs text-muted-foreground mb-2">
-                                        {duplicates.length} Nutzer mit gleichem Namen und ähnlicher Adresse:
+                                        {t('admin.duplicates_count', { count: duplicates.length })}
                                       </p>
                                       <ul className="text-xs space-y-1">
                                         {duplicates.map((dup) => (
@@ -1346,7 +1346,7 @@ const Admin = () => {
                               {(user.private_address || user.private_city || user.private_postal_code) && (
                                 <div className="mt-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                                   <p className="text-sm font-medium flex items-center gap-2 mb-1">
-                                    🏠 Registrierte Adresse
+                                    {t('admin.registered_address')}
                                   </p>
                                   <p className="text-sm text-muted-foreground">
                                     {user.private_address && <span>{user.private_address}<br /></span>}
@@ -1494,20 +1494,20 @@ const Admin = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <History className="w-5 h-5" />
-                  Ablehnungs-Historie
+                  {t('admin.rejection_history_title')}
                 </CardTitle>
                 <CardDescription>
-                  Zuletzt abgelehnte Verifizierungen mit Gründen
+                  {t('admin.rejection_history_desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {rejectedLoading ? (
-                  <p className="text-muted-foreground text-center py-8">Lade Historie...</p>
+                  <p className="text-muted-foreground text-center py-8">{t('admin.loading_history')}</p>
                 ) : !rejectedVerifications || rejectedVerifications.length === 0 ? (
                   <Alert>
                     <CheckCircle className="h-4 w-4 text-primary" />
                     <AlertDescription>
-                      Keine abgelehnten Verifizierungen vorhanden.
+                      {t('admin.no_rejections')}
                     </AlertDescription>
                   </Alert>
                 ) : (
@@ -1515,11 +1515,11 @@ const Admin = () => {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-border">
-                          <th className="text-left p-2 font-semibold">Nutzer</th>
-                          <th className="text-left p-2 font-semibold">Grund</th>
-                          <th className="text-left p-2 font-semibold">Details</th>
-                          <th className="text-left p-2 font-semibold">Datum</th>
-                          <th className="text-left p-2 font-semibold">Status</th>
+                          <th className="text-left p-2 font-semibold">{t('admin.table_user')}</th>
+                          <th className="text-left p-2 font-semibold">{t('admin.table_reason')}</th>
+                          <th className="text-left p-2 font-semibold">{t('admin.table_details')}</th>
+                          <th className="text-left p-2 font-semibold">{t('admin.table_date')}</th>
+                          <th className="text-left p-2 font-semibold">{t('admin.table_status')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1597,11 +1597,11 @@ const Admin = () => {
               </CardHeader>
               <CardContent>
                 {usersLoading ? (
-                  <p className="text-muted-foreground text-center py-8">Lade Benutzer...</p>
+                  <p className="text-muted-foreground text-center py-8">{t('admin.loading_users')}</p>
                 ) : !allUsers || allUsers.length === 0 ? (
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>Keine Benutzer gefunden.</AlertDescription>
+                    <AlertDescription>{t('admin.no_users_found')}</AlertDescription>
                   </Alert>
                 ) : (
                   <div className="overflow-x-auto">
@@ -1611,10 +1611,10 @@ const Admin = () => {
                           <th className="text-left p-3 text-sm font-semibold">Name</th>
                           <th className="text-left p-3 text-sm font-semibold">E-Mail</th>
                           <th className="text-left p-3 text-sm font-semibold">Role</th>
-                          <th className="text-left p-3 text-sm font-semibold">Verifiziert</th>
+                          <th className="text-left p-3 text-sm font-semibold">{t('admin.verified_badge')}</th>
                           <th className="text-left p-3 text-sm font-semibold">Registriert</th>
                           <th className="text-left p-3 text-sm font-semibold">Status</th>
-                          <th className="text-right p-3 text-sm font-semibold">Aktionen</th>
+                          <th className="text-right p-3 text-sm font-semibold">{t('admin.table_actions')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1673,7 +1673,7 @@ const Admin = () => {
                                                 </span>
                                               </TooltipTrigger>
                                               <TooltipContent side="right" className="max-w-xs">
-                                                <p className="font-medium mb-1">⚠️ Unvollständiges Profil:</p>
+                                                <p className="font-medium mb-1">{t('admin.incomplete_profile_tooltip')}</p>
                                                 <ul className="text-xs list-disc ml-3">
                                                   {warnings.map((w, i) => <li key={i}>{w}</li>)}
                                                 </ul>
@@ -1727,10 +1727,10 @@ const Admin = () => {
                                 {user.id_verified ? (
                                   <>
                                     <CheckCircle className="w-3 h-3" />
-                                    Verifiziert
+                                    {t('admin.verified_badge')}
                                   </>
                                 ) : (
-                                  'Verifizieren'
+                                  t('admin.verify_button')
                                 )}
                               </Button>
                             </td>
@@ -1746,7 +1746,7 @@ const Admin = () => {
                                   {user.verification_status}
                                 </Badge>
                                 {user.is_disabled && (
-                                  <Badge variant="destructive">Deaktiviert</Badge>
+                                  <Badge variant="destructive">{t('admin.deactivated_badge')}</Badge>
                                 )}
                               </div>
                             </td>
@@ -1763,7 +1763,7 @@ const Admin = () => {
                                   }}
                                   disabled={toggleUserDisabledMutation.isPending}
                                 >
-                                  {user.is_disabled ? 'Aktivieren' : 'Deaktivieren'}
+                                  {user.is_disabled ? t('admin.activate_button') : t('admin.deactivate_button')}
                                 </Button>
                                 <Button
                                   variant="destructive"
@@ -1776,13 +1776,13 @@ const Admin = () => {
                                       return;
                                     }
                                     
-                                    if (window.confirm(`Benutzer ${user.first_name} ${user.last_name} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
+                                    if (window.confirm(t('admin.delete_confirm', { name: `${user.first_name} ${user.last_name}` }))) {
                                       deleteUserMutation.mutate(user.id);
                                     }
                                   }}
                                   disabled={deleteUserMutation.isPending}
                                 >
-                                  Löschen
+                                  {t('admin.delete_button')}
                                 </Button>
                               </div>
                             </td>
@@ -1853,27 +1853,27 @@ const Admin = () => {
             <div className="grid gap-4 md:grid-cols-3">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Unvollständige Profile</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('admin.incomplete_profiles_title')}</CardTitle>
                   <AlertTriangle className="h-4 w-4 text-amber-500" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
                     {incompleteLoading ? '...' : incompleteProfiles?.length || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">Fehlt: Avatar, Telefon oder Adresse</p>
+                  <p className="text-xs text-muted-foreground">{t('admin.incomplete_profiles_desc')}</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Erinnerungen gesendet</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('admin.reminders_sent_title')}</CardTitle>
                   <Mail className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
                     {remindersLoading ? '...' : profileReminders?.length || 0}
                   </div>
-                  <p className="text-xs text-muted-foreground">User mit mind. 1 Erinnerung</p>
+                  <p className="text-xs text-muted-foreground">{t('admin.reminders_sent_desc')}</p>
                 </CardContent>
               </Card>
 
@@ -1896,10 +1896,10 @@ const Admin = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Send className="w-5 h-5 text-primary" />
-                  Erinnerungs-E-Mails manuell auslösen
+                  {t('admin.send_reminders_title')}
                 </CardTitle>
                 <CardDescription>
-                  Sendet E-Mails an alle User mit unvollständigen Profilen, die noch keine 3 Erinnerungen erhalten haben und deren letzte Erinnerung mindestens 7 Tage zurückliegt.
+                  {t('admin.send_reminders_desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1910,7 +1910,7 @@ const Admin = () => {
                     className="gap-2"
                   >
                     <Mail className="w-4 h-4" />
-                    {isSendingReminders ? 'Sende E-Mails...' : 'Jetzt Erinnerungen senden'}
+                    {isSendingReminders ? t('admin.sending_emails') : t('admin.send_reminders_now')}
                   </Button>
                   <p className="text-sm text-muted-foreground">
                     {t('admin.cron_schedule_info', 'Automatischer Cron: Jeden Montag um 10:00 Uhr (UTC)')}
@@ -1922,19 +1922,19 @@ const Admin = () => {
             {/* Reminder History Table */}
             <Card>
               <CardHeader>
-                <CardTitle>Erinnerungs-Verlauf</CardTitle>
+                <CardTitle>{t('admin.reminder_history_title')}</CardTitle>
                 <CardDescription>
-                  Übersicht welche User wie viele Erinnerungen erhalten haben
+                  {t('admin.reminder_history_desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {remindersLoading ? (
-                  <p className="text-muted-foreground text-center py-8">Lade Daten...</p>
+                  <p className="text-muted-foreground text-center py-8">{t('admin.loading_data')}</p>
                 ) : !profileReminders || profileReminders.length === 0 ? (
                   <Alert>
                     <Mail className="h-4 w-4" />
                     <AlertDescription>
-                      Noch keine Erinnerungen versendet.
+                      {t('admin.no_reminders_sent')}
                     </AlertDescription>
                   </Alert>
                 ) : (
@@ -1942,10 +1942,10 @@ const Admin = () => {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-border">
-                          <th className="text-left p-3 text-sm font-semibold">User</th>
-                          <th className="text-left p-3 text-sm font-semibold">Erinnerungen</th>
-                          <th className="text-left p-3 text-sm font-semibold">Letzte E-Mail</th>
-                          <th className="text-left p-3 text-sm font-semibold">Status</th>
+                          <th className="text-left p-3 text-sm font-semibold">{t('admin.table_user')}</th>
+                          <th className="text-left p-3 text-sm font-semibold">{t('admin.table_reminders')}</th>
+                          <th className="text-left p-3 text-sm font-semibold">{t('admin.table_last_email')}</th>
+                          <th className="text-left p-3 text-sm font-semibold">{t('admin.table_status')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -2126,9 +2126,9 @@ const Admin = () => {
                                 IBAN: {payout.chef.iban || '⚠️ Missing'}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                Letzte Auszahlung: {payout.chef.last_payout_at 
-                                  ? new Date(payout.chef.last_payout_at).toLocaleDateString('de-CH') 
-                                  : 'Nie'}
+                                {payout.chef.last_payout_at 
+                                  ? t('admin.last_payout', { date: new Date(payout.chef.last_payout_at).toLocaleDateString('de-CH') })
+                                  : t('admin.last_payout', { date: t('admin.last_payout_never') })}
                               </p>
                             </div>
                             <div className="text-right">
@@ -2150,14 +2150,14 @@ const Admin = () => {
                             className="w-full"
                           >
                             <CheckCircle className="w-4 h-4 mr-2" />
-                            Als bezahlt markieren
+                            {t('admin.mark_as_paid')}
                           </Button>
                           
                           {!payout.chef.iban && (
                             <Alert className="mt-3" variant="destructive">
                               <AlertCircle className="h-4 w-4" />
                               <AlertDescription className="text-xs">
-                                IBAN fehlt! Chef muss IBAN im Profil hinterlegen.
+                                {t('admin.iban_missing_alert')}
                               </AlertDescription>
                             </Alert>
                           )}
@@ -2200,7 +2200,7 @@ const Admin = () => {
                     setPayoutNote('');
                     setSelectedPayout(null);
                   }}>
-                    Abbrechen
+                    {t('common.cancel')}
                   </Button>
                   <Button 
                     onClick={() => {
@@ -2215,7 +2215,7 @@ const Admin = () => {
                     }}
                     disabled={markPaidMutation.isPending}
                   >
-                    {markPaidMutation.isPending ? 'Wird gespeichert...' : 'Bestätigen'}
+                    {markPaidMutation.isPending ? t('admin.saving') : t('admin.confirm_button')}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -2267,7 +2267,7 @@ const Admin = () => {
                         <div className="mt-2 pt-2 border-t border-border/50 text-xs text-muted-foreground">
                           <div className="flex items-center justify-between">
                             <span>
-                              Bestätigt von: {entry.admin?.name || 'Unknown'}
+                              {t('admin.confirmed_by', { name: entry.admin?.name || 'Unknown' })}
                             </span>
                             <span>
                               {new Date(entry.created_at).toLocaleString('de-CH', {
@@ -2379,23 +2379,23 @@ const Admin = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <UserCog className="w-5 h-5 text-primary" />
-                  Admin-Rollen verwalten
+                  {t('admin.manage_admin_roles_title')}
                 </CardTitle>
                 <CardDescription>
-                  Admins können andere Benutzer zu Admins befördern oder Admin-Rechte entziehen.
+                  {t('admin.manage_admin_roles_desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Alert>
                   <Shield className="h-4 w-4" />
                   <AlertDescription>
-                    ⚠️ Aktuelle Admins: Nur Benutzer mit Eintrag in der user_roles Tabelle mit role='admin' haben Admin-Zugriff.
+                    {t('admin.admin_warning')}
                   </AlertDescription>
                 </Alert>
                 
                 {/* List current admins */}
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium">Aktuelle Administratoren</h4>
+                  <h4 className="text-sm font-medium">{t('admin.current_admins')}</h4>
                   <div className="space-y-2">
                     {allUsers?.filter((u: any) => {
                       // Check in user_roles if this user has admin role
@@ -2514,18 +2514,18 @@ const Admin = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {pendingRoleChange?.makeAdmin ? 'Admin-Rechte vergeben' : 'Admin-Rechte entziehen'}
+              {pendingRoleChange?.makeAdmin ? t('admin.grant_admin_title') : t('admin.revoke_admin_title')}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {pendingRoleChange?.makeAdmin 
-                ? `Möchtest du "${pendingRoleChange?.userName}" wirklich Admin-Rechte geben? Diese Person erhält vollen Zugriff auf das Admin-Dashboard.`
-                : `Möchtest du "${pendingRoleChange?.userName}" wirklich die Admin-Rechte entziehen? Diese Person verliert den Zugriff auf das Admin-Dashboard.`
+                ? t('admin.grant_admin_confirm', { name: pendingRoleChange?.userName })
+                : t('admin.revoke_admin_confirm', { name: pendingRoleChange?.userName })
               }
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setPendingRoleChange(null)}>
-              Abbrechen
+              {t('common.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {

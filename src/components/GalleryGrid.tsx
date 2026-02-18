@@ -78,7 +78,7 @@ const GalleryGrid = ({ userId, isOwnProfile }: GalleryGridProps) => {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">
-          {isOwnProfile ? 'Noch keine Fotos hochgeladen' : 'Keine Galerie verfügbar'}
+          {isOwnProfile ? t('profile.no_photos_uploaded') : t('profile.no_gallery_available')}
         </p>
       </div>
     );
