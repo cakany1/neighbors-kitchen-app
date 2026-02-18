@@ -130,6 +130,7 @@
     "send_blocked": "Nachricht kann nicht gesendet werden. Es gibt eine Blockierung zwischen dir und diesem Nutzer.",
     "send_failed": "Nachricht konnte nicht gesendet werden",
     "message_sent": "Nachricht gesendet",
+    "self_chat_error": "Du kannst nicht mit dir selbst chatten.",
     "demo_title": "Demo-Modus",
     "demo_description": "Dies ist ein Demo-Gericht. Der Chat mit dem Koch ist nicht verfügbar.",
     "demo_hint": "Registriere dich und buche ein echtes Gericht, um mit Köchen zu chatten!",
