@@ -77,8 +77,8 @@ async function createServiceAccountJWT(): Promise<string> {
 
   const headerData = new TextEncoder().encode(JSON.stringify(header));
   const payloadData = new TextEncoder().encode(JSON.stringify(payload));
-  const encodedHeader = base64url(headerData);
-  const encodedPayload = base64url(payloadData);
+  const encodedHeader = base64url(headerData.buffer as ArrayBuffer);
+  const encodedPayload = base64url(payloadData.buffer as ArrayBuffer);
   const unsignedToken = `${encodedHeader}.${encodedPayload}`;
 
   // Import the private key and sign
@@ -103,7 +103,7 @@ async function createServiceAccountJWT(): Promise<string> {
     new TextEncoder().encode(unsignedToken)
   );
 
-  const encodedSignature = base64url(new Uint8Array(signature));
+  const encodedSignature = base64url(signature as ArrayBuffer);
   return `${unsignedToken}.${encodedSignature}`;
 }
 
