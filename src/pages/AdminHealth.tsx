@@ -790,7 +790,7 @@ const AdminHealth = () => {
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  {t('admin_health.no_webhooks')}. {t('admin_health.no_webhooks_info')}
+                  {t('admin_health.no_webhooks')} {t('admin_health.no_webhooks_info')}
                 </AlertDescription>
               </Alert>
             )}
@@ -915,7 +915,7 @@ const AdminHealth = () => {
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  {t('admin_health.no_tokens')}. {t('admin_health.no_tokens_info')}
+                  {t('admin_health.no_tokens')} {t('admin_health.no_tokens_info')}
                 </AlertDescription>
               </Alert>
             )}
