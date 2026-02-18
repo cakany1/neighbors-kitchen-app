@@ -898,6 +898,8 @@
     "translate_to_english": "Translate to English",
     "delete_karma_warning": "This meal is older than 5 minutes. Deleting it will cost you 10 Karma points. Continue?",
     "delete_free_hint": "Delete is free (within 5 minutes)",
+    "edit": "Edit",
+    "edit_free_hint": "Edit/Delete free (within 5 minutes)",
     "karma_penalty_applied": "Meal deleted. -10 Karma",
     "own_meal": "Your own offer"
   },
@@ -1010,7 +1012,11 @@
     "create_meal_button": "Create Meal",
     "login_to_publish": "Login to Publish",
     "verified_only_desc": "Only verified guests can book",
-    "ladies_only_desc": "Only female guests can book"
+    "ladies_only_desc": "Only female guests can book",
+    "edit_page_title": "Edit Meal",
+    "edit_page_subtitle": "Update your meal details",
+    "update_meal_button": "Update Meal",
+    "edit_window_expired": "Edit window expired (5 minutes)"
   },
   "feed_page": {
     "welcome_message": "Welcome to Neighbors Kitchen! This is a private food-sharing community. Please bring your own containers, respect the chefs' homes and pay fairly. Tap to close.",
@@ -1077,6 +1083,9 @@
     "insufficient_portions": "Not enough portions available.",
     "address_save_failed": "Could not save address.",
     "meal_live": "✅ Meal is live! Your food is now visible.",
+    "meal_updated": "✅ Meal updated successfully!",
+    "meal_update_error": "Failed to update meal. Please try again.",
+    "meal_creation_error": "Failed to create meal",
     "general_error": "An error occurred. Please try again.",
     "image_generated": "Image generated and updated successfully!",
     "image_generation_failed": "Failed to generate image",

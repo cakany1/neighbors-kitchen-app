@@ -450,6 +450,9 @@
     "insufficient_portions": "Nicht genügend Portionen verfügbar.",
     "address_save_failed": "Adresse konnte nicht gespeichert werden.",
     "meal_live": "✅ Gericht ist live! Dein Essen ist jetzt sichtbar.",
+    "meal_updated": "✅ Mahlzeit erfolgreich aktualisiert!",
+    "meal_update_error": "Fehler beim Aktualisieren der Mahlzeit. Bitte versuche es erneut.",
+    "meal_creation_error": "Fehler beim Erstellen der Mahlzeit",
     "general_error": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
     "image_generated": "Bild erfolgreich generiert und aktualisiert!",
     "image_generation_failed": "Fehler beim Generieren des Bildes",
@@ -1145,6 +1148,8 @@
     "translate_to_english": "Translate to English",
     "delete_karma_warning": "Diese Mahlzeit ist älter als 5 Minuten. Beim Löschen verlierst du 10 Karma Punkte. Fortfahren?",
     "delete_free_hint": "Löschen ist kostenlos (innerhalb 5 Minuten)",
+    "edit": "Bearbeiten",
+    "edit_free_hint": "Bearbeiten/Löschen kostenlos (innerhalb 5 Minuten)",
     "karma_penalty_applied": "Gericht gelöscht. -10 Karma",
     "own_meal": "Dein eigenes Angebot"
   },
@@ -1257,7 +1262,11 @@
     "create_meal_button": "Mahlzeit erstellen",
     "login_to_publish": "Einloggen zum Veröffentlichen",
     "verified_only_desc": "Nur Gäste mit Verifikation dürfen buchen",
-    "ladies_only_desc": "Nur weibliche Gäste dürfen buchen"
+    "ladies_only_desc": "Nur weibliche Gäste dürfen buchen",
+    "edit_page_title": "Mahlzeit bearbeiten",
+    "edit_page_subtitle": "Aktualisiere die Details deiner Mahlzeit",
+    "update_meal_button": "Mahlzeit aktualisieren",
+    "edit_window_expired": "Bearbeitungsfenster abgelaufen (5 Minuten)"
   },
   "feed_page": {
     "welcome_message": "Willkommen bei Neighbors Kitchen! Dies ist eine private Food-Sharing Community. Bitte bringe deine eigenen Behälter mit, respektiere die Wohnungen der Köche und zahle fair. Tippe zum Schliessen.",
