@@ -18,8 +18,14 @@ const FuzzyLocationMap = ({ lat, lng, radius = 200, neighborhood }: FuzzyLocatio
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    // Initialize map
-    const map = L.map(mapRef.current).setView([lat, lng], 15);
+    // Initialize map with zoom enabled
+    const map = L.map(mapRef.current, {
+      scrollWheelZoom: true,
+      zoomControl: true,
+      touchZoom: true,
+      doubleClickZoom: true,
+      dragging: true,
+    }).setView([lat, lng], 15);
     mapInstanceRef.current = map;
 
     // Add OpenStreetMap tiles
