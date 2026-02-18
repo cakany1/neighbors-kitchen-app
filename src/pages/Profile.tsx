@@ -143,7 +143,7 @@ const Profile = () => {
     // Validate phone
     const cleanPhone = phoneNumber.replace(/[\s\-()]/g, '');
     if (cleanPhone.length > 0 && cleanPhone.length < 8) {
-      toast.error(t('profile.phone_too_short', 'Telefonnummer muss mindestens 8 Zeichen lang sein'));
+      toast.error(t('validation.phone_too_short'));
       return;
     }
 
