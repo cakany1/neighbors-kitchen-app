@@ -57,6 +57,9 @@ const AddMeal = () => {
   });
 
   // Time dropdown options (24h format)
+  const DEFAULT_START_HOUR = '18';
+  const DEFAULT_END_HOUR = '19';
+  
   const hourOptions = Array.from({ length: 18 }, (_, i) => {
     const hour = (i + 6).toString().padStart(2, '0');
     return { value: hour, label: `${hour} ${t('add_meal.hour_suffix', 'Uhr')}` };
@@ -213,6 +216,38 @@ const AddMeal = () => {
     if (current > 1) {
       setFormData({ ...formData, portions: (current - 1).toString() });
     }
+  };
+
+  // Helper function to check if a time slot is in the past
+  const isTimeInPast = (timeString: string): boolean => {
+    if (!formData.scheduledDate || !timeString) return false;
+    
+    const now = new Date();
+    const scheduledDate = new Date(formData.scheduledDate);
+    
+    // Compare dates in local timezone by comparing year, month, and day
+    const isToday = scheduledDate.getFullYear() === now.getFullYear() &&
+                    scheduledDate.getMonth() === now.getMonth() &&
+                    scheduledDate.getDate() === now.getDate();
+    
+    if (!isToday) return false; // Future dates are always valid
+    
+    const [hour, minute] = timeString.split(':').map(Number);
+    // Create pickup time in local timezone using date components
+    const pickupTime = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      hour,
+      minute,
+      0,
+      0
+    );
+    
+    // Add 15 min grace period
+    const graceTime = new Date(now.getTime() + 15 * 60 * 1000);
+    
+    return pickupTime < graceTime;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -812,24 +847,32 @@ const AddMeal = () => {
                 
                 {/* Smart Time Chips */}
                 <div className="grid grid-cols-2 gap-3">
-                  {['17:00', '18:00', '19:00', '20:00'].map((time) => (
-                    <Button
-                      key={time}
-                      type="button"
-                      variant={formData.collectionWindowStart === time ? 'default' : 'outline'}
-                      onClick={() => {
-                        const endHour = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
-                        setFormData({ 
-                          ...formData, 
-                          collectionWindowStart: time,
-                          collectionWindowEnd: `${endHour}:00`
-                        });
-                      }}
-                      className="h-12"
-                    >
-                      {`${time} - ${(parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0')}:00 ${t('add_meal.time_suffix', 'Uhr')}`}
-                    </Button>
-                  ))}
+                  {['17:00', '18:00', '19:00', '20:00'].map((time) => {
+                    const isPast = isTimeInPast(time);
+                    return (
+                      <Button
+                        key={time}
+                        type="button"
+                        variant={formData.collectionWindowStart === time ? 'default' : 'outline'}
+                        onClick={() => {
+                          if (isPast) {
+                            toast.error(t('add_meal.past_timeslot_error', 'Dieser Zeitslot liegt in der Vergangenheit. Bitte wähle einen späteren Zeitpunkt.'));
+                            return;
+                          }
+                          const endHour = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
+                          setFormData({ 
+                            ...formData, 
+                            collectionWindowStart: time,
+                            collectionWindowEnd: `${endHour}:00`
+                          });
+                        }}
+                        disabled={isPast}
+                        className="h-12"
+                      >
+                        {`${time} - ${(parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0')}:00 ${t('add_meal.time_suffix', 'Uhr')}`}
+                      </Button>
+                    );
+                  })}
                 </div>
 
                 {/* Manual Time Selection with Dropdowns */}
@@ -844,37 +887,55 @@ const AddMeal = () => {
                         value={formData.collectionWindowStart.split(':')[0] || ''}
                         onValueChange={(hour) => {
                           const minute = formData.collectionWindowStart.split(':')[1] || '00';
-                          setFormData({ ...formData, collectionWindowStart: `${hour}:${minute}` });
+                          const newTime = `${hour}:${minute}`;
+                          if (isTimeInPast(newTime)) {
+                            toast.error(t('add_meal.past_timeslot_error', 'Dieser Zeitslot liegt in der Vergangenheit. Bitte wähle einen späteren Zeitpunkt.'));
+                            return;
+                          }
+                          setFormData({ ...formData, collectionWindowStart: newTime });
                         }}
                       >
                         <SelectTrigger className="h-11 w-[90px]">
                           <SelectValue placeholder="HH" />
                         </SelectTrigger>
                         <SelectContent className="max-h-60">
-                          {hourOptions.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {opt.value}
-                            </SelectItem>
-                          ))}
+                          {hourOptions.map((opt) => {
+                            // Only disable if all minute options (including :45) would be in the past
+                            const isPastHour = isTimeInPast(`${opt.value}:45`);
+                            return (
+                              <SelectItem key={opt.value} value={opt.value} disabled={isPastHour}>
+                                {opt.value}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                       <span className="text-lg font-bold px-1">:</span>
                       <Select
                         value={formData.collectionWindowStart.split(':')[1] || ''}
                         onValueChange={(minute) => {
-                          const hour = formData.collectionWindowStart.split(':')[0] || '18';
-                          setFormData({ ...formData, collectionWindowStart: `${hour}:${minute}` });
+                          const hour = formData.collectionWindowStart.split(':')[0] || DEFAULT_START_HOUR;
+                          const newTime = `${hour}:${minute}`;
+                          if (isTimeInPast(newTime)) {
+                            toast.error(t('add_meal.past_timeslot_error', 'Dieser Zeitslot liegt in der Vergangenheit. Bitte wähle einen späteren Zeitpunkt.'));
+                            return;
+                          }
+                          setFormData({ ...formData, collectionWindowStart: newTime });
                         }}
                       >
                         <SelectTrigger className="h-11 w-[90px]">
                           <SelectValue placeholder="MM" />
                         </SelectTrigger>
                         <SelectContent>
-                          {minuteOptions.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {opt.value}
-                            </SelectItem>
-                          ))}
+                          {minuteOptions.map((opt) => {
+                            const hour = formData.collectionWindowStart.split(':')[0] || DEFAULT_START_HOUR;
+                            const isPastMinute = isTimeInPast(`${hour}:${opt.value}`);
+                            return (
+                              <SelectItem key={opt.value} value={opt.value} disabled={isPastMinute}>
+                                {opt.value}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                       <span className="ml-1 text-sm text-muted-foreground">{t('add_meal.time_suffix', 'Uhr')}</span>
@@ -889,37 +950,55 @@ const AddMeal = () => {
                         value={formData.collectionWindowEnd.split(':')[0] || ''}
                         onValueChange={(hour) => {
                           const minute = formData.collectionWindowEnd.split(':')[1] || '00';
-                          setFormData({ ...formData, collectionWindowEnd: `${hour}:${minute}` });
+                          const newTime = `${hour}:${minute}`;
+                          if (isTimeInPast(newTime)) {
+                            toast.error(t('add_meal.past_timeslot_error', 'Dieser Zeitslot liegt in der Vergangenheit. Bitte wähle einen späteren Zeitpunkt.'));
+                            return;
+                          }
+                          setFormData({ ...formData, collectionWindowEnd: newTime });
                         }}
                       >
                         <SelectTrigger className="h-11 w-[90px]">
                           <SelectValue placeholder="HH" />
                         </SelectTrigger>
                         <SelectContent className="max-h-60">
-                          {hourOptions.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {opt.value}
-                            </SelectItem>
-                          ))}
+                          {hourOptions.map((opt) => {
+                            // Only disable if all minute options (including :45) would be in the past
+                            const isPastHour = isTimeInPast(`${opt.value}:45`);
+                            return (
+                              <SelectItem key={opt.value} value={opt.value} disabled={isPastHour}>
+                                {opt.value}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                       <span className="text-lg font-bold px-1">:</span>
                       <Select
                         value={formData.collectionWindowEnd.split(':')[1] || ''}
                         onValueChange={(minute) => {
-                          const hour = formData.collectionWindowEnd.split(':')[0] || '19';
-                          setFormData({ ...formData, collectionWindowEnd: `${hour}:${minute}` });
+                          const hour = formData.collectionWindowEnd.split(':')[0] || DEFAULT_END_HOUR;
+                          const newTime = `${hour}:${minute}`;
+                          if (isTimeInPast(newTime)) {
+                            toast.error(t('add_meal.past_timeslot_error', 'Dieser Zeitslot liegt in der Vergangenheit. Bitte wähle einen späteren Zeitpunkt.'));
+                            return;
+                          }
+                          setFormData({ ...formData, collectionWindowEnd: newTime });
                         }}
                       >
                         <SelectTrigger className="h-11 w-[90px]">
                           <SelectValue placeholder="MM" />
                         </SelectTrigger>
                         <SelectContent>
-                          {minuteOptions.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {opt.value}
-                            </SelectItem>
-                          ))}
+                          {minuteOptions.map((opt) => {
+                            const hour = formData.collectionWindowEnd.split(':')[0] || DEFAULT_END_HOUR;
+                            const isPastMinute = isTimeInPast(`${hour}:${opt.value}`);
+                            return (
+                              <SelectItem key={opt.value} value={opt.value} disabled={isPastMinute}>
+                                {opt.value}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                       <span className="ml-1 text-sm text-muted-foreground">{t('add_meal.time_suffix', 'Uhr')}</span>
