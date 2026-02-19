@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format, parse } from 'date-fns';
 import { Header } from '@/components/Header';
@@ -29,6 +29,12 @@ import { useQuery } from '@tanstack/react-query';
 const AddMeal = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  // Edit mode detection
+  const editMealId = searchParams.get('edit');
+  const isEditMode = !!editMealId;
+  
   const [womenOnly, setWomenOnly] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [visibilityRadius, setVisibilityRadius] = useState<number | null>(null); // null = no limit
@@ -128,6 +134,34 @@ const AddMeal = () => {
     refetchOnMount: 'always',
   });
 
+  // Fetch meal data when in edit mode
+  const { data: editMeal } = useQuery({
+    queryKey: ['editMeal', editMealId],
+    queryFn: async () => {
+      if (!editMealId || !currentUser?.id) return null;
+      
+      const { data: meal, error } = await supabase
+        .from('meals')
+        .select('*')
+        .eq('id', editMealId)
+        .eq('chef_id', currentUser.id) // Security: only owner can edit
+        .single();
+      
+      if (error) throw error;
+      
+      // Check if within 5-minute edit window
+      const ageMinutes = (Date.now() - new Date(meal.created_at).getTime()) / (1000 * 60);
+      if (ageMinutes > 5) {
+        toast.error(t('add_meal.edit_window_expired'));
+        navigate(`/meal/${editMealId}`);
+        return null;
+      }
+      
+      return meal;
+    },
+    enabled: !!editMealId && !!currentUser?.id,
+  });
+
   // Initialize address data when profile loads
   useEffect(() => {
     if (currentUser) {
@@ -142,6 +176,37 @@ const AddMeal = () => {
       }
     }
   }, [currentUser]);
+
+  // Populate form when editing existing meal
+  useEffect(() => {
+    if (editMeal && isEditMode) {
+      setFormData({
+        title: editMeal.title || '',
+        description: editMeal.description || '',
+        ingredients: editMeal.ingredients || '',
+        restaurantReferencePrice: editMeal.restaurant_reference_price ? (editMeal.restaurant_reference_price / 100).toFixed(2) : '',
+        estimatedValue: editMeal.estimated_restaurant_value ? (editMeal.estimated_restaurant_value / 100).toFixed(2) : '',
+        portions: String(editMeal.available_portions || 1),
+        scheduledDate: editMeal.scheduled_for ? new Date(editMeal.scheduled_for).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        collectionWindowStart: editMeal.collection_window_start || '',
+        collectionWindowEnd: editMeal.collection_window_end || '',
+      });
+      
+      setTags(editMeal.tags || []);
+      setSelectedAllergens(editMeal.allergens || []);
+      setWomenOnly(editMeal.women_only || false);
+      setVerifiedOnly(editMeal.verified_only || false);
+      setVisibilityRadius(editMeal.visibility_radius_km || null);
+      setContainerPolicy(editMeal.container_policy || 'either_ok');
+      setBarterText(editMeal.barter_text || '');
+      
+      // Set exchange options
+      const options: string[] = [];
+      if (editMeal.restaurant_reference_price) options.push('online');
+      if (editMeal.barter_text) options.push('barter');
+      setSelectedExchangeOptions(options);
+    }
+  }, [editMeal, isEditMode]);
 
   const toggleExchangeOption = (option: string) => {
     setSelectedExchangeOptions(prev =>
@@ -504,28 +569,54 @@ const AddMeal = () => {
         ai_image_confirmed: aiImageConfirmed,
       };
 
-      // 5. Insert meal into database
-      const { data: newMeal, error: insertError } = await supabase
-        .from('meals')
-        .insert(mealData)
-        .select()
-        .single();
+      // 5. Insert or Update meal in database
+      let mealId: string;
+      if (isEditMode && editMealId) {
+        // Update existing meal
+        const { data: updatedMeal, error: updateError } = await supabase
+          .from('meals')
+          .update(mealData)
+          .eq('id', editMealId)
+          .eq('chef_id', user.id) // Security: verify ownership
+          .select()
+          .single();
 
-      if (insertError) {
-        console.error('Insert error:', insertError);
+        if (updateError) {
+          console.error('Update error:', updateError);
+          toast.dismiss(loadingToastId);
+          const friendlyError = mapDbPriceError(updateError.message || '', t);
+          toast.error(friendlyError || t('toast.meal_update_error'));
+          return;
+        }
+        
+        mealId = updatedMeal.id;
         toast.dismiss(loadingToastId);
-        // Map database constraint errors to localized messages
-        const friendlyError = mapDbPriceError(insertError.message || '', t);
-        toast.error(friendlyError || t('toast.meal_creation_error'));
-        return;
-      }
+        toast.success(t('toast.meal_updated'));
+      } else {
+        // Insert new meal
+        const { data: newMeal, error: insertError } = await supabase
+          .from('meals')
+          .insert(mealData)
+          .select()
+          .single();
 
-      toast.dismiss(loadingToastId);
-      toast.success(t('toast.meal_live'));
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          toast.dismiss(loadingToastId);
+          // Map database constraint errors to localized messages
+          const friendlyError = mapDbPriceError(insertError.message || '', t);
+          toast.error(friendlyError || t('toast.meal_creation_error'));
+          return;
+        }
+
+        mealId = newMeal.id;
+        toast.dismiss(loadingToastId);
+        toast.success(t('toast.meal_live'));
+      }
       
-      // Navigate to the new meal detail page
+      // Navigate to the meal detail page
       setTimeout(() => {
-        navigate(`/meal/${newMeal.id}`);
+        navigate(`/meal/${mealId}`);
       }, 1000);
 
     } catch (error) {
@@ -541,8 +632,12 @@ const AddMeal = () => {
       
       <main className="max-w-lg mx-auto px-4 py-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">{t('add_meal.page_title')}</h1>
-          <p className="text-muted-foreground">{t('add_meal.page_subtitle')}</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">
+            {isEditMode ? t('add_meal.edit_page_title') : t('add_meal.page_title')}
+          </h1>
+          <p className="text-muted-foreground">
+            {isEditMode ? t('add_meal.edit_page_subtitle') : t('add_meal.page_subtitle')}
+          </p>
         </div>
 
         {/* Couple Verification Info — informational only, does NOT block meal creation */}
@@ -1432,7 +1527,12 @@ const AddMeal = () => {
             className="w-full" 
             size="lg"
           >
-            {currentUser ? t('add_meal.create_meal_button') : t('add_meal.login_to_publish')}
+            {isEditMode 
+              ? t('add_meal.update_meal_button') 
+              : currentUser 
+                ? t('add_meal.create_meal_button') 
+                : t('add_meal.login_to_publish')
+            }
           </Button>
         </form>
       </main>

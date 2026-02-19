@@ -36,6 +36,7 @@ import {
   Trash2,
   Sparkles,
   Camera,
+  Edit,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -562,25 +563,39 @@ const MealDetail = () => {
               </div>
             </div>
 
-            {/* Report or Delete Button */}
+            {/* Report, Edit or Delete Button */}
             <div className="flex flex-col items-end gap-1">
               {(currentUser?.id === meal.chef_id || (currentUser as any)?.isAdmin) ? (
                 <>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteMeal()}
-                    className="text-muted-foreground hover:text-destructive"
-                    title={
-                      (currentUser as any)?.isAdmin && currentUser?.id !== meal.chef_id
-                        ? t("meal_detail.admin_delete")
-                        : t("meal_detail.delete")
-                    }
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    {/* Edit button - only for owner within 5 minutes */}
+                    {isWithinGentlemanMinutes && currentUser?.id === meal.chef_id && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => navigate(`/add-meal?edit=${meal.id}`)}
+                        className="text-muted-foreground hover:text-primary"
+                        title={t("meal_detail.edit")}
+                      >
+                        <Edit className="w-5 h-5" />
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteMeal()}
+                      className="text-muted-foreground hover:text-destructive"
+                      title={
+                        (currentUser as any)?.isAdmin && currentUser?.id !== meal.chef_id
+                          ? t("meal_detail.admin_delete")
+                          : t("meal_detail.delete")
+                      }
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </Button>
+                  </div>
                   {isWithinGentlemanMinutes && currentUser?.id === meal.chef_id && (
-                    <span className="text-xs text-muted-foreground">{t("meal_detail.delete_free_hint")}</span>
+                    <span className="text-xs text-muted-foreground">{t("meal_detail.edit_free_hint")}</span>
                   )}
                   {(currentUser as any)?.isAdmin && currentUser?.id !== meal.chef_id && (
                     <span className="text-xs text-muted-foreground">Admin</span>
