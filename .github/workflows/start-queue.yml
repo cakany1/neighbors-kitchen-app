@@ -1,0 +1,38 @@
+name: Start Queue Generator
+
+# Parse .ACTIVE_PRIORITY_ISSUES.md, build parallel start groups, and
+# automatically apply workflow labels to Group 1 issues (ai-ready → ai-in-progress).
+# Trigger manually from the Actions tab; use dry_run=true to preview first.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — generate report only, do not change any labels'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  start-queue:
+    name: Generate Start Queue + Label Group 1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Start Queue Generator
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: node scripts/start-queue.mjs
