@@ -1,0 +1,50 @@
+name: docs-sync-status-files
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate updated dotfiles
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          node scripts/docs_sync.mjs
+
+      - name: Create PR with updates
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "docs: sync .SPRINT_STATUS.md and .ACTIVE_PRIORITY_ISSUES.md"
+          title: "docs: sync status files"
+          body: |
+            Auto-generated after merge to main.
+
+            Updated:
+            - .SPRINT_STATUS.md
+            - .ACTIVE_PRIORITY_ISSUES.md
+
+            Note:
+            - .PROJECT_CONTEXT.md is NOT auto-updated (stable by policy).
+            - Use label `touches:arch-context` on a PR to trigger a separate context update flow (manual review required).
+          branch: docs/auto-sync
+          delete-branch: true
+          labels: |
+            area:docs
