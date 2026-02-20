@@ -36,6 +36,30 @@ import { toast } from 'sonner';
 // Total number of checklist items - keep in sync with AdminReleaseChecklist
 const TOTAL_CHECKLIST_ITEMS = 14;
 
+// Known deployed Supabase Edge Functions
+const DEPLOYED_EDGE_FUNCTIONS = [
+  'stripe-webhook',
+  'create-payment-intent',
+  'verify-payment',
+  'run-self-test',
+  'send-push-notification',
+  'trigger-push-notification',
+  'send-welcome-email',
+  'send-admin-notification',
+  'send-admin-message',
+  'send-password-reset',
+  'send-profile-reminders',
+  'send-registration-notification',
+  'send-verification-rejection',
+  'admin-list-users',
+  'submit-contact',
+  'geocode-address',
+  'generate-meal-image',
+  'fetch-recipe-ingredients',
+  'translate-message',
+  'get-turnstile-key',
+] as const;
+
 interface TestResult {
   name: string;
   status: 'PASS' | 'FAIL' | 'SKIP';
@@ -687,6 +711,29 @@ const AdminHealth = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Edge Functions Status */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Zap className="w-5 h-5 text-primary" />
+              {t('admin_health.edge_functions', 'Edge Functions')}
+            </CardTitle>
+            <CardDescription>
+              {t('admin_health.edge_functions_desc', 'Deployed Supabase Edge Functions')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {DEPLOYED_EDGE_FUNCTIONS.map((fn) => (
+                <div key={fn} className="flex items-center gap-1.5 p-2 rounded-lg bg-muted/50">
+                  <Badge variant="outline" className="text-xs px-1 py-0 shrink-0">{t('admin_health.deployed', 'Deployed')}</Badge>
+                  <span className="font-mono text-xs truncate">{fn}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="border-2 border-primary/30">
           <CardHeader>
