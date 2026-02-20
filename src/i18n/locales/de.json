@@ -1533,6 +1533,10 @@
     "reload_page": "Seite neu laden",
     "back_to_home": "Zur Startseite"
   },
+  "not_found": {
+    "message": "Hoppla! Seite nicht gefunden",
+    "back_to_home": "Zur Startseite"
+  },
   "units": {
     "km": "km"
   },
