@@ -40,6 +40,9 @@ export const BookingActions = ({
   // No-show mutation (for chefs)
   const noShowMutation = useMutation({
     mutationFn: async () => {
+      if (currentStatus !== 'confirmed') {
+        throw new Error('Invalid state transition');
+      }
       const { error } = await supabase
         .from('bookings')
         .update({ status: 'no_show' })
@@ -61,6 +64,9 @@ export const BookingActions = ({
   // Chef cancel mutation
   const chefCancelMutation = useMutation({
     mutationFn: async () => {
+      if (!['pending', 'confirmed'].includes(currentStatus)) {
+        throw new Error('Invalid state transition');
+      }
       // Update booking status
       const { error } = await supabase
         .from('bookings')
@@ -126,15 +132,17 @@ export const BookingActions = ({
     <>
       {isChef && (
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowNoShowDialog(true)}
-            className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
-          >
-            <UserX className="w-4 h-4 mr-1" />
-            {t('booking.no_show')}
-          </Button>
+          {currentStatus === 'confirmed' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowNoShowDialog(true)}
+              className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+            >
+              <UserX className="w-4 h-4 mr-1" />
+              {t('booking.no_show')}
+            </Button>
+          )}
           
           <Button
             variant="outline"

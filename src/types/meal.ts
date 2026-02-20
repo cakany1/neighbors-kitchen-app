@@ -37,7 +37,7 @@ export interface Meal {
 export interface Booking {
   id: string;
   mealId: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'cancelled_by_chef' | 'no_show';
   exactAddressRevealed: boolean;
   paymentAmount?: number;
 }
