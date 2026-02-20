@@ -1534,6 +1534,10 @@
     "reload_page": "Reload Page",
     "back_to_home": "Back to Home"
   },
+  "not_found": {
+    "message": "Oops! Page not found",
+    "back_to_home": "Return to Home"
+  },
   "units": {
     "km": "km"
   },
