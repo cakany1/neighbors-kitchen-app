@@ -11,6 +11,7 @@ import {
   Shield, Star, Calendar, AlertTriangle, CreditCard, MessageSquare
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { formatDistance } from '@/utils/distance';
 
 interface UserProfile {
   id: string;
@@ -321,7 +322,7 @@ export function AdminUserProfileDialog({ user, open, onOpenChange, onSendMessage
             />
             <FieldRow 
               label="Benachrichtigungsradius" 
-              value={user.notification_radius ? `${user.notification_radius}m` : null} 
+              value={user.notification_radius ? formatDistance(user.notification_radius) : null} 
               status="neutral" 
             />
           </div>
