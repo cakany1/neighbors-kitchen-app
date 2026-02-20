@@ -1,0 +1,37 @@
+name: Issue Generator
+
+# Parse .ACTIVE_PRIORITY_ISSUES.md and create any missing GitHub Issues.
+# Trigger manually from the Actions tab; optionally enable dry-run first.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — list what would be created without creating anything'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  generate-issues:
+    name: Create Missing GitHub Issues
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Issue Generator
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: node scripts/issue-generator.mjs
