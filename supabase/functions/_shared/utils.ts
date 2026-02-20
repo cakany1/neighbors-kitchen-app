@@ -463,3 +463,34 @@ export async function cleanupRateLimits(maxAgeMs: number = 3600000): Promise<voi
     .delete()
     .lt('created_at', cutoff.toISOString())
 }
+
+// ============= Timeout Guard =============
+
+const DEFAULT_FUNCTION_TIMEOUT_MS = 25_000
+
+/**
+ * Race a promise against a timeout.
+ * Logs and throws an error if the promise does not resolve within timeoutMs.
+ *
+ * Note: The original promise continues running in the background after a timeout.
+ * Callers should use AbortController on fetch() if hard cancellation is required.
+ */
+export async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number = DEFAULT_FUNCTION_TIMEOUT_MS,
+  requestId?: string
+): Promise<T> {
+  // timer is always set synchronously inside the Promise executor before Promise.race runs
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      safeLog(requestId ?? 'timeout', 'error', `Operation timed out after ${timeoutMs}ms`)
+      reject(new Error(`Operation timed out after ${timeoutMs}ms`))
+    }, timeoutMs)
+  })
+  try {
+    return await Promise.race([promise, timeout])
+  } finally {
+    clearTimeout(timer)
+  }
+}

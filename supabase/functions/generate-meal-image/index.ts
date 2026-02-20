@@ -17,7 +17,8 @@ import {
   checkOrigin,
   jsonError,
   getAdminClient,
-  getAnonClient
+  getAnonClient,
+  withTimeout
 } from '../_shared/utils.ts'
 
 Deno.serve(async (req) => {
@@ -66,23 +67,27 @@ Deno.serve(async (req) => {
     safeLog(requestId, 'info', 'Generating image', { userId, mealId: mealId || 'preview' });
 
     // Generate image using Lovable AI
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image",
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        modalities: ["image", "text"]
-      })
-    });
+    const response = await withTimeout(
+      fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash-image",
+          messages: [
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          modalities: ["image", "text"]
+        })
+      }),
+      25_000,
+      requestId
+    );
 
     if (!response.ok) {
       const errorText = await response.text();

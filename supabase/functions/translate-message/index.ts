@@ -14,7 +14,8 @@ import {
   safeLog,
   verifyAuth,
   checkOrigin,
-  jsonError
+  jsonError,
+  withTimeout
 } from '../_shared/utils.ts'
 
 Deno.serve(async (req) => {
@@ -77,26 +78,30 @@ Deno.serve(async (req) => {
       userId: auth.user?.id 
     });
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: `You are a professional translator. Translate the following text from ${sourceLanguage} to ${targetLanguage}. Only return the translated text, nothing else. Keep the same tone and style.`
-          },
-          {
-            role: "user",
-            content: trimmedText
-          }
-        ],
+    const response = await withTimeout(
+      fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            {
+              role: "system",
+              content: `You are a professional translator. Translate the following text from ${sourceLanguage} to ${targetLanguage}. Only return the translated text, nothing else. Keep the same tone and style.`
+            },
+            {
+              role: "user",
+              content: trimmedText
+            }
+          ],
+        }),
       }),
-    });
+      25_000,
+      requestId
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
