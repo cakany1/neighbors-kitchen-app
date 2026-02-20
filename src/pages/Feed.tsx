@@ -35,7 +35,7 @@ const Feed = () => {
   const [filterSameAddress, setFilterSameAddress] = useState(false);
 
   // Fetch current user for allergens
-  const { data: currentUser } = useQuery({
+  const { data: currentUser, isFetched: isUserFetched } = useQuery({
     queryKey: ["currentUser"],
     queryFn: async () => {
       if (isGuestMode) return null; // Skip auth check in guest mode
@@ -50,6 +50,9 @@ const Feed = () => {
       return { ...user, profile };
     },
   });
+
+  // Auto-guest mode: auth check completed and user is not logged in (no ?guest=true needed)
+  const isAutoGuestMode = isUserFetched && !currentUser && !isGuestMode;
 
   // Check if user is admin (skip onboarding for admins unless explicitly requested)
   const { data: isAdmin } = useQuery({
@@ -303,6 +306,27 @@ const Feed = () => {
           </Alert>
         )}
 
+        {/* Guest mode banner: shown to unauthenticated users */}
+        {isAutoGuestMode && (
+          <Alert className="mb-6 border-warning bg-warning/10">
+            <Lock className="h-4 w-4 text-warning" />
+            <AlertDescription className="text-sm flex items-center justify-between gap-2">
+              <span>
+                <strong>{t("feed.guest_login_required")}</strong>{" "}
+                {t("feed.guest_login_desc")}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                className="shrink-0"
+                onClick={() => navigate("/signup")}
+              >
+                {t("feed_page.register_now")}
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-foreground mb-2">{t("feed.available_meals")}</h2>
           <p className="text-muted-foreground">
@@ -429,11 +453,8 @@ const Feed = () => {
                     scheduledDate: meal.scheduled_date,
                   }}
                   onClick={() => {
-                    // Demo meals allow full viewing for guests, real meals require registration
-                    if (isGuestMode && !isDemoMeal) {
-                      setShowGuestModal(true);
-                    } else if (isGuestMode && isDemoMeal) {
-                      // Show full demo meal detail for guests
+                    // Any guest (explicit ?guest=true or unauthenticated) sees registration modal
+                    if (isGuestMode || isAutoGuestMode) {
                       setShowGuestModal(true);
                     } else {
                       navigate(`/meal/${meal.id}`);
