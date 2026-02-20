@@ -15,7 +15,8 @@ import {
   safeLog,
   verifyAuth,
   checkOrigin,
-  jsonError
+  jsonError,
+  withTimeout
 } from '../_shared/utils.ts'
 
 Deno.serve(async (req) => {
@@ -82,44 +83,48 @@ Deno.serve(async (req) => {
     });
 
     // Create Checkout Session with dynamic pricing
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      customer_email: user.email || undefined,
-      line_items: [
-        {
-          price_data: {
-            currency: "chf",
-            product_data: {
-              name: mealTitle || "Nachbarschafts-Gericht",
-              description: `Beitrag an ${chefName || "deinen Nachbarn"}`,
+    const session = await withTimeout(
+      stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        mode: "payment",
+        customer_email: user.email || undefined,
+        line_items: [
+          {
+            price_data: {
+              currency: "chf",
+              product_data: {
+                name: mealTitle || "Nachbarschafts-Gericht",
+                description: `Beitrag an ${chefName || "deinen Nachbarn"}`,
+              },
+              unit_amount: amount,
             },
-            unit_amount: amount,
+            quantity: 1,
           },
-          quantity: 1,
-        },
-        {
-          price_data: {
-            currency: "chf",
-            product_data: {
-              name: "Servicegebühr",
-              description: "Plattform-Betrieb & Sicherheit",
+          {
+            price_data: {
+              currency: "chf",
+              product_data: {
+                name: "Servicegebühr",
+                description: "Plattform-Betrieb & Sicherheit",
+              },
+              unit_amount: serviceFee,
             },
-            unit_amount: serviceFee,
+            quantity: 1,
           },
-          quantity: 1,
+        ],
+        metadata: {
+          meal_id: mealId || "",
+          user_id: user.id,
+          user_email: user.email || "",
+          chef_contribution: amount.toString(),
+          service_fee: serviceFee.toString(),
         },
-      ],
-      metadata: {
-        meal_id: mealId || "",
-        user_id: user.id,
-        user_email: user.email || "",
-        chef_contribution: amount.toString(),
-        service_fee: serviceFee.toString(),
-      },
-      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/payment/${mealId}`,
-    });
+        success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.get("origin")}/payment/${mealId}`,
+      }),
+      25_000,
+      requestId
+    );
 
     safeLog(requestId, 'info', 'Payment session created', { sessionId: session.id });
 

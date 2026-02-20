@@ -17,7 +17,8 @@ import {
   verifyAuth,
   checkOrigin,
   jsonError,
-  jsonSuccess
+  jsonSuccess,
+  withTimeout
 } from '../_shared/utils.ts'
 
 // Rate limit configuration
@@ -86,11 +87,15 @@ Deno.serve(async (req) => {
     // Call OpenStreetMap Nominatim API (free, no API key needed)
     const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressQuery)}&limit=1&countrycodes=ch`;
     
-    const response = await fetch(nominatimUrl, {
-      headers: {
-        'User-Agent': 'NeighborsKitchen/1.0 (Food sharing app for Basel)',
-      },
-    });
+    const response = await withTimeout(
+      fetch(nominatimUrl, {
+        headers: {
+          'User-Agent': 'NeighborsKitchen/1.0 (Food sharing app for Basel)',
+        },
+      }),
+      10_000,
+      requestId
+    );
 
     if (!response.ok) {
       throw new Error(`Nominatim API error: ${response.status}`);
