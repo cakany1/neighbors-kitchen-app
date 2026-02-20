@@ -1,0 +1,44 @@
+name: release-checklist-comment
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  checklist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post release checklist comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = context.payload.pull_request.number;
+
+            const header = "## Release Checklist (Phase 1)";
+            const body = `${header}
+
+- [ ] PR title starts with the Issue number or PR links to "Closes #<id>"
+- [ ] Scope matches issue (no extra files)
+- [ ] If touches:i18n-json: verify no other open PR touches i18n JSON
+- [ ] CI is green: bun run build + bun run lint
+- [ ] Manual smoke test done (3–5 minutes) OR explicitly documented why not
+- [ ] After merge: confirm docs-sync PR updates .SPRINT_STATUS.md + .ACTIVE_PRIORITY_ISSUES.md
+`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number, per_page: 100
+            });
+
+            const exists = comments.some(c => c.body && c.body.includes(header));
+            if (exists) return;
+
+            await github.rest.issues.createComment({
+              owner, repo, issue_number,
+              body
+            });
