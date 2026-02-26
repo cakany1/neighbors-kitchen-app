@@ -1,19 +1,15 @@
 ﻿name: docs-sync-status-files
-
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-
 concurrency:
   group: docs-sync-status-files
   cancel-in-progress: true
-
 permissions:
   contents: write
   pull-requests: write
   issues: read
-
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -23,12 +19,10 @@ jobs:
         with:
           persist-credentials: true
           token: ${{ secrets.DOCS_SYNC_TOKEN }}
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Generate updated dotfiles
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -36,7 +30,6 @@ jobs:
           SHA: ${{ github.sha }}
         run: |
           node scripts/docs_sync.mjs
-
       - name: Create PR with updates
         uses: peter-evans/create-pull-request@v6
         with:
@@ -45,11 +38,9 @@ jobs:
           title: "ISSUE 0 - docs: sync status files"
           body: |
             Auto-generated after merge to main.
-
             Updated:
             - .SPRINT_STATUS.md
             - .ACTIVE_PRIORITY_ISSUES.md
-
             Note:
             - .PROJECT_CONTEXT.md is NOT auto-updated.
           branch: docs/auto-sync
