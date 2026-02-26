@@ -1,4 +1,4 @@
-name: docs-sync-status-files
+﻿name: docs-sync-status-files
 
 on:
   push:
@@ -9,7 +9,6 @@ concurrency:
   group: docs-sync-status-files
   cancel-in-progress: true
 
-# Wir lassen die Permissions drin, auch wenn die Org sie teilweise blockt.
 permissions:
   contents: write
   pull-requests: write
@@ -22,7 +21,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Geändert: Credentials speichern und PAT nutzen für Git-Auth
           persist-credentials: true
           token: ${{ secrets.DOCS_SYNC_TOKEN }}
 
@@ -33,12 +31,12 @@ jobs:
 
       - name: Generate updated dotfiles
         env:
-          # GITHUB_TOKEN für Read-Access im Script
           GITHUB_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           SHA: ${{ github.sha }}
         run: |
           node scripts/docs_sync.mjs
+
       - name: Create PR with updates
         uses: peter-evans/create-pull-request@v6
         with:
