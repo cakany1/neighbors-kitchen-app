@@ -30,6 +30,13 @@ jobs:
           SHA: ${{ github.sha }}
         run: |
           node scripts/docs_sync.mjs
+      - name: Validate DOCS_SYNC_TOKEN can access repo
+        env:
+          GH_TOKEN: ${{ secrets.DOCS_SYNC_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }} > /dev/null
+          echo "DOCS_SYNC_TOKEN OK   
+          
       - name: Create PR with updates
         uses: peter-evans/create-pull-request@v6
         with:
