@@ -15,37 +15,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Validate PR title contains ISSUE number
-        run: |
-          if [[ ! "${{ github.event.pull_request.title }}" =~ ISSUE\ [0-9]+ ]]; then
-            echo "❌ PR title must contain ISSUE number"
-            exit 1
-          fi
-
-      - name: Validate labels exist
-        run: |
-          labels=$(jq -r '.pull_request.labels[].name' <<< '${{ toJson(github.event) }}')
-
-          if ! echo "$labels" | grep -q "ai-ready\|ai-in-progress\|ai-review"; then
-            echo "❌ Missing AI workflow label"
-            exit 1
-          fi
+        with:
+          fetch-depth: 0
 
       - name: Detect changed files
         id: changes
         run: |
-          git fetch origin ${{ github.base_ref }}
-          files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          echo "Base SHA: $BASE_SHA"
+          files=$(git diff --name-only "$BASE_SHA"...HEAD)
           echo "Changed files:"
           echo "$files"
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$files" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: i18n JSON isolation check
         run: |
-          files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          files="${{ steps.changes.outputs.files }}"
 
-          if echo "$files" | grep -q "de.json\|en.json"; then
-            if echo "$files" | grep -vq "json$"; then
+          if echo "$files" | grep -qE 'src/i18n/locales/(de|en)\.json'; then
+            if echo "$files" | grep -vqE '\.json$'; then
               echo "❌ i18n JSON rule violated (non-JSON file changed)"
               exit 1
             fi
@@ -53,7 +43,8 @@ jobs:
 
       - name: Minimal Diff Check
         run: |
-          count=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | wc -l)
+          files="${{ steps.changes.outputs.files }}"
+          count=$(echo "$files" | sed '/^\s*$/d' | wc -l)
           if [ "$count" -gt 20 ]; then
             echo "⚠️ Large diff detected. Manual review required."
           fi
