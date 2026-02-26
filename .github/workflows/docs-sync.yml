@@ -26,7 +26,7 @@ jobs:
 
       - name: Generate updated dotfiles
         env:
-          GITHUB_TOKEN: ${{ secrets.DOCS_SYNC_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           SHA: ${{ github.sha }}
         run: |
