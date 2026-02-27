@@ -37,7 +37,7 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      # --- WARNING ONLY: title + AI label (keine Blocker) ---
+      # --- WARNING ONLY: title + AI label ---
 
       - name: Title contains ISSUE <n> (warning-only)
         run: |
@@ -46,7 +46,7 @@ jobs:
           if echo "$TITLE" | grep -iEq '\bISSUE[[:space:]]+[0-9]+\b'; then
             echo "✅ Title contains ISSUE number."
           else
-            echo "⚠️ Title missing ISSUE <n> (recommended, but not blocking)."
+            echo "⚠️ Title missing ISSUE <n> (recommended, not blocking)."
           fi
 
       - name: AI label present (warning-only)
@@ -65,7 +65,7 @@ jobs:
             echo "⚠️ Missing AI workflow label (ai-ready / ai-in-progress / ai-done)."
           fi
 
-      # --- BLOCKING: Traceability via PR BODY ---
+      # --- BLOCKING: Traceability via PR BODY (strict) ---
 
       - name: Validate PR body contains issue link (blocking)
         env:
@@ -73,7 +73,6 @@ jobs:
         run: |
           set -euo pipefail
           body="${PR_BODY:-}"
-          # require: Closes/Fixes/Resolves #<id>
           if ! echo "$body" | grep -iEq '\b(close[sd]?|fix(es|ed)?|resolve[sd]?)\s+#[0-9]+\b'; then
             echo "❌ PR body must contain an issue link (e.g. 'Closes #42', 'Fixes #42', 'Resolves #42')"
             exit 1
@@ -86,18 +85,11 @@ jobs:
         run: |
           set -euo pipefail
           body="${PR_BODY:-}"
-
-          # Accept a simple deterministic pattern. Keep it strict, but easy for AI.
-          # Required: either "Parallelisierbar: YES" or "Parallelisierbar: NO" plus optional blocker line.
           if echo "$body" | grep -Eq 'Parallelisierbar:\s*(YES|NO)'; then
             echo "✅ Parallelization statement present."
           else
             echo "❌ Missing parallelization statement in PR body."
-            echo "Add e.g.:"
-            echo "Parallelisierbar: YES"
-            echo "or"
-            echo "Parallelisierbar: NO"
-            echo "Blockiert durch: #<id> / PR #<id>"
+            echo "Add e.g.: Parallelisierbar: YES  OR  Parallelisierbar: NO + Blockiert durch: #<id>/PR #<id>"
             exit 1
           fi
 
@@ -107,7 +99,6 @@ jobs:
         run: |
           set -euo pipefail
           files="${{ steps.changes.outputs.files }}"
-
           if echo "$files" | grep -qE 'src/i18n/locales/(de|en)\.json'; then
             if echo "$files" | grep -vqE '\.json$'; then
               echo "❌ i18n JSON rule violated (non-JSON file changed in same PR)"
@@ -116,7 +107,7 @@ jobs:
           fi
           echo "✅ i18n JSON isolation OK."
 
-      # --- BLOCKING: minimal diff (file count gate, wie aktuell) ---
+      # --- BLOCKING: minimal diff (file count) ---
 
       - name: Minimal Diff Check (blocking)
         run: |
