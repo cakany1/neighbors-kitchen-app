@@ -1,0 +1,71 @@
+name: "Morgendlicher Slack Status-Report"
+
+on:
+  schedule:
+    - cron: '0 6 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    # Wir definieren die Variablen hier auf Job-Ebene vor, damit GitHub sie "kennt"
+    env:
+      SKIP_REPORT: false
+      ISSUES_CONTENT: ""
+      SPRINT_CONTENT: ""
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Urlaubs-Check
+        id: vacation_check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PAUSE_COUNT=$(gh issue list --search "Urlaub Pause" --state open --count)
+          if [ "$PAUSE_COUNT" -gt 0 ]; then
+            echo "SKIP_REPORT=true" >> $GITHUB_ENV
+          else
+            echo "SKIP_REPORT=false" >> $GITHUB_ENV
+          fi
+
+      - name: Daten aus Markdown extrahieren
+        # Hier nutzen wir env.SKIP_REPORT direkt im Check
+        if: env.SKIP_REPORT != 'true'
+        run: |
+          # Extraktion und Säuberung für Slack (JSON safe)
+          ISSUES=$(head -n 20 .ACTIVE_PRIORITY_ISSUES.md | tr -d '\r' | sed 's/"/\\"/g')
+          SPRINT=$(head -n 20 .SPRINT_STATUS.md | tr -d '\r' | sed 's/"/\\"/g')
+          
+          {
+            echo "ISSUES_CONTENT<<EOF"
+            echo "$ISSUES"
+            echo "EOF"
+            echo "SPRINT_CONTENT<<EOF"
+            echo "$SPRINT"
+            echo "EOF"
+          } >> $GITHUB_ENV
+
+      - name: Sende Nachricht an Slack Webhook
+        # Wichtig: Der Zugriff erfolgt über ${{ env.VAR }}
+        if: env.SKIP_REPORT != 'true'
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{
+            \"text\": \"☕ *Guten Morgen! Dein GitHub-Update ist da.*\",
+            \"blocks\": [
+              {
+                \"type\": \"header\",
+                \"text\": { \"type\": \"plain_text\", \"text\": \"🚀 Projekt-Status (Mo-Fr)\" }
+              },
+              {
+                \"type\": \"section\",
+                \"text\": { \"type\": \"mrkdwn\", \"text\": \"*Aktuelle Prioritäten:* \n\`\`\`${{ env.ISSUES_CONTENT }}\`\`\`\" }
+              },
+              {
+                \"type\": \"section\",
+                \"text\": { \"type\": \"mrkdwn\", \"text\": \"*Sprint Status:* \n\`\`\`${{ env.SPRINT_CONTENT }}\`\`\`\" }
+              }
+            ]
+          }" ${{ secrets.SLACK_WEBHOOK_URL }}
