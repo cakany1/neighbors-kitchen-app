@@ -8,7 +8,6 @@ on:
 jobs:
   report:
     runs-on: ubuntu-latest
-    # Wir definieren die Variablen hier auf Job-Ebene vor, damit GitHub sie "kennt"
     env:
       SKIP_REPORT: false
       ISSUES_CONTENT: ""
@@ -23,18 +22,21 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PAUSE_COUNT=$(gh issue list --search "Urlaub Pause" --state open --count)
+          # Wir fragen die Issues als JSON ab und zählen die Einträge im Array
+          PAUSE_COUNT=$(gh issue list --search "Urlaub Pause" --state open --json number --jq 'length')
+          
           if [ "$PAUSE_COUNT" -gt 0 ]; then
             echo "SKIP_REPORT=true" >> $GITHUB_ENV
+            echo "Urlaubsmodus aktiv ($PAUSE_COUNT Issues gefunden)."
           else
             echo "SKIP_REPORT=false" >> $GITHUB_ENV
+            echo "Kein Urlaubssignal gefunden."
           fi
 
       - name: Daten aus Markdown extrahieren
-        # Hier nutzen wir env.SKIP_REPORT direkt im Check
         if: env.SKIP_REPORT != 'true'
         run: |
-          # Extraktion und Säuberung für Slack (JSON safe)
+          # Extraktion der ersten 20 Zeilen, Backslashes für Slack-JSON maskieren
           ISSUES=$(head -n 20 .ACTIVE_PRIORITY_ISSUES.md | tr -d '\r' | sed 's/"/\\"/g')
           SPRINT=$(head -n 20 .SPRINT_STATUS.md | tr -d '\r' | sed 's/"/\\"/g')
           
@@ -48,7 +50,6 @@ jobs:
           } >> $GITHUB_ENV
 
       - name: Sende Nachricht an Slack Webhook
-        # Wichtig: Der Zugriff erfolgt über ${{ env.VAR }}
         if: env.SKIP_REPORT != 'true'
         run: |
           curl -X POST -H 'Content-type: application/json' \
