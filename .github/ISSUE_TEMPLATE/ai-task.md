@@ -32,7 +32,38 @@ Lint must pass: `bun run lint`
 
 ---
 
+## PR Requirements (mandatory)
+
+When opening a PR for this issue:
+
+- PR Title MUST start with: `ISSUE <number> – <short title>`
+- PR Body MUST include as first lines:
+
+Closes #<number>
+
+Parallelisierbar: YES/NO  
+Blockiert durch: #<id> / PR #<id> (if NO)  
+touches:i18n-json: YES/NO
+
+---
+
 ## Implementation Rules
+
+- Minimal diff. No refactors or formatting-only changes.
+- 1 issue → 1 PR.
+- If required information is missing: STOP AND REPORT.
+
+---
+
+## Allowed Files (if applicable)
+
+- src/**
+- supabase/**
+- .github/**
+- scripts/**
+- docs/**
+
+If changes are needed outside this list: STOP AND REPORT.
 
 ---
 
@@ -50,4 +81,3 @@ Lint must pass: `bun run lint`
 - Area: area:frontend / area:backend / area:infra / area:docs (exactly one)
 - Workflow: ai-ready / ai-in-progress / ai-review / blocked (optional)
 - Collision: touches:* (optional, use as needed)
-
