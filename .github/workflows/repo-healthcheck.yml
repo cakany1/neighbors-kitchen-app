@@ -1,0 +1,40 @@
+name: Repo Healthcheck
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 6 * * *"  # ~07:30 Europe/Zurich (UTC)
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+
+jobs:
+  healthcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ github.token }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run healthcheck
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_API_URL: ${{ github.api_url }}
+          GITHUB_STEP_SUMMARY: ${{ github.step_summary }}
+        run: node scripts/repo_healthcheck.mjs
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-healthcheck
+          path: repo-healthcheck-report.md
