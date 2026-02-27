@@ -45,9 +45,8 @@ jobs:
       - name: Install
         run: bun install
 
-      - name: Run tests
-        run: bun test || echo "No tests found"
-        continue-on-error: true
+      - name: Run unit tests (src only)
+        run: bash -lc 'if [ -d src ]; then bun test src || echo "No unit tests found under src/."; else echo "No src/ directory; skipping unit tests."; fi'
 
   edge-functions-check:
     name: Edge Functions Syntax Check
