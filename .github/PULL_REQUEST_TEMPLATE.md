@@ -1,5 +1,13 @@
 ## 🔍 Mandatory Technical Review
 
+## Traceability (required)
+Closes #<id>
+
+## Parallelisierung / Abhängigkeiten (required)
+- Parallelisierbar: YES / NO
+- Blockiert durch: #<id> / PR #<id> (falls NO)
+- touches:i18n-json: YES / NO
+
 @copilot review using structured 9-criteria gate:
 
 Generate a SINGLE COPY-PASTE MARKDOWN BLOCK for ChatGPT technical review.
