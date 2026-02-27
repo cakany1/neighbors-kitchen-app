@@ -1,5 +1,9 @@
 name: PR Self Check
 
+defaults:
+  run:
+    shell: bash
+
 on:
   pull_request:
     types: [opened, synchronize, reopened]
