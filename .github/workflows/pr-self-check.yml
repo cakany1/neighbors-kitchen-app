@@ -6,11 +6,11 @@ defaults:
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
 
 permissions:
   contents: read
-  pull-requests: write
+  pull-requests: read
 
 jobs:
   self-check:
@@ -21,36 +21,112 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ github.token }}
 
       - name: Detect changed files
         id: changes
         run: |
+          set -euo pipefail
           BASE_SHA="${{ github.event.pull_request.base.sha }}"
-          echo "Base SHA: $BASE_SHA"
-          files=$(git diff --name-only "$BASE_SHA"...HEAD)
+          files=$(git diff --name-only "$BASE_SHA"...HEAD || true)
           echo "Changed files:"
           echo "$files"
-          echo "files<<EOF" >> $GITHUB_OUTPUT
-          echo "$files" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "files<<EOF"
+            echo "$files"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
-      - name: i18n JSON isolation check
+      # --- WARNING ONLY: title + AI label (keine Blocker) ---
+
+      - name: Title contains ISSUE <n> (warning-only)
         run: |
+          set -euo pipefail
+          TITLE="${{ github.event.pull_request.title }}"
+          if echo "$TITLE" | grep -iEq '\bISSUE[[:space:]]+[0-9]+\b'; then
+            echo "✅ Title contains ISSUE number."
+          else
+            echo "⚠️ Title missing ISSUE <n> (recommended, but not blocking)."
+          fi
+
+      - name: AI label present (warning-only)
+        run: |
+          set -euo pipefail
+          labels_json='${{ toJson(github.event.pull_request.labels) }}'
+          if command -v jq >/dev/null 2>&1; then
+            names=$(echo "$labels_json" | jq -r '.[].name' 2>/dev/null || true)
+          else
+            names=""
+          fi
+
+          if echo "$names" | grep -qE '^ai-(ready|in-progress|done)$'; then
+            echo "✅ AI workflow label present."
+          else
+            echo "⚠️ Missing AI workflow label (ai-ready / ai-in-progress / ai-done)."
+          fi
+
+      # --- BLOCKING: Traceability via PR BODY ---
+
+      - name: Validate PR body contains issue link (blocking)
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+          body="${PR_BODY:-}"
+          # require: Closes/Fixes/Resolves #<id>
+          if ! echo "$body" | grep -iEq '\b(close[sd]?|fix(es|ed)?|resolve[sd]?)\s+#[0-9]+\b'; then
+            echo "❌ PR body must contain an issue link (e.g. 'Closes #42', 'Fixes #42', 'Resolves #42')"
+            exit 1
+          fi
+          echo "✅ Traceability OK (body contains Closes/Fixes/Resolves #<id>)."
+
+      - name: Validate parallelization / dependency declared (blocking)
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+          body="${PR_BODY:-}"
+
+          # Accept a simple deterministic pattern. Keep it strict, but easy for AI.
+          # Required: either "Parallelisierbar: YES" or "Parallelisierbar: NO" plus optional blocker line.
+          if echo "$body" | grep -Eq 'Parallelisierbar:\s*(YES|NO)'; then
+            echo "✅ Parallelization statement present."
+          else
+            echo "❌ Missing parallelization statement in PR body."
+            echo "Add e.g.:"
+            echo "Parallelisierbar: YES"
+            echo "or"
+            echo "Parallelisierbar: NO"
+            echo "Blockiert durch: #<id> / PR #<id>"
+            exit 1
+          fi
+
+      # --- BLOCKING: i18n JSON isolation ---
+
+      - name: i18n JSON isolation check (blocking)
+        run: |
+          set -euo pipefail
           files="${{ steps.changes.outputs.files }}"
 
           if echo "$files" | grep -qE 'src/i18n/locales/(de|en)\.json'; then
             if echo "$files" | grep -vqE '\.json$'; then
-              echo "❌ i18n JSON rule violated (non-JSON file changed)"
+              echo "❌ i18n JSON rule violated (non-JSON file changed in same PR)"
               exit 1
             fi
           fi
+          echo "✅ i18n JSON isolation OK."
 
-      - name: Minimal Diff Check
+      # --- BLOCKING: minimal diff (file count gate, wie aktuell) ---
+
+      - name: Minimal Diff Check (blocking)
         run: |
+          set -euo pipefail
           files="${{ steps.changes.outputs.files }}"
-          count=$(echo "$files" | sed '/^\s*$/d' | wc -l)
-          if [ "$count" -gt 20 ]; then
-            echo "⚠️ Large diff detected. Manual review required."
+          count=$(echo "$files" | sed '/^\s*$/d' | wc -l | tr -d ' ')
+          echo "Changed file count: $count"
+          if [ "${count:-0}" -gt 20 ]; then
+            echo "❌ Large diff detected (>20 files). Manual review required."
+            exit 1
           fi
 
       - name: Success
