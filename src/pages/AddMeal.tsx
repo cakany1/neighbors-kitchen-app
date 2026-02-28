@@ -183,11 +183,10 @@ const AddMeal = () => {
       setFormData({
         title: editMeal.title || '',
         description: editMeal.description || '',
-        ingredients: editMeal.ingredients || '',
+        ingredients: Array.isArray(editMeal.ingredients) ? editMeal.ingredients.join(', ') : (editMeal.ingredients || ''),
         restaurantReferencePrice: editMeal.restaurant_reference_price ? (editMeal.restaurant_reference_price / 100).toFixed(2) : '',
-        estimatedValue: editMeal.estimated_restaurant_value ? (editMeal.estimated_restaurant_value / 100).toFixed(2) : '',
         portions: String(editMeal.available_portions || 1),
-        scheduledDate: editMeal.scheduled_for ? new Date(editMeal.scheduled_for).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        scheduledDate: editMeal.scheduled_date ? new Date(editMeal.scheduled_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         collectionWindowStart: editMeal.collection_window_start || '',
         collectionWindowEnd: editMeal.collection_window_end || '',
       });
@@ -195,15 +194,14 @@ const AddMeal = () => {
       setTags(editMeal.tags || []);
       setSelectedAllergens(editMeal.allergens || []);
       setWomenOnly(editMeal.women_only || false);
-      setVerifiedOnly(editMeal.verified_only || false);
-      setVisibilityRadius(editMeal.visibility_radius_km || null);
-      setContainerPolicy(editMeal.container_policy || 'either_ok');
-      setBarterText(editMeal.barter_text || '');
+      setVisibilityRadius(editMeal.visibility_radius || null);
+      setContainerPolicy((editMeal.container_policy as 'bring_container' | 'either_ok' | 'plate_ok') || 'either_ok');
+      setBarterText(editMeal.barter_requests?.join(', ') || '');
       
       // Set exchange options
       const options: string[] = [];
       if (editMeal.restaurant_reference_price) options.push('online');
-      if (editMeal.barter_text) options.push('barter');
+      if (editMeal.barter_requests?.length) options.push('barter');
       setSelectedExchangeOptions(options);
     }
   }, [editMeal, isEditMode]);
