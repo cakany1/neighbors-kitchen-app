@@ -380,14 +380,11 @@ const MealDetail = () => {
     mutationFn: async () => {
       if (!currentUser?.id || !meal) throw new Error("Missing user or meal");
 
-      // Check if user is admin deleting another user's meal
-      const isAdminDelete = (currentUser as any).isAdmin && currentUser.id !== meal.chef_id;
-
       // Call server-side function that handles karma penalty
+      // Admin check is done server-side via has_role() - no client flag needed
       const { data, error } = await supabase.rpc("delete_meal_with_karma", {
         p_meal_id: meal.id,
         p_user_id: currentUser.id,
-        p_is_admin: isAdminDelete, // Admin delete = no karma penalty
       });
 
       if (error) throw error;
