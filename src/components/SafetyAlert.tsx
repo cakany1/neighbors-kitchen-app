@@ -30,12 +30,9 @@ export const SafetyAlert = ({ matchingAllergens, className = '' }: SafetyAlertPr
       <AlertCircle className="h-5 w-5 text-alert-danger" />
       <AlertDescription>
         <strong className="text-alert-danger text-base">{t('safety_alert.warning_title')}</strong>
-        <p
-          className="text-sm mt-1"
-          dangerouslySetInnerHTML={{
-            __html: t('safety_alert.warning_contains', { allergens: allergenLabels }),
-          }}
-        />
+        <p className="text-sm mt-1">
+          {t('safety_alert.warning_contains', { allergens: allergenLabels })}
+        </p>
         <p className="text-xs mt-2 text-muted-foreground">
           {t('safety_alert.warning_verify')}
         </p>
